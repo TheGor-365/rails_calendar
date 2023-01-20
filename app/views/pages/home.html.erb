@@ -1,8 +1,30 @@
 <div class="container mt-5 text-center">
   <h1>Consultations</h1>
-  <%= month_calendar(events: @consultations) do |date| %>
+  <%= month_calendar(events: @consultations) do |date, consultations| %>
     <div class="day">
       <%= date %>
     </div>
+    <% consultations.each do |consultation| %>
+      <div class="card-header">
+        <div class="card-title">
+          <%= link_to consultation.title, consultation %>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-text">
+          <%= consultation.description %>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-text">
+          <small class="text-muted">
+            From: <%= consultation.start_time.strftime('%A, %B, %d, %Y,  at %I:%M %p') %>
+          </small><br>
+          <small class="text-muted">
+            To: <%= consultation.end_time.strftime('%A, %B, %d, %Y,  at %I:%M %p') %>
+          </small>
+        </div>
+      </div>
+    <% end %>
   <% end %>
 </div>
