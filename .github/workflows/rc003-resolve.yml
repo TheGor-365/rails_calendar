@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - upgrade/rc-003-ruby-3-4-rails-8-1-2026-11-06
+  pull_request:
+    branches:
+      - feature/rc-002-admin-access-2026-11-06
 
 permissions:
   contents: read
