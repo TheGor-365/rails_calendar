@@ -53,7 +53,9 @@ class ConsultationsTest < ApplicationSystemTestCase
   test "administrator can destroy consultation" do
     sign_in_as_admin
     visit consultation_url(@consultation)
-    click_on "Destroy this consultation"
+    accept_confirm "Delete this consultation?" do
+      click_on "Destroy this consultation"
+    end
 
     assert_text "Consultation was successfully destroyed"
   end
