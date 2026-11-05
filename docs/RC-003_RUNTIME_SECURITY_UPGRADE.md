@@ -30,3 +30,23 @@ Date: 2026-11-06. **Audit baseline, not a completed upgrade.** Educational/demo 
 - `main`, prior Draft PR #1/#2 and Railway must not be modified.
 - Do not set external admin secrets or copy private user/consultation data to public logs.
 - Do not treat green functional CI as zero vulnerabilities. Review the Ruby and Yarn audit logs to update this document with evidence.
+
+## Verified vulnerability scan — 2026-11-06
+
+[Audit CI run #42131679203](https://github.com/TheGor-365/rails_calendar/actions/runs/42131679203) executed against the **existing**, unmodified lockfiles. Both independent audit jobs completed with a non-zero exit code because advisories were found. This is a known security failure, not an audit-tool crash.
+
+| Scanner | Results | Confirmed severity |
+| --- | --- | --- |
+| bundler-audit 0.9.3 / ruby-advisory-db as of 2026-11-04 | **146 advisory records** across 23 locked Ruby packages | 1 critical, 27 high, 58 medium, 9 low, 51 unclassified/unknown |
+| yarn audit (Yarn 1.22.22) | **9 advisories**, 48 packages audited | 6 high, 2 moderate, 1 low |
+
+High-priority Ruby examples (individual advisory applicability to reachable application paths still requires confirmation):
+- `activestorage 7.0.4.1`: [GHSA-f3w6-w445-fwh9](https://github.com/rails/rails/security/advisories/GHSA-f3w6-w445-fwh9) **critical** arbitrary file read/write; [GHSA-v924-7rp8-4mxh](https://github.com/rails/rails/security/advisories/GHSA-v924-7rp8-4mxh) **high** arbitrary read/RCE.
+- `actionpack 7.0.4.1`: [GHSA-wm3x-v3qw-4jh3](https://github.com/rails/rails/security/advisories/GHSA-wm3x-v3qw-4jh3) **high** strong-parameters bypass.
+- `activesupport 7.0.4.1`: [GHSA-8474-xrp6-wh69](https://github.com/rails/rails/security/advisories/GHSA-8474-xrp6-wh69) **high** denial of service.
+- `nokogiri 1.14.0`: multiple security advisories including [GHSA-c4rq-3m3g-8wgx](https://github.com/advisories/GHSA-c4rq-3m3g-8wgx) **high**.
+- `puma 5.6.5`: [GHSA-qpgp-93vx-g8v8](https://github.com/advisories/GHSA-qpgp-93vx-g8v8) **high** memory exhaustion in PROXY v1 parser.
+
+JavaScript findings concentrate around the old `sass` dependency tree: `braces`, `picomatch`, `immutable`, and `source-map-js`. The Yarn scanner exited 14 because high-severity issues were detected; no automatic fixes or lockfile modifications were performed.
+
+**Conclusion:** no public deployment, no merge until remediation and follow-up zero-unreviewed-high/critical audit. The 146 advisories are *not* 146 proven exploitable application vulnerabilities; they are dependency advisories requiring remediation/triage.
