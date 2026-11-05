@@ -20,15 +20,15 @@ credentials, put them in client-side JavaScript, or paste them into issues.
 Administrators sign in via /admin/login. The application does not seed an admin
 password or automatically generate one.
 
-## Legacy baseline and remaining release blockers
+## Runtime upgrade in progress (RC-003) and remaining release blockers
 
-- Ruby 3.1.2 / Rails 7.0.4.1 are end-of-life. Upgrade before public production.
+- Upgrade candidate: Ruby 3.4.12 / Rails 8.1.4.1, locked on the RC-003 draft branch and passed isolated CI; PR #3 is not merged.
 - PostgreSQL, Turbo/Stimulus, Bootstrap, esbuild/Sass, simple_calendar 2.4.3.
 - Existing database config is local-development-oriented; production credentials,
   DB connectivity, backup/rollback, HTTPS and secure session cookies require review.
 - Login attempt rate limiting, dependency/security audits, legacy invalid data
   assessment, and staging/browser smoke validation are release gates.
-- The repository is not production-ready merely because CI passes.
+- The repository is not production-ready merely because CI passes. See Draft PR #3 and the security audit workflow.
 
 ## Local development (isolated DB only)
 
