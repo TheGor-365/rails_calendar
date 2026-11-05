@@ -1,0 +1,31 @@
+# Temporary read-only lock generator; removed after lockfile commit.
+name: RC-003 resolve patched frontend packages
+
+on:
+  pull_request:
+    branches:
+      - feature/rc-002-admin-access-2026-11-06
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Refresh lock for patched Turbo/esbuild
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn install
+          yarn build
+          yarn build:css
+          echo "RC003_FRONTEND_LOCK_BEGIN"
+          base64 -w0 yarn.lock
+          echo ""
+          echo "RC003_FRONTEND_LOCK_END"
