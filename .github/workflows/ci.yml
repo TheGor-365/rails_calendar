@@ -60,3 +60,6 @@ jobs:
 
       - name: Run model and controller tests
         run: bin/rails test
+
+      - name: Run browser system tests
+        run: bin/rails test:system
