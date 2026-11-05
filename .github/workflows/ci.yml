@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Legacy pinned Ruby; upgrade is an explicit follow-up gate.
+      # Legacy pinned Ruby; upgrading is a separate release gate.
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
@@ -60,6 +60,20 @@ jobs:
 
       - name: Run model and controller tests
         run: bin/rails test
+
+      - uses: browser-actions/setup-chrome@v2
+        id: browser
+        with:
+          chrome-version: stable
+          install-chromedriver: true
+
+      - name: Configure legacy webdrivers gem with matching ChromeDriver
+        run: |
+          mkdir -p "$HOME/.webdrivers"
+          cp "${{ steps.browser.outputs.chromedriver-path }}" "$HOME/.webdrivers/chromedriver"
+          chmod +x "$HOME/.webdrivers/chromedriver"
+          echo "CI_CHROMEDRIVER_VERSION=${{ steps.browser.outputs.chromedriver-version }}" >> "$GITHUB_ENV"
+          echo "WD_CHROME_PATH=${{ steps.browser.outputs.chrome-path }}" >> "$GITHUB_ENV"
 
       - name: Run browser system tests
         run: bin/rails test:system
