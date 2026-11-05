@@ -1,13 +1,13 @@
 ENV["RAILS_ENV"] ||= "test"
+
+# Test-only fixture credentials. NEVER use these in a deployed environment.
+ENV["RAILS_CALENDAR_ADMIN_USERNAME"] ||= "test-admin"
+ENV["RAILS_CALENDAR_ADMIN_PASSWORD"] ||= "test-only-not-for-deployment-password"
+
 require_relative "../config/environment"
 require "rails/test_help"
 
 class ActiveSupport::TestCase
-  # Run tests in parallel with specified workers
   parallelize(workers: :number_of_processors)
-
-  # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
-
-  # Add more helper methods to be used by all tests here...
 end

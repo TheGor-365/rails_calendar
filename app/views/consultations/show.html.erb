@@ -2,9 +2,12 @@
   <%= render @consultation %>
 
   <div>
-    <%= link_to "Edit this consultation", edit_consultation_path(@consultation) %><br>
     <%= link_to "Back to consultations", consultations_path %>
 
-    <%= button_to "Destroy this consultation", @consultation, method: :delete %>
+    <% if admin_signed_in? %>
+      <%= link_to "Edit this consultation", edit_consultation_path(@consultation) %>
+      <%= button_to "Destroy this consultation", @consultation, method: :delete,
+                    data: { turbo_confirm: "Delete this consultation?" } %>
+    <% end %>
   </div>
 </div>

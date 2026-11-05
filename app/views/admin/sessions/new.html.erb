@@ -1,0 +1,16 @@
+<div class="container mt-4">
+  <h1>Administrator sign-in</h1>
+  <p>Consultation management is restricted to the administrator.</p>
+
+  <%= form_with url: admin_session_path, method: :post, local: true do |form| %>
+    <div class="mb-3">
+      <%= form.label :username, "Username" %>
+      <%= form.text_field :username, required: true, autocomplete: "username", class: "form-control" %>
+    </div>
+    <div class="mb-3">
+      <%= form.label :password, "Password" %>
+      <%= form.password_field :password, required: true, autocomplete: "current-password", class: "form-control" %>
+    </div>
+    <%= form.submit "Sign in", class: "btn btn-primary" %>
+  <% end %>
+</div>

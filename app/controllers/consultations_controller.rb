@@ -1,5 +1,8 @@
 class ConsultationsController < ApplicationController
-  before_action :set_consultation, only: %i[ show edit update destroy ]
+  # Public calendar/list/details; all administrative forms and mutations
+  # require a valid server-side authorization check.
+  before_action :require_admin!, except: %i[index show]
+  before_action :set_consultation, only: %i[show edit update destroy]
 
   def index
     @consultations = Consultation.all
