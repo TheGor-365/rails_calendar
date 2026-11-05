@@ -7,7 +7,7 @@ gem "rails", "= 8.1.4.1"
 
 gem "sprockets-rails"
 gem "pg", "~> 1.5"
-gem "puma", "~> 6.0"
+gem "puma", "~> 8.0", ">= 8.0.2"
 gem "jsbundling-rails"
 gem "turbo-rails"
 gem "stimulus-rails"
