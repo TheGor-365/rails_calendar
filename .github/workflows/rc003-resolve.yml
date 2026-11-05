@@ -1,0 +1,29 @@
+# Temporary read-only dependency lock resolution. Remove after lockfile is committed.
+name: RC-003 resolve Gemfile.lock
+
+on:
+  push:
+    branches:
+      - upgrade/rc-003-ruby-3-4-rails-8-1-2026-11-06
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: false
+      - name: Resolve dependencies without writing to repository
+        run: |
+          bundle lock --update
+          bundle check || bundle install
+          echo "RC003_LOCK_BEGIN"
+          base64 -w0 Gemfile.lock
+          echo ""
+          echo "RC003_LOCK_END"
