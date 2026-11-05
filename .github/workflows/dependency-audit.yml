@@ -1,0 +1,43 @@
+name: RC-003 dependency security baseline
+
+on:
+  push:
+    branches:
+      - feature/rc-003-*
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ruby_advisories:
+    name: Ruby dependency advisory scan
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.12'
+          bundler-cache: false
+      - name: Install audit tool (no dependency upgrade)
+        run: gem install bundler-audit -v 0.9.3 --no-document
+      - name: Check committed Gemfile.lock against current advisories
+        run: bundle-audit check --update
+
+  javascript_advisories:
+    name: JavaScript dependency advisory scan
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Yarn classic (no lockfile changes)
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+      - name: Check committed yarn.lock against registry advisories
+        run: yarn audit --level high
