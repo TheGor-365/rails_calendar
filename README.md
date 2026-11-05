@@ -1,49 +1,52 @@
 # Rails Calendar
 
-A small Ruby on Rails demonstration application for displaying and managing consultations with [Simple Calendar](https://github.com/excid3/simple_calendar).
+A Ruby on Rails educational/demo app for publicly browsing consultations with Simple Calendar.
 
-## Current legacy baseline
+## Security contract (RC-002)
 
-- Ruby **3.1.2**, Rails **7.0.4.1** (both release series are end-of-life)
-- PostgreSQL, Turbo/Stimulus, Bootstrap, esbuild/Sass
-- `simple_calendar` **2.4.3**
-- Stored events: title, description, start/end timestamps
+- Public: GET /, GET /consultations, GET /consultations/:id.
+- Administrator only: new/create/edit/update/destroy consultation routes.
+- The admin sign-in and sign-out endpoints are /admin/login and /admin/logout.
+- There is no public account registration, and no users table migration.
+- The application denies admin access if either server-side credential is absent.
+- Admin sessions expire after eight hours and are invalidated by credential rotation.
+- Never include real consultation PII in publicly exposed demo records.
 
-**Security warning:** The existing consultations CRUD does **not** implement authentication or authorization. Do not expose this repository to a public production audience until an appropriate access-control policy is implemented and tested. The pull request that adds validations/calendar tests is **not** an authorization fix.
+## Required admin secrets (outside source control)
 
-## Local development (isolated development database)
+Supply RAILS_CALENDAR_ADMIN_USERNAME and RAILS_CALENDAR_ADMIN_PASSWORD via
+the deployment secret manager. Use a unique, long random password; never commit
+credentials, put them in client-side JavaScript, or paste them into issues.
+Administrators sign in via /admin/login. The application does not seed an admin
+password or automatically generate one.
 
-1. Install Ruby 3.1.2 and Bundler 2.3.7 for this historical checkout; plan a migration to supported Ruby/Rails before production.
-2. Install PostgreSQL and Node.js/Yarn compatible with the pinned dependencies.
-3. Run:
+## Legacy baseline and remaining release blockers
 
-```bash
-bundle install
-yarn install --frozen-lockfile
-bin/rails db:prepare
-bin/dev
-```
+- Ruby 3.1.2 / Rails 7.0.4.1 are end-of-life. Upgrade before public production.
+- PostgreSQL, Turbo/Stimulus, Bootstrap, esbuild/Sass, simple_calendar 2.4.3.
+- Existing database config is local-development-oriented; production credentials,
+  DB connectivity, backup/rollback, HTTPS and secure session cookies require review.
+- Login attempt rate limiting, dependency/security audits, legacy invalid data
+  assessment, and staging/browser smoke validation are release gates.
+- The repository is not production-ready merely because CI passes.
 
-Open http://localhost:3000.
+## Local development (isolated DB only)
 
-Current `config/database.yml` expects PostgreSQL on `localhost:5432` with the `postgres` role; use an **isolated local database**. Do not use the database config as-is for Railway/production.
+Install the pinned Ruby version, compatible Bundler, PostgreSQL and Node/Yarn.
+Then install dependencies, prepare a development DB and run bin/dev.
+Do not connect a test instance to production data.
 
-## Tests
+## Automated tests
 
-```bash
-RAILS_ENV=test bin/rails db:prepare
-RAILS_ENV=test bin/rails test
-```
+Run RAILS_ENV=test bin/rails db:prepare and RAILS_ENV=test bin/rails test.
+Run RAILS_ENV=test bin/rails test:system for headless/browser coverage.
+The test suite uses explicitly named test-only credentials in test/test_helper.rb;
+those are intentionally not production credentials.
 
-The controller/model test suite does not replace real browser system tests. CI is intended to run the non-browser tests first. A verified successful CI run and a deployed instance must be linked before describing the project as release-ready.
+## Tracking
 
-## Delivery checklist
+- ClickUp RC-001: https://app.clickup.com/t/z8rp3ffu82
+- ClickUp RC-002: https://app.clickup.com/t/z8rp3ffu83
+- Baseline Draft PR #1: https://github.com/TheGor-365/rails_calendar/pull/1
 
-- [ ] Agree public/private data access and consultation editing rules.
-- [ ] Add authorization tests and enforce the agreed policy.
-- [ ] Upgrade end-of-life Ruby/Rails and audit dependency vulnerabilities.
-- [ ] Verify model/controller/system tests and CI on a clean environment.
-- [ ] Configure production PostgreSQL via safe environment variables, TLS, secrets and backup/rollback.
-- [ ] Perform mobile/desktop smoke tests and capture evidence.
-
-Engineering tracking: [ClickUp Rails Calendar](https://app.clickup.com/t/z8rp3ffu75) / [RC-001 audit](https://app.clickup.com/t/z8rp3ffu82). The app is a demo/learning project, **not** a verified paid client deployment.
+Educational case only; not a verified paid client deployment.
