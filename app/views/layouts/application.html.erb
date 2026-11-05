@@ -15,6 +15,13 @@
       <%= render "layouts/nav" %>
     </header>
 
+    <% if notice.present? %>
+      <p class="container alert alert-success" role="status"><%= notice %></p>
+    <% end %>
+    <% if alert.present? %>
+      <p class="container alert alert-danger" role="alert"><%= alert %></p>
+    <% end %>
+
     <main>
       <%= yield %>
     </main>

@@ -17,7 +17,7 @@ class ConsultationsController < ApplicationController
 
     respond_to do |format|
       if @consultation.save
-        format.html { redirect_to consultation_url(@consultation) }
+        format.html { redirect_to consultation_url(@consultation), notice: "Consultation was successfully created" }
       else
         format.html { render :new, status: :unprocessable_entity }
       end
@@ -27,7 +27,7 @@ class ConsultationsController < ApplicationController
   def update
     respond_to do |format|
       if @consultation.update(consultation_params)
-        format.html { redirect_to consultation_url(@consultation) }
+        format.html { redirect_to consultation_url(@consultation), notice: "Consultation was successfully updated" }
       else
         format.html { render :edit, status: :unprocessable_entity }
       end
@@ -38,12 +38,12 @@ class ConsultationsController < ApplicationController
     @consultation.destroy
 
     respond_to do |format|
-      format.html { redirect_to consultations_url }
+      format.html { redirect_to consultations_url, notice: "Consultation was successfully destroyed" }
     end
   end
 
   private
-  
+
   def set_consultation
     @consultation = Consultation.find(params[:id])
   end

@@ -18,10 +18,10 @@
         </div>
         <div class="card-footer">
           <p class="card-text text-muted">
-            From: <%= consultation.start_time.strftime('%A, %B, %d, %Y,  at %I:%M %p') %>
+            From: <%= consultation.start_time&.strftime('%A, %B, %d, %Y, at %I:%M %p') || "Not specified" %>
           </p>
           <p class="card-text text-muted">
-            To: <%= consultation.end_time.strftime('%A, %B, %d, %Y,  at %I:%M %p') %>
+            To: <%= consultation.end_time&.strftime('%A, %B, %d, %Y, at %I:%M %p') || "Not specified" %>
           </p>
         </div>
       </div>

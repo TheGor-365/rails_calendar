@@ -28,13 +28,12 @@ class ConsultationsTest < ApplicationSystemTestCase
     visit consultation_url(@consultation)
     click_on "Edit this consultation", match: :first
 
-    fill_in "Description", with: @consultation.description
-    fill_in "End time", with: @consultation.end_time
-    fill_in "Start time", with: @consultation.start_time
-    fill_in "Title", with: @consultation.title
+    # Verify an actual change while preserving the existing valid datetime inputs.
+    fill_in "Title", with: "Updated consultation"
     click_on "Update Consultation"
 
     assert_text "Consultation was successfully updated"
+    assert_text "Updated consultation"
     click_on "Back"
   end
 
