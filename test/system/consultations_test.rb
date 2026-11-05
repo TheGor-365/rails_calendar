@@ -15,8 +15,8 @@ class ConsultationsTest < ApplicationSystemTestCase
     click_on "New consultation"
 
     fill_in "Description", with: @consultation.description
-    fill_in "End time", with: @consultation.end_time
-    fill_in "Start time", with: @consultation.start_time
+    fill_in "Start time", with: @consultation.start_time.strftime("%Y-%m-%dT%H:%M")
+    fill_in "End time", with: @consultation.end_time.strftime("%Y-%m-%dT%H:%M")
     fill_in "Title", with: @consultation.title
     click_on "Create Consultation"
 
@@ -29,8 +29,8 @@ class ConsultationsTest < ApplicationSystemTestCase
     click_on "Edit this consultation", match: :first
 
     fill_in "Description", with: @consultation.description
-    fill_in "End time", with: @consultation.end_time
-    fill_in "Start time", with: @consultation.start_time
+    fill_in "Start time", with: @consultation.start_time.strftime("%Y-%m-%dT%H:%M")
+    fill_in "End time", with: @consultation.end_time.strftime("%Y-%m-%dT%H:%M")
     fill_in "Title", with: @consultation.title
     click_on "Update Consultation"
 
