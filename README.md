@@ -50,3 +50,9 @@ those are intentionally not production credentials.
 - Baseline Draft PR #1: https://github.com/TheGor-365/rails_calendar/pull/1
 
 Educational case only; not a verified paid client deployment.
+
+## RC-003 runtime and dependency audit
+
+- [Draft PR #3](https://github.com/TheGor-365/rails_calendar/pull/3) migrates to patched Ruby 3.4.12 / Rails 8.1.4.1 and resolves Ruby/JS dependencies.
+- [Runtime CI](https://github.com/TheGor-365/rails_calendar/actions/runs/42128427245) and [Security audit](https://github.com/TheGor-365/rails_calendar/actions/runs/42128427372) passed before final cleanup. See [RC-003 checkpoint](docs/RC003_RUNTIME_UPGRADE.md) for remaining release blockers.
+- Remains an **unmerged educational demo**, not a verified production service.
