@@ -49,4 +49,31 @@ jobs:
           corepack enable
           corepack prepare yarn@1.22.22 --activate
           yarn install --frozen-lockfile
-          yarn audit --level high
+          yarn audit --json > /tmp/rails_calendar_yarn_audit.jsonl || true
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const rows = fs.readFileSync("/tmp/rails_calendar_yarn_audit.jsonl", "utf8").split("\n");
+          let summary = null;
+          const issues = [];
+          for (const line of rows) {
+            if (!line.trim()) continue;
+            let obj;
+            try { obj = JSON.parse(line); } catch (_) { continue; }
+            if (obj.type === "auditSummary") summary = obj.data.vulnerabilities;
+            if (obj.type === "auditAdvisory" && obj.data && obj.data.advisory) {
+              const a = obj.data.advisory;
+              issues.push({ severity: a.severity, name: a.module_name, title: a.title });
+            }
+          }
+          if (!summary || typeof summary.high !== "number" || typeof summary.critical !== "number") {
+            console.error("Yarn audit did not return a valid summary; fail closed.");
+            process.exit(2);
+          }
+          console.log("Yarn audit summary:", JSON.stringify(summary));
+          for (const x of issues) console.log(`[${x.severity}] ${x.name}: ${x.title}`);
+          if (summary.high + summary.critical > 0) {
+            console.error("High/critical vulnerabilities detected; block this PR.");
+            process.exit(1);
+          }
+          console.log("High/critical dependency advisory gate passed; review low/moderate separately.");
+          NODE

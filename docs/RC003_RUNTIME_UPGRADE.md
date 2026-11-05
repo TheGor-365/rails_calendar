@@ -11,7 +11,8 @@ Recorded 2026-11-06. No Railway or production modifications.
 - Maintains `config.load_defaults 7.0` intentionally; upgrade of defaults remains separately reviewable.
 
 ## Security audit
-- Dedicated `.github/workflows/security-audit.yml` checks ruby-advisory-db, Brakeman, and Yarn audit; **results must be checked before release signoff**.
+- Dedicated `.github/workflows/security-audit.yml` checks ruby-advisory-db, Brakeman, and Yarn audit. GitHub Action gates high/critical JavaScript advisories, but reports residual low/moderate findings explicitly.
+- First scan: Puma 6.6.1 flagged 2 High CVEs; old Sass dependency tree flagged 9 advisories (6 High). Puma is locked to patched 8.0.2 and Sass refreshed to 1.107.1. **Re-run audit and inspect current SHA before accepting remediation.**
 - Scanner success does not prove absence of unknown vulnerabilities or correct production environment.
 
 ## Remaining blockers
