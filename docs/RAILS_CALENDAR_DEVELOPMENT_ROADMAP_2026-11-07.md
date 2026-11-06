@@ -1,6 +1,6 @@
 # Rails Calendar → AI Service Operating System — development roadmap
 
-**Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-015 minute-precision + P0 data safety. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
+**Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-016 UTC/access regression and owner-resolved demo #2 disposition. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
 
 **Product contract:** evolve the existing Rails Calendar, do not rewrite it. The calendar becomes the visible scheduling layer of an AI-assisted service-delivery system for the owner's actual Ruby on Rails freelance work. Initial vertical: Rails debugging, CRUD/forms, API/PostgreSQL, tests and small integrations. Later professions require versioned playbooks, not cloned apps. The system must not invent paid engagements, commitments or approvals.
 
@@ -31,25 +31,26 @@
 | RC-012 / PR #12 | Seven visible mobile columns, month event list and mobile feature parity | CI+Security success; user screenshots at 430px show working day/event navigation |
 | RC-013 / PR #13 | Restrained icon-labeled controls and touch/focus styling across existing screens | CI+Security SUCCESS; owner mobile detail screenshot shows icons |
 | RC-014 / PR #14 | Persistent five-tab dock and single-row detail actions | **Local visual PASS** on mobile after RC-014b; authenticated New screen confirmed; CI/Security green |
-| RC-015 / PR #16 | Minute-only input/validation, unchanged legacy timestamp retention, record-specific delete confirmation | CI+Security SUCCESS on `3c63dfb` (72 tests / 552 assertions), manual QA and local DB inspection pending; [safety note](RC015_MINUTE_PRECISION_DELETE_SAFETY_2026-11-07.md) |
+| RC-015 / PR #16 | Minute-only input/validation, unchanged legacy timestamp retention, record-specific delete confirmation | CI+Security SUCCESS; owner read-only DB check confirms #2 absent / #3 present, **owner waived restoration**. Manual HH:MM and confirmation QA pending; [safety note](RC015_MINUTE_PRECISION_DELETE_SAFETY_2026-11-07.md) |
+| RC-016 / next Draft | Explicit UTC storage/display baseline, midnight/DST regressions and expired/logged-out ACL | In code review; [ADR-001](ADR001_UTC_TIMEZONE_CONTRACT_2026-11-07.md); regional client timezone UX pending owner decision |
 
 All these PRs are Draft and stacked; `main` and production have not been changed by this program. #4 is a superseded duplicate (DO NOT MERGE).
 
 ## Phase A — finish the existing calendar (P0; before public launch)
 
-### A1. RC-014b — fixed mobile dock / CSS freshness (CURRENT)
+### A1. RC-014b — fixed mobile dock / CSS freshness (VISUAL ACCEPTED)
 - **Verified** [CI run 42304835490](https://github.com/TheGor-365/rails_calendar/actions/runs/42304835490) and [Security run 42304835617](https://github.com/TheGor-365/rails_calendar/actions/runs/42304835617) on SHA `af850af347c30d632058ca7464f6b3a1680a45f3`: 54 Rails tests/352 assertions + 15 Chrome tests/172 assertions, 0 failures/errors/skips. Chrome at 320/390/430 and desktop. Assert browser-computed CSS release marker, fixed viewport bottom even after long-page scroll, 5 equal tabs centered within a max-430px dock, required safe-area padding and one-row consultation actions. Verify guest/new authentication gate.
 - Test Month ⇄ Day → Hour and Event → details → anchored Day, Today, admin sign-in, create/edit/delete, cancellation.
-- User screenshot at 430px before RC-014b showed plain underlined dock links in document flow, despite GitHub browser CI showing fixed CSS. Root cause **not yet confirmed**, likely local CSS asset stale. Launcher now checks a version marker inside the built Sass bundle; use hard reload with Chrome cache disabled if necessary. Accept only after fresh screenshots at mobile 320 and 430 + desktop. Verify icon font, labels, focus/touch and no hidden content.
+- User screenshot at 430px before RC-014b showed plain underlined dock links in document flow, despite GitHub browser CI showing fixed CSS. Root cause **not yet confirmed**, likely local CSS asset stale. Launcher now checks a version marker inside the built Sass bundle; use hard reload with Chrome cache disabled if necessary. Owner accepted mobile dock on new screenshot; 320px and full cross-device keyboard/touch audit remain release checks. Verify icon font, labels, focus/touch and no hidden content.
 
 **Exit:** owner accepts visual style and controls; no failures or hidden functionality.
 
-### A1b. P0 CRUD local incident / precision (CURRENT)
+### A1b. P0 CRUD local incident / precision (RECOVERY DECISION CLOSED)
 
 - **Manual P0 confirmed:** admin sign-in, public month/day display, admin create #3, updated #3, record index and calendar deep links.
-- **Critical incident:** prompt for DELETE was shown on original **#2** and subsequent index shows only temporary **#3**, indicating original was deleted. The test cleanup is **NOT** complete. Treat as potential local data loss; do not claim success, silently re-create #2, or delete further records without exact ID confirmation and a backup decision.
+- **Disposition:** the original **#2** was deleted by mistake rather than temporary **#3**. Read-only Rails runner confirmed only #3 remains; owner explicitly confirmed #2 was an unneeded demonstration and **chose not to restore it**. This closes the recovery decision, not the underlying user-error risk. Do not delete #3 without further explicit authorization.
 - RC-015 changes the minute-only HTML fields (`step=60`, explicit value to HH:MM), server precision validation and preservation of legacy seconds for unchanged times; improves the confirmation with the exact title, ID and date/time. Reversible deletion/audit is a future schema decision, not implemented here.
-- **Exit:** fresh CI/Security, manual UI checks; read-only local verification of #2 and #3 and a user decision on recovery. No merge/Railway until state is reconciled.
+- **Exit:** local recovery decision resolved; RC-015 CI/Security green; manual HH:MM/delete-confirmation UI checks still required. No merge/Railway before those gates.
 
 ### A2. Admin/security & data review
 - Test admin login/logout, wrong password, session expiry and explicit denial of POST/PATCH/DELETE to anonymous users; preserve real records.
@@ -58,8 +59,8 @@ All these PRs are Draft and stacked; `main` and production have not been changed
 
 **Exit:** documented access matrix, negative tests and manual admin CRUD success.
 
-### A3. Timezone and scheduling ADR
-- Store instants UTC, explicitly decide which timezone the administrator and clients see.
+### A3. Timezone and scheduling ADR (UTC BASELINE IMPLEMENTED)
+- RC-016 pins existing UTC behavior; [ADR-001](ADR001_UTC_TIMEZONE_CONTRACT_2026-11-07.md). Regional admin/client display choice still requires approval.
 - Define display/entry across Armenia timezone, DST in other locales, nonexistent/ambiguous wall times, half-open `[start,end)` intervals, event conflicts and daylight-length anomalies.
 - Preserve stored instants and historical records in migrations. No silent timezone conversion.
 
@@ -120,4 +121,4 @@ Prepare ADRs and additive schema migrations, not a replacement application. Prop
 
 `readback current SHA + sources → define one user-visible acceptance outcome → write failing regression test where appropriate → smallest implementation → CI + Security on same final SHA → manual mobile and desktop QA → checkpoint with evidence`.
 
-**Next 1–3 actions after RC-015:** (1) Verify PR #14 CI/Security at final SHA; safely fetch/switch on Linux and restart only local port 3005 launcher; confirm it prints `CSS release rc014b-20261107 verified`, then Chrome hard refresh. (2) Owner submits 430px screenshots at top and scrolled bottom on calendar/detail, confirm dock pinned and consultation controls in one row. (3) Move to P0 admin CRUD/security with a **new temporary record only**, then timezone/scheduling ADR; do not merge/deploy until owner acceptance.
+**Next 1–3 actions:** (1) RC-016 final SHA CI/Security and review of UTC boundary, admin logout/expiry tests. (2) Locally switch safely to latest stacked RC-016 after confirming no tracked changes, verify HH:MM and identified Delete prompt **without confirming any deletion**; leave #3 intact. (3) Decide whether the next phase should expose secondary Armenia time or keep UTC-only MVP; then review shared login rate limiting/public read privacy before Railway staging. No merge/deploy without explicit owner gate.

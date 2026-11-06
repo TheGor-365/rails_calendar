@@ -16,7 +16,13 @@ module RailsCalendar
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # Contract for the current calendar UI: forms, day grids and "Today"
+    # use UTC. Database timestamps are also stored as UTC instants.
+    # Do not switch this to a regional zone without a separate, reviewed
+    # DST-aware display/input design and migration plan.
+    config.time_zone = "UTC"
+    config.active_record.default_timezone = :utc
+
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

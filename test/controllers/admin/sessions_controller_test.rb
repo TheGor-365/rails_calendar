@@ -55,6 +55,57 @@ class AdminSessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_login_url
   end
 
+  test "logout revokes all write routes while public calendar remains available" do
+    sign_in
+    record = consultations(:one)
+    original_title = record.title
+
+    delete admin_logout_url
+    assert_redirected_to root_url
+
+    assert_no_difference "Consultation.count" do
+      post consultations_url, params: {
+        consultation: {
+          title: "Unauthorized after logout",
+          start_time: "2026-11-12T09:00",
+          end_time: "2026-11-12T09:30"
+        }
+      }
+    end
+    assert_redirected_to admin_login_url
+
+    patch consultation_url(record), params: { consultation: { title: "Unauthorized after logout" } }
+    assert_redirected_to admin_login_url
+    assert_equal original_title, record.reload.title
+
+    assert_no_difference "Consultation.count" do
+      delete consultation_url(record)
+    end
+    assert_redirected_to admin_login_url
+
+    get calendar_day_url(date: "2026-11-12")
+    assert_response :success
+    get consultations_url
+    assert_response :success
+  end
+
+  test "expired cookie cannot update or delete a record" do
+    sign_in
+    record = consultations(:one)
+    original_title = record.title
+
+    travel 8.hours + 1.second do
+      patch consultation_url(record), params: { consultation: { title: "Unauthorized expired update" } }
+      assert_redirected_to admin_login_url
+      assert_equal original_title, record.reload.title
+
+      assert_no_difference "Consultation.count" do
+        delete consultation_url(record)
+      end
+      assert_redirected_to admin_login_url
+    end
+  end
+
   test "expired session is not accepted" do
     sign_in
     travel 8.hours + 1.second do
