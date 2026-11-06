@@ -28,13 +28,14 @@
 
     <% day_events.first(2).each do |consultation| %>
       <article class="calendar-event">
-        <%= link_to consultation_path(consultation), class: "calendar-event-link" do %>
+        <div class="calendar-event-link">
           <span class="calendar-event-dot" aria-hidden="true"></span>
           <span class="calendar-event-content">
-            <span class="calendar-event-name"><%= truncate(consultation.title, length: 26) %></span>
+            <%= link_to truncate(consultation.title, length: 26), consultation_path(consultation),
+                        class: "calendar-event-name" %>
             <span class="calendar-event-time"><%= consultation.start_time.in_time_zone.to_date < date ? "Ongoing" : consultation.start_time.in_time_zone.strftime("%H:%M") %></span>
           </span>
-        <% end %>
+        </div>
       </article>
     <% end %>
     <% if day_events.length > 2 %>
