@@ -1,5 +1,15 @@
 module Admin
   class SessionsController < ApplicationController
+    # Per-process protection for the demo. This is NOT a shared/distributed
+    # production rate limiter: production must use a shared cache backend.
+    LOGIN_RATE_LIMIT_STORE = ActiveSupport::Cache::MemoryStore.new(size: 4.megabytes)
+
+    # Count every login attempt (successful or failed) against the same IP.
+    # Do not throttle public calendar routes.
+    rate_limit to: 5, within: 1.minute, only: :create,
+      store: LOGIN_RATE_LIMIT_STORE,
+      with: -> { head :too_many_requests }
+
     def new
       redirect_to consultations_path if admin_signed_in?
     end

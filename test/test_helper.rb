@@ -10,4 +10,10 @@ require "rails/test_help"
 class ActiveSupport::TestCase
   parallelize(workers: :number_of_processors)
   fixtures :all
+
+  # Keep the per-process demo login limiter from leaking counters between
+  # unrelated tests that sign in from the same default localhost address.
+  setup do
+    Admin::SessionsController::LOGIN_RATE_LIMIT_STORE.clear
+  end
 end
