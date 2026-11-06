@@ -50,6 +50,8 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     assert_select "a.calendar-day-link[href=?]", calendar_day_path(date: "2023-01-19")
     assert_select "time[datetime='2023-01-19']"
     assert_select ".calendar-day-count", minimum: 30
+    assert_select "a.calendar-day-link[aria-label='View Thursday, January 19, 2023']", count: 1
+    assert_select "a.calendar-event-link[href=?]", consultation_path(consultations(:one)), count: 1
   end
 
   test "busy month cell caps previews at two and links to full day" do
@@ -78,8 +80,8 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     get root_url(start_date: "2023-02-01")
 
     assert_response :success
-    assert_select "a.calendar-event-name[href=?]", consultation_path(consultation)
-    assert_select "a.calendar-event-name", text: "Boundary event"
+    assert_select "a.calendar-event-link[href=?]", consultation_path(consultation)
+    assert_select ".calendar-event-name", text: "Boundary event"
     assert_select ".calendar-event-time", text: "Ongoing"
   end
 
@@ -129,6 +131,27 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     assert_select ".rc-range-event", count: 6 # Includes fixture :one.
     assert_select "article.rc-range-event[data-lanes='5']", count: 5
     assert_select ".rc-day-canvas[style*='--rc-max-lanes: 5']"
+  end
+
+  test "consultation index and details offer calendar deep links" do
+    event = consultations(:one)
+    date = event.start_time.in_time_zone.to_date.iso8601
+    get consultations_url
+    assert_response :success
+    assert_select "a[href=?]", consultation_path(event), text: event.title, count: 1
+    assert_select "a[href=?]", calendar_day_path(date: date, anchor: "event-#{event.id}"), text: "View in calendar", count: 1
+    get consultation_url(event)
+    assert_response :success
+    assert_select "a[href=?]", calendar_day_path(date: date, anchor: "event-#{event.id}"), text: "View in calendar", count: 1
+  end
+
+  test "today and day navigation lead to the 24-hour timeline" do
+    get root_url
+    assert_response :success
+    assert_select "a[href=?]", calendar_day_path(date: Time.zone.today.iso8601), text: /Today/
+    get calendar_day_url(date: Time.zone.today.iso8601)
+    assert_response :success
+    assert_select ".rc-time-axis-hour", count: 24
   end
 
   test "invalid dates and hours are rejected without exposing errors" do
