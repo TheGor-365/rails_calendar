@@ -1103,3 +1103,109 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
   .rc-time-axis-count { pointer-events: none; }
 }
+
+
+// RC-013 — Slate & Tide iconography. Reuses the pinned Bootstrap Icons font;
+// icons describe an action but never replace its visible accessible label.
+.rc-action,
+.rc-navigation-link,
+.rc-text-link {
+  gap: .42rem;
+}
+
+.rc-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  font-size: 1.02em;
+  line-height: 1;
+  font-weight: normal;
+  vertical-align: -.09em;
+  opacity: .9;
+}
+
+.rc-action-label {
+  min-width: 0;
+}
+
+.rc-action {
+  min-height: 42px;
+  border-radius: .42rem;
+  padding-inline: .86rem;
+}
+
+.rc-action--quiet {
+  border-color: #cfdad6;
+  box-shadow: 0 1px 2px rgba(18, 52, 46, .035);
+}
+
+.rc-action--quiet:hover,
+.rc-action--quiet:focus-visible {
+  border-color: #a0c9bd;
+  background: var(--rc-accent-wash);
+  color: var(--rc-accent-dark);
+}
+
+.rc-action--small {
+  min-height: 36px;
+  padding: .4rem .7rem;
+}
+
+.rc-navigation-link {
+  min-height: 38px;
+  padding: .4rem .25rem;
+  border-radius: .3rem;
+}
+
+.rc-navigation-link:hover,
+.rc-navigation-link:focus-visible {
+  color: var(--rc-accent-dark);
+  background: var(--rc-accent-wash);
+}
+
+.rc-text-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  text-decoration: none;
+}
+
+.rc-text-link:hover { text-decoration: underline; }
+
+.calendar-mobile-date-link .rc-icon,
+.calendar-mobile-event-time .rc-icon,
+.calendar-mobile-more .rc-icon {
+  color: var(--rc-accent);
+}
+
+.calendar-mobile-date-link > span,
+.calendar-mobile-event-time,
+.calendar-mobile-more {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+.calendar-mobile-event-time .rc-action-label { white-space: nowrap; }
+
+@media (max-width: 575.98px) {
+  .rc-action {
+    min-height: 44px;
+    padding: .52rem .73rem;
+    font-size: .8rem;
+  }
+  .rc-action--small {
+    min-height: 38px;
+    padding: .4rem .6rem;
+    font-size: .76rem;
+  }
+  .rc-navigation-link {
+    min-height: 44px;
+    font-size: .78rem;
+  }
+  .calendar-mobile-date-link {
+    min-height: 46px;
+  }
+  .calendar-mobile-event-link {
+    min-height: 48px;
+  }
+}
