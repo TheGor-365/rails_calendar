@@ -76,9 +76,11 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
 
     get root_url(start_date: "2023-01-19")
     assert_response :success
-    assert_select "a.calendar-mobile-event-link", count: 2
-    assert_select "a.calendar-mobile-more[href=?]", calendar_day_path(date: "2023-01-19"),
-                  text: "View all 5 events", count: 1
+    assert_select ".calendar-mobile-agenda-day[data-date='2023-01-19']" do
+      assert_select "a.calendar-mobile-event-link", count: 2
+      assert_select "a.calendar-mobile-more[href=?]", calendar_day_path(date: "2023-01-19"),
+                    text: "View all 5 events", count: 1
+    end
   end
 
   test "busy month cell caps previews at two and links to full day" do
