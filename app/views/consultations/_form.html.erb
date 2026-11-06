@@ -39,7 +39,7 @@
     <div class="col-12 col-md-6">
       <%= form.label :start_time, "Start time *", class: "form-label fw-medium" %>
       <%= form.datetime_field :start_time, class: "form-control#{' is-invalid' if consultation.errors.include?(:start_time)}",
-                              required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59",
+                              required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59", step: 1,
                               aria: { invalid: consultation.errors.include?(:start_time),
                                       describedby: "consultation-timezone-hint" } %>
       <% if consultation.errors.include?(:start_time) %>
@@ -50,7 +50,7 @@
     <div class="col-12 col-md-6">
       <%= form.label :end_time, "End time *", class: "form-label fw-medium" %>
       <%= form.datetime_field :end_time, class: "form-control#{' is-invalid' if consultation.errors.include?(:end_time)}",
-                              required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59",
+                              required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59", step: 1,
                               aria: { invalid: consultation.errors.include?(:end_time),
                                       describedby: "consultation-timezone-hint" } %>
       <% if consultation.errors.include?(:end_time) %>
