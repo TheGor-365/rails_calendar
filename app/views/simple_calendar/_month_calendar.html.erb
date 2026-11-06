@@ -1,12 +1,12 @@
 <div class="simple-calendar">
   <nav class="calendar-heading d-flex align-items-center justify-content-between gap-3 mb-3"
        aria-label="Calendar month navigation">
-    <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar.url_for_previous_view,
+    <%= link_to rc_icon_label('chevron-left', t('simple_calendar.previous', default: 'Previous')), calendar.url_for_previous_view,
                 class: "rc-navigation-link", aria: { label: "Previous month" } %>
     <h2 class="calendar-title" aria-live="polite">
       <%= t('date.month_names')[start_date.month] %> <span><%= start_date.year %></span>
     </h2>
-    <%= link_to t('simple_calendar.next', default: 'Next'), calendar.url_for_next_view,
+    <%= link_to rc_icon_label('chevron-right', t('simple_calendar.next', default: 'Next')), calendar.url_for_next_view,
                 class: "rc-navigation-link", aria: { label: "Next month" } %>
   </nav>
 
