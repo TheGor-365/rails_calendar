@@ -55,7 +55,7 @@
     <% if @month_days_with_events.any? %>
       <ol class="calendar-mobile-agenda-days">
         <% @month_days_with_events.each do |date, day_events| %>
-          <li class="calendar-mobile-agenda-day">
+          <li class="calendar-mobile-agenda-day" data-date="<%= date.iso8601 %>">
             <%= link_to calendar_day_path(date: date.iso8601), class: "calendar-mobile-date-link" do %>
               <time datetime="<%= date.iso8601 %>"><%= date.strftime("%a, %d %b") %></time>
               <span><%= pluralize(day_events.size, "event") %> · View day</span>
