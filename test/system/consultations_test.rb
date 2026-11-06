@@ -128,10 +128,14 @@ class ConsultationsTest < ApplicationSystemTestCase
     # this long schedule can be scrolled to the bottom on every mobile size.
     visit calendar_day_url(date: "2023-01-19")
     assert_selector "nav.rc-mobile-dock", visible: true
+    # Force a scrollable fixture even when browser zoom/viewport height changes.
+    # This tests fixed positioning, not the schedule's incidental pixel height.
+    page.execute_script("document.querySelector('main#main-content').style.minHeight = '2200px'")
+    page.execute_script("window.scrollTo(0, 0)")
     scrollBefore = page.evaluate_script("window.scrollY")
-    page.execute_script("window.scrollTo(0, document.documentElement.scrollHeight)")
+    page.execute_script("window.scrollTo(0, 2000)")
     scrollAfter = page.evaluate_script("window.scrollY")
-    assert_operator scrollAfter, :>, scrollBefore
+    assert_operator scrollAfter, :>, scrollBefore, "Fixed dock must remain visible after a real document scroll"
     dockAfterScroll = page.evaluate_script(<<~JS)
       (() => {
         const dock = document.querySelector(".rc-mobile-dock").getBoundingClientRect();
