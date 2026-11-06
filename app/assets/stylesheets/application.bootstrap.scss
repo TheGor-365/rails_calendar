@@ -897,3 +897,206 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 .rc-record-meta { color: var(--rc-muted); font-size: .76rem; }
 .rc-record-actions { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: .45rem; }
 .rc-detail-meta { margin: 1rem 0; padding-top: .85rem; border-top: 1px solid var(--rc-soft-line); font-size: .81rem; color: var(--rc-muted); }
+
+
+// RC-012 — equal navigation capability on touch and desktop.
+// The mobile month grid shows all seven dates without side scrolling.
+// Separate date/event links are available in a full-width agenda below.
+.calendar-mobile-agenda { display: none; }
+
+@media (max-width: 767.98px) {
+  .calendar-scroll-region {
+    overflow-x: visible;
+  }
+
+  .calendar-grid {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .calendar-grid thead th {
+    height: 34px;
+    padding: .45rem 0;
+    text-align: center;
+    font-size: .55rem;
+    letter-spacing: .02em;
+  }
+
+  .calendar-grid tbody td {
+    height: 76px;
+    padding: 0;
+  }
+
+  .calendar-date-heading {
+    display: block;
+    height: 76px;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .calendar-grid .calendar-day-link {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: .45rem 0;
+    border-radius: 0;
+    font-size: .79rem;
+  }
+
+  .calendar-day-label {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-weight: 800;
+    border-radius: 50%;
+  }
+
+  .calendar-grid .today .calendar-day-label {
+    color: #fff;
+    background: var(--rc-accent);
+  }
+
+  .calendar-grid td.prev-month .calendar-day-label,
+  .calendar-grid td.next-month .calendar-day-label {
+    color: #93a39e;
+  }
+
+  .calendar-day-count {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    z-index: 2;
+    transform: translateX(-50%);
+    min-width: 22px;
+    height: 21px;
+    font-size: .68rem;
+  }
+
+  .calendar-day-count[data-empty="true"] {
+    visibility: hidden;
+  }
+
+  // Desktop event previews cannot fit into seven readable mobile columns.
+  // All their destinations remain visible in the mobile agenda instead.
+  .calendar-grid .calendar-event,
+  .calendar-grid .calendar-more {
+    display: none;
+  }
+
+  .calendar-mobile-agenda {
+    display: block;
+    margin-top: 1.3rem;
+  }
+
+  .calendar-mobile-agenda-header { margin-bottom: .75rem; }
+
+  .calendar-mobile-agenda-title {
+    margin: 0 0 .35rem;
+    font-size: 1.12rem;
+    font-weight: 760;
+    letter-spacing: -.035em;
+  }
+
+  .calendar-mobile-agenda-days,
+  .calendar-mobile-event-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .calendar-mobile-agenda-days {
+    display: grid;
+    gap: .75rem;
+  }
+
+  .calendar-mobile-agenda-day {
+    border: 1px solid var(--rc-line);
+    border-radius: .4rem;
+    background: var(--rc-paper);
+    overflow: hidden;
+  }
+
+  .calendar-mobile-date-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    min-height: 45px;
+    padding: .58rem .75rem;
+    color: var(--rc-ink);
+    font-size: .82rem;
+    font-weight: 760;
+    text-decoration: none;
+    background: #f2f8f5;
+  }
+
+  .calendar-mobile-date-link span {
+    color: var(--rc-accent);
+    font-size: .74rem;
+  }
+
+  .calendar-mobile-event-list li + li {
+    border-top: 1px solid var(--rc-soft-line);
+  }
+
+  .calendar-mobile-event-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    min-height: 48px;
+    padding: .65rem .75rem;
+    color: var(--rc-ink);
+    text-decoration: none;
+  }
+
+  .calendar-mobile-event-link:hover,
+  .calendar-mobile-event-link:focus-visible,
+  .calendar-mobile-date-link:hover,
+  .calendar-mobile-date-link:focus-visible {
+    color: var(--rc-accent);
+    background: var(--rc-accent-wash);
+  }
+
+  .calendar-mobile-event-title {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: .83rem;
+    font-weight: 700;
+  }
+
+  .calendar-mobile-event-time {
+    flex: 0 0 auto;
+    color: var(--rc-muted);
+    font-size: .72rem;
+  }
+
+  .calendar-mobile-more {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: .55rem .75rem;
+    font-size: .8rem;
+    font-weight: 700;
+  }
+
+  // The left time axis must remain a full-height touch target when a
+  // continuous event covers the adjacent hour bands.
+  .rc-time-axis-hour { position: relative; }
+
+  .rc-time-axis-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .rc-time-axis-count { pointer-events: none; }
+}
