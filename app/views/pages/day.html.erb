@@ -40,12 +40,16 @@
     </div>
 
     <div class="rc-day-grid">
-      <div class="rc-time-axis" aria-hidden="true">
+      <div class="rc-time-axis" aria-label="Hour interval navigation">
         <% @hour_slots.each do |slot| %>
           <div class="rc-time-axis-hour" id="hour-<%= format('%02d', slot[:hour]) %>">
-            <time datetime="<%= slot[:start_time].iso8601 %>"><%= slot[:start_time].strftime("%H:%M") %></time>
+            <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
+                        class: "rc-time-axis-link",
+                        aria: { label: "Inspect #{slot[:start_time].strftime('%H:%M')}–#{slot[:end_time].strftime('%H:%M')}" } do %>
+              <time datetime="<%= slot[:start_time].iso8601 %>"><%= slot[:start_time].strftime("%H:%M") %></time>
+            <% end %>
             <% if slot[:count].positive? %>
-              <span class="rc-time-axis-count"><%= slot[:count] %></span>
+              <span class="rc-time-axis-count" aria-label="<%= pluralize(slot[:count], 'event') %>"><%= slot[:count] %></span>
             <% end %>
           </div>
         <% end %>
