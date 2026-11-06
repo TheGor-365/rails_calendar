@@ -69,6 +69,68 @@ class ConsultationsTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
+  test "mobile bottom dock stays fixed while detail actions stay on one row" do
+    multi_day = Consultation.create!(
+      title: "Mobile navigation QA",
+      start_time: Time.zone.local(2023, 1, 18, 23, 30),
+      end_time: Time.zone.local(2023, 1, 19, 1, 15)
+    )
+
+    [320, 390, 430].each do |viewport_width|
+      page.driver.browser.manage.window.resize_to(viewport_width, 932)
+      visit consultation_url(multi_day)
+      assert_selector "nav.rc-mobile-dock", visible: true
+      assert_no_selector ".app-nav > a.rc-nav-link", visible: true
+      assert_selector ".rc-detail-primary-actions > a", count: 3
+
+      layout = page.evaluate_script(<<~JS)
+        (() => {
+          const dock = document.querySelector(".rc-mobile-dock");
+          const actions = [...document.querySelectorAll(".rc-detail-primary-actions > a")];
+          const positions = actions.map(el => el.getBoundingClientRect());
+          return {
+            dockPosition: getComputedStyle(dock).position,
+            dockBottom: dock.getBoundingClientRect().bottom,
+            dockHeight: dock.getBoundingClientRect().height,
+            viewportHeight: window.innerHeight,
+            pageWidth: document.documentElement.scrollWidth,
+            viewportWidth: window.innerWidth,
+            firstActionLeft: Math.min(...positions.map(p => p.left)),
+            lastActionRight: Math.max(...positions.map(p => p.right)),
+            rowDrift: Math.max(...positions.map(p => p.top)) - Math.min(...positions.map(p => p.top)),
+            bottomPadding: parseFloat(getComputedStyle(document.body).paddingBottom)
+          };
+        })()
+      JS
+      assert_equal "fixed", layout["dockPosition"]
+      assert_in_delta layout["viewportHeight"], layout["dockBottom"], 1
+      assert_operator layout["pageWidth"], :<=, layout["viewportWidth"] + 1
+      assert_operator layout["firstActionLeft"], :>=, 0
+      assert_operator layout["lastActionRight"], :<=, layout["viewportWidth"] + 1
+      assert_operator layout["rowDrift"], :<=, 1
+      assert_operator layout["bottomPadding"], :>=, layout["dockHeight"]
+    end
+
+    find("nav.rc-mobile-dock a.rc-mobile-dock-item--create").click
+    assert_current_path admin_login_path
+    sign_in_as_admin
+    find("nav.rc-mobile-dock a.rc-mobile-dock-item--create").click
+    assert_current_path new_consultation_path
+    find("nav.rc-mobile-dock button[aria-label='Sign out of administrator session']").click
+    assert_text "Administrator signed out"
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  test "desktop hides the mobile bottom dock" do
+    page.driver.browser.manage.window.resize_to(1280, 900)
+    visit consultation_url(@consultation)
+    assert_no_selector "nav.rc-mobile-dock", visible: true
+    assert_selector ".app-nav > a.rc-nav-link", visible: true
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
   test "desktop month retains inline event previews" do
     page.driver.browser.manage.window.resize_to(1280, 900)
     visit root_url(start_date: "2023-01-19")
