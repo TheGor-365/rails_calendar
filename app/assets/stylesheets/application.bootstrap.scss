@@ -830,3 +830,38 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   background: var(--rc-accent-wash);
   text-decoration: underline;
 }
+
+
+// RC-010 precision: the right-hand line represents the real occupied time,
+// while very short events keep a readable (minimum-height) card.
+.rc-range-event-link {
+  position: relative;
+  z-index: 1;
+  gap: 0;
+  padding: .2rem .55rem;
+}
+.rc-range-event-heading { line-height: 1.1; }
+.rc-range-event-clock {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .18rem;
+  color: #335b54;
+  font-size: .64rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.rc-range-event-exact-bar {
+  position: absolute;
+  right: 0;
+  width: 3px;
+  z-index: 2;
+  display: block;
+  border-radius: 2px;
+  background: #16836f;
+  pointer-events: none;
+}
+@media (max-width: 575.98px) {
+  .rc-range-event-link { padding: .2rem .3rem; }
+  .rc-range-event-clock { font-size: .61rem; }
+}
