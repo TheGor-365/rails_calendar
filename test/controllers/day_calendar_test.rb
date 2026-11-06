@@ -54,6 +54,59 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     assert_select "a.calendar-event-link[href=?]", consultation_path(consultations(:one)), count: 1
   end
 
+  test "mobile primary navigation has distinct public routes and guarded create entry" do
+    get root_url(start_date: "2023-01-19")
+    assert_response :success
+
+    assert_select "nav[aria-label='Mobile primary navigation']" do
+      assert_select "a.rc-mobile-dock-item", count: 5
+      assert_select "a[href=?]", root_path, count: 1
+      assert_select "a[href=?]", calendar_day_path(date: Time.zone.today.iso8601), count: 1
+      assert_select "a[href=?]", consultations_path, count: 1
+      assert_select "a.rc-mobile-dock-item--create[href=?]", admin_login_path,
+                    count: 1
+      assert_select "a.rc-mobile-dock-item--create[aria-label='Sign in to add a consultation']", count: 1
+      assert_select "a.rc-mobile-dock-item--create[href=?]", new_consultation_path, count: 0
+    end
+
+    sign_in
+    get root_url(start_date: "2023-01-19")
+    assert_response :success
+
+    assert_select "nav[aria-label='Mobile primary navigation']" do
+      assert_select "a.rc-mobile-dock-item--create[href=?]", new_consultation_path, count: 1
+      assert_select "form[action=?]", admin_logout_path, count: 1
+      assert_select "button[aria-label='Sign out of administrator session']", count: 1
+    end
+  end
+
+  test "consultation actions distinguish calendar navigation from protected management" do
+    multi_day = Consultation.create!(
+      title: "Multi-day support",
+      start_time: Time.zone.local(2023, 1, 18, 23, 30),
+      end_time: Time.zone.local(2023, 1, 19, 1, 15)
+    )
+
+    get consultation_url(multi_day)
+    assert_response :success
+    assert_select "nav.rc-detail-actions[aria-label='Consultation actions']" do
+      assert_select ".rc-detail-primary-actions > a", count: 3
+      assert_select "a[aria-label='View in calendar']", count: 1
+      assert_select "a[aria-label='See final day']", count: 1
+      assert_select "a[aria-label='All consultations']", count: 1
+      assert_select ".rc-detail-admin-actions", count: 0
+    end
+
+    sign_in
+    get consultation_url(multi_day)
+    assert_response :success
+    assert_select ".rc-detail-admin-actions" do
+      assert_select "a[aria-label='Edit this consultation']", count: 1
+      assert_select "button[aria-label='Destroy this consultation']", count: 1
+      assert_select "form[action=?]", consultation_path(multi_day), count: 1
+    end
+  end
+
   test "icon actions preserve text labels and remain decorative" do
     get root_url(start_date: "2023-01-19")
     assert_response :success
