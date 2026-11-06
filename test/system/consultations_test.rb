@@ -32,6 +32,7 @@ class ConsultationsTest < ApplicationSystemTestCase
       visit root_url(start_date: "2023-01-19")
 
       assert_selector ".calendar-mobile-agenda", visible: true
+      assert_selector "a.calendar-mobile-agenda-trigger[href='#month-events']", visible: true
       assert_selector "a.calendar-mobile-event-link[href='#{consultation_path(@consultation)}']", visible: true
       assert_no_selector ".calendar-grid .calendar-event-link", visible: true
 
@@ -74,6 +75,7 @@ class ConsultationsTest < ApplicationSystemTestCase
 
     assert_selector "a.calendar-event-link[href='#{consultation_path(@consultation)}']", visible: true
     assert_no_selector ".calendar-mobile-agenda", visible: true
+    assert_no_selector ".calendar-mobile-agenda-trigger", visible: true
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
