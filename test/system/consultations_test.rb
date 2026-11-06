@@ -206,8 +206,8 @@ class ConsultationsTest < ApplicationSystemTestCase
     click_on "New consultation"
 
     fill_in "Description", with: @consultation.description
-    fill_in "End time", with: @consultation.end_time
-    fill_in "Start time", with: @consultation.start_time
+    fill_in "End time", with: @consultation.end_time.change(sec: 0)
+    fill_in "Start time", with: @consultation.start_time.change(sec: 0)
     fill_in "Title", with: @consultation.title
     click_on "Create Consultation"
 
