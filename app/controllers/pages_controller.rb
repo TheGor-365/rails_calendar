@@ -5,16 +5,27 @@ class PagesController < ApplicationController
 
     first_visible_day = calendar_date.beginning_of_month.beginning_of_week
     last_visible_day = calendar_date.end_of_month.end_of_week
+    from = Time.zone.local(first_visible_day.year, first_visible_day.month, first_visible_day.day)
+    last_date = last_visible_day.next_day
+    through = Time.zone.local(last_date.year, last_date.month, last_date.day)
 
+    # Fetch overlaps, not just sessions beginning this month. Otherwise a
+    # cross-midnight consultation disappears from the next month's first cell.
     @consultations = Consultation.where(
-      start_time: first_visible_day.beginning_of_day..last_visible_day.end_of_day
-    )
-  rescue Date::Error, TypeError
+      "start_time < :through AND end_time > :from",
+      from: from, through: through
+    ).order(:start_time, :id).to_a
+
+    @consultations_by_day = (first_visible_day..last_visible_day).to_h do |date|
+      day_start = Time.zone.local(date.year, date.month, date.day)
+      day_end = day_start + 1.day
+      [date, @consultations.select { |event| event.start_time < day_end && event.end_time > day_start }]
+    end
+  rescue Date::Error, TypeError, ArgumentError
     redirect_to root_path, alert: "Invalid calendar date"
   end
 
-  # Public 24-hour agenda. Admin-only write operations stay in
-  # ConsultationsController and are never performed by this endpoint.
+  # Public 24-hour agenda. All write operations remain admin-only.
   def day
     @selected_date = params[:date].present? ? Date.iso8601(params[:date]) : Time.zone.today
     unless (Consultation::MIN_SCHEDULE_YEAR..Consultation::MAX_SCHEDULE_YEAR).cover?(@selected_date.year)
@@ -24,7 +35,6 @@ class PagesController < ApplicationController
     day_start = Time.zone.local(@selected_date.year, @selected_date.month, @selected_date.day)
     day_end = day_start + 1.day
 
-    # Include events begun before midnight but extending into this date.
     @consultations = Consultation.where(
       "start_time < :day_end AND end_time > :day_start",
       day_start: day_start,
@@ -37,8 +47,8 @@ class PagesController < ApplicationController
 
       {
         start_time: slot_start,
-        consultations: @consultations.select do |consultation|
-          consultation.start_time < slot_end && consultation.end_time > slot_start
+        consultations: @consultations.select do |event|
+          event.start_time < slot_end && event.end_time > slot_start
         end
       }
     end
