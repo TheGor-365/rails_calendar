@@ -24,8 +24,8 @@ password or automatically generate one.
 
 - Upgrade candidate: Ruby 3.4.12 / Rails 8.1.4.1, locked on the RC-003 draft branch and passed isolated CI; PR #3 is not merged.
 - PostgreSQL, Turbo/Stimulus, Bootstrap, esbuild/Sass, simple_calendar 2.4.3.
-- Existing database config is local-development-oriented; production credentials,
-  DB connectivity, backup/rollback, HTTPS and secure session cookies require review.
+- Local/test database names are isolated; production requires an explicit `DATABASE_URL`.
+  DB connectivity, backup/rollback, HTTPS and secure session cookies still require review.
 - Login attempt rate limiting, dependency/security audits, legacy invalid data
   assessment, and staging/browser smoke validation are release gates.
 - The repository is not production-ready merely because CI passes. See Draft PR #3 and the security audit workflow.
@@ -33,8 +33,7 @@ password or automatically generate one.
 ## Local development (isolated DB only)
 
 Install the pinned Ruby version, compatible Bundler, PostgreSQL and Node/Yarn.
-Then install dependencies, prepare a development DB and run bin/dev.
-Do not connect a test instance to production data.
+Follow [isolated Linux Mint setup](docs/RC003_LOCAL_RUN_3005.md) to use this app on **127.0.0.1:3005** alongside other Rails projects. Run only this project's development/test DB commands; never connect to a production database.
 
 ## Automated tests
 
