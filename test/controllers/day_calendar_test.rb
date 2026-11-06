@@ -54,6 +54,33 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     assert_select "a.calendar-event-link[href=?]", consultation_path(consultations(:one)), count: 1
   end
 
+  test "mobile agenda has independent day and consultation links" do
+    get root_url(start_date: "2023-01-19")
+
+    assert_response :success
+    assert_select "section.calendar-mobile-agenda[aria-label='Consultations in the displayed month']", count: 1
+    assert_select ".calendar-mobile-agenda-title", text: "Events in January 2023"
+    assert_select "a.calendar-mobile-date-link[href=?]", calendar_day_path(date: "2023-01-19"), count: 1
+    assert_select "a.calendar-mobile-event-link[href=?]", consultation_path(consultations(:one)), count: 1
+    assert_select "a.calendar-day-link[href=?]", calendar_day_path(date: "2023-01-19"), count: 1
+  end
+
+  test "mobile agenda limits previews but preserves access to every busy day" do
+    4.times do |index|
+      Consultation.create!(
+        title: "Additional session #{index}",
+        start_time: Time.zone.local(2023, 1, 19, 9, index * 5),
+        end_time: Time.zone.local(2023, 1, 19, 9, index * 5 + 5)
+      )
+    end
+
+    get root_url(start_date: "2023-01-19")
+    assert_response :success
+    assert_select "a.calendar-mobile-event-link", count: 2
+    assert_select "a.calendar-mobile-more[href=?]", calendar_day_path(date: "2023-01-19"),
+                  text: "View all 5 events", count: 1
+  end
+
   test "busy month cell caps previews at two and links to full day" do
     4.times do |index|
       Consultation.create!(
