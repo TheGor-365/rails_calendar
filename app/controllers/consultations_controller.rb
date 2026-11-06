@@ -29,8 +29,14 @@ class ConsultationsController < ApplicationController
   end
 
   def update
+    attributes = consultation_params
+    # An existing timestamp may contain legacy seconds. The HTML editor is
+    # minute-only, so posting the same displayed minute must not silently
+    # discard the persisted seconds when editing the title/description.
+    preserve_unchanged_minutes!(attributes)
+
     respond_to do |format|
-      if @consultation.update(consultation_params)
+      if @consultation.update(attributes)
         format.html { redirect_to consultation_url(@consultation), notice: "Consultation was successfully updated" }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -61,6 +67,17 @@ class ConsultationsController < ApplicationController
   rescue ArgumentError, TypeError, RangeError
     # An invalid URL parameter must not crash an admin form or write data.
     nil
+  end
+
+  def preserve_unchanged_minutes!(attributes)
+    %w[start_time end_time].each do |name|
+      submitted = attributes[name]
+      persisted = @consultation.public_send(name)
+      next unless submitted.is_a?(String) && persisted.present?
+
+      same_minute = persisted.in_time_zone.strftime("%Y-%m-%dT%H:%M")
+      attributes.delete(name) if submitted == same_minute
+    end
   end
 
   def consultation_params
