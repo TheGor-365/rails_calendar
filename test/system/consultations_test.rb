@@ -95,7 +95,7 @@ class ConsultationsTest < ApplicationSystemTestCase
 
   test "visitor sees one continuous card, can drill into any hour, and open the consultation" do
     visit root_url(start_date: "2023-01-01")
-    find("a.calendar-day-link[href*='2023-01-19']").click(x: 18, y: 18)
+    find("a.calendar-day-link[href*='2023-01-19']").click
 
     assert_current_path calendar_day_path(date: "2023-01-19")
     assert_selector ".rc-time-axis-hour", count: 24
