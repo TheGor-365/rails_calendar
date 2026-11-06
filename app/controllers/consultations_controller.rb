@@ -5,7 +5,7 @@ class ConsultationsController < ApplicationController
   before_action :set_consultation, only: %i[show edit update destroy]
 
   def index
-    @consultations = Consultation.all
+    @consultations = Consultation.order(:start_time, :id)
   end
 
   def show; end

@@ -6,7 +6,7 @@
       <p class="rc-muted mb-0">Every date opens a detailed hourly schedule. Times shown in <%= Time.zone.name %>.</p>
     </div>
     <div class="d-flex flex-wrap align-items-center gap-2">
-      <%= link_to "Today · Day view", calendar_day_path(date: Time.zone.today.iso8601),
+      <%= link_to "Today · 24h", calendar_day_path(date: Time.zone.today.iso8601),
                   class: "rc-action rc-action--quiet" %>
       <% if admin_signed_in? %>
         <%= link_to "New consultation", new_consultation_path, class: "rc-action rc-action--primary" %>
@@ -28,14 +28,14 @@
 
     <% day_events.first(2).each do |consultation| %>
       <article class="calendar-event">
-        <div class="calendar-event-link">
+        <%= link_to consultation_path(consultation), class: "calendar-event-link",
+                    aria: { label: "Open consultation #{consultation.title}" } do %>
           <span class="calendar-event-dot" aria-hidden="true"></span>
           <span class="calendar-event-content">
-            <%= link_to truncate(consultation.title, length: 26), consultation_path(consultation),
-                        class: "calendar-event-name" %>
+            <span class="calendar-event-name"><%= truncate(consultation.title, length: 26) %></span>
             <span class="calendar-event-time"><%= consultation.start_time.in_time_zone.to_date < date ? "Ongoing" : consultation.start_time.in_time_zone.strftime("%H:%M") %></span>
           </span>
-        </div>
+        <% end %>
       </article>
     <% end %>
     <% if day_events.length > 2 %>

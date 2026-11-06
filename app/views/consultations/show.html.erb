@@ -1,22 +1,37 @@
 <div class="container my-4 my-sm-5">
   <div class="content-page">
     <header class="mb-4">
-      <p class="eyebrow mb-2">SCHEDULE / DETAIL</p>
-      <h1 class="page-title mb-0">Consultation details</h1>
+      <p class="eyebrow mb-2">SCHEDULE / SESSION</p>
+      <h1 class="page-title mb-1">Consultation details</h1>
+      <p class="rc-muted mb-0">Session details, duration and direct calendar navigation.</p>
     </header>
     <div class="surface-panel">
       <%= render @consultation %>
+      <div class="rc-detail-meta">
+        <strong>Duration:</strong>
+        <%= distance_of_time_in_words(@consultation.start_time, @consultation.end_time) %>
+        <span aria-hidden="true">·</span>
+        <%= @consultation.end_time <= Time.current ? "Past" : (@consultation.start_time <= Time.current ? "In progress by scheduled time" : "Upcoming") %>
+      </div>
     </div>
 
-    <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
-      <%= link_to "Back to consultations", consultations_path, class: "rc-action rc-action--quiet" %>
+    <nav class="d-flex flex-wrap align-items-center gap-2 mt-3" aria-label="Consultation actions">
+      <%= link_to "View in calendar",
+                  calendar_day_path(date: @consultation.start_time.in_time_zone.to_date.iso8601, anchor: "event-#{@consultation.id}"),
+                  class: "rc-action rc-action--primary" %>
+      <% final_date = (@consultation.end_time - 1.second).in_time_zone.to_date %>
+      <% if final_date > @consultation.start_time.in_time_zone.to_date %>
+        <%= link_to "See final day", calendar_day_path(date: final_date.iso8601, anchor: "event-#{@consultation.id}"),
+                    class: "rc-action rc-action--quiet" %>
+      <% end %>
+      <%= link_to "All consultations", consultations_path, class: "rc-action rc-action--quiet" %>
       <% if admin_signed_in? %>
         <%= link_to "Edit this consultation", edit_consultation_path(@consultation),
-                    class: "rc-action rc-action--primary" %>
+                    class: "rc-action rc-action--quiet" %>
         <%= button_to "Destroy this consultation", @consultation, method: :delete,
                       class: "rc-action rc-action--danger",
                       data: { turbo_confirm: "Delete this consultation?" } %>
       <% end %>
-    </div>
+    </nav>
   </div>
 </div>

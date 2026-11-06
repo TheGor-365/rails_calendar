@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Safe local launcher for Rails Calendar on 127.0.0.1:3005.
+# Does not kill processes or touch other Rails projects.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+unset DATABASE_URL RAILS_ENV
+
+port=3005
+if command -v ss >/dev/null 2>&1 && ss -ltn "( sport = :$port )" | grep -qE '(^|[[:space:]])LISTEN([[:space:]]|$)'; then
+  echo >&2 "Port $port is occupied. Stop the existing Rails Calendar in its terminal with Ctrl+C."
+  echo >&2 "Check the owner without killing anything: ss -ltnp '( sport = :3005 )'"
+  exit 2
+fi
+
+if [[ -f tmp/pids/server.pid ]]; then
+  old_pid="$(cat tmp/pids/server.pid)"
+  if [[ "$old_pid" =~ ^[0-9]+$ ]] && kill -0 "$old_pid" 2>/dev/null; then
+    echo >&2 "Project PID file refers to running process $old_pid."
+    echo >&2 "Inspect it first: ps -p $old_pid -o pid,command; do NOT kill unrelated processes."
+    exit 2
+  fi
+  # Only remove a confirmed stale PID in this repo's directory.
+  rm tmp/pids/server.pid
+fi
+
+echo "Checking that the current branch can load Calendar::DayEventLayout..."
+bin/rails runner 'abort("Calendar::DayEventLayout not available") unless defined?(Calendar::DayEventLayout)'
+echo "Building frontend..."
+npx --yes yarn@1.22.22 build
+npx --yes yarn@1.22.22 build:css
+echo "Starting Rails Calendar on http://127.0.0.1:$port"
+RAILS_LOG_LEVEL="warn" exec bin/rails server -b 127.0.0.1 -p "$port"

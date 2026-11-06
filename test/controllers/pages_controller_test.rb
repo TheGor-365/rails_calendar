@@ -25,7 +25,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get root_url(start_date: consultation.start_time.to_date.iso8601)
 
     assert_response :success
-    assert_select "a[href=?]", consultation_path(consultation), text: consultation.title
+    assert_select "a.calendar-event-link[href=?] .calendar-event-name", consultation_path(consultation), text: consultation.title
   end
 
   test "does not show consultations outside the selected calendar month" do

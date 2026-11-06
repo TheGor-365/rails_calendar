@@ -14,6 +14,18 @@ class ConsultationsTest < ApplicationSystemTestCase
     assert_selector ".calendar-title", text: "February 2023"
   end
 
+  test "calendar month day hit targets and event cards navigate independently" do
+    visit root_url(start_date: "2023-01-01")
+    find("a.calendar-event-link[href='#{consultation_path(@consultation)}']").click
+    assert_current_path consultation_path(@consultation)
+    click_on "View in calendar"
+    assert_current_path calendar_day_path(date: "2023-01-19")
+    assert_selector ".rc-time-axis-hour", count: 24
+    visit root_url(start_date: "2023-01-01")
+    find("time.calendar-day-label[datetime='2023-01-19']").click
+    assert_current_path calendar_day_path(date: "2023-01-19")
+  end
+
   test "anonymous visitors can browse without editing controls" do
     visit consultations_url
     assert_selector "h1", text: "Consultations"
