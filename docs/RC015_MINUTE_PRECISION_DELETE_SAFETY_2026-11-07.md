@@ -13,6 +13,10 @@ User's browser screenshots from the Rails Calendar P0 manual test show:
 
 **Safety constraint:** Do not silently recreate #2, reuse primary keys, delete #3 or run DB reset/migration without verifying the local DB, checking backups and getting the owner's explicit decision. Prior screenshots show #2 originally titled `New`, description `Description for consultation`, 07 Nov 2026 23:54 UTC → 08 Nov 2026 22:53 UTC. These can assist a reconstruction plan but are **not a verified backup**; any recreation would receive a new ID unless an audited restore process is chosen.
 
+## Owner disposition — 07 Nov 2026
+
+**Read-only local DB evidence supplied by owner:** `[[3, "RC-P0 QA — DELETE AFTER TEST"]]` for `Consultation.where(id: [2, 3])`. Original `#2` is absent; temporary `#3` exists. The owner explicitly confirmed `#2` was an unneeded demonstration, and chose **not to restore it**. The incident is now **resolved as a data-recovery decision**, not proof the original delete confirmation was safe. `#3` remains untouched; no automated cleanup is authorized.
+
 ## Code changes
 
 1. Input `datetime-local` displays **HH:MM only** with `step=60`; form text says minute precision and UTC, no seconds control.
@@ -25,7 +29,7 @@ User's browser screenshots from the Rails Calendar P0 manual test show:
 
 - [x] Rails CI + Security audit green on same code SHA: [CI](https://github.com/TheGor-365/rails_calendar/actions/runs/42311286112) · [Security](https://github.com/TheGor-365/rails_calendar/actions/runs/42311286151).
 - [ ] Owner local test on 320/430/mobile and desktop. New/Edit datetime fields must show HH:MM only.
-- [ ] Read-only verification of local records #2 and #3, backup status, and whether the owner wants original #2 restored (no automatic changes).
+- [x] Owner read-only verification of #2/#3 completed; #2 was disposable and **no restoration requested**. #3 stays for QA.
 - [ ] Test delete confirmation only against a deliberately created **new** synthetic record and inspect that ID/title match; never use original record.
 - [ ] Verify guest ACL, session expiry and login rate-limit behavior. No production/main/Railway modification.
 
