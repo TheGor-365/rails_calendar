@@ -6,6 +6,10 @@ Rails.application.configure do
   # In the development environment your application's code is reloaded any time
   # it changes. This slows down response time but is perfect for development
   # since you don't have to restart the web server when you make code changes.
+  # Opt-in quieter terminal logs for the dedicated local :3005 launcher.
+  # Default Rails development verbosity stays unchanged for debugging.
+  config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "debug").to_sym
+
   config.cache_classes = false
 
   # Do not eager load code on boot.
