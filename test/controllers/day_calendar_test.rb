@@ -54,6 +54,33 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     assert_select "a.calendar-event-link[href=?]", consultation_path(consultations(:one)), count: 1
   end
 
+  test "icon actions preserve text labels and remain decorative" do
+    get root_url(start_date: "2023-01-19")
+    assert_response :success
+
+    assert_select "a.calendar-mobile-agenda-trigger[href='#month-events']" do
+      assert_select "i.bi.bi-list-ul[aria-hidden='true']", count: 1
+      assert_select "span.rc-action-label", text: "Events by date"
+    end
+    assert_select "nav[aria-label='Calendar month navigation']" do
+      assert_select "i.bi.bi-chevron-left[aria-hidden='true']", count: 1
+      assert_select "i.bi.bi-chevron-right[aria-hidden='true']", count: 1
+    end
+
+    get consultation_url(consultations(:one))
+    assert_response :success
+    assert_select "nav[aria-label='Consultation actions'] a" do
+      assert_select "i.bi.bi-calendar-event[aria-hidden='true']", minimum: 1
+    end
+
+    get admin_login_url
+    assert_response :success
+    assert_select "button.rc-action.rc-action--primary[type='submit']" do
+      assert_select "i.bi.bi-box-arrow-in-right[aria-hidden='true']", count: 1
+      assert_select "span.rc-action-label", text: "Sign in"
+    end
+  end
+
   test "mobile agenda has independent day and consultation links" do
     get root_url(start_date: "2023-01-19")
 

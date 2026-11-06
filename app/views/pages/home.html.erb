@@ -6,11 +6,11 @@
       <p class="rc-muted mb-0">Every date opens a detailed hourly schedule. Times shown in <%= Time.zone.name %>.</p>
     </div>
     <div class="d-flex flex-wrap align-items-center gap-2">
-      <%= link_to "Today · 24h", calendar_day_path(date: Time.zone.today.iso8601),
+      <%= link_to rc_icon_label("calendar3", "Today · 24h"), calendar_day_path(date: Time.zone.today.iso8601),
                   class: "rc-action rc-action--quiet" %>
-      <%= link_to "Events by date", "#month-events", class: "rc-action rc-action--quiet calendar-mobile-agenda-trigger" %>
+      <%= link_to rc_icon_label("list-ul", "Events by date"), "#month-events", class: "rc-action rc-action--quiet calendar-mobile-agenda-trigger" %>
       <% if admin_signed_in? %>
-        <%= link_to "New consultation", new_consultation_path, class: "rc-action rc-action--primary" %>
+        <%= link_to rc_icon_label("plus-lg", "New consultation"), new_consultation_path, class: "rc-action rc-action--primary" %>
       <% end %>
     </div>
   </header>
@@ -40,7 +40,7 @@
       </article>
     <% end %>
     <% if day_events.length > 2 %>
-      <%= link_to "+ #{day_events.length - 2} more", calendar_day_path(date: date.iso8601),
+      <%= link_to rc_icon_label("three-dots", "+ #{day_events.length - 2} more"), calendar_day_path(date: date.iso8601),
                   class: "calendar-more", aria: { label: "View all #{day_events.length} events on #{date.iso8601}" } %>
     <% end %>
   <% end %>
@@ -59,7 +59,7 @@
           <li class="calendar-mobile-agenda-day" data-date="<%= date.iso8601 %>">
             <%= link_to calendar_day_path(date: date.iso8601), class: "calendar-mobile-date-link" do %>
               <time datetime="<%= date.iso8601 %>"><%= date.strftime("%a, %d %b") %></time>
-              <span><%= pluralize(day_events.size, "event") %> · View day</span>
+              <span><%= rc_icon_label("arrow-up-right", "#{pluralize(day_events.size, "event")} · View day") %></span>
             <% end %>
             <ul class="calendar-mobile-event-list">
               <% day_events.first(2).each do |consultation| %>
@@ -69,14 +69,14 @@
                     <span class="calendar-mobile-event-title"><%= truncate(consultation.title, length: 75) %></span>
                     <span class="calendar-mobile-event-time">
                       <%= consultation.start_time.in_time_zone.to_date < date ? "Ongoing" : consultation.start_time.in_time_zone.strftime("%H:%M") %>
-                      <span aria-hidden="true">·</span> Details
+                      <span aria-hidden="true">·</span> <%= rc_icon_label("arrow-up-right", "Details") %>
                     </span>
                   <% end %>
                 </li>
               <% end %>
               <% if day_events.length > 2 %>
                 <li>
-                  <%= link_to "View all #{day_events.length} events", calendar_day_path(date: date.iso8601),
+                  <%= link_to rc_icon_label("list-ul", "View all #{day_events.length} events"), calendar_day_path(date: date.iso8601),
                               class: "calendar-mobile-more" %>
                 </li>
               <% end %>

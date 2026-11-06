@@ -62,7 +62,9 @@
   </div>
 
   <div class="d-flex flex-wrap align-items-center gap-2">
-    <%= form.submit class: "rc-action rc-action--primary" %>
-    <%= link_to "Cancel", consultations_path, class: "rc-action rc-action--quiet" %>
+    <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
+      <%= rc_icon_label(consultation.persisted? ? "check2-circle" : "plus-lg", consultation.persisted? ? "Update Consultation" : "Create Consultation") %>
+    <% end %>
+    <%= link_to rc_icon_label("x-lg", "Cancel"), consultations_path, class: "rc-action rc-action--quiet" %>
   </div>
 <% end %>

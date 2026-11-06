@@ -16,19 +16,19 @@
     </div>
 
     <nav class="d-flex flex-wrap align-items-center gap-2 mt-3" aria-label="Consultation actions">
-      <%= link_to "View in calendar",
+      <%= link_to rc_icon_label("calendar-event", "View in calendar"),
                   calendar_day_path(date: @consultation.start_time.in_time_zone.to_date.iso8601, anchor: "event-#{@consultation.id}"),
                   class: "rc-action rc-action--primary" %>
       <% final_date = (@consultation.end_time - 1.second).in_time_zone.to_date %>
       <% if final_date > @consultation.start_time.in_time_zone.to_date %>
-        <%= link_to "See final day", calendar_day_path(date: final_date.iso8601, anchor: "event-#{@consultation.id}"),
+        <%= link_to rc_icon_label("calendar-check", "See final day"), calendar_day_path(date: final_date.iso8601, anchor: "event-#{@consultation.id}"),
                     class: "rc-action rc-action--quiet" %>
       <% end %>
-      <%= link_to "All consultations", consultations_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("list-ul", "All consultations"), consultations_path, class: "rc-action rc-action--quiet" %>
       <% if admin_signed_in? %>
-        <%= link_to "Edit this consultation", edit_consultation_path(@consultation),
+        <%= link_to rc_icon_label("pencil-square", "Edit this consultation"), edit_consultation_path(@consultation),
                     class: "rc-action rc-action--quiet" %>
-        <%= button_to "Destroy this consultation", @consultation, method: :delete,
+        <%= button_to rc_icon_label("trash3", "Destroy this consultation"), @consultation, method: :delete,
                       class: "rc-action rc-action--danger",
                       data: { turbo_confirm: "Delete this consultation?" } %>
       <% end %>
