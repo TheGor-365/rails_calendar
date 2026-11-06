@@ -812,3 +812,21 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   .rc-range-event-times { font-size: .6rem; }
   .rc-day-canvas { min-width: max(100%, calc(var(--rc-max-lanes) * 138px)); }
 }
+
+.rc-time-axis-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  margin-top: -.12rem;
+  padding: 0 .2rem;
+  margin-left: -.2rem;
+  border-radius: .16rem;
+  color: var(--rc-muted);
+  text-decoration: none;
+}
+.rc-time-axis-link:hover,
+.rc-time-axis-link:focus-visible {
+  color: var(--rc-accent);
+  background: var(--rc-accent-wash);
+  text-decoration: underline;
+}
