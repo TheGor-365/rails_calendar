@@ -1249,11 +1249,13 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
   .rc-mobile-dock {
     position: fixed;
-    left: 50%;
+    // Use viewport units: html has scrollbar-gutter: stable (15px in
+    // headless Chrome), so 50% would appear 7.5px off-center.
+    left: 50vw;
     bottom: 0;
     transform: translateX(-50%);
-    width: min(100%, 430px);
-    max-width: 100%;
+    width: min(100vw, 430px);
+    max-width: 100vw;
     box-sizing: border-box;
     z-index: 1100;
     isolation: isolate;
