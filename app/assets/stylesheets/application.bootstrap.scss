@@ -210,3 +210,127 @@ $font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sa
     animation-duration: .01ms !important;
   }
 }
+
+/* RC-008: calm, readable daily agenda with all 24 hours. */
+.calendar-day-link {
+  display: inline-flex;
+  align-items: center;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: .15rem .4rem;
+  border-radius: .4rem;
+  color: var(--bs-body-color);
+  text-decoration: none;
+}
+
+.calendar-day-link:hover,
+.calendar-day-link:focus-visible {
+  background: #eae8ff;
+  color: #312e81;
+  outline-offset: 2px;
+}
+
+.day-schedule {
+  max-height: min(72vh, 900px);
+  overflow-y: auto;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: .875rem;
+  box-shadow: var(--app-shadow);
+}
+
+.day-timeline {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.day-timeline tr {
+  height: 70px;
+}
+
+.day-timeline th,
+.day-timeline td {
+  border: 0;
+  border-bottom: 1px solid var(--app-border);
+  background: transparent;
+}
+
+.day-timeline tr:last-child th,
+.day-timeline tr:last-child td {
+  border-bottom: 0;
+}
+
+.day-hour {
+  position: relative;
+  width: 90px;
+  padding: .75rem .625rem;
+  text-align: right;
+  font-size: .875rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--app-muted);
+  border-right: 1px solid var(--app-border) !important;
+  vertical-align: top;
+}
+
+.day-slot {
+  padding: .5rem .75rem !important;
+  vertical-align: top;
+  min-width: 0;
+}
+
+.day-slot-empty {
+  display: inline-block;
+  padding-top: .25rem;
+  color: #94a3b8;
+}
+
+.day-add-link {
+  display: inline-block;
+  margin-top: .15rem;
+  padding: .2rem .35rem;
+  border-radius: .375rem;
+  text-decoration: none;
+  color: #4338ca;
+}
+
+.day-add-link:hover,
+.day-add-link:focus-visible {
+  background: #eef2ff;
+  text-decoration: underline;
+}
+
+.day-event {
+  width: 100%;
+  padding: .55rem .75rem;
+  margin-bottom: .375rem;
+  border: 1px solid #c7d2fe;
+  border-left: 3px solid #4338ca;
+  border-radius: .5rem;
+  background: #f5f3ff;
+  overflow-wrap: anywhere;
+}
+
+.day-event a {
+  color: #312e81;
+}
+
+.day-event a:focus-visible {
+  outline: 2px solid #4338ca;
+  outline-offset: 3px;
+}
+
+@media (max-width: 575.98px) {
+  .day-hour {
+    width: 66px;
+    font-size: .8rem;
+    padding: .625rem .375rem !important;
+  }
+  .day-slot {
+    padding: .375rem .5rem !important;
+  }
+  .day-event {
+    padding: .5rem;
+  }
+}

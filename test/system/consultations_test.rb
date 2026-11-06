@@ -80,6 +80,33 @@ class ConsultationsTest < ApplicationSystemTestCase
     assert_no_link "New consultation"
   end
 
+
+  test "public visitor opens a date and sees all 24 hours" do
+    visit root_url(start_date: "2023-01-01")
+    find("a.calendar-day-link[href*='2023-01-19']").click
+
+    assert_current_path calendar_day_path(date: "2023-01-19")
+    assert_selector "table.day-timeline tbody tr", count: 24
+    assert_selector "#hour-22", text: @consultation.title
+    assert_no_link "Add at 09:00"
+  end
+
+  test "administrator manually creates consultation from a day timeslot" do
+    sign_in_as_admin
+    visit calendar_day_url(date: "2026-11-06")
+    click_on "Add at 09:00"
+
+    assert_selector "h1", text: "New consultation"
+    assert_field "Start time", with: /2026-11-06T09:00/
+    assert_field "End time", with: /2026-11-06T10:00/
+
+    fill_in "Title", with: "Project kickoff"
+    click_on "Create Consultation"
+
+    assert_text "Consultation was successfully created"
+    assert_text "Project kickoff"
+  end
+
   private
 
   def sign_in_as_admin
