@@ -112,7 +112,9 @@ class ConsultationsTest < ApplicationSystemTestCase
     assert_selector "article#event-#{long_event.id} a", count: 1
     assert_selector ".rc-time-axis-hour", count: 24
 
-    find("a.rc-hour-band[href*='hour=12']").click
+    # The large event intentionally covers the band; the left time axis
+    # provides an independent click target for its interval.
+    find("#hour-12 a.rc-time-axis-link").click
     assert_current_path calendar_hour_path(date: "2023-01-19", hour: 12)
     assert_link "Long support session"
   end
