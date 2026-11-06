@@ -26,6 +26,58 @@ class ConsultationsTest < ApplicationSystemTestCase
     assert_current_path calendar_day_path(date: "2023-01-19")
   end
 
+  test "mobile calendar fits seven days and preserves independent day event and hour navigation" do
+    [320, 390, 430].each do |viewport_width|
+      page.driver.browser.manage.window.resize_to(viewport_width, 932)
+      visit root_url(start_date: "2023-01-19")
+
+      assert_selector ".calendar-mobile-agenda", visible: true
+      assert_selector "a.calendar-mobile-event-link[href='#{consultation_path(@consultation)}']", visible: true
+      assert_no_selector ".calendar-grid .calendar-event-link", visible: true
+
+      dimensions = page.evaluate_script(<<~JS)
+        (() => {
+          const first = document.querySelector("a.calendar-day-link[href*='2023-01-16']");
+          const sunday = document.querySelector("a.calendar-day-link[href*='2023-01-22']");
+          return {
+            firstLeft: first.getBoundingClientRect().left,
+            sundayRight: sunday.getBoundingClientRect().right,
+            documentWidth: document.documentElement.scrollWidth,
+            viewportWidth: window.innerWidth
+          };
+        })()
+      JS
+
+      assert_operator dimensions["firstLeft"], :>=, 0, "Monday is clipped at #{viewport_width}px"
+      assert_operator dimensions["sundayRight"], :<=, dimensions["viewportWidth"] + 1,
+                      "Sunday is off-screen at #{viewport_width}px"
+      assert_operator dimensions["documentWidth"], :<=, dimensions["viewportWidth"] + 1,
+                      "Document overflows at #{viewport_width}px"
+
+      find("a.calendar-mobile-event-link[href='#{consultation_path(@consultation)}']").click
+      assert_current_path consultation_path(@consultation)
+
+      visit root_url(start_date: "2023-01-19")
+      find("a.calendar-day-link[href*='2023-01-19']").click
+      assert_current_path calendar_day_path(date: "2023-01-19")
+      find("#hour-22 a.rc-time-axis-link").click
+      assert_current_path calendar_hour_path(date: "2023-01-19", hour: 22)
+      assert_link @consultation.title
+    end
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  test "desktop month retains inline event previews" do
+    page.driver.browser.manage.window.resize_to(1280, 900)
+    visit root_url(start_date: "2023-01-19")
+
+    assert_selector "a.calendar-event-link[href='#{consultation_path(@consultation)}']", visible: true
+    assert_no_selector ".calendar-mobile-agenda", visible: true
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
   test "anonymous visitors can browse without editing controls" do
     visit consultations_url
     assert_selector "h1", text: "Consultations"
