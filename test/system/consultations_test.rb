@@ -229,7 +229,7 @@ class ConsultationsTest < ApplicationSystemTestCase
   test "administrator can destroy consultation" do
     sign_in_as_admin
     visit consultation_url(@consultation)
-    accept_confirm "Delete this consultation?" do
+    accept_confirm(/Delete consultation ##{@consultation.id}.*#{Regexp.escape(@consultation.title)}.*cannot be undone/) do
       click_on "Destroy this consultation"
     end
 
