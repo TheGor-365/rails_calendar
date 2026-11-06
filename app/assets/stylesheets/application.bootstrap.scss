@@ -1249,13 +1249,14 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
   .rc-mobile-dock {
     position: fixed;
-    // Use viewport units: html has scrollbar-gutter: stable (15px in
-    // headless Chrome), so 50% would appear 7.5px off-center.
-    left: 50vw;
+    // Center within the usable layout viewport. In desktop-emulated Chrome
+    // the vertical scrollbar takes up width: window.innerWidth includes it,
+    // documentElement.clientWidth (and this fixed containing block) do not.
+    left: 50%;
     bottom: 0;
     transform: translateX(-50%);
-    width: min(100vw, 430px);
-    max-width: 100vw;
+    width: min(100%, 430px);
+    max-width: 100%;
     box-sizing: border-box;
     z-index: 1100;
     isolation: isolate;
