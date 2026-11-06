@@ -13,6 +13,7 @@ class ConsultationsController < ApplicationController
 
   def new
     @consultation = Consultation.new
+    prefill_schedule_from_day if params[:start_at].present?
   end
 
   def create
@@ -49,6 +50,17 @@ class ConsultationsController < ApplicationController
 
   def set_consultation
     @consultation = Consultation.find(params[:id])
+  end
+
+  def prefill_schedule_from_day
+    start_at = Time.iso8601(params[:start_at].to_s).in_time_zone
+    return unless (Consultation::MIN_SCHEDULE_YEAR..Consultation::MAX_SCHEDULE_YEAR).cover?(start_at.year)
+    return unless (Consultation::MIN_SCHEDULE_YEAR..Consultation::MAX_SCHEDULE_YEAR).cover?((start_at + 1.hour).year)
+
+    @consultation.assign_attributes(start_time: start_at, end_time: start_at + 1.hour)
+  rescue ArgumentError, TypeError, RangeError
+    # An invalid URL parameter must not crash an admin form or write data.
+    nil
   end
 
   def consultation_params
