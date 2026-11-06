@@ -8,6 +8,7 @@
     <div class="d-flex flex-wrap align-items-center gap-2">
       <%= link_to "Today · 24h", calendar_day_path(date: Time.zone.today.iso8601),
                   class: "rc-action rc-action--quiet" %>
+      <%= link_to "Events by date", "#month-events", class: "rc-action rc-action--quiet calendar-mobile-agenda-trigger" %>
       <% if admin_signed_in? %>
         <%= link_to "New consultation", new_consultation_path, class: "rc-action rc-action--primary" %>
       <% end %>
@@ -46,7 +47,7 @@
 
   <%# Small screens keep all seven calendar columns visible. Day links stay
       inside the grid; event links remain independently reachable below it. %>
-  <section class="calendar-mobile-agenda" aria-label="Consultations in the displayed month">
+  <section id="month-events" class="calendar-mobile-agenda" aria-label="Consultations in the displayed month">
     <header class="calendar-mobile-agenda-header">
       <h2 class="calendar-mobile-agenda-title">Events in <%= @displayed_month.strftime("%B %Y") %></h2>
       <p class="rc-hint mb-0">Tap a date above for its 24-hour schedule, or open an event directly below.</p>
