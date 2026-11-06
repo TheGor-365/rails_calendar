@@ -10,7 +10,8 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     assert_select "table.day-timeline tbody tr", count: 24
     assert_select "tr#hour-00 time", text: /00:00/
     assert_select "tr#hour-23 time", text: /23:00/
-    assert_select "a[href=?]", consultation_path(consultations(:one)), count: 1
+    assert_select "tr#hour-22 a[href=?]", consultation_path(consultations(:one))
+    assert_select "tr#hour-23 a[href=?]", consultation_path(consultations(:one))
     assert_select ".day-add-link", count: 0
   end
 
