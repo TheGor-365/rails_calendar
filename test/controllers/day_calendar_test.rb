@@ -94,11 +94,14 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "article#event-#{event.id}", count: 1
     assert_select "article#event-#{event.id} a[href=?]", consultation_path(event), count: 1
+    assert_select "article#event-#{event.id} .rc-range-event-clock", text: /23:30.*24:00/m
+    assert_select "article#event-#{event.id} .rc-range-event-exact-bar", count: 1
 
     get calendar_day_url(date: "2023-01-19")
     assert_response :success
     assert_select "article#event-#{event.id}", count: 1
     assert_select "article#event-#{event.id} a[href=?]", consultation_path(event), count: 1
+    assert_select "article#event-#{event.id} .rc-range-event-clock", text: /00:00.*01:15/m
     assert_select "#hour-00 .rc-time-axis-count", text: "1"
     assert_select "#hour-01 .rc-time-axis-count", text: "1"
     assert_select "#hour-02 .rc-time-axis-count", count: 0
