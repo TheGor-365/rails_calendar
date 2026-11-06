@@ -53,7 +53,8 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "a.calendar-event-name[href=?]", consultation_path(consultation)
-    assert_select "a.calendar-event-name[href=?]", text: "Boundary event"
+    assert_select "a.calendar-event-name", text: "Boundary event"
+    assert_select ".calendar-event-time", text: "Ongoing"
   end
 
   test "cross-midnight consultations appear in the following day" do
