@@ -1,26 +1,43 @@
 <div class="container my-4 my-sm-5">
   <header class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
     <div>
-      <p class="eyebrow mb-2">SCHEDULE / RECORDS</p>
-      <h1 class="page-title mb-0">Consultations</h1>
+      <p class="eyebrow mb-2">SCHEDULE / ALL RECORDS</p>
+      <h1 class="page-title mb-1">Consultations</h1>
+      <p class="rc-muted mb-0">Chronological list of sessions. Open a record or jump directly to its calendar date.</p>
     </div>
-    <% if admin_signed_in? %>
-      <%= link_to "New consultation", new_consultation_path, class: "rc-action rc-action--primary" %>
-    <% end %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Calendar", root_path, class: "rc-action rc-action--quiet" %>
+      <% if admin_signed_in? %>
+        <%= link_to "New consultation", new_consultation_path, class: "rc-action rc-action--primary" %>
+      <% end %>
+    </div>
   </header>
 
   <% if @consultations.any? %>
     <ul id="consultations" class="rc-record-list">
       <% @consultations.each do |consultation| %>
-        <li class="rc-record">
-          <%= render consultation %>
-          <%= link_to "Show this consultation", consultation, class: "rc-text-link mt-2" %>
+        <li class="rc-record" id="<%= dom_id consultation %>">
+          <div class="rc-record-head">
+            <h2 class="h5 mb-0"><%= link_to consultation.title, consultation_path(consultation), class: "rc-record-title" %></h2>
+            <span class="rc-record-meta">
+              <time datetime="<%= consultation.start_time.iso8601 %>"><%= consultation.start_time.in_time_zone.strftime("%d %b %Y, %H:%M") %></time>
+              <span aria-hidden="true">—</span>
+              <time datetime="<%= consultation.end_time.iso8601 %>"><%= consultation.end_time.in_time_zone.strftime("%d %b %Y, %H:%M") %></time>
+            </span>
+          </div>
+          <% if consultation.description.present? %>
+            <p class="rc-muted mt-2 mb-0"><%= truncate(consultation.description, length: 140) %></p>
+          <% end %>
+          <div class="rc-record-actions">
+            <%= link_to "View details", consultation_path(consultation), class: "rc-text-link" %>
+            <%= link_to "View in calendar",
+                        calendar_day_path(date: consultation.start_time.in_time_zone.to_date.iso8601, anchor: "event-#{consultation.id}"),
+                        class: "rc-text-link" %>
+          </div>
         </li>
       <% end %>
     </ul>
   <% else %>
-    <p id="consultations" role="status" class="rc-notice rc-notice--neutral">
-      No consultations have been scheduled.
-    </p>
+    <p id="consultations" role="status" class="rc-notice rc-notice--neutral">No consultations have been scheduled.</p>
   <% end %>
 </div>
