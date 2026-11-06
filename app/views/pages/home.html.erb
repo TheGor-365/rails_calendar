@@ -5,14 +5,20 @@
       <h1 class="page-title mb-1">Consultations</h1>
       <p class="text-muted mb-0">Browse scheduled consultations. Times are shown in <%= Time.zone.name %>.</p>
     </div>
-    <% if admin_signed_in? %>
-      <%= link_to "New consultation", new_consultation_path, class: "btn btn-primary" %>
-    <% end %>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <%= link_to "Today · Day view", calendar_day_path(date: Time.zone.today.iso8601),
+                  class: "btn btn-outline-secondary" %>
+      <% if admin_signed_in? %>
+        <%= link_to "New consultation", new_consultation_path, class: "btn btn-primary" %>
+      <% end %>
+    </div>
   </div>
 
   <%= month_calendar(events: @consultations) do |date, consultations| %>
-    <time class="calendar-day-label" datetime="<%= date.iso8601 %>"
-          aria-label="<%= date.strftime('%A, %B %d, %Y') %>"><%= date.day %></time>
+    <%= link_to calendar_day_path(date: date.iso8601), class: "calendar-day-link",
+                aria: { label: "View #{date.strftime('%A, %B %d, %Y')}" } do %>
+      <time class="calendar-day-label" datetime="<%= date.iso8601 %>"><%= date.day %></time>
+    <% end %>
 
     <% consultations.each do |consultation| %>
       <article class="card calendar-event mt-2">
