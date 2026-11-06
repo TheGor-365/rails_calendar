@@ -20,21 +20,20 @@ credentials, put them in client-side JavaScript, or paste them into issues.
 Administrators sign in via /admin/login. The application does not seed an admin
 password or automatically generate one.
 
-## Legacy baseline and remaining release blockers
+## Runtime upgrade in progress (RC-003) and remaining release blockers
 
-- Ruby 3.1.2 / Rails 7.0.4.1 are end-of-life. Upgrade before public production.
+- Upgrade candidate: Ruby 3.4.12 / Rails 8.1.4.1, locked on the RC-003 draft branch and passed isolated CI; PR #3 is not merged.
 - PostgreSQL, Turbo/Stimulus, Bootstrap, esbuild/Sass, simple_calendar 2.4.3.
-- Existing database config is local-development-oriented; production credentials,
-  DB connectivity, backup/rollback, HTTPS and secure session cookies require review.
+- Local/test database names are isolated; production requires an explicit `DATABASE_URL`.
+  DB connectivity, backup/rollback, HTTPS and secure session cookies still require review.
 - Login attempt rate limiting, dependency/security audits, legacy invalid data
   assessment, and staging/browser smoke validation are release gates.
-- The repository is not production-ready merely because CI passes.
+- The repository is not production-ready merely because CI passes. See Draft PR #3 and the security audit workflow.
 
 ## Local development (isolated DB only)
 
 Install the pinned Ruby version, compatible Bundler, PostgreSQL and Node/Yarn.
-Then install dependencies, prepare a development DB and run bin/dev.
-Do not connect a test instance to production data.
+Follow [isolated Linux Mint setup](docs/RC003_LOCAL_RUN_3005.md) to use this app on **127.0.0.1:3005** alongside other Rails projects. Run only this project's development/test DB commands; never connect to a production database.
 
 ## Automated tests
 
@@ -50,3 +49,9 @@ those are intentionally not production credentials.
 - Baseline Draft PR #1: https://github.com/TheGor-365/rails_calendar/pull/1
 
 Educational case only; not a verified paid client deployment.
+
+## RC-003 runtime and dependency audit
+
+- [Draft PR #3](https://github.com/TheGor-365/rails_calendar/pull/3) migrates to patched Ruby 3.4.12 / Rails 8.1.4.1 and resolves Ruby/JS dependencies.
+- [Runtime CI](https://github.com/TheGor-365/rails_calendar/actions/runs/42128427245) and [Security audit](https://github.com/TheGor-365/rails_calendar/actions/runs/42128427372) passed before final cleanup. See [RC-003 checkpoint](docs/RC003_RUNTIME_UPGRADE.md) for remaining release blockers.
+- Remains an **unmerged educational demo**, not a verified production service.

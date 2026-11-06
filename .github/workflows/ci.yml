@@ -1,4 +1,4 @@
-name: Rails Calendar baseline tests
+name: Rails Calendar CI
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     services:
       postgres:
@@ -37,7 +37,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Legacy pinned Ruby; upgrading is a separate release gate.
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
@@ -67,12 +66,9 @@ jobs:
           chrome-version: stable
           install-chromedriver: true
 
-      - name: Configure legacy webdrivers gem with matching ChromeDriver
+      - name: Configure matching ChromeDriver
         run: |
-          mkdir -p "$HOME/.webdrivers"
-          cp "${{ steps.browser.outputs.chromedriver-path }}" "$HOME/.webdrivers/chromedriver"
-          chmod +x "$HOME/.webdrivers/chromedriver"
-          echo "CI_CHROMEDRIVER_VERSION=${{ steps.browser.outputs.chromedriver-version }}" >> "$GITHUB_ENV"
+          echo "$(dirname "${{ steps.browser.outputs.chromedriver-path }}")" >> "$GITHUB_PATH"
           echo "WD_CHROME_PATH=${{ steps.browser.outputs.chrome-path }}" >> "$GITHUB_ENV"
 
       - name: Run browser system tests
