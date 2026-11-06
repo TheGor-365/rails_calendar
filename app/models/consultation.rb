@@ -7,6 +7,7 @@ class Consultation < ApplicationRecord
   validates :description, length: { maximum: 5_000 }, allow_nil: true
   validate :dates_within_supported_range
   validate :end_time_after_start_time
+  validate :changed_schedule_times_are_whole_minutes
 
   private
 
@@ -19,6 +20,20 @@ class Consultation < ApplicationRecord
 
       unless (MIN_SCHEDULE_YEAR..MAX_SCHEDULE_YEAR).cover?(value.year)
         errors.add(attribute, "must be between years #{MIN_SCHEDULE_YEAR} and #{MAX_SCHEDULE_YEAR}")
+      end
+    end
+  end
+
+  # Preserve old instants exactly, but require any newly created or edited
+  # timestamp to use minute precision. No silent data migration or truncation.
+  def changed_schedule_times_are_whole_minutes
+    %i[start_time end_time].each do |attribute|
+      value = public_send(attribute)
+      next if value.blank?
+      next unless new_record? || will_save_change_to_attribute?(attribute)
+
+      unless value.sec.zero? && value.subsec.zero?
+        errors.add(attribute, "must use whole minutes (seconds must be 00)")
       end
     end
   end
