@@ -1,6 +1,30 @@
 require "test_helper"
 
 class AdminSessionsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    Admin::SessionsController::LOGIN_RATE_LIMIT_STORE.clear
+  end
+  test "login limits the sixth request and keeps anonymous calendar public" do
+    5.times do
+      post admin_session_url, params: {
+        username: ENV.fetch("RAILS_CALENDAR_ADMIN_USERNAME"),
+        password: "invalid-test-password"
+      }
+      assert_response :unauthorized
+    end
+
+    post admin_session_url, params: {
+      username: ENV.fetch("RAILS_CALENDAR_ADMIN_USERNAME"),
+      password: ENV.fetch("RAILS_CALENDAR_ADMIN_PASSWORD")
+    }
+    assert_response :too_many_requests
+
+    get consultations_url
+    assert_response :success
+    get new_consultation_url
+    assert_redirected_to admin_login_url
+  end
+
   test "administrator login page is public" do
     get admin_login_url
     assert_response :success
