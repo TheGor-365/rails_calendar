@@ -1,4 +1,4 @@
-name: Rails Calendar baseline tests
+name: Rails Calendar tests (RC-003)
 
 on:
   push:
@@ -10,8 +10,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-22.04
-    timeout-minutes: 15
-
+    timeout-minutes: 20
     services:
       postgres:
         image: postgres:15
@@ -26,54 +25,41 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     env:
       RAILS_ENV: test
       PGHOST: 127.0.0.1
       PGPORT: 5432
       PGUSER: postgres
       PGPASSWORD: postgres
-
     steps:
       - uses: actions/checkout@v4
-
-      # Legacy pinned Ruby; upgrading is a separate release gate.
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-
+          node-version: '24'
       - name: Install JS dependencies and build assets
         run: |
-          corepack enable
-          corepack prepare yarn@1.22.22 --activate
+          npm install --global yarn@1.22.22
           yarn install --frozen-lockfile
           yarn build
           yarn build:css
-
       - name: Prepare isolated test DB
         run: bin/rails db:prepare
-
-      - name: Run model and controller tests
-        run: bin/rails test
-
+      - name: Check eager loading and model/controller tests
+        run: |
+          bin/rails zeitwerk:check
+          bin/rails test
       - uses: browser-actions/setup-chrome@v2
         id: browser
         with:
           chrome-version: stable
           install-chromedriver: true
-
-      - name: Configure legacy webdrivers gem with matching ChromeDriver
+      - name: Configure Chrome and ChromeDriver for Selenium
         run: |
-          mkdir -p "$HOME/.webdrivers"
-          cp "${{ steps.browser.outputs.chromedriver-path }}" "$HOME/.webdrivers/chromedriver"
-          chmod +x "$HOME/.webdrivers/chromedriver"
-          echo "CI_CHROMEDRIVER_VERSION=${{ steps.browser.outputs.chromedriver-version }}" >> "$GITHUB_ENV"
-          echo "WD_CHROME_PATH=${{ steps.browser.outputs.chrome-path }}" >> "$GITHUB_ENV"
-
+          echo "CI_CHROMEDRIVER_PATH=${{ steps.browser.outputs.chromedriver-path }}" >> "$GITHUB_ENV"
+          echo "CI_CHROME_PATH=${{ steps.browser.outputs.chrome-path }}" >> "$GITHUB_ENV"
       - name: Run browser system tests
         run: bin/rails test:system

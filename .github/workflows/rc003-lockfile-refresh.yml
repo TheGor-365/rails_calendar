@@ -1,0 +1,53 @@
+name: RC-003 one-time lockfile regeneration
+
+on:
+  push:
+    branches:
+      - feature/rc-003-runtime-security-audit-2026-11-06
+    paths:
+      - Gemfile
+      - package.json
+      - .github/workflows/rc003-lockfile-refresh.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    # Never run for externally supplied PR code or on main.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feature/rc-003-runtime-security-audit-2026-11-06'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.12'
+          bundler-cache: false
+      - name: Generate Ruby lockfile on target runtime
+        run: |
+          gem install bundler --no-document
+          bundle update
+          bundle lock --add-platform x86_64-linux
+          bundle check
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Generate Yarn classic lockfile from updated package constraints
+        run: |
+          npm install --global yarn@1.22.22
+          rm yarn.lock
+          yarn install --non-interactive
+          yarn build
+          yarn build:css
+      - name: Commit regenerated lockfiles to RC-003 branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Gemfile.lock yarn.lock
+          if ! git diff --cached --quiet; then
+            git commit -m "RC-003: regenerate Ruby and JS lockfiles on supported runtimes"
+            git push origin "HEAD:feature/rc-003-runtime-security-audit-2026-11-06"
+          fi
