@@ -30,14 +30,14 @@
 | RC-011 / PR #11 | Safe local boot, day/event deep links, separate list/detail UX | CI+Security success; user desktop screenshots show NameError resolved |
 | RC-012 / PR #12 | Seven visible mobile columns, month event list and mobile feature parity | CI+Security success; user screenshots at 430px show working day/event navigation |
 | RC-013 / PR #13 | Restrained icon-labeled controls and touch/focus styling across existing screens | CI+Security SUCCESS; owner mobile detail screenshot shows icons |
-| RC-014 / PR #14 | Persistent five-tab dock and single-row detail actions | Earlier CI+Security PASS, but owner 430px screenshot showed unstyled scrolling text links: **UX REJECTED**; RC-014b centered fixed dock plus CSS-bundle verification in progress |
+| RC-014 / PR #14 | Persistent five-tab dock and single-row detail actions | Owner's 430px screenshot of RC-014 rejected (unstyled links in flow). RC-014b fixed dock + bundle check committed at `af850af`; CI+Security SUCCESS (69 tests, 524 assertions); **manual RC-014b browser QA pending** |
 
 All these PRs are Draft and stacked; `main` and production have not been changed by this program. #4 is a superseded duplicate (DO NOT MERGE).
 
 ## Phase A — finish the existing calendar (P0; before public launch)
 
 ### A1. RC-014b — fixed mobile dock / CSS freshness (CURRENT)
-- Verify fresh CI+Security on the exact RC-014b PR #14 HEAD SHA; Chrome at 320/390/430 and desktop. Assert browser-computed CSS release marker, fixed viewport bottom even after long-page scroll, 5 equal tabs centered within a max-430px dock, required safe-area padding and one-row consultation actions. Verify guest/new authentication gate.
+- **Verified** [CI run 42304835490](https://github.com/TheGor-365/rails_calendar/actions/runs/42304835490) and [Security run 42304835617](https://github.com/TheGor-365/rails_calendar/actions/runs/42304835617) on SHA `af850af347c30d632058ca7464f6b3a1680a45f3`: 54 Rails tests/352 assertions + 15 Chrome tests/172 assertions, 0 failures/errors/skips. Chrome at 320/390/430 and desktop. Assert browser-computed CSS release marker, fixed viewport bottom even after long-page scroll, 5 equal tabs centered within a max-430px dock, required safe-area padding and one-row consultation actions. Verify guest/new authentication gate.
 - Test Month ⇄ Day → Hour and Event → details → anchored Day, Today, admin sign-in, create/edit/delete, cancellation.
 - User screenshot at 430px before RC-014b showed plain underlined dock links in document flow, despite GitHub browser CI showing fixed CSS. Root cause **not yet confirmed**, likely local CSS asset stale. Launcher now checks a version marker inside the built Sass bundle; use hard reload with Chrome cache disabled if necessary. Accept only after fresh screenshots at mobile 320 and 430 + desktop. Verify icon font, labels, focus/touch and no hidden content.
 
