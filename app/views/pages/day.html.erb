@@ -89,13 +89,11 @@
                             aria: { label: "#{event.title}, #{time_span}. Open consultation" },
                             title: "#{event.title} — #{time_span}" do %>
                   <span class="rc-range-event-heading"><%= event.title %></span>
-                  <% if item.height_px >= 55 %>
-                    <span class="rc-range-event-times">
-                      <time datetime="<%= event.start_time.iso8601 %>"><%= event.start_time.in_time_zone.strftime('%d %b %H:%M') %></time>
-                      <span aria-hidden="true">–</span>
-                      <time datetime="<%= event.end_time.iso8601 %>"><%= event.end_time.in_time_zone.strftime('%d %b %H:%M') %></time>
-                    </span>
-                  <% end %>
+                  <span class="rc-range-event-clock">
+                    <time datetime="<%= item.visible_start_at.iso8601 %>"><%= item.visible_start_label %></time>
+                    <span aria-hidden="true">–</span>
+                    <time datetime="<%= item.visible_end_at.iso8601 %>"><%= item.visible_end_label %></time>
+                  </span>
                   <% if item.height_px >= 95 && event.description.present? %>
                     <span class="rc-range-event-summary"><%= truncate(event.description, length: 85) %></span>
                   <% end %>
@@ -105,6 +103,8 @@
                     </span>
                   <% end %>
                 <% end %>
+                <span class="rc-range-event-exact-bar" aria-hidden="true"
+                      style="top: <%= (item.real_start_px - item.start_px).round(2) %>px; height: <%= [item.real_height_px, 2].max.round(2) %>px"></span>
               </article>
             <% end %>
           </div>
