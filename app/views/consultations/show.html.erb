@@ -43,7 +43,7 @@
           <%= button_to @consultation, method: :delete,
                         class: "rc-action rc-action--danger",
                         aria: { label: "Destroy this consultation" },
-                        data: { turbo_confirm: "Delete this consultation?" } do %>
+                        data: { turbo_confirm: "Delete consultation ##{@consultation.id} — #{@consultation.title} (#{@consultation.start_time.in_time_zone.strftime('%d %b %Y, %H:%M %Z')})? This cannot be undone." } do %>
             <%= rc_responsive_icon_label("trash3", "Destroy this consultation", "Delete") %>
           <% end %>
         </div>
