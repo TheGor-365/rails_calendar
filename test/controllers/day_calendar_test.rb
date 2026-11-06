@@ -251,7 +251,10 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", calendar_day_path(date: date, anchor: "event-#{event.id}"), text: "View in calendar", count: 1
     get consultation_url(event)
     assert_response :success
-    assert_select "a[href=?]", calendar_day_path(date: date, anchor: "event-#{event.id}"), text: "View in calendar", count: 1
+    assert_select "a[href=?][aria-label='View in calendar']", calendar_day_path(date: date, anchor: "event-#{event.id}"), count: 1 do
+      assert_select "span.rc-action-label--full", text: "View in calendar"
+      assert_select "span.rc-action-label--compact", text: "Calendar"
+    end
   end
 
   test "today and day navigation lead to the 24-hour timeline" do
