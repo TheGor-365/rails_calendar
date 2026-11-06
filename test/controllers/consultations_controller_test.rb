@@ -58,6 +58,18 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_login_url
   end
 
+  test "admin form exposes required inputs and time zone help" do
+    sign_in_as_admin
+
+    get new_consultation_url
+
+    assert_response :success
+    assert_select "input[name='consultation[title]'][required]", count: 1
+    assert_select "input[name='consultation[start_time]'][required]", count: 1
+    assert_select "input[name='consultation[end_time]'][required]", count: 1
+    assert_select "#consultation-timezone-hint", text: /UTC/
+  end
+
   test "admin can open new and edit forms" do
     sign_in_as_admin
     get new_consultation_url
@@ -97,6 +109,8 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
       }
     end
     assert_response :unprocessable_entity
+    assert_select "[role='alert']#consultation-form-errors"
+    assert_select "input[name='consultation[end_time]'][aria-invalid='true']"
   end
 
   private

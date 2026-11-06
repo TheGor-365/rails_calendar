@@ -1,60 +1,69 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
 
-
+// Keep seven columns readable. The focusable scroll region allows keyboard and
+// touch users to navigate the full calendar instead of shrinking days to 30px.
 .simple-calendar {
   width: 100%;
-  border-collapse: collapse;
-  border-spacing: 0;
-  border: 1px solid #ccc;
-  font-size: 12px;
-  font-family: Arial, sans-serif;
-  color: #333;
-  background-color: #fff;
 }
 
-.day {
-  padding: 5px;
-  border: 1px solid #ccc;
+.calendar-scroll-region {
+  border: 1px solid var(--bs-border-color);
+  border-radius: .375rem;
+}
+
+.calendar-scroll-region:focus-visible {
+  outline: 3px solid var(--bs-primary);
+  outline-offset: 3px;
+}
+
+.calendar-grid {
+  min-width: 770px;
+  table-layout: fixed;
+  background: var(--bs-body-bg);
+}
+
+.calendar-grid thead th {
   text-align: center;
+  white-space: nowrap;
 }
 
-.wday-0 { color: #f00; }
-.wday-1 { color: #000; }
-.wday-2 { color: #000; }
-.wday-3 { color: #000; }
-.wday-4 { color: #000; }
-.wday-5 { color: #000; }
-.wday-6 { color: #f00; }
-
-.today {
-  background-color: #f0f0f0;
+.calendar-grid td {
+  vertical-align: top;
+  height: 106px;
+  padding: .45rem;
+  overflow-wrap: anywhere;
 }
 
-.past {
-  color: #ccc;
+.calendar-day-label {
+  display: block;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
-.future {
-  color: #000;
+.calendar-event {
+  text-align: left;
+  overflow-wrap: anywhere;
 }
 
-.start-date {
-  background-color: #f0f0f0;
+.calendar-event a {
+  color: var(--bs-link-color);
 }
 
-.prev-month {
-  color: #ccc;
+.calendar-grid .today {
+  box-shadow: inset 0 0 0 2px var(--bs-primary);
+  background-color: var(--bs-primary-bg-subtle);
 }
 
-.next-month {
-  color: #ccc;
+.calendar-grid .prev-month,
+.calendar-grid .next-month,
+.calendar-grid .past {
+  // Do not render calendar dates in low-contrast #ccc on white.
+  color: #596579;
 }
 
-.current-month {
-  color: #000;
-}
-
-.has-events {
-  background-color: #f0f0f0;
+@media (max-width: 575.98px) {
+  .calendar-heading .calendar-title {
+    font-size: 1.1rem;
+  }
 }

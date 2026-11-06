@@ -5,6 +5,15 @@ class ConsultationsTest < ApplicationSystemTestCase
     @consultation = consultations(:one)
   end
 
+  test "visitor can navigate the month with accessible calendar semantics" do
+    visit root_url(start_date: "2023-01-01")
+    assert_selector "nav[aria-label='Calendar month navigation']"
+    assert_selector ".calendar-scroll-region[tabindex='0']"
+    assert_selector "time.calendar-day-label[datetime='2023-01-19']"
+    click_on "Next"
+    assert_selector ".calendar-title", text: "February 2023"
+  end
+
   test "anonymous visitors can browse without editing controls" do
     visit consultations_url
     assert_selector "h1", text: "Consultations"
