@@ -28,3 +28,16 @@ Chrome DevTools can request `/.well-known/appspecific/com.chrome.devtools.json`.
 - RC-013 (previous): https://github.com/TheGor-365/rails_calendar/pull/13
 - Development roadmap: https://github.com/TheGor-365/rails_calendar/blob/feature/rc013-slate-tide-icon-actions-2026-11-07/docs/RAILS_CALENDAR_DEVELOPMENT_ROADMAP_2026-11-07.md
 - Notion checkpoint: https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6
+
+## RC-014b: failed visual acceptance and corrective revision — 07.11.2026
+
+**Owner screenshot (source: current CAREER chat, approximately 00:48 local):** 430px Chrome-emulated month shows bottom navigation as flat, underlined links located at the end of scrolling content instead of a floating dock. That screenshot **rejects RC-014 visual acceptance** even though prior GitHub CI and Security were green. The rendered HTML proves the mobile partial is present, but not that its current stylesheet loaded. It is not yet possible to distinguish local stale Sass bundle/browser cache from another browser-specific issue without local loaded-asset readback.
+
+**Implemented RC-014b response in the same PR #14:**
+- Centered dock: `position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; width: min(100%, 430px); z-index: 1100;`, 5 equal grid columns.
+- Refined Slate & Tide surface, border, background blur, shadow, stronger icon hierarchy, centered labels, active state, raised shaded `+`, safe-area padding and body bottom reserve.
+- Keep independent guest/admin `+` destinations, server-side access checks and separate admin management row; no extra JavaScript or icon dependencies.
+- Launcher rebuilds CSS **and checks** `--rc-mobile-dock-release: rc014b-20261107` in `app/assets/builds/application.css`; exits if missing. A local asset can still be browser-cached: Chrome hard reload with DevTools Disable cache required if plain underlined links remain.
+- Chrome system regression checks loaded CSS marker, Bootstrap icon pseudo font, the dock's fixed position, center alignment and max-width at 320/390/430px, plus fixed viewport bottom **after scrolling a long day**.
+
+**Release status:** branch/PR code pending fresh final-SHA CI/Security and owner screenshots; do not describe RC-014 as visually accepted until dock is visibly pinned. Do not merge/deploy Railway. **Next**: local screenshot at month and consultation details, 430px and 320px; then P0 admin create/edit/delete of a newly created test record, access-control/manual security checks, timezone ADR.
