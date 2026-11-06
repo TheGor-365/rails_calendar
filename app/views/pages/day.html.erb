@@ -1,0 +1,90 @@
+<div class="container my-4 my-sm-5">
+  <header class="day-header d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+    <div>
+      <p class="eyebrow mb-2">Day view</p>
+      <h1 class="page-title mb-1">
+        <time datetime="<%= @selected_date.iso8601 %>"><%= @selected_date.strftime("%A, %d %B %Y") %></time>
+      </h1>
+      <p class="text-secondary mb-0">
+        00:00–23:59 · <%= Time.zone.name %> ·
+        <%= pluralize(@consultations.count, "consultation") %>
+      </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <% if admin_signed_in? %>
+        <%= link_to "New consultation", new_consultation_path(start_at: @hour_slots.first[:start_time].iso8601),
+                    class: "btn btn-primary" %>
+      <% end %>
+      <%= link_to "Month", root_path(start_date: @selected_date.iso8601),
+                  class: "btn btn-outline-secondary" %>
+    </div>
+  </header>
+
+  <nav aria-label="Calendar day navigation"
+       class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div class="d-flex gap-2">
+      <% if @selected_date.year > Consultation::MIN_SCHEDULE_YEAR ||
+            @selected_date > Date.new(Consultation::MIN_SCHEDULE_YEAR, 1, 1) %>
+        <%= link_to "Previous day", calendar_day_path(date: @selected_date.prev_day.iso8601),
+                    class: "btn btn-outline-secondary btn-sm" %>
+      <% end %>
+      <%= link_to "Today", calendar_day_path(date: Time.zone.today.iso8601),
+                  class: "btn btn-outline-secondary btn-sm" %>
+      <% if @selected_date < Date.new(Consultation::MAX_SCHEDULE_YEAR, 12, 31) %>
+        <%= link_to "Next day", calendar_day_path(date: @selected_date.next_day.iso8601),
+                    class: "btn btn-outline-secondary btn-sm" %>
+      <% end %>
+    </div>
+  </nav>
+
+  <div class="day-schedule" role="region"
+       aria-label="Hourly consultation schedule for <%= @selected_date.strftime('%d %B %Y') %>">
+    <table class="table day-timeline mb-0">
+      <caption class="visually-hidden">24 hourly slots, with scheduled consultations and administrator actions</caption>
+      <thead class="visually-hidden">
+        <tr><th scope="col">Time</th><th scope="col">Consultations</th></tr>
+      </thead>
+      <tbody>
+        <% @hour_slots.each do |slot| %>
+          <tr id="hour-<%= slot[:start_time].strftime('%H') %>">
+            <th class="day-hour" scope="row">
+              <time datetime="<%= slot[:start_time].iso8601 %>">
+                <%= slot[:start_time].strftime('%H:%M') %>
+              </time>
+            </th>
+            <td class="day-slot">
+              <% slot[:consultations].each do |consultation| %>
+                <article class="day-event">
+                  <div class="d-flex flex-wrap gap-2 align-items-baseline">
+                    <%= link_to consultation.title, consultation_path(consultation), class: "fw-semibold" %>
+                    <% if consultation.start_time < slot[:start_time] %>
+                      <span class="badge text-bg-light border">Continues</span>
+                    <% end %>
+                  </div>
+                  <p class="small text-secondary mb-0">
+                    <time datetime="<%= consultation.start_time.iso8601 %>">
+                      <%= consultation.start_time.in_time_zone.strftime('%d %b %H:%M') %>
+                    </time>
+                    –
+                    <time datetime="<%= consultation.end_time.iso8601 %>">
+                      <%= consultation.end_time.in_time_zone.strftime('%d %b %H:%M') %>
+                    </time>
+                  </p>
+                </article>
+              <% end %>
+
+              <% if admin_signed_in? %>
+                <%= link_to "Add at #{slot[:start_time].strftime('%H:%M')}",
+                            new_consultation_path(start_at: slot[:start_time].iso8601),
+                            class: "day-add-link small" %>
+              <% elsif slot[:consultations].empty? %>
+                <span class="day-slot-empty" aria-label="No consultations scheduled for this hour">—</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <p class="form-text mt-3">Consultations spanning multiple hours appear in each overlapping hour. Only an administrator can add or change them.</p>
+</div>
