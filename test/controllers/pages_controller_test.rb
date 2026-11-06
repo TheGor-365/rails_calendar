@@ -1,6 +1,19 @@
 require "test_helper"
 
 class PagesControllerTest < ActionDispatch::IntegrationTest
+  test "calendar provides accessible month navigation and weekday headings" do
+    get root_url(start_date: "2023-01-01")
+
+    assert_response :success
+    assert_select "nav[aria-label='Calendar month navigation']"
+    assert_select "nav a[aria-label='Previous month']", count: 1
+    assert_select "nav a[aria-label='Next month']", count: 1
+    assert_select ".calendar-grid caption", text: /January 2023/
+    assert_select ".calendar-grid th[scope='col']", count: 7
+    assert_select ".calendar-scroll-region[tabindex='0']", count: 1
+    assert_select "time.calendar-day-label[datetime='2023-01-19']", count: 1
+  end
+
   test "should get home" do
     get root_url
     assert_response :success

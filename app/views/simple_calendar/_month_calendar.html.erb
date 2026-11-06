@@ -1,33 +1,45 @@
 <div class="simple-calendar">
-  <div class="calendar-heading">
-    <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar.url_for_previous_view %>
-    <span class="calendar-title"><%= t('date.month_names')[start_date.month] %> <%= start_date.year %></span>
-    <%= link_to t('simple_calendar.next', default: 'Next'), calendar.url_for_next_view %>
-  </div>
+  <nav class="calendar-heading d-flex align-items-center justify-content-between gap-2 mb-3"
+       aria-label="Calendar month navigation">
+    <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar.url_for_previous_view,
+                class: "btn btn-outline-secondary btn-sm",
+                aria: { label: "Previous month" } %>
+    <h2 class="calendar-title h4 mb-0 text-center" aria-live="polite">
+      <%= t('date.month_names')[start_date.month] %> <%= start_date.year %>
+    </h2>
+    <%= link_to t('simple_calendar.next', default: 'Next'), calendar.url_for_next_view,
+                class: "btn btn-outline-secondary btn-sm",
+                aria: { label: "Next month" } %>
+  </nav>
 
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <% date_range.slice(0, 7).each do |day| %>
-          <th><%= t('date.abbr_day_names')[day.wday] %></th>
-        <% end %>
-      </tr>
-    </thead>
-
-    <tbody>
-      <% date_range.each_slice(7) do |week| %>
+  <div class="table-responsive calendar-scroll-region" role="region"
+       aria-label="<%= start_date.strftime('%B %Y') %> consultation calendar"
+       tabindex="0">
+    <table class="table table-bordered calendar-grid mb-0">
+      <caption class="visually-hidden"><%= start_date.strftime('%B %Y') %> consultation calendar</caption>
+      <thead>
         <tr>
-          <% week.each do |day| %>
-            <%= content_tag :td, class: calendar.td_classes_for(day) do %>
-              <% if defined?(Haml) && respond_to?(:block_is_haml?) && block_is_haml?(passed_block) %>
-                <% capture_haml(day, sorted_events.fetch(day, []), &passed_block) %>
-              <% else %>
-                <% passed_block.call day, sorted_events.fetch(day, []) %>
-              <% end %>
-            <% end %>
+          <% date_range.slice(0, 7).each do |day| %>
+            <th scope="col"><%= t('date.abbr_day_names')[day.wday] %></th>
           <% end %>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% date_range.each_slice(7) do |week| %>
+          <tr>
+            <% week.each do |day| %>
+              <%= content_tag :td, class: calendar.td_classes_for(day) do %>
+                <% if defined?(Haml) && respond_to?(:block_is_haml?) && block_is_haml?(passed_block) %>
+                  <% capture_haml(day, sorted_events.fetch(day, []), &passed_block) %>
+                <% else %>
+                  <% passed_block.call day, sorted_events.fetch(day, []) %>
+                <% end %>
+              <% end %>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <p class="form-text mt-2">On smaller screens, scroll the calendar horizontally to view all seven days.</p>
 </div>

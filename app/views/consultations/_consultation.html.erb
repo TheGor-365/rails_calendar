@@ -1,21 +1,28 @@
-<div id="<%= dom_id consultation %>">
-  <p>
-    <strong>Title:</strong>
-    <%= consultation.title %>
-  </p>
-
-  <p>
-    <strong>Description:</strong>
-    <%= consultation.description %>
-  </p>
-
-  <p>
-    <strong>Start time:</strong>
-    <%= consultation.start_time %>
-  </p>
-
-  <p>
-    <strong>End time:</strong>
-    <%= consultation.end_time %>
-  </p>
-</div>
+<article id="<%= dom_id consultation %>" aria-label="<%= consultation.title.presence || 'Consultation details' %>">
+  <h2 class="h5"><%= consultation.title.presence || "Untitled consultation" %></h2>
+  <% if consultation.description.present? %>
+    <p class="text-break"><%= consultation.description %></p>
+  <% end %>
+  <dl class="row mb-0">
+    <dt class="col-sm-3">Start time</dt>
+    <dd class="col-sm-9">
+      <% if consultation.start_time.present? %>
+        <time datetime="<%= consultation.start_time.iso8601 %>">
+          <%= consultation.start_time.in_time_zone.strftime('%d %b %Y, %H:%M %Z') %>
+        </time>
+      <% else %>
+        Not specified
+      <% end %>
+    </dd>
+    <dt class="col-sm-3">End time</dt>
+    <dd class="col-sm-9">
+      <% if consultation.end_time.present? %>
+        <time datetime="<%= consultation.end_time.iso8601 %>">
+          <%= consultation.end_time.in_time_zone.strftime('%d %b %Y, %H:%M %Z') %>
+        </time>
+      <% else %>
+        Not specified
+      <% end %>
+    </dd>
+  </dl>
+</article>

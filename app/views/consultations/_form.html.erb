@@ -1,9 +1,8 @@
 <%= form_with(model: consultation) do |form| %>
   <% if consultation.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(consultation.errors.count, "error") %> prohibited this consultation from being saved:</h2>
-
-      <ul>
+    <div id="consultation-form-errors" class="alert alert-danger" role="alert" tabindex="-1">
+      <h2 class="h5">Please correct <%= pluralize(consultation.errors.count, "error") %>:</h2>
+      <ul class="mb-0">
         <% consultation.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,27 +10,44 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :title %>
-    <%= form.text_field :title %>
+  <p id="consultation-timezone-hint" class="text-muted">
+    Enter dates and times in the application time zone (<%= Time.zone.name %>).
+    Title, start time and end time are required.
+  </p>
+
+  <div class="mb-3">
+    <%= form.label :title, class: "form-label" %>
+    <%= form.text_field :title, class: "form-control#{' is-invalid' if consultation.errors.include?(:title)}",
+                        required: true, aria: { invalid: consultation.errors.include?(:title) } %>
+    <% if consultation.errors.include?(:title) %>
+      <div class="invalid-feedback d-block"><%= consultation.errors.full_messages_for(:title).join(", ") %></div>
+    <% end %>
   </div>
 
-  <div>
-    <%= form.label :description %>
-    <%= form.text_area :description %>
+  <div class="mb-3">
+    <%= form.label :description, class: "form-label" %>
+    <%= form.text_area :description, rows: 4, class: "form-control" %>
   </div>
 
-  <div>
-    <%= form.label :start_time %>
-    <%= form.datetime_field :start_time %>
+  <div class="mb-3">
+    <%= form.label :start_time, class: "form-label" %>
+    <%= form.datetime_field :start_time, class: "form-control#{' is-invalid' if consultation.errors.include?(:start_time)}",
+                            required: true, aria: { invalid: consultation.errors.include?(:start_time),
+                                                    describedby: "consultation-timezone-hint" } %>
+    <% if consultation.errors.include?(:start_time) %>
+      <div class="invalid-feedback d-block"><%= consultation.errors.full_messages_for(:start_time).join(", ") %></div>
+    <% end %>
   </div>
 
-  <div>
-    <%= form.label :end_time %>
-    <%= form.datetime_field :end_time %>
+  <div class="mb-3">
+    <%= form.label :end_time, class: "form-label" %>
+    <%= form.datetime_field :end_time, class: "form-control#{' is-invalid' if consultation.errors.include?(:end_time)}",
+                            required: true, aria: { invalid: consultation.errors.include?(:end_time),
+                                                    describedby: "consultation-timezone-hint" } %>
+    <% if consultation.errors.include?(:end_time) %>
+      <div class="invalid-feedback d-block"><%= consultation.errors.full_messages_for(:end_time).join(", ") %></div>
+    <% end %>
   </div>
 
-  <div>
-    <%= form.submit %>
-  </div>
+  <%= form.submit class: "btn btn-primary" %>
 <% end %>
