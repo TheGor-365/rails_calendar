@@ -20,10 +20,15 @@ credentials, put them in client-side JavaScript, or paste them into issues.
 Administrators sign in via /admin/login. The application does not seed an admin
 password or automatically generate one.
 
-## Legacy baseline and remaining release blockers
+## RC-003 supported runtime (Draft PR #4)
 
-- Ruby 3.1.2 / Rails 7.0.4.1 are end-of-life. Upgrade before public production.
-- PostgreSQL, Turbo/Stimulus, Bootstrap, esbuild/Sass, simple_calendar 2.4.3.
+- Ruby **3.4.12**, Rails **8.1.4.1** and refreshed Ruby/JavaScript lockfiles are on the RC-003 branch for compatibility and security testing only.
+- Read [isolated Linux Mint local setup on port 3005](docs/RC-003_LOCAL_RUN_3005.md) before running alongside other Rails projects.
+- This is not a deploy approval; [CI](https://github.com/TheGor-365/rails_calendar/actions) and both dependency audits must be reviewed before merge.
+
+## Remaining release blockers
+
+- PostgreSQL, Turbo/Stimulus, Bootstrap, esbuild/Sass, Simple Calendar remain in the existing architecture.
 - Existing database config is local-development-oriented; production credentials,
   DB connectivity, backup/rollback, HTTPS and secure session cookies require review.
 - Login attempt rate limiting, dependency/security audits, legacy invalid data
@@ -32,8 +37,9 @@ password or automatically generate one.
 
 ## Local development (isolated DB only)
 
-Install the pinned Ruby version, compatible Bundler, PostgreSQL and Node/Yarn.
-Then install dependencies, prepare a development DB and run bin/dev.
+Install Ruby 3.4.12, a compatible Bundler, PostgreSQL and Node/Yarn in this **project only**.
+Follow [local instructions](docs/RC-003_LOCAL_RUN_3005.md), then run `RAILS_CALENDAR_PORT=3005 bin/dev`.
+Other Rails apps can keep their existing ports.
 Do not connect a test instance to production data.
 
 ## Automated tests
