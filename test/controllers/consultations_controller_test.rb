@@ -5,8 +5,10 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     @consultation = consultations(:one)
     @valid_attributes = {
       description: @consultation.description,
-      end_time: @consultation.end_time,
-      start_time: @consultation.start_time,
+      # Fixture :one intentionally includes legacy seconds (:51). New
+      # consultations must be submitted with whole-minute precision.
+      end_time: @consultation.end_time.change(sec: 0),
+      start_time: @consultation.start_time.change(sec: 0),
       title: @consultation.title
     }
   end
