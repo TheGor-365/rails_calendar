@@ -52,8 +52,8 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     get root_url(start_date: "2023-02-01")
 
     assert_response :success
-    assert_select "a.calendar-event-link[href=?]", consultation_path(consultation)
-    assert_select "a.calendar-event-link[href=?] .calendar-event-time", text: "Ongoing"
+    assert_select "a.calendar-event-name[href=?]", consultation_path(consultation)
+    assert_select "a.calendar-event-name[href=?]", text: "Boundary event"
   end
 
   test "cross-midnight consultations appear in the following day" do
