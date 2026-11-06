@@ -20,10 +20,10 @@
       </div>
       <div class="d-flex flex-wrap gap-2">
         <% if admin_signed_in? %>
-          <%= link_to "Add consultation", new_consultation_path(start_at: @hour_start.iso8601),
+          <%= link_to rc_icon_label("plus-lg", "Add consultation"), new_consultation_path(start_at: @hour_start.iso8601),
                       class: "rc-action rc-action--primary" %>
         <% end %>
-        <%= link_to "Back to day", calendar_day_path(date: @selected_date.iso8601,
+        <%= link_to rc_icon_label("arrow-left", "Back to day"), calendar_day_path(date: @selected_date.iso8601,
                           anchor: format("hour-%02d", @selected_hour)), class: "rc-action rc-action--quiet" %>
       </div>
     </header>
