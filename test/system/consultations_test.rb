@@ -206,8 +206,8 @@ class ConsultationsTest < ApplicationSystemTestCase
     click_on "New consultation"
 
     fill_in "Description", with: @consultation.description
-    fill_in "End time", with: @consultation.end_time
-    fill_in "Start time", with: @consultation.start_time
+    fill_in "End time", with: @consultation.end_time.change(sec: 0)
+    fill_in "Start time", with: @consultation.start_time.change(sec: 0)
     fill_in "Title", with: @consultation.title
     click_on "Create Consultation"
 
@@ -229,7 +229,7 @@ class ConsultationsTest < ApplicationSystemTestCase
   test "administrator can destroy consultation" do
     sign_in_as_admin
     visit consultation_url(@consultation)
-    accept_confirm "Delete this consultation?" do
+    accept_confirm(/Delete consultation ##{@consultation.id}.*#{Regexp.escape(@consultation.title)}.*cannot be undone/) do
       click_on "Destroy this consultation"
     end
 

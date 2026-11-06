@@ -5,8 +5,10 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     @consultation = consultations(:one)
     @valid_attributes = {
       description: @consultation.description,
-      end_time: @consultation.end_time,
-      start_time: @consultation.start_time,
+      # Fixture :one intentionally includes legacy seconds (:51). New
+      # consultations must be submitted with whole-minute precision.
+      end_time: @consultation.end_time.change(sec: 0),
+      start_time: @consultation.start_time.change(sec: 0),
       title: @consultation.title
     }
   end
@@ -65,8 +67,8 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "input[name='consultation[title]'][required]", count: 1
-    assert_select "input[name='consultation[start_time]'][required]", count: 1
-    assert_select "input[name='consultation[end_time]'][required]", count: 1
+    assert_select "input[name='consultation[start_time]'][required][step='60']", count: 1
+    assert_select "input[name='consultation[end_time]'][required][step='60']", count: 1
     assert_select "#consultation-timezone-hint", text: /UTC/
   end
 
@@ -91,6 +93,66 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     patch consultation_url(@consultation), params: { consultation: { title: "Admin update" } }
     assert_redirected_to consultation_url(@consultation)
     assert_equal "Admin update", @consultation.reload.title
+  end
+
+  test "edit form hides legacy seconds without silently modifying stored instants" do
+    sign_in_as_admin
+
+    legacy_end_time = @consultation.end_time.change(sec: 7)
+    @consultation.update_columns(end_time: legacy_end_time)
+
+    get edit_consultation_url(@consultation)
+    assert_response :success
+    assert_select "input[name='consultation[end_time]'][step='60'][value=?]",
+                  legacy_end_time.in_time_zone.strftime("%Y-%m-%dT%H:%M"), count: 1
+
+    patch consultation_url(@consultation), params: {
+      consultation: {
+        title: "Text-only update",
+        start_time: @consultation.start_time.in_time_zone.strftime("%Y-%m-%dT%H:%M"),
+        end_time: legacy_end_time.in_time_zone.strftime("%Y-%m-%dT%H:%M")
+      }
+    }
+    assert_redirected_to consultation_url(@consultation)
+    assert_equal legacy_end_time, @consultation.reload.end_time
+    assert_equal "Text-only update", @consultation.title
+  end
+
+  test "new and changed times reject seconds while minute inputs remain valid" do
+    sign_in_as_admin
+    start_input = @consultation.start_time.in_time_zone.strftime("%Y-%m-%dT%H:%M")
+    end_input = @consultation.end_time.in_time_zone.strftime("%Y-%m-%dT%H:%M")
+
+    assert_no_difference "Consultation.count" do
+      post consultations_url, params: {
+        consultation: { title: "Rejected seconds", start_time: start_input, end_time: "#{end_input}:07" }
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_select "#consultation-form-errors", text: /seconds must be 00/
+
+    assert_difference "Consultation.count", 1 do
+      post consultations_url, params: {
+        consultation: { title: "Minute-only", start_time: start_input, end_time: end_input }
+      }
+    end
+    created = Consultation.order(:id).last
+    assert_equal 0, created.start_time.sec
+    assert_equal 0, created.end_time.sec
+  end
+
+  test "delete action identifies the exact record before confirmation" do
+    sign_in_as_admin
+    get consultation_url(@consultation)
+    assert_response :success
+
+    assert_select "button[aria-label='Destroy this consultation']" do |buttons|
+      confirmation = buttons.first["data-turbo-confirm"]
+      assert_includes confirmation, "##{@consultation.id}"
+      assert_includes confirmation, @consultation.title
+      assert_includes confirmation, @consultation.start_time.in_time_zone.strftime("%d %b %Y")
+      assert_includes confirmation, "cannot be undone"
+    end
   end
 
   test "admin can delete a consultation" do

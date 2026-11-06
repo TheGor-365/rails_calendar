@@ -12,7 +12,7 @@
 
   <p id="consultation-timezone-hint" class="rc-hint mb-4">
     Required fields are marked *. Times use <%= Time.zone.name %>.
-    Supported years: <%= Consultation::MIN_SCHEDULE_YEAR %>–<%= Consultation::MAX_SCHEDULE_YEAR %>.
+    Precision: whole minutes (HH:MM). Supported years: <%= Consultation::MIN_SCHEDULE_YEAR %>–<%= Consultation::MAX_SCHEDULE_YEAR %>.
   </p>
 
   <div class="rc-field">
@@ -40,7 +40,8 @@
       <%= form.label :start_time, "Start time *", class: "rc-field-label" %>
       <%= form.datetime_field :start_time,
                               class: "rc-input#{' rc-input--invalid' if consultation.errors.include?(:start_time)}",
-                              required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59", step: 1,
+                              value: consultation.start_time&.in_time_zone&.strftime("%Y-%m-%dT%H:%M"),
+                              required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59", step: 60,
                               aria: { invalid: consultation.errors.include?(:start_time),
                                       describedby: "consultation-timezone-hint" } %>
       <% if consultation.errors.include?(:start_time) %>
@@ -52,7 +53,8 @@
       <%= form.label :end_time, "End time *", class: "rc-field-label" %>
       <%= form.datetime_field :end_time,
                               class: "rc-input#{' rc-input--invalid' if consultation.errors.include?(:end_time)}",
-                              required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59", step: 1,
+                              value: consultation.end_time&.in_time_zone&.strftime("%Y-%m-%dT%H:%M"),
+                              required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59", step: 60,
                               aria: { invalid: consultation.errors.include?(:end_time),
                                       describedby: "consultation-timezone-hint" } %>
       <% if consultation.errors.include?(:end_time) %>
