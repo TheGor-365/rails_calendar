@@ -113,6 +113,38 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='consultation[end_time]'][aria-invalid='true']"
   end
 
+
+  test "admin cannot create consultation outside supported years" do
+    sign_in_as_admin
+
+    assert_no_difference "Consultation.count" do
+      post consultations_url, params: {
+        consultation: @valid_attributes.merge(
+          start_time: "1212-12-12T12:12",
+          end_time: "1213-12-12T13:12"
+        )
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_select "#consultation-form-errors", text: /between years 2000 and 2100/
+  end
+
+  test "admin cannot update consultation with far future year" do
+    sign_in_as_admin
+    original_end = @consultation.end_time
+
+    patch consultation_url(@consultation), params: {
+      consultation: {
+        start_time: "2101-12-12T12:12",
+        end_time: "2101-12-12T13:12"
+      }
+    }
+
+    assert_response :unprocessable_entity
+    assert_equal original_end, @consultation.reload.end_time
+    assert_select "#consultation-form-errors", text: /between years 2000 and 2100/
+  end
+
   private
 
   def sign_in_as_admin

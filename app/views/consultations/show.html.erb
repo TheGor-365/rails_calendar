@@ -1,13 +1,22 @@
-<div class="container">
-  <%= render @consultation %>
+<div class="container my-4 my-sm-5">
+  <div class="content-page">
+    <header class="mb-4">
+      <p class="eyebrow mb-2">Scheduling</p>
+      <h1 class="page-title mb-0">Consultation details</h1>
+    </header>
+    <div class="surface-panel">
+      <%= render @consultation %>
+    </div>
 
-  <div>
-    <%= link_to "Back to consultations", consultations_path %>
-
-    <% if admin_signed_in? %>
-      <%= link_to "Edit this consultation", edit_consultation_path(@consultation) %>
-      <%= button_to "Destroy this consultation", @consultation, method: :delete,
-                    data: { turbo_confirm: "Delete this consultation?" } %>
-    <% end %>
+    <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+      <%= link_to "Back to consultations", consultations_path, class: "btn btn-outline-secondary" %>
+      <% if admin_signed_in? %>
+        <%= link_to "Edit this consultation", edit_consultation_path(@consultation),
+                    class: "btn btn-primary" %>
+        <%= button_to "Destroy this consultation", @consultation, method: :delete,
+                      class: "btn btn-outline-danger",
+                      data: { turbo_confirm: "Delete this consultation?" } %>
+      <% end %>
+    </div>
   </div>
 </div>

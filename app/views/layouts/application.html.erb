@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Consult book</title>
+    <title>Rails Calendar</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -10,19 +10,19 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   </head>
 
-  <body>
-    <header>
+  <body class="app-shell">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="app-header">
       <%= render "layouts/nav" %>
     </header>
 
-    <% if notice.present? %>
-      <p class="container alert alert-success" role="status"><%= notice %></p>
-    <% end %>
-    <% if alert.present? %>
-      <p class="container alert alert-danger" role="alert"><%= alert %></p>
-    <% end %>
-
-    <main>
+    <main id="main-content" class="pb-5" tabindex="-1">
+      <% if notice.present? %>
+        <p class="container alert alert-success mt-3" role="status"><%= notice %></p>
+      <% end %>
+      <% if alert.present? %>
+        <p class="container alert alert-danger mt-3" role="alert"><%= alert %></p>
+      <% end %>
       <%= yield %>
     </main>
   </body>

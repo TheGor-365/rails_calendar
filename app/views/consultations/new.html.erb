@@ -1,11 +1,12 @@
-<div class="container">  
-  <h1>New consultation</h1>
-
-  <%= render "form", consultation: @consultation %>
-
-  <br>
-
-  <div>
-    <%= link_to "Back to consultations", consultations_path %>
+<div class="container my-4 my-sm-5">
+  <div class="form-page">
+    <header class="mb-4">
+      <p class="eyebrow mb-2">Scheduling</p>
+      <h1 class="page-title mb-2">New consultation</h1>
+      <p class="text-secondary mb-0">Create a consultation in the shared calendar.</p>
+    </header>
+    <section class="surface-panel" aria-label="Consultation details">
+      <%= render "form", consultation: @consultation %>
+    </section>
   </div>
 </div>
