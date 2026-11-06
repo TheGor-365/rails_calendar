@@ -21,7 +21,7 @@
                   aria: { label: "View #{date.strftime('%A, %B %d, %Y')}" } do %>
         <time class="calendar-day-label" datetime="<%= date.iso8601 %>"><%= date.day %></time>
       <% end %>
-      <span class="calendar-day-count" aria-label="<%= pluralize(day_events.length, 'event') %>">
+      <span class="calendar-day-count" data-empty="<%= day_events.empty? %>" aria-label="<%= pluralize(day_events.length, 'event') %>">
         <%= day_events.length %>
       </span>
     </div>
@@ -32,7 +32,7 @@
           <span class="calendar-event-dot" aria-hidden="true"></span>
           <span class="calendar-event-content">
             <span class="calendar-event-name"><%= truncate(consultation.title, length: 26) %></span>
-            <span class="calendar-event-time"><%= consultation.start_time.in_time_zone.strftime("%H:%M") %></span>
+            <span class="calendar-event-time"><%= consultation.start_time.in_time_zone.to_date < date ? "Ongoing" : consultation.start_time.in_time_zone.strftime("%H:%M") %></span>
           </span>
         <% end %>
       </article>
