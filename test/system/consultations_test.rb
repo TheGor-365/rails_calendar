@@ -98,7 +98,8 @@ class ConsultationsTest < ApplicationSystemTestCase
             dockWidth: dock.getBoundingClientRect().width,
             iconFont: getComputedStyle(dock.querySelector(".rc-mobile-dock-icon"), "::before").fontFamily,
             viewportHeight: window.innerHeight,
-            layoutWidth: document.documentElement.clientWidth,
+            contentCenter: (() => { const r = document.querySelector("main#main-content").getBoundingClientRect();
+              return (r.left + r.right) / 2; })(),
             pageWidth: document.documentElement.scrollWidth,
             viewportWidth: window.innerWidth,
             firstActionLeft: Math.min(...positions.map(p => p.left)),
@@ -112,7 +113,8 @@ class ConsultationsTest < ApplicationSystemTestCase
       assert_equal "rc014b-20261107", layout["cssRelease"], "Current Sass bundle is not loaded"
       assert_includes layout["iconFont"].downcase, "bootstrap-icons"
       assert_in_delta layout["viewportHeight"], layout["dockBottom"], 1
-      assert_in_delta layout["layoutWidth"] / 2.0, layout["dockCenter"], 1
+      assert_in_delta layout["contentCenter"], layout["dockCenter"], 1,
+                      "Dock must align with centered application content"
       assert_operator layout["dockWidth"], :<=, 430
       assert_operator layout["dockWidth"], :<=, layout["viewportWidth"] + 1
       assert_operator layout["pageWidth"], :<=, layout["viewportWidth"] + 1
@@ -135,11 +137,12 @@ class ConsultationsTest < ApplicationSystemTestCase
         const dock = document.querySelector(".rc-mobile-dock").getBoundingClientRect();
         return {bottom: dock.bottom, center: (dock.left + dock.right) / 2,
                 viewportHeight: window.innerHeight,
-                layoutWidth: document.documentElement.clientWidth};
+                contentCenter: (() => { const r = document.querySelector("main#main-content").getBoundingClientRect();
+                  return (r.left + r.right) / 2; })()};
       })()
     JS
     assert_in_delta dockAfterScroll["viewportHeight"], dockAfterScroll["bottom"], 1
-    assert_in_delta dockAfterScroll["layoutWidth"] / 2.0, dockAfterScroll["center"], 1
+    assert_in_delta dockAfterScroll["contentCenter"], dockAfterScroll["center"], 1
 
     find("nav.rc-mobile-dock a.rc-mobile-dock-item--create").click
     assert_current_path admin_login_path
