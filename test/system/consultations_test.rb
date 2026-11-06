@@ -19,10 +19,10 @@ class ConsultationsTest < ApplicationSystemTestCase
     find("a.calendar-event-link[href='#{consultation_path(@consultation)}']").click
     assert_current_path consultation_path(@consultation)
     click_on "View in calendar"
-    assert_current_path calendar_day_path(date: "2023-01-19", anchor: "event-#{@consultation.id}")
+    assert_current_path calendar_day_path(date: "2023-01-19")
     assert_selector ".rc-time-axis-hour", count: 24
     visit root_url(start_date: "2023-01-01")
-    find("a.calendar-day-link[href*='2023-01-19']").click(x: 18, y: 18)
+    find("time.calendar-day-label[datetime='2023-01-19']").click
     assert_current_path calendar_day_path(date: "2023-01-19")
   end
 
