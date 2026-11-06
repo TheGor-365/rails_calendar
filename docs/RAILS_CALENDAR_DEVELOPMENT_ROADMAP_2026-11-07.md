@@ -29,14 +29,15 @@
 | RC-010 / PR #10 | Continuous multi-hour event layout, overlap lanes and hour detail | Implemented, CI |
 | RC-011 / PR #11 | Safe local boot, day/event deep links, separate list/detail UX | CI+Security success; user desktop screenshots show NameError resolved |
 | RC-012 / PR #12 | Seven visible mobile columns, month event list and mobile feature parity | CI+Security success; user screenshots at 430px show working day/event navigation |
-| RC-013 / new Draft | Restrained icon-labeled controls and touch/focus styling across existing screens | **In progress**; verify final SHA CI+Security and owner screenshots |
+| RC-013 / PR #13 | Restrained icon-labeled controls and touch/focus styling across existing screens | CI+Security SUCCESS; owner mobile detail screenshot shows icons |
+| RC-014 / PR pending | Persistent five-tab mobile dock with guarded center +, one-row detail actions | Implemented on new Draft branch, awaiting CI and owner QA |
 
 All these PRs are Draft and stacked; `main` and production have not been changed by this program.
 
 ## Phase A — finish the existing calendar (P0; before public launch)
 
-### A1. RC-013 design acceptance
-- Verify fresh CI+Security on latest PR SHA; Chrome browser tests at 320/390/430 and desktop.
+### A1. RC-013/RC-014 mobile navigation acceptance
+- Verify fresh CI+Security on latest PR SHA; Chrome browser tests at 320/390/430 and desktop. Verify five bottom destinations, guest/new authentication gate, detail actions in one row, and safe-area no-overlap.
 - Test Month ⇄ Day → Hour and Event → details → anchored Day, Today, admin sign-in, create/edit/delete, cancellation.
 - Screenshot mobile 320 and 430 + desktop; verify icon font actually loads; no lost text, clipped navigation, inaccessible focus or keyboard actions.
 
