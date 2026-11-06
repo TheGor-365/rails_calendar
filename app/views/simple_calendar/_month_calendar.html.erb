@@ -1,21 +1,19 @@
 <div class="simple-calendar">
-  <nav class="calendar-heading d-flex align-items-center justify-content-between gap-2 mb-3"
+  <nav class="calendar-heading d-flex align-items-center justify-content-between gap-3 mb-3"
        aria-label="Calendar month navigation">
     <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar.url_for_previous_view,
-                class: "btn btn-outline-secondary btn-sm",
-                aria: { label: "Previous month" } %>
-    <h2 class="calendar-title h4 mb-0 text-center" aria-live="polite">
-      <%= t('date.month_names')[start_date.month] %> <%= start_date.year %>
+                class: "rc-navigation-link", aria: { label: "Previous month" } %>
+    <h2 class="calendar-title" aria-live="polite">
+      <%= t('date.month_names')[start_date.month] %> <span><%= start_date.year %></span>
     </h2>
     <%= link_to t('simple_calendar.next', default: 'Next'), calendar.url_for_next_view,
-                class: "btn btn-outline-secondary btn-sm",
-                aria: { label: "Next month" } %>
+                class: "rc-navigation-link", aria: { label: "Next month" } %>
   </nav>
 
-  <div class="table-responsive calendar-scroll-region" role="region"
+  <div class="calendar-scroll-region" role="region"
        aria-label="<%= start_date.strftime('%B %Y') %> consultation calendar"
        tabindex="0">
-    <table class="table table-bordered calendar-grid mb-0">
+    <table class="calendar-grid">
       <caption class="visually-hidden"><%= start_date.strftime('%B %Y') %> consultation calendar</caption>
       <thead>
         <tr>
@@ -41,5 +39,5 @@
       </tbody>
     </table>
   </div>
-  <p class="form-text mt-2">On smaller screens, scroll the calendar horizontally to view all seven days.</p>
+  <p class="rc-hint mt-2">Swipe the month grid horizontally on narrow screens. Open a date to see all events by hour.</p>
 </div>

@@ -1,41 +1,46 @@
 <div class="container my-4 my-sm-5">
-  <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+  <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
     <div>
-      <p class="eyebrow mb-2">Overview</p>
+      <p class="eyebrow mb-2">MONTHLY / OVERVIEW</p>
       <h1 class="page-title mb-1">Consultations</h1>
-      <p class="text-muted mb-0">Browse scheduled consultations. Times are shown in <%= Time.zone.name %>.</p>
+      <p class="rc-muted mb-0">Every date opens a detailed hourly schedule. Times shown in <%= Time.zone.name %>.</p>
     </div>
     <div class="d-flex flex-wrap align-items-center gap-2">
       <%= link_to "Today · Day view", calendar_day_path(date: Time.zone.today.iso8601),
-                  class: "btn btn-outline-secondary" %>
+                  class: "rc-action rc-action--quiet" %>
       <% if admin_signed_in? %>
-        <%= link_to "New consultation", new_consultation_path, class: "btn btn-primary" %>
+        <%= link_to "New consultation", new_consultation_path, class: "rc-action rc-action--primary" %>
       <% end %>
     </div>
-  </div>
+  </header>
 
-  <%= month_calendar(events: @consultations) do |date, consultations| %>
-    <%= link_to calendar_day_path(date: date.iso8601), class: "calendar-day-link",
-                aria: { label: "View #{date.strftime('%A, %B %d, %Y')}" } do %>
-      <time class="calendar-day-label" datetime="<%= date.iso8601 %>"><%= date.day %></time>
-    <% end %>
+  <%= month_calendar(events: @consultations) do |date, _calendar_events| %>
+    <% day_events = @consultations_by_day.fetch(date, []) %>
+    <div class="calendar-date-heading">
+      <%= link_to calendar_day_path(date: date.iso8601), class: "calendar-day-link",
+                  aria: { label: "View #{date.strftime('%A, %B %d, %Y')}" } do %>
+        <time class="calendar-day-label" datetime="<%= date.iso8601 %>"><%= date.day %></time>
+      <% end %>
+      <span class="calendar-day-count" data-empty="<%= day_events.empty? %>" aria-label="<%= pluralize(day_events.length, 'event') %>">
+        <%= day_events.length %>
+      </span>
+    </div>
 
-    <% consultations.each do |consultation| %>
-      <article class="card calendar-event mt-2">
-        <div class="card-body p-2">
-          <h2 class="h6 mb-1">
-            <%= link_to consultation.title, consultation, class: "stretched-link" %>
-          </h2>
-          <% if consultation.start_time.present? %>
-            <time class="small text-muted" datetime="<%= consultation.start_time.iso8601 %>">
-              <%= consultation.start_time.in_time_zone.strftime('%H:%M') %>
-            </time>
-          <% end %>
-          <% if consultation.description.present? %>
-            <p class="small mb-0 mt-1 text-break"><%= truncate(consultation.description, length: 110) %></p>
-          <% end %>
+    <% day_events.first(2).each do |consultation| %>
+      <article class="calendar-event">
+        <div class="calendar-event-link">
+          <span class="calendar-event-dot" aria-hidden="true"></span>
+          <span class="calendar-event-content">
+            <%= link_to truncate(consultation.title, length: 26), consultation_path(consultation),
+                        class: "calendar-event-name" %>
+            <span class="calendar-event-time"><%= consultation.start_time.in_time_zone.to_date < date ? "Ongoing" : consultation.start_time.in_time_zone.strftime("%H:%M") %></span>
+          </span>
         </div>
       </article>
+    <% end %>
+    <% if day_events.length > 2 %>
+      <%= link_to "+ #{day_events.length - 2} more", calendar_day_path(date: date.iso8601),
+                  class: "calendar-more", aria: { label: "View all #{day_events.length} events on #{date.iso8601}" } %>
     <% end %>
   <% end %>
 </div>

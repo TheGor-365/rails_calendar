@@ -1,90 +1,104 @@
 <div class="container my-4 my-sm-5">
-  <header class="day-header d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
     <div>
-      <p class="eyebrow mb-2">Day view</p>
+      <p class="eyebrow mb-2">DAY / <%= @selected_date.strftime("%j") %></p>
       <h1 class="page-title mb-1">
         <time datetime="<%= @selected_date.iso8601 %>"><%= @selected_date.strftime("%A, %d %B %Y") %></time>
       </h1>
-      <p class="text-secondary mb-0">
-        00:00–23:59 · <%= Time.zone.name %> ·
-        <%= pluralize(@consultations.count, "consultation") %>
+      <p class="rc-muted mb-0">
+        <span class="rc-data-number"><%= pluralize(@consultations.count, "consultation") %></span>
+        <span aria-hidden="true">·</span> 24 hours <span aria-hidden="true">·</span> <%= Time.zone.name %>
       </p>
     </div>
     <div class="d-flex flex-wrap gap-2">
       <% if admin_signed_in? %>
         <%= link_to "New consultation", new_consultation_path(start_at: @hour_slots.first[:start_time].iso8601),
-                    class: "btn btn-primary" %>
+                    class: "rc-action rc-action--primary" %>
       <% end %>
       <%= link_to "Month", root_path(start_date: @selected_date.iso8601),
-                  class: "btn btn-outline-secondary" %>
+                  class: "rc-action rc-action--quiet" %>
     </div>
   </header>
 
-  <nav aria-label="Calendar day navigation"
-       class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-    <div class="d-flex gap-2">
-      <% if @selected_date.year > Consultation::MIN_SCHEDULE_YEAR ||
-            @selected_date > Date.new(Consultation::MIN_SCHEDULE_YEAR, 1, 1) %>
-        <%= link_to "Previous day", calendar_day_path(date: @selected_date.prev_day.iso8601),
-                    class: "btn btn-outline-secondary btn-sm" %>
-      <% end %>
-      <%= link_to "Today", calendar_day_path(date: Time.zone.today.iso8601),
-                  class: "btn btn-outline-secondary btn-sm" %>
-      <% if @selected_date < Date.new(Consultation::MAX_SCHEDULE_YEAR, 12, 31) %>
-        <%= link_to "Next day", calendar_day_path(date: @selected_date.next_day.iso8601),
-                    class: "btn btn-outline-secondary btn-sm" %>
-      <% end %>
-    </div>
+  <nav aria-label="Calendar day navigation" class="rc-day-navigation mb-3">
+    <% if @selected_date > Date.new(Consultation::MIN_SCHEDULE_YEAR, 1, 1) %>
+      <%= link_to "← Previous day", calendar_day_path(date: @selected_date.prev_day.iso8601),
+                  class: "rc-navigation-link" %>
+    <% end %>
+    <%= link_to "Today", calendar_day_path(date: Time.zone.today.iso8601),
+                class: "rc-navigation-link" %>
+    <% if @selected_date < Date.new(Consultation::MAX_SCHEDULE_YEAR, 12, 31) %>
+      <%= link_to "Next day →", calendar_day_path(date: @selected_date.next_day.iso8601),
+                  class: "rc-navigation-link" %>
+    <% end %>
   </nav>
 
-  <div class="day-schedule" role="region"
-       aria-label="Hourly consultation schedule for <%= @selected_date.strftime('%d %B %Y') %>">
-    <table class="table day-timeline mb-0">
-      <caption class="visually-hidden">24 hourly slots, with scheduled consultations and administrator actions</caption>
-      <thead class="visually-hidden">
-        <tr><th scope="col">Time</th><th scope="col">Consultations</th></tr>
-      </thead>
-      <tbody>
-        <% @hour_slots.each do |slot| %>
-          <tr id="hour-<%= slot[:start_time].strftime('%H') %>">
-            <th class="day-hour" scope="row">
-              <time datetime="<%= slot[:start_time].iso8601 %>">
-                <%= slot[:start_time].strftime('%H:%M') %>
-              </time>
-            </th>
-            <td class="day-slot">
-              <% slot[:consultations].each do |consultation| %>
-                <article class="day-event">
-                  <div class="d-flex flex-wrap gap-2 align-items-baseline">
-                    <%= link_to consultation.title, consultation_path(consultation), class: "fw-semibold" %>
-                    <% if consultation.start_time < slot[:start_time] %>
-                      <span class="badge text-bg-light border">Continues</span>
-                    <% end %>
-                  </div>
-                  <p class="small text-secondary mb-0">
-                    <time datetime="<%= consultation.start_time.iso8601 %>">
-                      <%= consultation.start_time.in_time_zone.strftime('%d %b %H:%M') %>
-                    </time>
-                    –
-                    <time datetime="<%= consultation.end_time.iso8601 %>">
-                      <%= consultation.end_time.in_time_zone.strftime('%d %b %H:%M') %>
-                    </time>
-                  </p>
-                </article>
-              <% end %>
+  <section class="rc-agenda" aria-label="24 hour consultation agenda">
+    <div class="rc-agenda-legend" aria-hidden="true">
+      <span>TIME</span><span>ACTIVITY</span>
+    </div>
 
-              <% if admin_signed_in? %>
-                <%= link_to "Add at #{slot[:start_time].strftime('%H:%M')}",
-                            new_consultation_path(start_at: slot[:start_time].iso8601),
-                            class: "day-add-link small" %>
-              <% elsif slot[:consultations].empty? %>
-                <span class="day-slot-empty" aria-label="No consultations scheduled for this hour">—</span>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-  <p class="form-text mt-3">Consultations spanning multiple hours appear in each overlapping hour. Only an administrator can add or change them.</p>
+    <div class="day-schedule" role="list"
+         aria-label="Hourly consultation schedule for <%= @selected_date.strftime('%d %B %Y') %>">
+      <% @hour_slots.each do |slot| %>
+        <% hour_label = slot[:start_time].strftime("%H:%M") %>
+        <% count = slot[:consultations].length %>
+        <section id="hour-<%= slot[:start_time].strftime('%H') %>"
+                 class="hour-row <%= count.positive? ? 'hour-row--busy' : 'hour-row--quiet' %>"
+                 role="listitem" aria-label="<%= hour_label %> — <%= pluralize(count, 'event') %>">
+          <% if count.positive? %>
+            <details class="hour-disclosure" open>
+              <summary class="hour-header">
+                <time class="hour-time" datetime="<%= slot[:start_time].iso8601 %>"><%= hour_label %></time>
+                <span class="hour-activity">
+                  <span class="hour-activity-dot" aria-hidden="true"></span>
+                  <span class="hour-activity-count"><%= pluralize(count, "event") %></span>
+                </span>
+                <span class="hour-toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="hour-event-list" role="list"
+                   aria-label="Consultations in the <%= hour_label %> time slot"
+                   tabindex="<%= count > 3 ? 0 : -1 %>">
+                <% slot[:consultations].each do |consultation| %>
+                  <article class="hour-event" role="listitem">
+                    <div class="hour-event-content">
+                      <%= link_to consultation.title, consultation_path(consultation),
+                                  class: "hour-event-title" %>
+                      <% if consultation.start_time < slot[:start_time] %>
+                        <span class="hour-event-continuation">Continues</span>
+                      <% end %>
+                      <p class="hour-event-description">
+                        <%= truncate(consultation.description.to_s, length: 110) if consultation.description.present? %>
+                      </p>
+                    </div>
+                    <span class="hour-event-range">
+                      <time datetime="<%= consultation.start_time.iso8601 %>"><%= consultation.start_time.in_time_zone.strftime('%d %b %H:%M') %></time>
+                      <span aria-hidden="true">–</span>
+                      <time datetime="<%= consultation.end_time.iso8601 %>"><%= consultation.end_time.in_time_zone.strftime('%d %b %H:%M') %></time>
+                    </span>
+                  </article>
+                <% end %>
+              </div>
+            </details>
+          <% else %>
+            <div class="hour-header hour-header--empty">
+              <time class="hour-time" datetime="<%= slot[:start_time].iso8601 %>"><%= hour_label %></time>
+              <span class="hour-empty-label">Free</span>
+            </div>
+          <% end %>
+          <% if admin_signed_in? %>
+            <%= link_to "Add at #{hour_label}",
+                        new_consultation_path(start_at: slot[:start_time].iso8601),
+                        class: "day-add-link hour-add",
+                        title: "Add at #{hour_label}" %>
+          <% end %>
+        </section>
+      <% end %>
+    </div>
+  </section>
+
+  <p class="rc-hint mt-3">
+    Occupied hours are expanded by default. Select an hour to collapse it.
+    Hours with many events scroll independently. Events crossing an hour boundary appear in each relevant slot.
+  </p>
 </div>

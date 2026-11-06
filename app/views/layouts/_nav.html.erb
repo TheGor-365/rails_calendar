@@ -2,20 +2,21 @@
   <nav aria-label="Main navigation" class="app-nav d-flex flex-wrap align-items-center gap-2 gap-sm-3 py-3">
     <%= link_to "Rails Calendar", root_path, class: "app-brand me-2" %>
     <%= link_to "Calendar", root_path,
-                class: "nav-link #{'active' if current_page?(root_path)}",
-                aria: { current: ("page" if current_page?(root_path)) } %>
+                class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",
+                aria: { current: ("page" if controller_name == 'pages' && action_name == 'home') } %>
     <%= link_to "Day", calendar_day_path(date: Time.zone.today.iso8601),
-                class: "nav-link #{'active' if controller_name == 'pages' && action_name == 'day'}" %>
+                class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'day'}",
+                aria: { current: ("page" if controller_name == 'pages' && action_name == 'day') } %>
     <%= link_to "Consultations", consultations_path,
-                class: "nav-link #{'active' if current_page?(consultations_path)}",
-                aria: { current: ("page" if current_page?(consultations_path)) } %>
+                class: "rc-nav-link #{'active' if controller_name == 'consultations' && action_name == 'index'}",
+                aria: { current: ("page" if controller_name == 'consultations' && action_name == 'index') } %>
 
     <div class="ms-auto d-flex align-items-center gap-2">
       <% if admin_signed_in? %>
-        <span class="small text-secondary d-none d-sm-inline">Administrator</span>
-        <%= button_to "Sign out", admin_logout_path, method: :delete, class: "btn btn-outline-secondary btn-sm" %>
+        <span class="rc-nav-admin d-none d-sm-inline">Administrator</span>
+        <%= button_to "Sign out", admin_logout_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
       <% else %>
-        <%= link_to "Admin sign in", admin_login_path, class: "btn btn-outline-secondary btn-sm" %>
+        <%= link_to "Admin sign in", admin_login_path, class: "rc-action rc-action--quiet rc-action--small" %>
       <% end %>
     </div>
   </nav>

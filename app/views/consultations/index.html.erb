@@ -1,22 +1,25 @@
 <div class="container my-4 my-sm-5">
-  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h1 class="page-title mb-0">Consultations</h1>
+  <header class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <p class="eyebrow mb-2">SCHEDULE / RECORDS</p>
+      <h1 class="page-title mb-0">Consultations</h1>
+    </div>
     <% if admin_signed_in? %>
-      <%= link_to "New consultation", new_consultation_path, class: "btn btn-primary" %>
+      <%= link_to "New consultation", new_consultation_path, class: "rc-action rc-action--primary" %>
     <% end %>
-  </div>
+  </header>
 
   <% if @consultations.any? %>
-    <ul id="consultations" class="list-group rounded-3 shadow-sm">
+    <ul id="consultations" class="rc-record-list">
       <% @consultations.each do |consultation| %>
-        <li class="list-group-item">
+        <li class="rc-record">
           <%= render consultation %>
-          <%= link_to "Show this consultation", consultation, class: "btn btn-outline-primary btn-sm mt-2" %>
+          <%= link_to "Show this consultation", consultation, class: "rc-text-link mt-2" %>
         </li>
       <% end %>
     </ul>
   <% else %>
-    <p id="consultations" role="status" class="alert alert-info">
+    <p id="consultations" role="status" class="rc-notice rc-notice--neutral">
       No consultations have been scheduled.
     </p>
   <% end %>

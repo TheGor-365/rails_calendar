@@ -1,24 +1,22 @@
 <div class="container my-4 my-sm-5">
   <div class="form-page">
     <header class="mb-4">
-      <p class="eyebrow mb-2">Restricted access</p>
+      <p class="eyebrow mb-2">SECURE / ACCESS</p>
       <h1 class="page-title mb-2">Administrator sign-in</h1>
-      <p class="text-secondary mb-0">Consultation management is restricted to the administrator.</p>
+      <p class="rc-muted mb-0">Consultation management is restricted to the administrator.</p>
     </header>
 
     <section class="surface-panel" aria-label="Administrator credentials">
-      <%= form_with url: admin_session_path, method: :post, local: true do |form| %>
-        <div class="mb-3">
-          <%= form.label :username, "Username", class: "form-label fw-medium" %>
-          <%= form.text_field :username, required: true, autocomplete: "username",
-                              class: "form-control" %>
+      <%= form_with url: admin_session_path, method: :post, local: true, html: { class: "rc-form" } do |form| %>
+        <div class="rc-field">
+          <%= form.label :username, "Username", class: "rc-field-label" %>
+          <%= form.text_field :username, required: true, autocomplete: "username", class: "rc-input" %>
         </div>
-        <div class="mb-4">
-          <%= form.label :password, "Password", class: "form-label fw-medium" %>
-          <%= form.password_field :password, required: true, autocomplete: "current-password",
-                                  class: "form-control" %>
+        <div class="rc-field">
+          <%= form.label :password, "Password", class: "rc-field-label" %>
+          <%= form.password_field :password, required: true, autocomplete: "current-password", class: "rc-input" %>
         </div>
-        <%= form.submit "Sign in", class: "btn btn-primary px-4" %>
+        <%= form.submit "Sign in", class: "rc-action rc-action--primary" %>
       <% end %>
     </section>
   </div>

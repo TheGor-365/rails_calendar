@@ -1,6 +1,6 @@
-<%= form_with(model: consultation, html: { class: "consultation-form" }) do |form| %>
+<%= form_with(model: consultation, html: { class: "consultation-form rc-form" }) do |form| %>
   <% if consultation.errors.any? %>
-    <div id="consultation-form-errors" class="alert alert-danger" role="alert" tabindex="-1">
+    <div id="consultation-form-errors" class="rc-notice rc-notice--error mb-4" role="alert" tabindex="-1">
       <h2 class="h6 fw-semibold">Please correct <%= pluralize(consultation.errors.count, "error") %></h2>
       <ul class="mb-0">
         <% consultation.errors.each do |error| %>
@@ -10,57 +10,59 @@
     </div>
   <% end %>
 
-  <p id="consultation-timezone-hint" class="small text-secondary mb-4">
-    All fields marked * are required. Times use <%= Time.zone.name %>.
+  <p id="consultation-timezone-hint" class="rc-hint mb-4">
+    Required fields are marked *. Times use <%= Time.zone.name %>.
     Supported years: <%= Consultation::MIN_SCHEDULE_YEAR %>–<%= Consultation::MAX_SCHEDULE_YEAR %>.
   </p>
 
-  <div class="mb-3">
-    <%= form.label :title, "Title *", class: "form-label fw-medium" %>
-    <%= form.text_field :title, class: "form-control#{' is-invalid' if consultation.errors.include?(:title)}",
+  <div class="rc-field">
+    <%= form.label :title, "Title *", class: "rc-field-label" %>
+    <%= form.text_field :title, class: "rc-input#{' rc-input--invalid' if consultation.errors.include?(:title)}",
                         maxlength: 120, required: true, autocomplete: "off",
                         aria: { invalid: consultation.errors.include?(:title) } %>
     <% if consultation.errors.include?(:title) %>
-      <div class="invalid-feedback d-block"><%= consultation.errors.full_messages_for(:title).join(", ") %></div>
+      <p class="rc-field-error"><%= consultation.errors.full_messages_for(:title).join(", ") %></p>
     <% end %>
   </div>
 
-  <div class="mb-3">
-    <%= form.label :description, class: "form-label fw-medium" %>
-    <%= form.text_area :description, rows: 4, maxlength: 5000,
-                      class: "form-control#{' is-invalid' if consultation.errors.include?(:description)}",
+  <div class="rc-field">
+    <%= form.label :description, class: "rc-field-label" %>
+    <%= form.text_area :description, rows: 3, maxlength: 5000,
+                      class: "rc-input rc-input--area#{' rc-input--invalid' if consultation.errors.include?(:description)}",
                       aria: { invalid: consultation.errors.include?(:description) } %>
     <% if consultation.errors.include?(:description) %>
-      <div class="invalid-feedback d-block"><%= consultation.errors.full_messages_for(:description).join(", ") %></div>
+      <p class="rc-field-error"><%= consultation.errors.full_messages_for(:description).join(", ") %></p>
     <% end %>
   </div>
 
-  <div class="row g-3 mb-4">
-    <div class="col-12 col-md-6">
-      <%= form.label :start_time, "Start time *", class: "form-label fw-medium" %>
-      <%= form.datetime_field :start_time, class: "form-control#{' is-invalid' if consultation.errors.include?(:start_time)}",
+  <div class="row g-4 mb-4">
+    <div class="col-12 col-md-6 rc-field">
+      <%= form.label :start_time, "Start time *", class: "rc-field-label" %>
+      <%= form.datetime_field :start_time,
+                              class: "rc-input#{' rc-input--invalid' if consultation.errors.include?(:start_time)}",
                               required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59", step: 1,
                               aria: { invalid: consultation.errors.include?(:start_time),
                                       describedby: "consultation-timezone-hint" } %>
       <% if consultation.errors.include?(:start_time) %>
-        <div class="invalid-feedback d-block"><%= consultation.errors.full_messages_for(:start_time).join(", ") %></div>
+        <p class="rc-field-error"><%= consultation.errors.full_messages_for(:start_time).join(", ") %></p>
       <% end %>
     </div>
 
-    <div class="col-12 col-md-6">
-      <%= form.label :end_time, "End time *", class: "form-label fw-medium" %>
-      <%= form.datetime_field :end_time, class: "form-control#{' is-invalid' if consultation.errors.include?(:end_time)}",
+    <div class="col-12 col-md-6 rc-field">
+      <%= form.label :end_time, "End time *", class: "rc-field-label" %>
+      <%= form.datetime_field :end_time,
+                              class: "rc-input#{' rc-input--invalid' if consultation.errors.include?(:end_time)}",
                               required: true, min: "2000-01-01T00:00", max: "2100-12-31T23:59", step: 1,
                               aria: { invalid: consultation.errors.include?(:end_time),
                                       describedby: "consultation-timezone-hint" } %>
       <% if consultation.errors.include?(:end_time) %>
-        <div class="invalid-feedback d-block"><%= consultation.errors.full_messages_for(:end_time).join(", ") %></div>
+        <p class="rc-field-error"><%= consultation.errors.full_messages_for(:end_time).join(", ") %></p>
       <% end %>
     </div>
   </div>
 
   <div class="d-flex flex-wrap align-items-center gap-2">
-    <%= form.submit class: "btn btn-primary px-4" %>
-    <%= link_to "Cancel", consultations_path, class: "btn btn-outline-secondary" %>
+    <%= form.submit class: "rc-action rc-action--primary" %>
+    <%= link_to "Cancel", consultations_path, class: "rc-action rc-action--quiet" %>
   </div>
 <% end %>

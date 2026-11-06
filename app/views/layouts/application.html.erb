@@ -18,10 +18,10 @@
 
     <main id="main-content" class="pb-5" tabindex="-1">
       <% if notice.present? %>
-        <p class="container alert alert-success mt-3" role="status"><%= notice %></p>
+        <p class="container rc-notice rc-notice--success mt-3" role="status"><%= notice %></p>
       <% end %>
       <% if alert.present? %>
-        <p class="container alert alert-danger mt-3" role="alert"><%= alert %></p>
+        <p class="container rc-notice rc-notice--error mt-3" role="alert"><%= alert %></p>
       <% end %>
       <%= yield %>
     </main>
