@@ -1233,6 +1233,16 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 .rc-action-label--compact { display: none; }
 
 @media (max-width: 767.98px) {
+  // Mobile scrollbars are overlays on devices. On desktop Chrome emulation,
+  // the global stable scrollbar gutter makes fixed-position elements appear
+  // 7.5px left of the centered app. Remove that reserved gutter only in the
+  // mobile layout; scrolling still works by touch, wheel and keyboard.
+  html {
+    scrollbar-gutter: auto;
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+
   .app-nav { min-height: 55px; }
   .app-nav > .rc-nav-link,
   .app-nav > .ms-auto { display: none !important; }
