@@ -1,13 +1,13 @@
-<div class="container my-4">
+<div class="container my-4 my-sm-5">
   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h1 class="h2 mb-0">Consultations</h1>
+    <h1 class="page-title mb-0">Consultations</h1>
     <% if admin_signed_in? %>
       <%= link_to "New consultation", new_consultation_path, class: "btn btn-primary" %>
     <% end %>
   </div>
 
   <% if @consultations.any? %>
-    <ul id="consultations" class="list-group">
+    <ul id="consultations" class="list-group rounded-3 shadow-sm">
       <% @consultations.each do |consultation| %>
         <li class="list-group-item">
           <%= render consultation %>
