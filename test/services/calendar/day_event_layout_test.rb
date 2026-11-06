@@ -15,6 +15,10 @@ class Calendar::DayEventLayoutTest < ActiveSupport::TestCase
     assert_equal event.id, item.consultation.id
     assert_in_delta 441.0, item.start_px, 0.01
     assert_in_delta 63.0, item.height_px, 0.01
+    assert_equal "10:30", item.visible_start_label
+    assert_equal "12:00", item.visible_end_label
+    assert_in_delta item.start_px, item.real_start_px, 0.01
+    assert_in_delta item.height_px, item.real_height_px, 0.01
     assert_equal 0, item.lane
     assert_equal 1, item.lanes
   end
@@ -53,6 +57,10 @@ class Calendar::DayEventLayoutTest < ActiveSupport::TestCase
     first_day = layout_for(event)
     assert_equal 1, first_day.items.size
     assert first_day.items.first.continues_into_next_day
+    assert_equal "23:54", first_day.items.first.visible_start_label
+    assert_equal "24:00", first_day.items.first.visible_end_label
+    assert_in_delta 4.2, first_day.items.first.real_height_px, 0.01
+    assert_operator first_day.items.first.height_px, :>, first_day.items.first.real_height_px
     refute first_day.items.first.continues_from_previous_day
     assert_in_delta Calendar::DayEventLayout::DAY_HEIGHT_PX,
                     first_day.items.first.start_px + first_day.items.first.height_px, 0.01
@@ -65,6 +73,8 @@ class Calendar::DayEventLayoutTest < ActiveSupport::TestCase
     )
     assert_equal 1, next_day.items.size
     assert next_day.items.first.continues_from_previous_day
+    assert_equal "00:00", next_day.items.first.visible_start_label
+    assert_equal "22:53", next_day.items.first.visible_end_label
     refute next_day.items.first.continues_into_next_day
     assert_equal 0, next_day.items.first.start_px
     assert_in_delta 22 * 42 + 53 * 0.7, next_day.items.first.height_px, 0.01
