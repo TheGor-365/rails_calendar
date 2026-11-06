@@ -621,3 +621,247 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+
+// RC-010: continuous 24h scheduling. The timeline has a precise 42px/hour
+// scale, with cards rendered once, spanning their real clipped interval.
+// Event overflow is horizontal instead of duplicating records across hours.
+.rc-agenda-legend {
+  grid-template-columns: 76px minmax(0, 1fr);
+  padding: .65rem .85rem;
+}
+
+.rc-day-grid {
+  --rc-hour-height: 42px;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  height: calc(24 * var(--rc-hour-height));
+  min-width: 0;
+}
+
+.rc-time-axis {
+  display: grid;
+  grid-template-rows: repeat(24, var(--rc-hour-height));
+  border-right: 1px solid var(--rc-line);
+  background: #fafbf9;
+}
+
+.rc-time-axis-hour {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .15rem;
+  min-height: var(--rc-hour-height);
+  padding: .4rem .45rem .2rem .75rem;
+  border-bottom: 1px solid var(--rc-soft-line);
+  color: var(--rc-muted);
+  font-size: .68rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  scroll-margin-top: 25px;
+}
+
+.rc-time-axis-hour:last-child { border-bottom: 0; }
+.rc-time-axis-hour time { font-weight: 740; }
+
+.rc-time-axis-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 .12rem;
+  border-radius: 50%;
+  font-size: .6rem;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--rc-accent);
+  background: var(--rc-accent-wash);
+}
+
+.rc-day-scroll {
+  position: relative;
+  min-width: 0;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-color: #a2b9b1 transparent;
+}
+
+.rc-day-scroll:focus-visible {
+  outline: 2px solid var(--rc-accent);
+  outline-offset: -2px;
+}
+
+.rc-day-canvas {
+  position: relative;
+  height: 100%;
+  min-width: max(100%, calc(var(--rc-max-lanes) * 158px));
+}
+
+.rc-hour-bands {
+  display: grid;
+  grid-template-rows: repeat(24, var(--rc-hour-height));
+  height: 100%;
+}
+
+.rc-hour-band {
+  display: block;
+  min-height: var(--rc-hour-height);
+  border-bottom: 1px solid var(--rc-soft-line);
+  border-left: 2px solid transparent;
+  background: var(--rc-paper);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.rc-hour-band:last-child { border-bottom: 0; }
+.rc-hour-band:hover { border-left-color: var(--rc-accent); background: #f2f8f5; }
+.rc-hour-band:focus-visible {
+  border-color: var(--rc-accent);
+  outline: 2px solid var(--rc-accent);
+  outline-offset: -2px;
+  background: var(--rc-accent-wash);
+}
+.rc-hour-band--busy { background: #fafdfb; }
+
+.rc-event-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.rc-range-event {
+  position: absolute;
+  z-index: 2;
+  pointer-events: auto;
+  min-width: 0;
+  margin-left: 4px;
+  border-radius: .26rem;
+  border-left: 3px solid var(--rc-accent);
+  background: #dff1e9;
+  box-shadow: 0 0 0 1px rgba(23, 103, 92, .15);
+  overflow: hidden;
+}
+
+.rc-range-event:hover,
+.rc-range-event:focus-within {
+  z-index: 3;
+  box-shadow: 0 0 0 2px var(--rc-accent), 0 4px 15px rgba(23, 103, 92, .1);
+}
+
+.rc-range-event-link {
+  display: flex;
+  flex-direction: column;
+  gap: .12rem;
+  width: 100%;
+  height: 100%;
+  padding: .42rem .55rem;
+  color: var(--rc-ink);
+  font-size: .72rem;
+  line-height: 1.26;
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.rc-range-event-link:hover { color: var(--rc-accent-dark); }
+.rc-range-event-link:focus-visible { outline: 2px solid var(--rc-accent); outline-offset: -2px; }
+
+.rc-range-event-heading {
+  display: block;
+  font-size: .75rem;
+  font-weight: 760;
+  letter-spacing: -.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rc-range-event-times {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: .2rem;
+  font-size: .66rem;
+  font-weight: 600;
+  color: #335b54;
+  font-variant-numeric: tabular-nums;
+}
+
+.rc-range-event-summary {
+  overflow-wrap: anywhere;
+  color: #466861;
+  font-size: .68rem;
+  line-height: 1.35;
+}
+
+.rc-range-event-continuation {
+  margin-top: .3rem;
+  font-size: .64rem;
+  color: #487168;
+  font-style: italic;
+}
+
+@media (max-width: 575.98px) {
+  .rc-day-grid { grid-template-columns: 61px minmax(0, 1fr); }
+  .rc-agenda-legend { grid-template-columns: 61px minmax(0, 1fr); padding: .55rem; font-size: .56rem; }
+  .rc-time-axis-hour { padding: .4rem .2rem .2rem .3rem; font-size: .65rem; }
+  .rc-time-axis-count { min-width: 14px; height: 14px; font-size: .55rem; }
+  .rc-range-event-link { padding: .3rem .4rem; font-size: .67rem; }
+  .rc-range-event-heading { font-size: .7rem; }
+  .rc-range-event-times { font-size: .6rem; }
+  .rc-day-canvas { min-width: max(100%, calc(var(--rc-max-lanes) * 138px)); }
+}
+
+.rc-time-axis-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  margin-top: -.12rem;
+  padding: 0 .2rem;
+  margin-left: -.2rem;
+  border-radius: .16rem;
+  color: var(--rc-muted);
+  text-decoration: none;
+}
+.rc-time-axis-link:hover,
+.rc-time-axis-link:focus-visible {
+  color: var(--rc-accent);
+  background: var(--rc-accent-wash);
+  text-decoration: underline;
+}
+
+
+// RC-010 precision: the right-hand line represents the real occupied time,
+// while very short events keep a readable (minimum-height) card.
+.rc-range-event-link {
+  position: relative;
+  z-index: 1;
+  gap: 0;
+  padding: .2rem .55rem;
+}
+.rc-range-event-heading { line-height: 1.1; }
+.rc-range-event-clock {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .18rem;
+  color: #335b54;
+  font-size: .64rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.rc-range-event-exact-bar {
+  position: absolute;
+  right: 0;
+  width: 3px;
+  z-index: 2;
+  display: block;
+  border-radius: 2px;
+  background: #16836f;
+  pointer-events: none;
+}
+@media (max-width: 575.98px) {
+  .rc-range-event-link { padding: .2rem .3rem; }
+  .rc-range-event-clock { font-size: .61rem; }
+}
