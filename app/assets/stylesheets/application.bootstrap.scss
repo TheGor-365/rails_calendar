@@ -867,32 +867,25 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 }
 
 
-// RC-011: a day cell is one large click target while event links take precedence.
+// RC-011: Keep the date link small and accessible, but extend its click
+// target to the whole table cell using a pseudo-element positioned by the td.
+// Interactive event previews have higher stacking priority and stay clickable.
 .calendar-grid tbody td { position: relative; }
-.calendar-grid .calendar-day-link {
+.calendar-grid .calendar-day-link { position: static; }
+.calendar-grid .calendar-day-link::before {
+  content: "";
   position: absolute;
   inset: 0;
-  display: block;
-  min-width: 0;
-  min-height: 0;
-  padding: 0;
-  border-radius: 0;
   z-index: 1;
+  cursor: pointer;
 }
-.calendar-grid .calendar-day-link:hover { background: rgba(23, 103, 92, .055); }
+.calendar-grid .calendar-day-link:hover::before { background: rgba(23, 103, 92, .045); }
 .calendar-grid .calendar-day-link:focus-visible {
   outline: 2px solid var(--rc-accent);
-  outline-offset: -2px;
+  outline-offset: 2px;
 }
-.calendar-day-label {
-  position: absolute;
-  top: .48rem;
-  left: .52rem;
-  padding: .15rem .25rem;
-  pointer-events: none;
-}
+.calendar-day-label { position: relative; z-index: 2; pointer-events: auto; }
 .calendar-day-count { position: relative; z-index: 2; pointer-events: none; }
-.calendar-date-heading { min-height: 1.6rem; }
 .calendar-event, .calendar-more { position: relative; z-index: 3; }
 .calendar-event-link:hover .calendar-event-name { color: var(--rc-accent); text-decoration: underline; }
 .calendar-event-link:focus-visible { outline: 2px solid var(--rc-accent); outline-offset: 2px; }
