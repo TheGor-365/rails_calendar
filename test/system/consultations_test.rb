@@ -16,13 +16,13 @@ class ConsultationsTest < ApplicationSystemTestCase
 
   test "calendar month day hit targets and event cards navigate independently" do
     visit root_url(start_date: "2023-01-01")
-    find("a.calendar-event-link[href=?]", consultation_path(@consultation)).click
+    find("a.calendar-event-link[href='#{consultation_path(@consultation)}']").click
     assert_current_path consultation_path(@consultation)
     click_on "View in calendar"
     assert_current_path calendar_day_path(date: "2023-01-19", anchor: "event-#{@consultation.id}")
     assert_selector ".rc-time-axis-hour", count: 24
     visit root_url(start_date: "2023-01-01")
-    find("a.calendar-day-link[href=?]", calendar_day_path(date: "2023-01-19")).click
+    find("a.calendar-day-link[href*='2023-01-19']").click(x: 18, y: 18)
     assert_current_path calendar_day_path(date: "2023-01-19")
   end
 
@@ -95,7 +95,7 @@ class ConsultationsTest < ApplicationSystemTestCase
 
   test "visitor sees one continuous card, can drill into any hour, and open the consultation" do
     visit root_url(start_date: "2023-01-01")
-    find("a.calendar-day-link[href*='2023-01-19']").click
+    find("a.calendar-day-link[href*='2023-01-19']").click(x: 18, y: 18)
 
     assert_current_path calendar_day_path(date: "2023-01-19")
     assert_selector ".rc-time-axis-hour", count: 24
