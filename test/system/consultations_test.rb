@@ -90,8 +90,13 @@ class ConsultationsTest < ApplicationSystemTestCase
           const positions = actions.map(el => el.getBoundingClientRect());
           return {
             dockPosition: getComputedStyle(dock).position,
+            cssRelease: getComputedStyle(document.documentElement)
+              .getPropertyValue("--rc-mobile-dock-release").trim(),
             dockBottom: dock.getBoundingClientRect().bottom,
             dockHeight: dock.getBoundingClientRect().height,
+            dockCenter: (dock.getBoundingClientRect().left + dock.getBoundingClientRect().right) / 2,
+            dockWidth: dock.getBoundingClientRect().width,
+            iconFont: getComputedStyle(dock.querySelector(".rc-mobile-dock-icon"), "::before").fontFamily,
             viewportHeight: window.innerHeight,
             pageWidth: document.documentElement.scrollWidth,
             viewportWidth: window.innerWidth,
@@ -103,13 +108,36 @@ class ConsultationsTest < ApplicationSystemTestCase
         })()
       JS
       assert_equal "fixed", layout["dockPosition"]
+      assert_equal "rc014b-20261107", layout["cssRelease"], "Current Sass bundle is not loaded"
+      assert_includes layout["iconFont"].downcase, "bootstrap-icons"
       assert_in_delta layout["viewportHeight"], layout["dockBottom"], 1
+      assert_in_delta layout["viewportWidth"] / 2.0, layout["dockCenter"], 1
+      assert_operator layout["dockWidth"], :<=, 430
+      assert_operator layout["dockWidth"], :<=, layout["viewportWidth"] + 1
       assert_operator layout["pageWidth"], :<=, layout["viewportWidth"] + 1
       assert_operator layout["firstActionLeft"], :>=, 0
       assert_operator layout["lastActionRight"], :<=, layout["viewportWidth"] + 1
       assert_operator layout["rowDrift"], :<=, 1
       assert_operator layout["bottomPadding"], :>=, layout["dockHeight"]
     end
+
+    # Verify that the dock is pinned to the viewport, not the document footer:
+    # this long schedule can be scrolled to the bottom on every mobile size.
+    visit calendar_day_url(date: "2023-01-19")
+    assert_selector "nav.rc-mobile-dock", visible: true
+    scrollBefore = page.evaluate_script("window.scrollY")
+    page.execute_script("window.scrollTo(0, document.documentElement.scrollHeight)")
+    scrollAfter = page.evaluate_script("window.scrollY")
+    assert_operator scrollAfter, :>, scrollBefore
+    dockAfterScroll = page.evaluate_script(<<~JS)
+      (() => {
+        const dock = document.querySelector(".rc-mobile-dock").getBoundingClientRect();
+        return {bottom: dock.bottom, center: (dock.left + dock.right) / 2,
+                viewportHeight: window.innerHeight, viewportWidth: window.innerWidth};
+      })()
+    JS
+    assert_in_delta dockAfterScroll["viewportHeight"], dockAfterScroll["bottom"], 1
+    assert_in_delta dockAfterScroll["viewportWidth"] / 2.0, dockAfterScroll["center"], 1
 
     find("nav.rc-mobile-dock a.rc-mobile-dock-item--create").click
     assert_current_path admin_login_path
