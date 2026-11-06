@@ -13,10 +13,11 @@ module Calendar
     DAY_MINUTES = 24 * 60
     DAY_HEIGHT_PX = HOUR_HEIGHT_PX * 24
     MIN_CARD_HEIGHT_PX = 34.0
-    MIN_CARD_MINUTES = MIN_CARD_HEIGHT_PX * 60 / HOUR_HEIGHT_PX
 
     Item = Struct.new(
       :consultation, :start_px, :height_px, :lane, :lanes,
+      :real_start_px, :real_height_px, :visible_start_at, :visible_end_at,
+      :visible_start_label, :visible_end_label,
       :continues_from_previous_day, :continues_into_next_day,
       keyword_init: true
     )
@@ -38,6 +39,12 @@ module Calendar
             height_px: (entry.fetch(:visual_end) - entry.fetch(:visual_start)).round(2),
             lane: entry.fetch(:lane),
             lanes: entry.fetch(:lanes),
+            real_start_px: entry.fetch(:real_start_px).round(2),
+            real_height_px: entry.fetch(:real_height_px).round(2),
+            visible_start_at: entry.fetch(:visible_start_at),
+            visible_end_at: entry.fetch(:visible_end_at),
+            visible_start_label: entry.fetch(:visible_start_label),
+            visible_end_label: entry.fetch(:visible_end_label),
             continues_from_previous_day: entry.fetch(:continues_from_previous_day),
             continues_into_next_day: entry.fetch(:continues_into_next_day)
           )
@@ -62,16 +69,22 @@ module Calendar
 
         # A very short event must remain readable and clickable. Clamp its
         # visual card within the 24-hour canvas, without changing real times.
-        height_px = [(end_minute - start_minute) * HOUR_HEIGHT_PX / 60.0,
-                     MIN_CARD_HEIGHT_PX].max
-        visual_start = [start_minute * HOUR_HEIGHT_PX / 60.0,
-                        DAY_HEIGHT_PX - height_px].min
+        real_start_px = start_minute * HOUR_HEIGHT_PX / 60.0
+        real_height_px = (end_minute - start_minute) * HOUR_HEIGHT_PX / 60.0
+        height_px = [real_height_px, MIN_CARD_HEIGHT_PX].max
+        visual_start = [real_start_px, DAY_HEIGHT_PX - height_px].min
         visual_end = visual_start + height_px
 
         {
           consultation: consultation,
           visual_start: visual_start,
           visual_end: visual_end,
+          real_start_px: real_start_px,
+          real_height_px: real_height_px,
+          visible_start_at: actual_start,
+          visible_end_at: actual_end,
+          visible_start_label: actual_start == @day_start ? "00:00" : actual_start.in_time_zone.strftime("%H:%M"),
+          visible_end_label: actual_end == @day_end ? "24:00" : actual_end.in_time_zone.strftime("%H:%M"),
           continues_from_previous_day: consultation.start_time < @day_start,
           continues_into_next_day: consultation.end_time > @day_end
         }
