@@ -1,6 +1,6 @@
 # RC-015 — Minute-only scheduling and identifiable deletion
 
-**Date:** 2026-11-07. **Status:** implementation candidate; manual acceptance and final CI are required.
+**Date:** 2026-11-07. **Status:** CI + Security SUCCESS on code SHA `3c63dfb88dc83f02c641491e90596e6ab6cf4ecb` (57 Rails tests / 380 assertions + 15 Chrome tests / 172 assertions, all passing); manual acceptance and local DB read-only inspection pending.
 
 ## Confirmed user evidence / incident
 
@@ -23,7 +23,7 @@ User's browser screenshots from the Rails Calendar P0 manual test show:
 
 ## Gates
 
-- [ ] Rails CI + Security audit green on same final SHA.
+- [x] Rails CI + Security audit green on same code SHA: [CI](https://github.com/TheGor-365/rails_calendar/actions/runs/42311286112) · [Security](https://github.com/TheGor-365/rails_calendar/actions/runs/42311286151).
 - [ ] Owner local test on 320/430/mobile and desktop. New/Edit datetime fields must show HH:MM only.
 - [ ] Read-only verification of local records #2 and #3, backup status, and whether the owner wants original #2 restored (no automatic changes).
 - [ ] Test delete confirmation only against a deliberately created **new** synthetic record and inspect that ID/title match; never use original record.
