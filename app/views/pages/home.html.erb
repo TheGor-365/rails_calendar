@@ -48,7 +48,7 @@
       inside the grid; event links remain independently reachable below it. %>
   <section class="calendar-mobile-agenda" aria-label="Consultations in the displayed month">
     <header class="calendar-mobile-agenda-header">
-      <h2 class="calendar-mobile-agenda-title">Events in <%= @consultations_by_day.keys.find { |date| date.day == 1 }&.strftime("%B %Y") || "this month" %></h2>
+      <h2 class="calendar-mobile-agenda-title">Events in <%= @displayed_month.strftime("%B %Y") %></h2>
       <p class="rc-hint mb-0">Tap a date above for its 24-hour schedule, or open an event directly below.</p>
     </header>
 
