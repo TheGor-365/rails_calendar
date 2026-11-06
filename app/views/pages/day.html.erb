@@ -6,8 +6,9 @@
         <time datetime="<%= @selected_date.iso8601 %>"><%= @selected_date.strftime("%A, %d %B %Y") %></time>
       </h1>
       <p class="rc-muted mb-0">
-        <span class="rc-data-number"><%= pluralize(@consultations.count, "consultation") %></span>
-        <span aria-hidden="true">·</span> 24 hours <span aria-hidden="true">·</span> <%= Time.zone.name %>
+        <span class="rc-data-number"><%= pluralize(@consultations.size, "consultation") %></span>
+        <span aria-hidden="true">·</span> 00:00–24:00
+        <span aria-hidden="true">·</span> <%= Time.zone.name %>
       </p>
     </div>
     <div class="d-flex flex-wrap gap-2">
@@ -33,72 +34,85 @@
     <% end %>
   </nav>
 
-  <section class="rc-agenda" aria-label="24 hour consultation agenda">
+  <section class="rc-agenda" aria-label="Continuous 24 hour consultation timeline">
     <div class="rc-agenda-legend" aria-hidden="true">
-      <span>TIME</span><span>ACTIVITY</span>
+      <span>TIME</span><span>EVENTS · CLICK AN HOUR FOR DETAILS</span>
     </div>
 
-    <div class="day-schedule" role="list"
-         aria-label="Hourly consultation schedule for <%= @selected_date.strftime('%d %B %Y') %>">
-      <% @hour_slots.each do |slot| %>
-        <% hour_label = slot[:start_time].strftime("%H:%M") %>
-        <% count = slot[:consultations].length %>
-        <section id="hour-<%= slot[:start_time].strftime('%H') %>"
-                 class="hour-row <%= count.positive? ? 'hour-row--busy' : 'hour-row--quiet' %>"
-                 role="listitem" aria-label="<%= hour_label %> — <%= pluralize(count, 'event') %>">
-          <% if count.positive? %>
-            <details class="hour-disclosure" open>
-              <summary class="hour-header">
-                <time class="hour-time" datetime="<%= slot[:start_time].iso8601 %>"><%= hour_label %></time>
-                <span class="hour-activity">
-                  <span class="hour-activity-dot" aria-hidden="true"></span>
-                  <span class="hour-activity-count"><%= pluralize(count, "event") %></span>
+    <div class="rc-day-grid">
+      <div class="rc-time-axis" aria-hidden="true">
+        <% @hour_slots.each do |slot| %>
+          <div class="rc-time-axis-hour" id="hour-<%= format('%02d', slot[:hour]) %>">
+            <time datetime="<%= slot[:start_time].iso8601 %>"><%= slot[:start_time].strftime("%H:%M") %></time>
+            <% if slot[:count].positive? %>
+              <span class="rc-time-axis-count"><%= slot[:count] %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="rc-day-scroll" role="region" tabindex="0"
+           aria-label="Continuous daily schedule; scroll horizontally when events overlap">
+        <div class="rc-day-canvas" style="--rc-max-lanes: <%= @timeline.max_lanes %>">
+          <div class="rc-hour-bands" role="list" aria-label="24 selectable one-hour intervals">
+            <% @hour_slots.each do |slot| %>
+              <% from_label = slot[:start_time].strftime("%H:%M") %>
+              <% to_label = slot[:end_time].strftime("%H:%M") %>
+              <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
+                          class: "rc-hour-band #{'rc-hour-band--busy' if slot[:count].positive?}",
+                          role: "listitem",
+                          aria: { label: "Inspect #{from_label}–#{to_label}, #{pluralize(slot[:count], 'event')}" },
+                          title: "Inspect #{from_label}–#{to_label}" do %>
+                <span class="visually-hidden">
+                  <%= from_label %>–<%= to_label %>, <%= pluralize(slot[:count], "event") %>
                 </span>
-                <span class="hour-toggle" aria-hidden="true"></span>
-              </summary>
-              <div class="hour-event-list" role="list"
-                   aria-label="Consultations in the <%= hour_label %> time slot"
-                   tabindex="<%= count > 3 ? 0 : -1 %>">
-                <% slot[:consultations].each do |consultation| %>
-                  <article class="hour-event" role="listitem">
-                    <div class="hour-event-content">
-                      <%= link_to consultation.title, consultation_path(consultation),
-                                  class: "hour-event-title" %>
-                      <% if consultation.start_time < slot[:start_time] %>
-                        <span class="hour-event-continuation">Continues</span>
-                      <% end %>
-                      <p class="hour-event-description">
-                        <%= truncate(consultation.description.to_s, length: 110) if consultation.description.present? %>
-                      </p>
-                    </div>
-                    <span class="hour-event-range">
-                      <time datetime="<%= consultation.start_time.iso8601 %>"><%= consultation.start_time.in_time_zone.strftime('%d %b %H:%M') %></time>
+              <% end %>
+            <% end %>
+          </div>
+
+          <div class="rc-event-layer" aria-label="Consultations drawn once per day">
+            <% @timeline.items.each do |item| %>
+              <% event = item.consultation %>
+              <% left = (item.lane * 100.0 / item.lanes).round(4) %>
+              <% width = (100.0 / item.lanes).round(4) %>
+              <% time_span = "#{event.start_time.in_time_zone.strftime('%d %b %H:%M')} – #{event.end_time.in_time_zone.strftime('%d %b %H:%M')}" %>
+              <article class="rc-range-event" id="event-<%= event.id %>"
+                       style="top: <%= item.start_px %>px; height: <%= item.height_px %>px; left: <%= left %>%; width: calc(<%= width %>% - 8px);"
+                       data-event-id="<%= event.id %>" data-lane="<%= item.lane %>"
+                       data-lanes="<%= item.lanes %>">
+                <%= link_to consultation_path(event),
+                            class: "rc-range-event-link",
+                            aria: { label: "#{event.title}, #{time_span}. Open consultation" },
+                            title: "#{event.title} — #{time_span}" do %>
+                  <span class="rc-range-event-heading"><%= event.title %></span>
+                  <% if item.height_px >= 55 %>
+                    <span class="rc-range-event-times">
+                      <time datetime="<%= event.start_time.iso8601 %>"><%= event.start_time.in_time_zone.strftime('%d %b %H:%M') %></time>
                       <span aria-hidden="true">–</span>
-                      <time datetime="<%= consultation.end_time.iso8601 %>"><%= consultation.end_time.in_time_zone.strftime('%d %b %H:%M') %></time>
+                      <time datetime="<%= event.end_time.iso8601 %>"><%= event.end_time.in_time_zone.strftime('%d %b %H:%M') %></time>
                     </span>
-                  </article>
+                  <% end %>
+                  <% if item.height_px >= 95 && event.description.present? %>
+                    <span class="rc-range-event-summary"><%= truncate(event.description, length: 85) %></span>
+                  <% end %>
+                  <% if item.height_px >= 82 && (item.continues_from_previous_day || item.continues_into_next_day) %>
+                    <span class="rc-range-event-continuation">
+                      <%= item.continues_from_previous_day ? "Continues from previous day" : "Continues next day" %>
+                    </span>
+                  <% end %>
                 <% end %>
-              </div>
-            </details>
-          <% else %>
-            <div class="hour-header hour-header--empty">
-              <time class="hour-time" datetime="<%= slot[:start_time].iso8601 %>"><%= hour_label %></time>
-              <span class="hour-empty-label">Free</span>
-            </div>
-          <% end %>
-          <% if admin_signed_in? %>
-            <%= link_to "Add at #{hour_label}",
-                        new_consultation_path(start_at: slot[:start_time].iso8601),
-                        class: "day-add-link hour-add",
-                        title: "Add at #{hour_label}" %>
-          <% end %>
-        </section>
-      <% end %>
+              </article>
+            <% end %>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <p class="rc-hint mt-3">
-    Occupied hours are expanded by default. Select an hour to collapse it.
-    Hours with many events scroll independently. Events crossing an hour boundary appear in each relevant slot.
+    One continuous block represents each consultation, even when it lasts several hours.
+    Select a time row to inspect its exact interval; select an event to open its details.
+    On crowded days, scroll horizontally to see overlapping event lanes.
+    Times are displayed in <%= Time.zone.name %>.
   </p>
 </div>
