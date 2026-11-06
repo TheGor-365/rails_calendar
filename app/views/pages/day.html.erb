@@ -13,23 +13,23 @@
     </div>
     <div class="d-flex flex-wrap gap-2">
       <% if admin_signed_in? %>
-        <%= link_to "New consultation", new_consultation_path(start_at: @hour_slots.first[:start_time].iso8601),
+        <%= link_to rc_icon_label("plus-lg", "New consultation"), new_consultation_path(start_at: @hour_slots.first[:start_time].iso8601),
                     class: "rc-action rc-action--primary" %>
       <% end %>
-      <%= link_to "Month", root_path(start_date: @selected_date.iso8601),
+      <%= link_to rc_icon_label("calendar3", "Month"), root_path(start_date: @selected_date.iso8601),
                   class: "rc-action rc-action--quiet" %>
     </div>
   </header>
 
   <nav aria-label="Calendar day navigation" class="rc-day-navigation mb-3">
     <% if @selected_date > Date.new(Consultation::MIN_SCHEDULE_YEAR, 1, 1) %>
-      <%= link_to "← Previous day", calendar_day_path(date: @selected_date.prev_day.iso8601),
+      <%= link_to rc_icon_label("chevron-left", "Previous day"), calendar_day_path(date: @selected_date.prev_day.iso8601),
                   class: "rc-navigation-link" %>
     <% end %>
-    <%= link_to "Today", calendar_day_path(date: Time.zone.today.iso8601),
+    <%= link_to rc_icon_label("calendar-check", "Today"), calendar_day_path(date: Time.zone.today.iso8601),
                 class: "rc-navigation-link" %>
     <% if @selected_date < Date.new(Consultation::MAX_SCHEDULE_YEAR, 12, 31) %>
-      <%= link_to "Next day →", calendar_day_path(date: @selected_date.next_day.iso8601),
+      <%= link_to rc_icon_label("chevron-right", "Next day"), calendar_day_path(date: @selected_date.next_day.iso8601),
                   class: "rc-navigation-link" %>
     <% end %>
   </nav>
