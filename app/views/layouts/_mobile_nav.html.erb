@@ -1,0 +1,52 @@
+<%# RC-014: one-thumb navigation with real server-side destinations. %>
+<% calendar_active = controller_name == "pages" && action_name == "home" %>
+<% today_active = controller_name == "pages" && %w[day hour].include?(action_name) && @selected_date == Time.zone.today %>
+<% consultations_active = controller_name == "consultations" && %w[index show].include?(action_name) %>
+<% creation_active = controller_name == "consultations" && %w[new create].include?(action_name) %>
+<% access_active = controller_path == "admin/sessions" %>
+
+<nav class="rc-mobile-dock" aria-label="Mobile primary navigation">
+  <%= link_to root_path, class: "rc-mobile-dock-item #{'is-active' if calendar_active}",
+              aria: { current: ("page" if calendar_active) } do %>
+    <i class="bi bi-calendar3 rc-mobile-dock-icon" aria-hidden="true"></i>
+    <span class="rc-mobile-dock-label">Month</span>
+  <% end %>
+
+  <%= link_to calendar_day_path(date: Time.zone.today.iso8601),
+              class: "rc-mobile-dock-item #{'is-active' if today_active}",
+              aria: { current: ("page" if today_active) } do %>
+    <i class="bi bi-calendar-day rc-mobile-dock-icon" aria-hidden="true"></i>
+    <span class="rc-mobile-dock-label">Today</span>
+  <% end %>
+
+  <%# Guests are sent to the existing login screen, never to a write action. %>
+  <%= link_to(admin_signed_in? ? new_consultation_path : admin_login_path,
+              class: "rc-mobile-dock-item rc-mobile-dock-item--create #{'is-active' if creation_active}",
+              aria: { label: (admin_signed_in? ? "New consultation" : "Sign in to add a consultation"),
+                      current: ("page" if creation_active) }) do %>
+    <span class="rc-mobile-dock-create-icon"><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
+    <span class="rc-mobile-dock-label">New</span>
+  <% end %>
+
+  <%= link_to consultations_path, class: "rc-mobile-dock-item #{'is-active' if consultations_active}",
+              aria: { current: ("page" if consultations_active) } do %>
+    <i class="bi bi-list-ul rc-mobile-dock-icon" aria-hidden="true"></i>
+    <span class="rc-mobile-dock-label">Records</span>
+  <% end %>
+
+  <% if admin_signed_in? %>
+    <%= button_to admin_logout_path, method: :delete,
+                  form: { class: "rc-mobile-dock-form" },
+                  class: "rc-mobile-dock-item",
+                  aria: { label: "Sign out of administrator session" } do %>
+      <i class="bi bi-box-arrow-right rc-mobile-dock-icon" aria-hidden="true"></i>
+      <span class="rc-mobile-dock-label">Sign out</span>
+    <% end %>
+  <% else %>
+    <%= link_to admin_login_path, class: "rc-mobile-dock-item #{'is-active' if access_active}",
+                aria: { current: ("page" if access_active) } do %>
+      <i class="bi bi-person-circle rc-mobile-dock-icon" aria-hidden="true"></i>
+      <span class="rc-mobile-dock-label">Admin</span>
+    <% end %>
+  <% end %>
+</nav>

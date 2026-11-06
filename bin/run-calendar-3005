@@ -29,5 +29,16 @@ bin/rails runner 'abort("Calendar::DayEventLayout not available") unless defined
 echo "Building frontend..."
 npx --yes yarn@1.22.22 build
 npx --yes yarn@1.22.22 build:css
+
+# This mobile navigation depends on compiled Sass in ignored app/assets/builds/.
+# Fail early instead of silently serving a previous branch's CSS.
+css_bundle=app/assets/builds/application.css
+if [[ ! -s "$css_bundle" ]] || ! grep -Fq -- "--rc-mobile-dock-release: rc014b-20261107" "$css_bundle"; then
+  echo >&2 "ERROR: Built CSS is missing the current mobile navigation release marker."
+  echo >&2 "Check the Sass build output and do not validate the dock using cached assets."
+  exit 3
+fi
+echo "CSS release rc014b-20261107 verified in $css_bundle."
+echo "If Chrome still shows plain text links, use Ctrl+Shift+R (hard reload) with DevTools cache disabled."
 echo "Starting Rails Calendar on http://127.0.0.1:$port"
 RAILS_LOG_LEVEL="warn" exec bin/rails server -b 127.0.0.1 -p "$port"

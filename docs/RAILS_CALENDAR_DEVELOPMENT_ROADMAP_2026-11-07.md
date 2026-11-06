@@ -1,6 +1,6 @@
 # Rails Calendar → AI Service Operating System — development roadmap
 
-**Checkpoint:** 2026-11-07 (Asia/Yerevan). **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
+**Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-014b dock revision. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
 
 **Product contract:** evolve the existing Rails Calendar, do not rewrite it. The calendar becomes the visible scheduling layer of an AI-assisted service-delivery system for the owner's actual Ruby on Rails freelance work. Initial vertical: Rails debugging, CRUD/forms, API/PostgreSQL, tests and small integrations. Later professions require versioned playbooks, not cloned apps. The system must not invent paid engagements, commitments or approvals.
 
@@ -29,16 +29,17 @@
 | RC-010 / PR #10 | Continuous multi-hour event layout, overlap lanes and hour detail | Implemented, CI |
 | RC-011 / PR #11 | Safe local boot, day/event deep links, separate list/detail UX | CI+Security success; user desktop screenshots show NameError resolved |
 | RC-012 / PR #12 | Seven visible mobile columns, month event list and mobile feature parity | CI+Security success; user screenshots at 430px show working day/event navigation |
-| RC-013 / new Draft | Restrained icon-labeled controls and touch/focus styling across existing screens | **In progress**; verify final SHA CI+Security and owner screenshots |
+| RC-013 / PR #13 | Restrained icon-labeled controls and touch/focus styling across existing screens | CI+Security SUCCESS; owner mobile detail screenshot shows icons |
+| RC-014 / PR #14 | Persistent five-tab dock and single-row detail actions | Owner's 430px screenshot of RC-014 rejected (unstyled links in flow). RC-014b fixed dock + bundle check committed at `af850af`; CI+Security SUCCESS (69 tests, 524 assertions); **manual RC-014b browser QA pending** |
 
-All these PRs are Draft and stacked; `main` and production have not been changed by this program.
+All these PRs are Draft and stacked; `main` and production have not been changed by this program. #4 is a superseded duplicate (DO NOT MERGE).
 
 ## Phase A — finish the existing calendar (P0; before public launch)
 
-### A1. RC-013 design acceptance
-- Verify fresh CI+Security on latest PR SHA; Chrome browser tests at 320/390/430 and desktop.
+### A1. RC-014b — fixed mobile dock / CSS freshness (CURRENT)
+- **Verified** [CI run 42304835490](https://github.com/TheGor-365/rails_calendar/actions/runs/42304835490) and [Security run 42304835617](https://github.com/TheGor-365/rails_calendar/actions/runs/42304835617) on SHA `af850af347c30d632058ca7464f6b3a1680a45f3`: 54 Rails tests/352 assertions + 15 Chrome tests/172 assertions, 0 failures/errors/skips. Chrome at 320/390/430 and desktop. Assert browser-computed CSS release marker, fixed viewport bottom even after long-page scroll, 5 equal tabs centered within a max-430px dock, required safe-area padding and one-row consultation actions. Verify guest/new authentication gate.
 - Test Month ⇄ Day → Hour and Event → details → anchored Day, Today, admin sign-in, create/edit/delete, cancellation.
-- Screenshot mobile 320 and 430 + desktop; verify icon font actually loads; no lost text, clipped navigation, inaccessible focus or keyboard actions.
+- User screenshot at 430px before RC-014b showed plain underlined dock links in document flow, despite GitHub browser CI showing fixed CSS. Root cause **not yet confirmed**, likely local CSS asset stale. Launcher now checks a version marker inside the built Sass bundle; use hard reload with Chrome cache disabled if necessary. Accept only after fresh screenshots at mobile 320 and 430 + desktop. Verify icon font, labels, focus/touch and no hidden content.
 
 **Exit:** owner accepts visual style and controls; no failures or hidden functionality.
 
@@ -57,7 +58,7 @@ All these PRs are Draft and stacked; `main` and production have not been changed
 **Exit:** reviewed ADR, timezone regression tests and clear UI labels.
 
 ### A4. Stack review & release gate
-- Review commits and dependencies for PR #1→#13, exclude #4; squash/rebase only after explicit owner consent and backup.
+- Review commits and dependencies for PR #1→#14, exclude #4; squash/rebase only after explicit owner consent and backup.
 - Verify staging DB migrations/data, restore/rollback procedure, health checks, 320/390/430 smoke, credentials, session policy and Railway resource costs.
 - Production remains blocked until manual gate.
 
@@ -111,4 +112,4 @@ Prepare ADRs and additive schema migrations, not a replacement application. Prop
 
 `readback current SHA + sources → define one user-visible acceptance outcome → write failing regression test where appropriate → smallest implementation → CI + Security on same final SHA → manual mobile and desktop QA → checkpoint with evidence`.
 
-**Next 1–3 actions after RC-013 code:** 1) review GitHub checks and run `git fetch`/safe switch; 2) verify icon-loaded month/events/detail on 430px and desktop plus admin form; 3) manual admin CRUD and A2 security checklist, then timezone ADR.
+**Next 1–3 actions after RC-014b:** (1) Verify PR #14 CI/Security at final SHA; safely fetch/switch on Linux and restart only local port 3005 launcher; confirm it prints `CSS release rc014b-20261107 verified`, then Chrome hard refresh. (2) Owner submits 430px screenshots at top and scrolled bottom on calendar/detail, confirm dock pinned and consultation controls in one row. (3) Move to P0 admin CRUD/security with a **new temporary record only**, then timezone/scheduling ADR; do not merge/deploy until owner acceptance.

@@ -1209,3 +1209,229 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
     min-height: 48px;
   }
 }
+
+
+// RC-014b — centered app-like mobile dock, verified on the CSS bundle.
+// This marker is checked at boot to catch stale local stylesheets.
+:root { --rc-mobile-dock-release: rc014b-20261107; }
+
+.rc-mobile-dock { display: none; }
+
+.rc-detail-actions { display: grid; gap: .75rem; }
+.rc-detail-primary-actions,
+.rc-detail-admin-actions {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  gap: .45rem;
+}
+.rc-detail-admin-actions {
+  padding-top: .75rem;
+  border-top: 1px solid var(--rc-line);
+}
+.rc-detail-admin-actions form { margin: 0; }
+.rc-action-label--compact { display: none; }
+
+@media (max-width: 767.98px) {
+  // Mobile scrollbars are overlays on devices. On desktop Chrome emulation,
+  // the global stable scrollbar gutter makes fixed-position elements appear
+  // 7.5px left of the centered app. Remove that reserved gutter only in the
+  // mobile layout; scrolling still works by touch, wheel and keyboard.
+  html {
+    scrollbar-gutter: auto;
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar { display: none; }
+
+  .app-nav { min-height: 55px; }
+  .app-nav > .rc-nav-link,
+  .app-nav > .ms-auto { display: none !important; }
+  .app-brand {
+    border-right: 0;
+    padding-right: 0;
+    margin-right: 0 !important;
+  }
+
+  // Preserve scrollability of page content behind a dock and home indicator.
+  body.app-shell {
+    padding-bottom: calc(98px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .rc-mobile-dock {
+    position: fixed;
+    // Center within the usable layout viewport. In desktop-emulated Chrome
+    // the vertical scrollbar takes up width: window.innerWidth includes it,
+    // documentElement.clientWidth (and this fixed containing block) do not.
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: min(100%, 430px);
+    max-width: 100%;
+    box-sizing: border-box;
+    z-index: 1100;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 3px;
+    min-height: 79px;
+    padding: 9px max(7px, env(safe-area-inset-right, 0px))
+             calc(7px + env(safe-area-inset-bottom, 0px))
+             max(7px, env(safe-area-inset-left, 0px));
+    border: 1px solid #cbded8;
+    border-bottom: 0;
+    border-radius: 19px 19px 0 0;
+    background: rgba(250, 253, 251, .97);
+    box-shadow: 0 -9px 30px rgba(12, 56, 46, .12), 0 -1px 6px rgba(12, 56, 46, .06);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+
+  .rc-mobile-dock-form {
+    display: block;
+    height: 100%;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .rc-mobile-dock-item {
+    appearance: none;
+    display: grid;
+    grid-template-rows: 34px 17px;
+    align-content: center;
+    justify-items: center;
+    align-items: center;
+    row-gap: 2px;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    min-height: 60px;
+    padding: 3px 1px;
+    margin: 0;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--rc-muted);
+    font: inherit;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color .15s ease, color .15s ease;
+  }
+
+  .rc-mobile-dock-item:hover,
+  .rc-mobile-dock-item:focus-visible,
+  .rc-mobile-dock-item.is-active {
+    color: var(--rc-accent-dark);
+    background: var(--rc-accent-wash);
+  }
+
+  .rc-mobile-dock-item:focus-visible {
+    outline: 2px solid var(--rc-accent);
+    outline-offset: -2px;
+  }
+
+  .rc-mobile-dock-icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 34px;
+    font-size: 1.48rem;
+    line-height: 1;
+  }
+
+  .rc-mobile-dock-item.is-active .rc-mobile-dock-icon {
+    border-radius: 10px;
+    background: #d1eee4;
+  }
+
+  .rc-mobile-dock-label {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: .69rem;
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: -.015em;
+  }
+
+  // The center tab is a real anchor (admin route is guarded server-side),
+  // visually elevated but keyboard- and touch-accessible like all other tabs.
+  .rc-mobile-dock-item--create .rc-mobile-dock-create-icon {
+    display: grid;
+    place-items: center;
+    width: 49px;
+    height: 49px;
+    border: 3px solid var(--rc-paper);
+    border-radius: 16px;
+    transform: translateY(-10px);
+    color: #fff;
+    background: linear-gradient(155deg, #27998a, #17675c 68%, #105248);
+    box-shadow: 0 6px 16px rgba(12, 86, 73, .30), 0 1px 3px rgba(12, 86, 73, .1);
+  }
+
+  .rc-mobile-dock-item--create .rc-mobile-dock-create-icon .bi {
+    font-size: 1.65rem;
+    line-height: 1;
+  }
+
+  .rc-mobile-dock-item--create .rc-mobile-dock-label {
+    color: var(--rc-accent-dark);
+  }
+
+  .rc-mobile-dock-item--create:hover .rc-mobile-dock-create-icon,
+  .rc-mobile-dock-item--create:focus-visible .rc-mobile-dock-create-icon {
+    background: linear-gradient(155deg, #17675c, #105248);
+    box-shadow: 0 7px 19px rgba(12, 86, 73, .36);
+  }
+
+  // The three navigation actions stay in one row even at 320px.
+  .rc-detail-primary-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .35rem;
+  }
+
+  .rc-detail-primary-actions--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rc-detail-admin-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .4rem;
+  }
+
+  .rc-detail-primary-actions > .rc-action,
+  .rc-detail-admin-actions .rc-action,
+  .rc-detail-admin-actions form {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .rc-detail-actions .rc-action {
+    min-height: 46px;
+    padding: .53rem .2rem;
+    gap: .25rem;
+    font-size: .76rem;
+    border-radius: .42rem;
+  }
+
+  .rc-detail-actions .rc-action-label--full { display: none; }
+  .rc-detail-actions .rc-action-label--compact { display: inline; }
+
+  .rc-detail-actions .rc-action-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rc-mobile-dock-item,
+  .rc-mobile-dock-create-icon { transition: none; }
+}

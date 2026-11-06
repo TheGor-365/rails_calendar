@@ -15,22 +15,38 @@
       </div>
     </div>
 
-    <nav class="d-flex flex-wrap align-items-center gap-2 mt-3" aria-label="Consultation actions">
-      <%= link_to rc_icon_label("calendar-event", "View in calendar"),
-                  calendar_day_path(date: @consultation.start_time.in_time_zone.to_date.iso8601, anchor: "event-#{@consultation.id}"),
-                  class: "rc-action rc-action--primary" %>
-      <% final_date = (@consultation.end_time - 1.second).in_time_zone.to_date %>
-      <% if final_date > @consultation.start_time.in_time_zone.to_date %>
-        <%= link_to rc_icon_label("calendar-check", "See final day"), calendar_day_path(date: final_date.iso8601, anchor: "event-#{@consultation.id}"),
-                    class: "rc-action rc-action--quiet" %>
-      <% end %>
-      <%= link_to rc_icon_label("list-ul", "All consultations"), consultations_path, class: "rc-action rc-action--quiet" %>
+    <% final_date = (@consultation.end_time - 1.second).in_time_zone.to_date %>
+    <% spans_multiple_days = final_date > @consultation.start_time.in_time_zone.to_date %>
+
+    <nav class="rc-detail-actions mt-3" aria-label="Consultation actions">
+      <div class="rc-detail-primary-actions <%= 'rc-detail-primary-actions--two' unless spans_multiple_days %>"
+           role="group" aria-label="Calendar navigation">
+        <%= link_to rc_responsive_icon_label("calendar-event", "View in calendar", "Calendar"),
+                    calendar_day_path(date: @consultation.start_time.in_time_zone.to_date.iso8601, anchor: "event-#{@consultation.id}"),
+                    class: "rc-action rc-action--primary", aria: { label: "View in calendar" } %>
+        <% if spans_multiple_days %>
+          <%= link_to rc_responsive_icon_label("calendar-check", "See final day", "Final day"),
+                      calendar_day_path(date: final_date.iso8601, anchor: "event-#{@consultation.id}"),
+                      class: "rc-action rc-action--quiet", aria: { label: "See final day" } %>
+        <% end %>
+        <%= link_to rc_responsive_icon_label("list-ul", "All consultations", "All"),
+                    consultations_path, class: "rc-action rc-action--quiet",
+                    aria: { label: "All consultations" } %>
+      </div>
+
       <% if admin_signed_in? %>
-        <%= link_to rc_icon_label("pencil-square", "Edit this consultation"), edit_consultation_path(@consultation),
-                    class: "rc-action rc-action--quiet" %>
-        <%= button_to rc_icon_label("trash3", "Destroy this consultation"), @consultation, method: :delete,
-                      class: "rc-action rc-action--danger",
-                      data: { turbo_confirm: "Delete this consultation?" } %>
+        <div class="rc-detail-admin-actions" role="group" aria-label="Administrator consultation actions">
+          <%= link_to rc_responsive_icon_label("pencil-square", "Edit this consultation", "Edit"),
+                      edit_consultation_path(@consultation),
+                      class: "rc-action rc-action--quiet",
+                      aria: { label: "Edit this consultation" } %>
+          <%= button_to @consultation, method: :delete,
+                        class: "rc-action rc-action--danger",
+                        aria: { label: "Destroy this consultation" },
+                        data: { turbo_confirm: "Delete this consultation?" } do %>
+            <%= rc_responsive_icon_label("trash3", "Destroy this consultation", "Delete") %>
+          <% end %>
+        </div>
       <% end %>
     </nav>
   </div>
