@@ -86,9 +86,24 @@ class ConsultationsTest < ApplicationSystemTestCase
     find("a.calendar-day-link[href*='2023-01-19']").click
 
     assert_current_path calendar_day_path(date: "2023-01-19")
-    assert_selector "table.day-timeline tbody tr", count: 24
+    assert_selector ".day-schedule > section.hour-row", count: 24
+    assert_selector "#hour-22 details.hour-disclosure[open]"
     assert_selector "#hour-22", text: @consultation.title
     assert_no_link "Add at 09:00"
+  end
+
+  test "busy hour can be collapsed and expanded without losing events" do
+    visit calendar_day_url(date: "2023-01-19")
+
+    within "#hour-22" do
+      assert_selector "details[open]"
+      find("summary").click
+      assert_no_selector "details[open]"
+      find("summary").click
+      assert_selector "details[open]"
+      assert_link @consultation.title
+    end
+    assert_selector ".hour-row--quiet", minimum: 1
   end
 
   test "administrator manually creates consultation from a day timeslot" do
