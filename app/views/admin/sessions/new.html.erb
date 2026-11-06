@@ -16,7 +16,9 @@
           <%= form.label :password, "Password", class: "rc-field-label" %>
           <%= form.password_field :password, required: true, autocomplete: "current-password", class: "rc-input" %>
         </div>
-        <%= form.submit "Sign in", class: "rc-action rc-action--primary" %>
+        <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
+          <%= rc_icon_label("box-arrow-in-right", "Sign in") %>
+        <% end %>
       <% end %>
     </section>
   </div>
