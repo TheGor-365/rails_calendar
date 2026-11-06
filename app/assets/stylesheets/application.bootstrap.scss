@@ -903,8 +903,10 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 // The mobile month grid shows all seven dates without side scrolling.
 // Separate date/event links are available in a full-width agenda below.
 .calendar-mobile-agenda { display: none; }
+.calendar-mobile-agenda-trigger { display: none; }
 
 @media (max-width: 767.98px) {
+  .calendar-mobile-agenda-trigger { display: inline-flex; }
   .calendar-scroll-region {
     overflow-x: visible;
   }
@@ -993,6 +995,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   .calendar-mobile-agenda {
     display: block;
     margin-top: 1.3rem;
+    scroll-margin-top: 1rem;
   }
 
   .calendar-mobile-agenda-header { margin-bottom: .75rem; }
