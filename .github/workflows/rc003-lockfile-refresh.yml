@@ -29,7 +29,7 @@ jobs:
       - name: Generate Ruby lockfile on target runtime
         run: |
           gem install bundler --no-document
-          bundle update --bundler
+          bundle update
           bundle lock --add-platform x86_64-linux
           bundle check
       - uses: actions/setup-node@v4
