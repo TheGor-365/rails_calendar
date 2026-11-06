@@ -131,7 +131,9 @@ class ConsultationsTest < ApplicationSystemTestCase
     # Force a scrollable fixture even when browser zoom/viewport height changes.
     # This tests fixed positioning, not the schedule's incidental pixel height.
     page.execute_script("document.querySelector('main#main-content').style.minHeight = '2200px'")
-    page.execute_script("window.scrollTo(0, 0)")
+    # Bootstrap sets scroll-behavior: smooth, making an immediate scrollY
+    # assertion race with the CSS animation. Force deterministic test scroll.
+    page.execute_script("document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, 0)")
     scrollBefore = page.evaluate_script("window.scrollY")
     page.execute_script("window.scrollTo(0, 2000)")
     scrollAfter = page.evaluate_script("window.scrollY")
