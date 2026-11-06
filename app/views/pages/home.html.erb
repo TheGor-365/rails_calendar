@@ -43,4 +43,48 @@
                   class: "calendar-more", aria: { label: "View all #{day_events.length} events on #{date.iso8601}" } %>
     <% end %>
   <% end %>
+
+  <%# Small screens keep all seven calendar columns visible. Day links stay
+      inside the grid; event links remain independently reachable below it. %>
+  <section class="calendar-mobile-agenda" aria-label="Consultations in the displayed month">
+    <header class="calendar-mobile-agenda-header">
+      <h2 class="calendar-mobile-agenda-title">Events in <%= @consultations_by_day.keys.find { |date| date.day == 1 }&.strftime("%B %Y") || "this month" %></h2>
+      <p class="rc-hint mb-0">Tap a date above for its 24-hour schedule, or open an event directly below.</p>
+    </header>
+
+    <% if @month_days_with_events.any? %>
+      <ol class="calendar-mobile-agenda-days">
+        <% @month_days_with_events.each do |date, day_events| %>
+          <li class="calendar-mobile-agenda-day">
+            <%= link_to calendar_day_path(date: date.iso8601), class: "calendar-mobile-date-link" do %>
+              <time datetime="<%= date.iso8601 %>"><%= date.strftime("%a, %d %b") %></time>
+              <span><%= pluralize(day_events.size, "event") %> · View day</span>
+            <% end %>
+            <ul class="calendar-mobile-event-list">
+              <% day_events.first(2).each do |consultation| %>
+                <li>
+                  <%= link_to consultation_path(consultation), class: "calendar-mobile-event-link",
+                              aria: { label: "Open consultation #{consultation.title} on #{date.iso8601}" } do %>
+                    <span class="calendar-mobile-event-title"><%= truncate(consultation.title, length: 75) %></span>
+                    <span class="calendar-mobile-event-time">
+                      <%= consultation.start_time.in_time_zone.to_date < date ? "Ongoing" : consultation.start_time.in_time_zone.strftime("%H:%M") %>
+                      <span aria-hidden="true">·</span> Details
+                    </span>
+                  <% end %>
+                </li>
+              <% end %>
+              <% if day_events.length > 2 %>
+                <li>
+                  <%= link_to "View all #{day_events.length} events", calendar_day_path(date: date.iso8601),
+                              class: "calendar-mobile-more" %>
+                </li>
+              <% end %>
+            </ul>
+          </li>
+        <% end %>
+      </ol>
+    <% else %>
+      <p class="rc-notice rc-notice--neutral" role="status">No consultations this month. Select any date to inspect its hours.</p>
+    <% end %>
+  </section>
 </div>
