@@ -4,6 +4,8 @@
     <%= link_to "Calendar", root_path,
                 class: "nav-link #{'active' if current_page?(root_path)}",
                 aria: { current: ("page" if current_page?(root_path)) } %>
+    <%= link_to "Day", calendar_day_path(date: Time.zone.today.iso8601),
+                class: "nav-link #{'active' if controller_name == 'pages' && action_name == 'day'}" %>
     <%= link_to "Consultations", consultations_path,
                 class: "nav-link #{'active' if current_page?(consultations_path)}",
                 aria: { current: ("page" if current_page?(consultations_path)) } %>
