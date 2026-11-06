@@ -31,7 +31,7 @@
 | RC-012 / PR #12 | Seven visible mobile columns, month event list and mobile feature parity | CI+Security success; user screenshots at 430px show working day/event navigation |
 | RC-013 / PR #13 | Restrained icon-labeled controls and touch/focus styling across existing screens | CI+Security SUCCESS; owner mobile detail screenshot shows icons |
 | RC-014 / PR #14 | Persistent five-tab dock and single-row detail actions | **Local visual PASS** on mobile after RC-014b; authenticated New screen confirmed; CI/Security green |
-| RC-015 / new stacked Draft | Minute-only input/validation, unchanged legacy timestamp retention, record-specific delete confirmation | Code in review; see [RC-015 safety note](RC015_MINUTE_PRECISION_DELETE_SAFETY_2026-11-07.md) |
+| RC-015 / PR #16 | Minute-only input/validation, unchanged legacy timestamp retention, record-specific delete confirmation | CI+Security SUCCESS on `3c63dfb` (72 tests / 552 assertions), manual QA and local DB inspection pending; [safety note](RC015_MINUTE_PRECISION_DELETE_SAFETY_2026-11-07.md) |
 
 All these PRs are Draft and stacked; `main` and production have not been changed by this program. #4 is a superseded duplicate (DO NOT MERGE).
 
