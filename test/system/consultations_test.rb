@@ -81,35 +81,49 @@ class ConsultationsTest < ApplicationSystemTestCase
   end
 
 
-  test "public visitor opens a date and sees all 24 hours" do
+  test "visitor sees one continuous card, can drill into any hour, and open the consultation" do
     visit root_url(start_date: "2023-01-01")
     find("a.calendar-day-link[href*='2023-01-19']").click
 
     assert_current_path calendar_day_path(date: "2023-01-19")
-    assert_selector ".day-schedule > section.hour-row", count: 24
-    assert_selector "#hour-22 details.hour-disclosure[open]"
-    assert_selector "#hour-22", text: @consultation.title
-    assert_no_link "Add at 09:00"
+    assert_selector ".rc-time-axis-hour", count: 24
+    assert_selector "a.rc-hour-band", count: 24
+    assert_selector "article#event-#{@consultation.id}", count: 1
+    assert_no_link "Add consultation"
+
+    find("a.rc-hour-band[href*='hour=22']").click
+    assert_current_path calendar_hour_path(date: "2023-01-19", hour: 22)
+    assert_selector "h1", text: "22:00"
+    assert_link @consultation.title
+
+    click_on @consultation.title
+    assert_current_path consultation_path(@consultation)
   end
 
-  test "busy hour can be collapsed and expanded without losing events" do
+  test "long consultation renders once per day and neighboring hours stay clickable" do
+    long_event = Consultation.create!(
+      title: "Long support session",
+      start_time: Time.zone.local(2023, 1, 19, 0, 15),
+      end_time: Time.zone.local(2023, 1, 19, 23, 15)
+    )
+
     visit calendar_day_url(date: "2023-01-19")
+    assert_selector "article#event-#{long_event.id}", count: 1
+    assert_selector "article#event-#{long_event.id} a", count: 1
+    assert_selector ".rc-time-axis-hour", count: 24
 
-    within "#hour-22" do
-      assert_selector "details[open]"
-      find("summary").click
-      assert_no_selector "details[open]"
-      find("summary").click
-      assert_selector "details[open]"
-      assert_link @consultation.title
-    end
-    assert_selector ".hour-row--quiet", minimum: 1
+    find("a.rc-hour-band[href*='hour=12']").click
+    assert_current_path calendar_hour_path(date: "2023-01-19", hour: 12)
+    assert_link "Long support session"
   end
 
-  test "administrator manually creates consultation from a day timeslot" do
+  test "administrator manually creates a consultation from a selected time interval" do
     sign_in_as_admin
     visit calendar_day_url(date: "2026-11-06")
-    click_on "Add at 09:00"
+    find("a.rc-hour-band[href*='hour=9']").click
+
+    assert_current_path calendar_hour_path(date: "2026-11-06", hour: 9)
+    click_on "Add consultation"
 
     assert_selector "h1", text: "New consultation"
     assert_field "Start time", with: /2026-11-06T09:00/
