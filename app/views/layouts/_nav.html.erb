@@ -4,8 +4,8 @@
     <%= link_to "Calendar", root_path,
                 class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",
                 aria: { current: ("page" if controller_name == 'pages' && action_name == 'home') } %>
-    <%= link_to "Day", calendar_day_path(date: Time.zone.today.iso8601),
-                class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'day'}",
+    <%= link_to "Today · 24h", calendar_day_path(date: Time.zone.today.iso8601),
+                class: "rc-nav-link #{'active' if controller_name == 'pages' && %w[day hour].include?(action_name)}",
                 aria: { current: ("page" if controller_name == 'pages' && action_name == 'day') } %>
     <%= link_to "Consultations", consultations_path,
                 class: "rc-nav-link #{'active' if controller_name == 'consultations' && action_name == 'index'}",
