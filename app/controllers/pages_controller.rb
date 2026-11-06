@@ -19,6 +19,13 @@ class PagesController < ApplicationController
       day_end = day_start + 1.day
       [date, @consultations.select { |event| event.start_time < day_end && event.end_time > day_start }]
     end
+
+    # Mobile month view exposes the same day and event destinations as desktop.
+    # The narrow seven-column grid is an overview; event links live in a
+    # chronological agenda below it, not off-screen in a wide table.
+    @month_days_with_events = @consultations_by_day.select do |date, events|
+      date.year == calendar_date.year && date.month == calendar_date.month && events.any?
+    end
   rescue Date::Error, TypeError, ArgumentError
     redirect_to root_path, alert: "Invalid calendar date"
   end
