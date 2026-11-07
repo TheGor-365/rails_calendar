@@ -1,0 +1,17 @@
+<div class="container my-4 my-sm-5">
+  <header class="mb-4">
+    <p class="eyebrow">ADMIN / INTAKE REVIEW</p>
+    <h1 class="page-title">Incoming project briefs (demo)</h1>
+    <p class="rc-muted">Only the signed-in administrator can see the intake inbox. Public access is disabled by default.</p>
+    <%= link_to "Start a fictional intake", new_project_intake_path, class: "rc-action rc-action--primary" %>
+  </header>
+  <ul class="rc-record-list">
+    <% @intakes.each do |intake| %>
+      <li class="rc-record">
+        <h2 class="h5"><%= link_to intake.title, project_intake_path(intake) %></h2>
+        <p class="rc-muted"><%= intake.project_type.humanize %> · <%= intake.status.humanize %> · <%= intake.created_at.utc.strftime("%d %b %Y %H:%M UTC") %></p>
+      </li>
+    <% end %>
+  </ul>
+  <% if @intakes.empty? %><p>No fictional intakes yet.</p><% end %>
+</div>

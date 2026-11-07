@@ -1,0 +1,36 @@
+<div class="container my-4 my-sm-5">
+  <header class="mb-4">
+    <p class="eyebrow">AI SERVICE WORKSPACE / DEMO</p>
+    <h1 class="page-title">Describe a website request</h1>
+    <p class="rc-muted">A protected, synthetic-data demonstration: interview → reviewable specification → proposed milestones. No quote, timeline or contract is committed automatically.</p>
+  </header>
+  <div class="surface-panel p-4">
+    <% if @intake.errors.any? %>
+      <div class="rc-notice rc-notice--error" role="alert"><%= @intake.errors.full_messages.to_sentence %></div>
+    <% end %>
+    <%= form_with model: @intake, html: { class: "rc-form" } do |f| %>
+      <div class="rc-field mb-3">
+        <%= f.label :title, "Project title", class: "rc-field-label" %>
+        <%= f.text_field :title, class: "rc-input", required: true, maxlength: 120, placeholder: "Example: Bakery landing page" %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= f.label :project_type, "Work type", class: "rc-field-label" %>
+        <%= f.select :project_type,
+            [["New website", "website"], ["Website redesign", "redesign"],
+             ["Rails bug fix", "rails_bugfix"], ["API/integration", "api_integration"]],
+            { include_blank: "Choose a work type" }, class: "rc-input", required: true %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= f.label :goal, "What should this project achieve?", class: "rc-field-label" %>
+        <%= f.text_area :goal, class: "rc-input", rows: 5, required: true, minlength: 10, maxlength: 3000,
+            placeholder: "A fictional scenario: who the visitors are and what they need" %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= check_box_tag :demo_consent, "1", false, required: true %>
+        <%= label_tag :demo_consent, "I will use fictional data only. I understand that, when enabled, the interview may be sent to the xAI Grok API." %>
+      </div>
+      <p class="rc-hint">Do not enter real names, contacts, client content, credentials, tokens or confidential details. Demo records are not paid orders.</p>
+      <%= f.submit "Start intake demo", class: "rc-action rc-action--primary" %>
+    <% end %>
+  </div>
+</div>

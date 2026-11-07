@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -36,6 +36,48 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_230000) do
     t.index ["consultation_id", "created_at", "id"], name: "idx_reschedule_history_by_consultation_and_time"
   end
 
+  create_table "intake_ai_quotas", force: :cascade do |t|
+    t.date "usage_day", null: false
+    t.integer "call_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["usage_day"], name: "index_intake_ai_quotas_on_usage_day", unique: true
+  end
+
+  create_table "project_intakes", force: :cascade do |t|
+    t.string "title", limit: 120, null: false
+    t.string "project_type", limit: 32, null: false
+    t.text "goal", null: false
+    t.string "status", limit: 32, default: "interviewing", null: false
+    t.integer "ai_call_count", default: 0, null: false
+    t.datetime "demo_consent_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "intake_messages", force: :cascade do |t|
+    t.bigint "project_intake_id", null: false
+    t.string "role", limit: 16, null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_intake_id"], name: "index_intake_messages_on_project_intake_id"
+    t.index ["project_intake_id", "created_at", "id"], name: "idx_intake_conversation_order"
+  end
+
+  create_table "intake_spec_versions", force: :cascade do |t|
+    t.bigint "project_intake_id", null: false
+    t.integer "version", null: false
+    t.jsonb "document", default: {}, null: false
+    t.string "source", limit: 16, null: false
+    t.datetime "owner_approved_at"
+    t.datetime "client_reviewed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_intake_id"], name: "index_intake_spec_versions_on_project_intake_id"
+    t.index ["project_intake_id", "version"], name: "idx_intake_spec_immutable_version", unique: true
+  end
+
   create_table "consultations", force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -46,4 +88,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_230000) do
     t.integer "lock_version", default: 0, null: false
   end
 
+  add_foreign_key "intake_messages", "project_intakes"
+  add_foreign_key "intake_spec_versions", "project_intakes"
 end

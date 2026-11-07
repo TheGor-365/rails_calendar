@@ -10,4 +10,21 @@ Rails.application.routes.draw do
   end
 
   resources :consultations
+
+  # Public intake is disabled unless an explicitly synthetic demo is enabled.
+  resources :project_intakes, only: %i[new create show] do
+    member do
+      post :reply
+      post :acknowledge
+    end
+  end
+
+  namespace :admin do
+    resources :project_intakes, only: [:index] do
+      member do
+        post :draft_spec
+        post :approve_spec
+      end
+    end
+  end
 end
