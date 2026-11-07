@@ -12,6 +12,12 @@ class ConsultationsController < ApplicationController
 
   def show
     prepare_overlap_advisory
+    if admin_signed_in?
+      @reschedule_events = ConsultationRescheduleEvent
+        .where(consultation_id: @consultation.id)
+        .order(created_at: :desc, id: :desc)
+        .limit(20)
+    end
   end
 
   def edit
@@ -45,7 +51,7 @@ class ConsultationsController < ApplicationController
     preserve_unchanged_minutes!(attributes)
 
     respond_to do |format|
-      if @consultation.update(attributes)
+      if Consultations::Reschedule.call(consultation: @consultation, attributes: attributes)
         format.html { redirect_to consultation_url(@consultation), notice: "Consultation was successfully updated" }
       else
         prepare_overlap_advisory
@@ -103,7 +109,8 @@ class ConsultationsController < ApplicationController
       :title,
       :description,
       :start_time,
-      :end_time
+      :end_time,
+      :reschedule_reason
     )
   end
 end
