@@ -1,4 +1,5 @@
 class ConsultationsController < ApplicationController
+  before_action :require_calendar_read_access!, only: %i[index show]
   # Public calendar/list/details; all administrative forms and mutations
   # require a valid server-side authorization check.
   before_action :require_admin!, except: %i[index show]
