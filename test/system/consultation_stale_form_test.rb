@@ -23,7 +23,7 @@ class ConsultationStaleFormTest < ApplicationSystemTestCase
     end
 
     within_window(new_tab) do
-      assert_selector "input[name='consultation[lock_version]'][value='#{old_version}']", visible: false)
+      assert_selector "input[name='consultation[lock_version]'][value='#{old_version}']", visible: false
       fill_in "Title", with: "Newer saved title"
       click_on "Update Consultation"
       assert_text "Consultation was successfully updated"
@@ -35,7 +35,7 @@ class ConsultationStaleFormTest < ApplicationSystemTestCase
       click_on "Update Consultation"
       assert_selector "#consultation-form-errors[role='alert']", text: /changed in another tab/
       assert_field "Title", with: "Newer saved title"
-      assert_selector "input[name='consultation[lock_version]'][value='#{old_version.to_i + 1}']", visible: false)
+      assert_selector "input[name='consultation[lock_version]'][value='#{old_version.to_i + 1}']", visible: false
     end
 
     assert_equal "Newer saved title", @consultation.reload.title
