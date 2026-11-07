@@ -15,6 +15,10 @@
       </div>
     </div>
 
+    <% if admin_signed_in? %>
+      <%= render "overlap_advisory", overlaps: @overlaps, more: @overlaps_more, mode: :details %>
+    <% end %>
+
     <% final_date = (@consultation.end_time - 1.second).in_time_zone.to_date %>
     <% spans_multiple_days = final_date > @consultation.start_time.in_time_zone.to_date %>
 

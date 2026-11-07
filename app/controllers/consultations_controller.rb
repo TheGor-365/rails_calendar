@@ -10,12 +10,18 @@ class ConsultationsController < ApplicationController
     @consultations = @search.results
   end
 
-  def show; end
-  def edit; end
+  def show
+    prepare_overlap_advisory
+  end
+
+  def edit
+    prepare_overlap_advisory
+  end
 
   def new
     @consultation = Consultation.new
     prefill_schedule_from_day if params[:start_at].present?
+    prepare_overlap_advisory
   end
 
   def create
@@ -25,6 +31,7 @@ class ConsultationsController < ApplicationController
       if @consultation.save
         format.html { redirect_to consultation_url(@consultation), notice: "Consultation was successfully created" }
       else
+        prepare_overlap_advisory
         format.html { render :new, status: :unprocessable_entity }
       end
     end
@@ -41,6 +48,7 @@ class ConsultationsController < ApplicationController
       if @consultation.update(attributes)
         format.html { redirect_to consultation_url(@consultation), notice: "Consultation was successfully updated" }
       else
+        prepare_overlap_advisory
         format.html { render :edit, status: :unprocessable_entity }
       end
     end
@@ -55,6 +63,14 @@ class ConsultationsController < ApplicationController
   end
 
   private
+
+  def prepare_overlap_advisory
+    # Display at most ten records and whether more exist; no writes or
+    # implicit conflict rejection. Controller access checks run first.
+    matches = @consultation.overlapping_consultations.limit(11).to_a
+    @overlaps = matches.first(10)
+    @overlaps_more = matches.length > 10
+  end
 
   def set_consultation
     @consultation = Consultation.find(params[:id])

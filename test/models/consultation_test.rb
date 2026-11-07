@@ -54,4 +54,29 @@ class ConsultationTest < ActiveSupport::TestCase
     assert_includes consultation.errors.attribute_names, :title
     assert_includes consultation.errors.attribute_names, :description
   end
+
+  test "advisory overlap uses half-open boundaries and excludes the current record" do
+    base = Time.zone.local(2026, 11, 13, 11, 0)
+    source = Consultation.create!(title: "Source", start_time: base, end_time: base + 100.minutes)
+    meeting = Consultation.create!(title: "Boundary meeting", start_time: base + 100.minutes, end_time: base + 2.hours)
+    overlap = Consultation.create!(title: "Crossing", start_time: base + 99.minutes, end_time: base + 101.minutes)
+
+    assert_equal [overlap.id], source.overlapping_consultations.pluck(:id)
+    assert_not_includes source.overlapping_consultations.pluck(:id), meeting.id
+    assert_not_includes source.overlapping_consultations.pluck(:id), source.id
+    assert_equal [source.id, meeting.id], overlap.overlapping_consultations.pluck(:id)
+
+    # A new, unsaved candidate checks existing records without writing.
+    candidate = Consultation.new(title: "Candidate", start_time: base - 30.minutes, end_time: base + 1.minute)
+    assert_includes candidate.overlapping_consultations.pluck(:id), source.id
+    assert_not candidate.persisted?
+  end
+
+  test "overlap advisory remains read-only and handles invalid or empty intervals" do
+    consultation = Consultation.new(start_time: Time.zone.local(2026, 11, 13, 12),
+                                    end_time: Time.zone.local(2026, 11, 13, 11))
+    assert_empty consultation.overlapping_consultations
+    consultation.start_time = nil
+    assert_empty consultation.overlapping_consultations
+  end
 end
