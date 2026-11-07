@@ -1,6 +1,7 @@
 # Persistent daily call cap shared by all Rails workers, independent of session.
 # Reserving counts attempted calls, including failures, rather than risking a retry storm.
 class IntakeAiQuota < ApplicationRecord
+  self.table_name = "intake_ai_quotas"
   MAX_CALLS_PER_UTC_DAY = 12
 
   def self.reserve_call!
