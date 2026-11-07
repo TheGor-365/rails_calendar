@@ -1435,3 +1435,87 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   .rc-mobile-dock-item,
   .rc-mobile-dock-create-icon { transition: none; }
 }
+
+
+// RC-019 — filters are available on mobile and desktop; no horizontal rail.
+.rc-consultation-filters {
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  margin: 0 0 1rem;
+  border: 1px solid var(--rc-line);
+  border-radius: .45rem;
+  background: var(--rc-paper);
+  box-shadow: var(--rc-shadow);
+}
+
+.rc-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  align-items: end;
+  column-gap: 1rem;
+  row-gap: .75rem;
+}
+
+.rc-filter-field { min-width: 0; }
+
+.rc-filter-field .rc-field-label {
+  margin-bottom: .32rem;
+}
+
+.rc-filter-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: .55rem .45rem;
+  font-size: .87rem;
+}
+
+.rc-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .6rem;
+  margin-top: 1rem;
+}
+
+.rc-filter-actions .rc-action { min-height: 44px; }
+.rc-filter-actions .rc-hint { flex: 1 1 240px; }
+
+.rc-results-summary {
+  margin: .75rem 0 1rem;
+  color: var(--rc-muted);
+  font-size: .82rem;
+  font-weight: 620;
+  font-variant-numeric: tabular-nums;
+}
+
+.rc-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+  padding: 1.2rem 0 .4rem;
+}
+
+.rc-pagination-current {
+  color: var(--rc-muted);
+  font-size: .83rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767.98px) {
+  .rc-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rc-filter-grid .rc-filter-field:first-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 575.98px) {
+  .rc-filter-grid { grid-template-columns: minmax(0, 1fr); }
+  .rc-filter-grid .rc-filter-field:first-child { grid-column: auto; }
+  .rc-filter-actions .rc-action { flex: 1 1 0; min-width: 0; }
+  .rc-filter-actions .rc-hint { flex-basis: 100%; }
+  .rc-pagination { gap: .4rem; }
+  .rc-pagination .rc-action { padding: .5rem .65rem; }
+}
