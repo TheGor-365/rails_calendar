@@ -24,6 +24,7 @@ Rails.application.routes.draw do
       member do
         post :draft_spec
         post :approve_spec
+        post :plan
       end
     end
   end
