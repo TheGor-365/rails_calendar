@@ -73,12 +73,52 @@
           </li>
         <% end %>
       </ol>
+      <% if admin_signed_in? && @latest_spec.approved? && @milestones.empty? %>
+        <div class="surface-panel p-3 mt-4" aria-label="Project schedule planning">
+          <h3 class="h5">Create tentative calendar from this approved version</h3>
+          <%= form_with url: plan_admin_project_intake_path(@intake), method: :post do |f| %>
+            <%= label_tag :start_date, "Proposed start date (UTC calendar date)", class: "rc-field-label" %>
+            <%= date_field_tag :start_date, Date.current.iso8601, min: "2000-01-01", max: "2100-12-31", class: "rc-input", required: true %>
+            <%= hidden_field_tag :confirm_plan, "1" %>
+            <p class="rc-hint">Workdays skip weekends; holidays, capacity and budgets are not calculated.</p>
+            <%= f.submit "Create tentative project calendar", class: "rc-action rc-action--primary mt-2" %>
+          <% end %>
+        </div>
+      <% end %>
       <% if @latest_spec.approved? && @latest_spec.client_reviewed_at.nil? %>
         <%= button_to "Mark version as reviewed (demo only)", acknowledge_project_intake_path(@intake),
             method: :post, class: "rc-action rc-action--quiet" %>
       <% elsif @latest_spec.client_reviewed_at %>
         <p class="rc-notice rc-notice--neutral" role="status">Demo client marked this version as reviewed. This is not a signed acceptance or payment.</p>
       <% end %>
+    </section>
+  <% end %>
+
+  <% if @milestones.any? && (admin_signed_in? || @latest_spec&.approved?) %>
+    <section class="surface-panel p-3 p-sm-4 mt-4" aria-label="Private project calendar" id="private-project-calendar">
+      <p class="eyebrow">PROJECT TIMELINE / TENTATIVE</p>
+      <h2 class="h4">Calendar of proposed delivery phases</h2>
+      <p class="rc-hint">Only this intake's milestones are visible. Dates are proposals, not contractual deadlines or booked consultations. Weekends excluded; no public access to other projects.</p>
+      <ol class="rc-record-list">
+        <% @milestones.each do |milestone| %>
+          <li class="rc-record">
+            <strong><%= milestone.title %></strong>
+            <p><%= milestone.description %></p>
+            <p class="rc-muted"><time datetime="<%= milestone.start_on.iso8601 %>"><%= milestone.start_on.iso8601 %></time> –
+              <time datetime="<%= milestone.end_on.iso8601 %>"><%= milestone.end_on.iso8601 %></time> (UTC calendar dates, proposed)</p>
+          </li>
+        <% end %>
+      </ol>
+      <div class="rc-calendar-container" id="intake-month-grid">
+        <%= month_calendar(start_date: @visible_month) do |date| %>
+          <span class="rc-muted"><%= date.day %></span>
+          <% @milestones.each do |milestone| %>
+            <% if (milestone.start_on..milestone.end_on).cover?(date) && !date.saturday? && !date.sunday? %>
+              <div class="rc-hint"><%= milestone.title %></div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
     </section>
   <% end %>
 </div>

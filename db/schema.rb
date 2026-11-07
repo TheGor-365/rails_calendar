@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_143000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -78,6 +78,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
     t.index ["project_intake_id", "version"], name: "idx_intake_spec_immutable_version", unique: true
   end
 
+  create_table "project_milestones", force: :cascade do |t|
+    t.bigint "project_intake_id", null: false
+    t.bigint "intake_spec_version_id", null: false
+    t.integer "position", null: false
+    t.string "title", limit: 100, null: false
+    t.text "description", null: false
+    t.integer "suggested_work_days", null: false
+    t.date "start_on", null: false
+    t.date "end_on", null: false
+    t.string "status", limit: 24, default: "proposed", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_intake_id"], name: "index_project_milestones_on_project_intake_id"
+    t.index ["intake_spec_version_id"], name: "index_project_milestones_on_intake_spec_version_id"
+    t.index ["project_intake_id", "position"], name: "idx_project_milestone_position", unique: true
+  end
+
   create_table "consultations", force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -90,4 +107,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_120000) do
 
   add_foreign_key "intake_messages", "project_intakes"
   add_foreign_key "intake_spec_versions", "project_intakes"
+  add_foreign_key "project_milestones", "project_intakes"
+  add_foreign_key "project_milestones", "intake_spec_versions"
 end
