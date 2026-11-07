@@ -1,6 +1,6 @@
 # RC-020 — Advisory scheduling conflicts and one-hop rescheduling
 
-**Date:** 2026-11-07. **Status:** Draft implementation awaiting exact-SHA CI + manual acceptance.  
+**Date:** 2026-11-07. **Status:** Draft implementation; CI + Security SUCCESS on implementation SHA `910e2d3c1baa0d0223f335cfdcdb2f108139de67` (90 Rails tests / 614 assertions + 18 Chrome tests / 238 assertions = 108 tests / 852 assertions, 0 failures/errors/skips); owner local QA pending.  
 **Parent:** [RC-019 P1 filters and duration](https://github.com/TheGor-365/rails_calendar/pull/20).
 
 ## Verified baseline
@@ -23,7 +23,7 @@ Until the owner accepts a policy for concurrent consultations, rooms, staff and 
 - Mobile-friendly Slate & Tide styling, icon + visible label, >42px touch targets, no new icon package.
 
 ## Test and acceptance contract
-- [ ] Rails CI and Security pass on final SHA, including model interval boundaries and unsaved candidate, read-only guest views, admin overlap and index action, update collision advisory, prefilling a new form from calendar, Chrome 320/390/430 one-hop navigation/no overflow/fixed dock.
+- [x] [Rails CI #42384844085](https://github.com/TheGor-365/rails_calendar/actions/runs/42384844085) and [Security #42384844128](https://github.com/TheGor-365/rails_calendar/actions/runs/42384844128) SUCCESS on implementation SHA `910e2d3` (108 tests/852 assertions). All listed integration/Chrome cases passed. Documentation-only update to be rechecked at final HEAD.
 - [ ] Owner local desktop test: navigate to all consultations; logged-in user sees `Reschedule` on existing records; tap goes to `/consultations/:id/edit#consultation_start_time`. No change to record until explicit Update.
 - [ ] To test advisory, create **only an approved disposable** consultation (optional). Do not create or delete any demo record without direction. The automated CI uses isolated fixtures, so user need not manually introduce overlaps.
 - [ ] Mobile (320/390/430): dock pinned; reschedule button visible, form reachable, overlaps readable without horizontal scrolling.
