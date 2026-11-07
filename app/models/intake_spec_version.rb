@@ -2,7 +2,7 @@ class IntakeSpecVersion < ApplicationRecord
   belongs_to :project_intake
 
   validates :version, numericality: { only_integer: true, greater_than: 0 }, uniqueness: { scope: :project_intake_id }
-  validates :source, inclusion: { in: %w[grok template] }
+  validates :source, inclusion: { in: %w[grok template human] }
   validate :structured_document_is_valid
 
   def approved?
