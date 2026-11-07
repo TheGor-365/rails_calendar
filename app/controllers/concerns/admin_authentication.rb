@@ -66,11 +66,11 @@ module AdminAuthentication
   # In production, existing consultation details are private by default.
   # Explicit opt-in to public demo visibility is intended ONLY for synthetic
   # records that the owner has approved for public display.
-  def calendar_public_read_enabled?
+  def calendar_public_read_enabled?(environment: Rails.env)
     flag = ENV["RAILS_CALENDAR_PUBLIC_DEMO_MODE"]
     return flag == "true" unless flag.nil?
 
-    !Rails.env.production?
+    !environment.production?
   end
 
   def require_calendar_read_access!
