@@ -1,0 +1,27 @@
+<% if overlaps.present? %>
+  <aside class="rc-overlap-notice" role="status" aria-label="Overlapping consultations">
+    <p class="rc-overlap-heading mb-1">
+      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+      <strong>Schedule overlap:</strong>
+      <%= pluralize(overlaps.length, "other consultation") %><%= " (and more)" if more %>
+    </p>
+    <p class="rc-hint mb-2">
+      Time intervals intersect. This is an advisory, not a booking restriction.
+      <% if mode == :form %>
+        The comparison uses the times loaded with this form; after changing them,
+        save to recheck the updated schedule.
+      <% end %>
+    </p>
+    <ul class="rc-overlap-list">
+      <% overlaps.each do |other| %>
+        <li>
+          <%= link_to other.title, consultation_path(other), class: "rc-text-link" %>
+          <span class="rc-overlap-range">
+            <%= other.start_time.in_time_zone.strftime("%d %b, %H:%M") %>–
+            <%= other.end_time.in_time_zone.strftime("%d %b, %H:%M") %> UTC
+          </span>
+        </li>
+      <% end %>
+    </ul>
+  </aside>
+<% end %>
