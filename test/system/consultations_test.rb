@@ -310,6 +310,26 @@ class ConsultationsTest < ApplicationSystemTestCase
     assert_text "Updated consultation"
   end
 
+  test "canceling the exact-record delete dialog leaves the consultation intact" do
+    sign_in_as_admin
+    visit consultation_url(@consultation)
+
+    original_title = @consultation.title
+    original_start = @consultation.start_time
+    original_end = @consultation.end_time
+
+    dismiss_confirm(/Delete consultation ##{@consultation.id}.*#{Regexp.escape(original_title)}.*cannot be undone/) do
+      click_on "Destroy this consultation"
+    end
+
+    assert_current_path consultation_path(@consultation)
+    assert_selector "h1", text: "Consultation details"
+    assert_equal original_title, @consultation.reload.title
+    assert_equal original_start, @consultation.start_time
+    assert_equal original_end, @consultation.end_time
+    assert_selector "button[aria-label='Destroy this consultation']", visible: true
+  end
+
   test "administrator can destroy consultation" do
     sign_in_as_admin
     visit consultation_url(@consultation)
