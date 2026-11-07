@@ -83,7 +83,7 @@ class AdminSecurityHttpGateTest < ActionDispatch::IntegrationTest
     }
     assert_redirected_to consultations_url
     patch consultation_url(consultation), params: {
-      consultation: { title: "Approved edit (isolated fixture)" }
+      consultation: { lock_version: consultation.lock_version, title: "Approved edit (isolated fixture)" }
     }
     assert_redirected_to consultation_url(consultation)
     assert_equal "Approved edit (isolated fixture)", consultation.reload.title

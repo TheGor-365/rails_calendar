@@ -44,15 +44,26 @@ class ConsultationsController < ApplicationController
   end
 
   def update
+    expected_lock_version = params.require(:consultation)[:lock_version]
     attributes = consultation_params
     # An existing timestamp may contain legacy seconds. The HTML editor is
     # minute-only, so posting the same displayed minute must not silently
     # discard the persisted seconds when editing the title/description.
     preserve_unchanged_minutes!(attributes)
 
+    result = Consultations::Reschedule.call(
+      consultation: @consultation,
+      attributes: attributes,
+      expected_lock_version: expected_lock_version
+    )
+
     respond_to do |format|
-      if Consultations::Reschedule.call(consultation: @consultation, attributes: attributes)
+      case result
+      when :updated
         format.html { redirect_to consultation_url(@consultation), notice: "Consultation was successfully updated" }
+      when :stale
+        prepare_overlap_advisory
+        format.html { render :edit, status: :conflict }
       else
         prepare_overlap_advisory
         format.html { render :edit, status: :unprocessable_entity }

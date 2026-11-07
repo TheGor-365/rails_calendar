@@ -14,6 +14,7 @@ class ConsultationRescheduleHistoryTest < ActionDispatch::IntegrationTest
     assert_difference "ConsultationRescheduleEvent.count", 1 do
       patch consultation_url(@consultation), params: {
         consultation: {
+          lock_version: @consultation.lock_version,
           title: @consultation.title,
           start_time: new_start.strftime("%Y-%m-%dT%H:%M"),
           end_time: new_end.strftime("%Y-%m-%dT%H:%M"),
@@ -49,6 +50,7 @@ class ConsultationRescheduleHistoryTest < ActionDispatch::IntegrationTest
     assert_no_difference "ConsultationRescheduleEvent.count" do
       patch consultation_url(@consultation), params: {
         consultation: {
+          lock_version: @consultation.lock_version,
           start_time: (old_start + 1.hour).strftime("%Y-%m-%dT%H:%M"),
           end_time: (old_end + 1.hour).strftime("%Y-%m-%dT%H:%M")
         }
@@ -69,6 +71,7 @@ class ConsultationRescheduleHistoryTest < ActionDispatch::IntegrationTest
     assert_no_difference "ConsultationRescheduleEvent.count" do
       patch consultation_url(@consultation), params: {
         consultation: {
+          lock_version: @consultation.lock_version,
           start_time: (old_start + 1.hour).strftime("%Y-%m-%dT%H:%M"),
           end_time: (@consultation.end_time + 1.hour).strftime("%Y-%m-%dT%H:%M"),
           reschedule_reason: "r" * 501
@@ -81,6 +84,7 @@ class ConsultationRescheduleHistoryTest < ActionDispatch::IntegrationTest
     assert_no_difference "ConsultationRescheduleEvent.count" do
       patch consultation_url(@consultation), params: {
         consultation: {
+          lock_version: @consultation.lock_version,
           end_time: (old_start - 1.minute).strftime("%Y-%m-%dT%H:%M"),
           reschedule_reason: "Attempted invalid interval"
         }
@@ -99,6 +103,7 @@ class ConsultationRescheduleHistoryTest < ActionDispatch::IntegrationTest
     assert_no_difference "ConsultationRescheduleEvent.count" do
       patch consultation_url(legacy), params: {
         consultation: {
+          lock_version: legacy.lock_version,
           title: "Edited without moving",
           start_time: first.in_time_zone.strftime("%Y-%m-%dT%H:%M"),
           end_time: last.in_time_zone.strftime("%Y-%m-%dT%H:%M")
@@ -116,6 +121,7 @@ class ConsultationRescheduleHistoryTest < ActionDispatch::IntegrationTest
     assert_no_difference "ConsultationRescheduleEvent.count" do
       patch consultation_url(@consultation), params: {
         consultation: {
+          lock_version: @consultation.lock_version,
           start_time: (old_start + 1.hour).strftime("%Y-%m-%dT%H:%M"),
           reschedule_reason: "Unauthorized reason"
         }
@@ -134,6 +140,7 @@ class ConsultationRescheduleHistoryTest < ActionDispatch::IntegrationTest
     sign_in_as_admin
     patch consultation_url(@consultation), params: {
       consultation: {
+          lock_version: @consultation.lock_version,
         start_time: (@consultation.start_time + 15.minutes).strftime("%Y-%m-%dT%H:%M"),
         reschedule_reason: "Test-only time adjustment"
       }
@@ -153,6 +160,7 @@ class ConsultationRescheduleHistoryTest < ActionDispatch::IntegrationTest
     sign_in_as_admin
     patch consultation_url(@consultation), params: {
       consultation: {
+          lock_version: @consultation.lock_version,
         end_time: (@consultation.end_time + 5.minutes).strftime("%Y-%m-%dT%H:%M"),
         reschedule_reason: "<script>alert('xss')</script>"
       }

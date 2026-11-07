@@ -78,6 +78,8 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     get edit_consultation_url(@consultation)
     assert_response :success
+    assert_select "input[name='consultation[lock_version]'][value=?]",
+                  @consultation.lock_version.to_s, count: 1
   end
 
   test "admin can create a consultation" do
@@ -90,7 +92,7 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
 
   test "admin can update a consultation" do
     sign_in_as_admin
-    patch consultation_url(@consultation), params: { consultation: { title: "Admin update" } }
+    patch consultation_url(@consultation), params: { consultation: { lock_version: @consultation.lock_version, title: "Admin update" } }
     assert_redirected_to consultation_url(@consultation)
     assert_equal "Admin update", @consultation.reload.title
   end
@@ -108,6 +110,7 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
 
     patch consultation_url(@consultation), params: {
       consultation: {
+        lock_version: @consultation.lock_version,
         title: "Text-only update",
         start_time: @consultation.start_time.in_time_zone.strftime("%Y-%m-%dT%H:%M"),
         end_time: legacy_end_time.in_time_zone.strftime("%Y-%m-%dT%H:%M")
@@ -197,6 +200,7 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
 
     patch consultation_url(@consultation), params: {
       consultation: {
+        lock_version: @consultation.lock_version,
         start_time: "2101-12-12T12:12",
         end_time: "2101-12-12T13:12"
       }
