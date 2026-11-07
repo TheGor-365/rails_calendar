@@ -1,4 +1,5 @@
 class PagesController < ApplicationController
+  before_action :require_calendar_read_access!
   def home
     requested_date = params[:start_date].presence
     calendar_date = requested_date ? Date.iso8601(requested_date) : Time.zone.today
