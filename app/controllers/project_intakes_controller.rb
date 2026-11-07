@@ -52,11 +52,13 @@ class ProjectIntakesController < ApplicationController
   end
 
   def acknowledge
-    spec = @intake.latest_spec
+    spec = @intake.published_spec
     return head :conflict unless spec&.approved?
 
     spec.update!(client_reviewed_at: Time.current) if spec.client_reviewed_at.nil?
-    @intake.update!(status: "client_reviewed")
+    # A client reviewing the previous published version must not discard the
+    # pending newer draft/version review state.
+    @intake.update!(status: "client_reviewed") if @intake.status == "owner_approved"
     redirect_to project_intake_path(@intake), notice: "Demo review recorded (not a contract or final acceptance)"
   end
 
@@ -85,7 +87,7 @@ class ProjectIntakesController < ApplicationController
 
   def prepare_show
     @messages = @intake.intake_messages.order(:id).limit(20)
-    @latest_spec = @intake.latest_spec
+    @latest_spec = admin_signed_in? ? @intake.latest_spec : @intake.published_spec
     @milestones = @intake.project_milestones.order(:position).to_a
     @visible_month = begin
       value = params[:start_date].present? ? Date.iso8601(params[:start_date].to_s) : (@milestones.first&.start_on || Date.current)

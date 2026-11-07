@@ -17,6 +17,10 @@ class ProjectIntake < ApplicationRecord
     intake_spec_versions.order(version: :desc).first
   end
 
+  def published_spec
+    intake_spec_versions.where.not(owner_approved_at: nil).order(version: :desc).first
+  end
+
   def client_message_count
     intake_messages.where(role: "client").count
   end
