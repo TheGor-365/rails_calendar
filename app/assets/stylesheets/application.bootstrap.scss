@@ -1519,3 +1519,70 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   .rc-pagination { gap: .4rem; }
   .rc-pagination .rc-action { padding: .5rem .65rem; }
 }
+
+
+// RC-020 — advisory overlap cards, not a booking policy or an automated hold.
+.rc-overlap-notice {
+  margin: 1rem 0;
+  padding: .9rem 1rem;
+  color: var(--rc-ink);
+  background: #fff9eb;
+  border: 1px solid #e9d39c;
+  border-left: 3px solid #aa7c19;
+  border-radius: .4rem;
+}
+
+.rc-overlap-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .4rem;
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+.rc-overlap-heading .bi { color: #8a6213; }
+
+.rc-overlap-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rc-overlap-list li {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem .75rem;
+  padding: .45rem 0;
+  border-top: 1px solid rgba(170, 124, 25, .15);
+}
+
+.rc-overlap-range {
+  color: var(--rc-muted);
+  font-size: .78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.rc-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25rem .75rem;
+}
+
+.rc-record-actions .rc-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  min-height: 42px;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .17em;
+}
+
+@media (max-width: 575.98px) {
+  .rc-overlap-notice { padding: .85rem .75rem; }
+  .rc-overlap-list li { align-items: flex-start; flex-direction: column; }
+  .rc-record-actions { gap: .15rem .6rem; }
+}
