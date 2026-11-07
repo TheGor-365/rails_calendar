@@ -10,6 +10,12 @@
     <%= link_to "Consultations", consultations_path,
                 class: "rc-nav-link #{'active' if controller_name == 'consultations' && action_name == 'index'}",
                 aria: { current: ("page" if controller_name == 'consultations' && action_name == 'index') } %>
+    <% if admin_signed_in? || ENV["RC_INTAKE_PUBLIC_DEMO"] == "true" %>
+      <%= link_to "AI request", new_project_intake_path, class: "rc-nav-link" %>
+      <% if admin_signed_in? %>
+        <%= link_to "Intake inbox", admin_project_intakes_path, class: "rc-nav-link" %>
+      <% end %>
+    <% end %>
 
     <div class="ms-auto d-flex align-items-center gap-2">
       <% if admin_signed_in? %>
