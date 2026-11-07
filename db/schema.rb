@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_19_193351) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_123000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "admin_login_windows", force: :cascade do |t|
+    t.string "client_digest", limit: 64, null: false
+    t.bigint "window_start_epoch", null: false
+    t.integer "attempts", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_digest", "window_start_epoch"], name: "idx_admin_login_windows_identity_and_window", unique: true
+    t.index ["window_start_epoch"], name: "idx_admin_login_windows_cleanup"
+  end
 
   create_table "consultations", force: :cascade do |t|
     t.string "title"
