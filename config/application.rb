@@ -23,6 +23,10 @@ module RailsCalendar
     config.time_zone = "UTC"
     config.active_record.default_timezone = :utc
 
+    # Enforce same-origin checks for authenticated form mutations when CSRF
+    # protection is enabled; the test-only opt-in exercises this HTTP path.
+    config.action_controller.forgery_protection_origin_check = true
+
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
