@@ -54,6 +54,12 @@ jobs:
           yarn build
           yarn build:css
 
+      - name: Verify read-only staging restore preflight (offline)
+        run: |
+          bash -n bin/rc-staging-restore-preflight
+          bash -n test/scripts/rc_staging_restore_preflight_test.sh
+          bash test/scripts/rc_staging_restore_preflight_test.sh
+
       - name: Prepare isolated test DB
         run: bin/rails db:prepare
 
