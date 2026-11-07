@@ -1,14 +1,9 @@
 module Admin
   class SessionsController < ApplicationController
-    # Per-process protection for the demo. This is NOT a shared/distributed
-    # production rate limiter: production must use a shared cache backend.
-    LOGIN_RATE_LIMIT_STORE = ActiveSupport::Cache::MemoryStore.new(size: 4.megabytes)
-
-    # Count every login attempt (successful or failed) against the same IP.
-    # Do not throttle public calendar routes.
-    rate_limit to: 5, within: 1.minute, only: :create,
-      store: LOGIN_RATE_LIMIT_STORE,
-      with: -> { head :too_many_requests }
+    # Shared PostgreSQL counter counts all authentication attempts, including
+    # successful ones, before reading any credentials. A database outage fails
+    # closed rather than silently disabling throttling.
+    before_action :enforce_admin_login_rate_limit!, only: :create
 
     def new
       redirect_to consultations_path if admin_signed_in?
@@ -35,6 +30,15 @@ module Admin
     def destroy
       reset_session
       redirect_to root_path, notice: "Administrator signed out"
+    end
+
+    private
+
+    def enforce_admin_login_rate_limit!
+      head :too_many_requests if AdminLoginWindow.throttled?(remote_ip: request.remote_ip)
+    rescue ActiveRecord::ActiveRecordError => error
+      Rails.logger.error("Administrator login limiter unavailable: #{error.class}")
+      head :service_unavailable
     end
   end
 end

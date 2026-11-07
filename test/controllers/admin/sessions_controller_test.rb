@@ -2,7 +2,7 @@ require "test_helper"
 
 class AdminSessionsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    Admin::SessionsController::LOGIN_RATE_LIMIT_STORE.clear
+    AdminLoginWindow.delete_all
   end
   test "login limits the sixth request and keeps anonymous calendar public" do
     5.times do
