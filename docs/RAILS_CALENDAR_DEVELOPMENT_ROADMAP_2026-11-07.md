@@ -1,6 +1,6 @@
 # Rails Calendar → AI Service Operating System — development roadmap
 
-**Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-017 private-calendar release gate, owner screenshot QA of minute-only #4. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
+**Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-018 shared PostgreSQL login throttle after owner manual RC-017 private-mode PASS. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
 
 **Product contract:** evolve the existing Rails Calendar, do not rewrite it. The calendar becomes the visible scheduling layer of an AI-assisted service-delivery system for the owner's actual Ruby on Rails freelance work. Initial vertical: Rails debugging, CRUD/forms, API/PostgreSQL, tests and small integrations. Later professions require versioned playbooks, not cloned apps. The system must not invent paid engagements, commitments or approvals.
 
@@ -33,7 +33,8 @@
 | RC-014 / PR #14 | Persistent five-tab dock and single-row detail actions | **Local visual PASS** on mobile after RC-014b; authenticated New screen confirmed; CI/Security green |
 | RC-015 / PR #16 | Minute-only input/validation, unchanged legacy timestamp retention, record-specific delete confirmation | CI+Security SUCCESS; owner screenshots show **minute-only form, successful #4 creation, index and anchored day card**. Record-specific delete confirmation still needs manual QA; [safety note](RC015_MINUTE_PRECISION_DELETE_SAFETY_2026-11-07.md) |
 | RC-016 / PR #17 | Explicit UTC storage/display baseline, midnight/DST regressions and expired/logged-out ACL | CI+Security SUCCESS: 76 tests/601 assertions. [ADR-001](ADR001_UTC_TIMEZONE_CONTRACT_2026-11-07.md); regional client timezone UX pending decision |
-| RC-017 / next Draft | Private-by-default production calendar read mode, explicit demo-only public opt-in | Code/tests in review; see [RC-017 privacy gate](RC017_PRIVATE_CALENDAR_RELEASE_GATE_2026-11-07.md). No production data touched |
+| RC-017 / PR #18 | Private-by-default production calendar read mode, explicit demo-only public opt-in | **CI+Security SUCCESS** (82 tests, 636 assertions); owner 07 Nov incognito screenshot confirms guest root → admin login in private mode; [privacy gate](RC017_PRIVATE_CALENDAR_RELEASE_GATE_2026-11-07.md) |
+| RC-018 / next Draft | Shared PostgreSQL fixed-minute admin login throttle (atomic, fail-closed); additive rate-limit table | Code/tests in review; [RC-018 operational gate](RC018_SHARED_LOGIN_THROTTLE_2026-11-07.md); migration **not applied** to local/production DB |
 
 All these PRs are Draft and stacked; `main` and production have not been changed by this program. #4 is a superseded duplicate (DO NOT MERGE).
 
@@ -53,9 +54,10 @@ All these PRs are Draft and stacked; `main` and production have not been changed
 - RC-015 changes the minute-only HTML fields (`step=60`, explicit value to HH:MM), server precision validation and preservation of legacy seconds for unchanged times; improves the confirmation with the exact title, ID and date/time. Reversible deletion/audit is a future schema decision, not implemented here.
 - **Exit:** local recovery decision resolved; RC-015 CI/Security green; owner demonstrated HH:MM + new #4 consultation, calendar/index navigation. Deletion confirmation still needs manual UI check. No merge/Railway before those gates.
 
-### A2. Admin/security & data review (RC-017 READ GATE IN PROGRESS)
+### A2. Admin/security & data review (RC-017 READ PASS; RC-018 THROTTLE IN PROGRESS)
 - Test admin login/logout, wrong password, session expiry and explicit denial of POST/PATCH/DELETE to anonymous users; preserve real records.
-- RC-017 makes production read routes private unless explicit synthetic-only public demo opt-in. **Important**: all records become readable when demo mode is on; no row-level/client privacy yet. Assess auth cookie/CSRF, redaction, per-process rate limiter, HTTPS/proxy, secret manager, auditability, and environment isolation.
+- RC-017 makes production read routes private unless explicit synthetic-only public demo opt-in; owner screenshot shows intended guest redirect. **Important**: all records become readable when demo mode is on; no row-level/client privacy yet.
+- RC-018 replaces per-process login throttling with shared PostgreSQL atomic counters, HMAC IP pseudonyms and fail-closed DB errors. Review/additive migration on isolated staging with backup; operator-configured maintenance prune. Verify reverse-proxy trust, cookies/CSRF, secrets/HTTPS and log redaction before production.
 - Confirm duration and boundary behavior for midnight, empty days, simultaneous bookings and invalid input. Define cancellation/no-show/reschedule policies before adding states.
 
 **Exit:** documented access matrix, negative tests and manual admin CRUD success.
@@ -68,7 +70,7 @@ All these PRs are Draft and stacked; `main` and production have not been changed
 **Exit:** reviewed ADR, timezone regression tests and clear UI labels.
 
 ### A4. Stack review & release gate
-- Review commits and dependencies for PR #1→#14, exclude #4; squash/rebase only after explicit owner consent and backup.
+- Review commits and dependencies for PR #1→#18 (excluding superseded PR #4 and unrelated #15); squash/rebase only after explicit owner consent and backup.
 - Verify staging DB migrations/data, restore/rollback procedure, health checks, 320/390/430 smoke, credentials, session policy and Railway resource costs.
 - Production remains blocked until manual gate.
 
@@ -122,4 +124,4 @@ Prepare ADRs and additive schema migrations, not a replacement application. Prop
 
 `readback current SHA + sources → define one user-visible acceptance outcome → write failing regression test where appropriate → smallest implementation → CI + Security on same final SHA → manual mobile and desktop QA → checkpoint with evidence`.
 
-**Next 1–3 actions:** (1) Verify RC-017 CI/Security on exact head SHA and safely switch to it on Linux Mint without touching existing app data or other ports. (2) Local browser QA: HH:MM form and record-specific delete confirmation **Cancel** (do not delete #3/#4); optionally verify anonymous calendar is denied when running with `RAILS_CALENDAR_PUBLIC_DEMO_MODE=false`. (3) Review production read policy, shared rate limiter, secure storage and staged smoke plan. No merge/deploy or paid resources without approval.
+**Next 1–3 actions:** (1) Run RC-018 final SHA CI/Security (PostgreSQL migration and tests) and record evidence. (2) Locally review migration, backup `ruby_calendar`, then explicitly approve/apply additive migration before testing admin login; do not run production. (3) Complete admin session/CSRF/proxy and per-client data privacy release review, then enter P1 precise duration/filters. Never deploy or merge automatically.
