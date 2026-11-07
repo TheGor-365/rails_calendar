@@ -13,6 +13,62 @@
     </div>
   </header>
 
+  <%= form_with url: consultations_path, method: :get, local: true,
+                html: { class: "rc-consultation-filters", role: "search",
+                        aria: { label: "Filter consultations" } } do %>
+    <div class="rc-filter-grid">
+      <div class="rc-filter-field">
+        <%= label_tag :q, "Title contains", class: "rc-field-label" %>
+        <%= search_field_tag :q, @search.query,
+                             class: "rc-input rc-filter-input",
+                             maxlength: ConsultationSearch::MAX_QUERY_LENGTH,
+                             placeholder: "Search consultation titles" %>
+      </div>
+      <div class="rc-filter-field">
+        <%= label_tag :from, "From (UTC)", class: "rc-field-label" %>
+        <%= date_field_tag :from, @search.from_value,
+                           class: "rc-input rc-filter-input",
+                           min: "2000-01-01", max: "2100-12-31" %>
+      </div>
+      <div class="rc-filter-field">
+        <%= label_tag :to, "To (UTC)", class: "rc-field-label" %>
+        <%= date_field_tag :to, @search.to_value,
+                           class: "rc-input rc-filter-input",
+                           min: "2000-01-01", max: "2100-12-31" %>
+      </div>
+      <div class="rc-filter-field">
+        <%= label_tag :status, "Schedule status", class: "rc-field-label" %>
+        <%= select_tag :status,
+                       options_for_select([["All", "all"], ["Upcoming", "upcoming"],
+                                           ["In progress", "ongoing"], ["Past", "past"]], @search.status),
+                       class: "rc-input rc-filter-input" %>
+      </div>
+    </div>
+    <div class="rc-filter-actions">
+      <%= button_tag rc_icon_label("search", "Apply filters"),
+                     type: :submit, class: "rc-action rc-action--primary" %>
+      <%= link_to rc_icon_label("arrow-counterclockwise", "Clear"), consultations_path,
+                  class: "rc-action rc-action--quiet" %>
+      <p class="rc-hint mb-0">Dates include consultations that overlap the selected UTC day range.</p>
+    </div>
+  <% end %>
+
+  <% if @search.errors.any? %>
+    <div class="rc-notice rc-notice--error mb-3" role="alert" id="consultation-filter-errors">
+      <%= @search.errors.join(". ") %>
+    </div>
+  <% end %>
+
+  <p class="rc-results-summary" role="status" aria-live="polite">
+    <% if @search.errors.any? %>
+      Filters need correction before results can be displayed.
+    <% elsif @search.total.zero? %>
+      <%= @search.filtered? ? "No matching consultations." : "No consultations scheduled." %>
+    <% else %>
+      Showing <%= @search.first_result %>–<%= @search.last_result %> of <%= pluralize(@search.total, "consultation") %>.
+    <% end %>
+  </p>
+
   <% if @consultations.any? %>
     <ul id="consultations" class="rc-record-list">
       <% @consultations.each do |consultation| %>
@@ -38,6 +94,32 @@
       <% end %>
     </ul>
   <% else %>
-    <p id="consultations" role="status" class="rc-notice rc-notice--neutral">No consultations have been scheduled.</p>
+    <p id="consultations" class="rc-notice rc-notice--neutral">
+      <% if @search.errors.any? %>
+        Correct the filters above to view results.
+      <% elsif @search.filtered? %>
+        No results for these filters. Try another title, date range or schedule status.
+      <% else %>
+        No consultations have been scheduled.
+      <% end %>
+    </p>
+  <% end %>
+
+  <% if @search.total_pages > 1 %>
+    <nav class="rc-pagination" aria-label="Consultation result pages">
+      <% if @search.page > 1 %>
+        <%= link_to rc_icon_label("chevron-left", "Previous"),
+                    consultations_path(@search.page_params(@search.page - 1)),
+                    class: "rc-action rc-action--quiet", rel: "prev" %>
+      <% end %>
+      <span class="rc-pagination-current" aria-current="page">
+        Page <%= @search.page %> of <%= @search.total_pages %>
+      </span>
+      <% if @search.page < @search.total_pages %>
+        <%= link_to rc_icon_label("chevron-right", "Next"),
+                    consultations_path(@search.page_params(@search.page + 1)),
+                    class: "rc-action rc-action--quiet", rel: "next" %>
+      <% end %>
+    </nav>
   <% end %>
 </div>
