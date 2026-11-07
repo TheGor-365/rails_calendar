@@ -6,21 +6,34 @@ module Consultations
     ACTOR_LABEL = "administrator".freeze
     MAX_REASON_LENGTH = 500
 
-    def self.call(consultation:, attributes:)
-      new(consultation: consultation, attributes: attributes).call
+    def self.call(consultation:, attributes:, expected_lock_version:)
+      new(
+        consultation: consultation,
+        attributes: attributes,
+        expected_lock_version: expected_lock_version
+      ).call
     end
 
-    def initialize(consultation:, attributes:)
+    def initialize(consultation:, attributes:, expected_lock_version:)
       @consultation = consultation
       @attributes = attributes.to_h.stringify_keys
       @reason = @attributes.delete("reschedule_reason").to_s.strip
+      @expected_lock_version = expected_lock_version.to_s
     end
 
     def call
-      # Acquire the row lock before reading the previous values. Consultation
-      # save and history INSERT commit together or not at all. We do not move
-      # or reject other overlapping records.
+      # Reload under row lock before validating the version submitted by
+      # the open edit form, so a concurrent tab cannot overwrite newer data.
+      # The consultation update and optional audit insertion remain atomic.
       @consultation.with_lock do
+        unless current_edit_version?
+          @consultation.errors.add(
+            :base,
+            "This consultation changed in another tab, or the edit form is outdated. Your edits were not saved; review the latest values and try again."
+          )
+          next :stale
+        end
+
         previous_start = @consultation.start_time
         previous_end = @consultation.end_time
 
@@ -42,8 +55,8 @@ module Consultations
           @consultation.errors.add(:reschedule_reason, "is too long (maximum #{MAX_REASON_LENGTH} characters)")
         end
 
-        next false if @consultation.errors.any?
-        next false unless @consultation.save
+        next :invalid if @consultation.errors.any?
+        next :invalid unless @consultation.save
 
         if schedule_changed
           ConsultationRescheduleEvent.create!(
@@ -58,8 +71,16 @@ module Consultations
           )
         end
 
-        true
+        :updated
       end
+    end
+
+    private
+
+    def current_edit_version?
+      # Invalid, absent and noncanonical edit tokens fail closed.
+      @expected_lock_version.match?(/\A(?:0|[1-9]\d{0,10})\z/) &&
+        @expected_lock_version.to_i == @consultation.lock_version
     end
   end
 end
