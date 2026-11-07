@@ -9,6 +9,17 @@ class Consultation < ApplicationRecord
   validate :end_time_after_start_time
   validate :changed_schedule_times_are_whole_minutes
 
+  # Scheduling overlaps are advisory until an explicit booking policy is
+  # approved. Endpoints use half-open [start_time, end_time) intervals: events
+  # meeting exactly at a boundary are NOT considered overlapping.
+  def overlapping_consultations
+    return self.class.none if start_time.blank? || end_time.blank? || end_time <= start_time
+
+    scope = self.class.where("start_time < ? AND end_time > ?", end_time, start_time)
+    scope = scope.where.not(id: id) if persisted?
+    scope.order(:start_time, :id)
+  end
+
   private
 
   # The database accepts years that make no sense for a service calendar.
