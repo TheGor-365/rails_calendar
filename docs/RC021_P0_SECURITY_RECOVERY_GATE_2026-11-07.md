@@ -18,7 +18,7 @@ Previous RC-018 production-like model test yielded `[false,false,false,false,fal
 | Shared login limiting | RC-018 PostgreSQL atomic counter; owner six-call synthetic model PASS | Browser/Puma endpoint 429 after five wrong submissions **not manually verified** |
 | Missing database during login | RC-021 isolated simulated DB-failure HTTP 503 regression | Actual outage/failover and monitored alert in staging still unverified |
 | Sessions/logout/expiry | Existing controller tests, RC-021 request tests | Cookie Secure/SameSite, HTTPS termination and CSRF acceptance on staging still open |
-| Delete exact-record confirmation | RC-015 record ID/title/time; RC-021 Chrome Cancel regression | Owner must inspect prompt for targeted record and press **Cancel** only |
+| Delete exact-record confirmation | RC-015 record ID/title/time; RC-021 Chrome Cancel regression | Selenium Cancel is tested on isolated fixture. Do **not** manually trigger destructive controls on owner records #3/#4; optional owner UI check only on an explicitly approved disposable staging record |
 | Database backup | Owner's custom archive created using pg_dump 18.6 against PG16.11, readable by pg_restore 18.6 | Actual **restore into separate isolated DB not yet done** |
 | Proxy IP identity | HMAC of `request.remote_ip`; DB window shared | Review real proxy chain/forwarded headers so spoofing or shared NAT cannot compromise limits |
 | Tenant/private client records | Demo-only single administrator, no row scoping | **Block real multi-client rollout** until identity/ACL designed and tested |
@@ -45,7 +45,7 @@ Until the business has confirmed whether a consultation is an exclusive single-p
 ## Next actions
 
 1. Await final SHA CI+Security on this Draft. Keep it unmerged and undeployed.
-2. Owner performs **Cancel**, not confirmation, on existing record-specific Delete dialog (no data change) and optionally a temporary localhost HTTP-throttle test on a fresh IP/minute. Do not paste secrets.
+2. Do **not** click Destroy on existing local records #3/#4 for manual QA. The isolated Chrome test verifies Cancel safely on a fixture; any supplementary human Cancel check must use an explicitly approved disposable staging record. The live Puma HTTP limiter may be checked on localhost without sharing credentials.
 3. Authorize a separate staging restore rehearsal and decide booking/capacity + audit scope before stateful P1 changes or any release.
 
 **No new migrations, services, paid resources, records or production mutation in RC-021.**
