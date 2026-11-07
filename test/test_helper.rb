@@ -11,9 +11,9 @@ class ActiveSupport::TestCase
   parallelize(workers: :number_of_processors)
   fixtures :all
 
-  # Keep the per-process demo login limiter from leaking counters between
-  # unrelated tests that sign in from the same default localhost address.
+  # Reset only this worker's isolated test database counters; never touch
+  # development/production data. Fixtures are independent per worker.
   setup do
-    Admin::SessionsController::LOGIN_RATE_LIMIT_STORE.clear
+    AdminLoginWindow.delete_all
   end
 end
