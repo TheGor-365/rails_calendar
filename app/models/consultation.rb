@@ -1,4 +1,8 @@
 class Consultation < ApplicationRecord
+  # Form-only field; a reschedule reason is stored on the immutable history row,
+  # never in the consultation or HTTP query string.
+  attr_accessor :reschedule_reason
+
   MIN_SCHEDULE_YEAR = 2000
   MAX_SCHEDULE_YEAR = 2100
 
