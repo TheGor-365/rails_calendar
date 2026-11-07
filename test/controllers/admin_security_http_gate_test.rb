@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/mock"
 
 # These assertions exercise the real HTTP route and session cookies rather
 # than calling the rate-limit model directly. All records are test fixtures.
