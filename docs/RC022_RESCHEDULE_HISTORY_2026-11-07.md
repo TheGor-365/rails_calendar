@@ -1,7 +1,7 @@
 # RC-022 — Administrator reschedule history
 
 **Date:** 2026-11-07  
-**Status:** Draft implementation, CI/manual acceptance pending. Stacked on RC-021.  
+**Status:** Draft implementation. [Rails CI #42388655729](https://github.com/TheGor-365/rails_calendar/actions/runs/42388655729) and [Security #42388655663](https://github.com/TheGor-365/rails_calendar/actions/runs/42388655663) SUCCESS on code SHA `e96c3662580e3a208dd68db5703b56f7f8700b50`: 103 Rails tests/709 assertions + 20 Chrome tests/273 assertions = **123 tests/982 assertions**, 0 failures/errors/skips. Manual staging/migration approval outstanding. Stacked on RC-021.  
 **Contract:** [ADR-002](ADR002_RESCHEDULE_AUDIT_CAPACITY_2026-11-07.md).
 
 ## Feature scope and behavior
@@ -25,7 +25,7 @@
 
 ## Release acceptance
 
-- [ ] CI + Security green on final exact SHA; Rails tests assert missing/long reasons rejected, valid moves generate precise old/new snapshots, text-only edits and untouched legacy minutes never audit, guest cannot mutate/read history, changed record deletion leaves snapshot, script content escaped, readonly model blocks modifications.
+- [x] CI + Security green on code SHA `e96c366` (123 tests/982 assertions); documentation-only final HEAD still to verify; Rails tests assert missing/long reasons rejected, valid moves generate precise old/new snapshots, text-only edits and untouched legacy minutes never audit, guest cannot mutate/read history, changed record deletion leaves snapshot, script content escaped, readonly model blocks modifications.
 - [ ] Chrome system tests 320/390/430: reason input accessible, fixed dock, history text wraps with no horizontal scroll.
 - [ ] Owner confirms no stale form overwrite policy and approves DB migration in isolated staging **after** backup/restore rehearsal. Do not directly run a production or owner development migration from this chat.
 - [ ] Owner sees edit #4 prefilled and that a title-only edit needs no reason (can Cancel without saving). Real reschedule may be tested exclusively on an owner-approved disposable staging record, not retained #3/#4.
