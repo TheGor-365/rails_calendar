@@ -1586,3 +1586,41 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   .rc-overlap-list li { align-items: flex-start; flex-direction: column; }
   .rc-record-actions { gap: .15rem .6rem; }
 }
+
+
+// RC-022 — administrator-only audit history; readable without horizontal scroll.
+.rc-reschedule-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rc-reschedule-history > li {
+  padding: .85rem 0;
+  border-top: 1px solid rgba(14, 92, 82, .14);
+  overflow-wrap: anywhere;
+}
+
+.rc-reschedule-history p {
+  font-size: .88rem;
+  line-height: 1.5;
+}
+
+.rc-reschedule-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .25rem 1rem;
+  margin-bottom: .45rem;
+  font-size: .88rem;
+}
+
+.rc-reschedule-heading > span {
+  color: var(--rc-muted);
+  font-size: .8rem;
+}
+
+@media (max-width: 575.98px) {
+  .rc-reschedule-history > li { padding: .7rem 0; }
+  .rc-reschedule-heading { flex-direction: column; gap: .15rem; }
+}
