@@ -1,6 +1,6 @@
 # RC-018 — Shared PostgreSQL administrator login throttle
 
-**Date:** 2026-11-07. **Status:** Draft implementation awaiting CI and migration review.  
+**Date:** 2026-11-07. **Status:** Code CI+Security SUCCESS on SHA `39d9e44be2c45ef08945967abd0385c27f48451b`; local/staging migration and owner QA pending.  
 **Parent:** [RC-017 privacy gate](https://github.com/TheGor-365/rails_calendar/pull/18).
 
 ## Risk addressed
@@ -34,7 +34,7 @@ Production dependency remains the existing PostgreSQL URL. No new cloud subscrip
 
 ## Remaining release gates
 
-1. Final exact SHA Rails CI + Security; migration schema parity.
+1. **PASS** [CI run #42373571723](https://github.com/TheGor-365/rails_calendar/actions/runs/42373571723) and [Security run #42373571745](https://github.com/TheGor-365/rails_calendar/actions/runs/42373571745) on code SHA `39d9e44`: 71 Rails tests / 485 assertions + 15 Chrome tests / 172 assertions = 86 tests / 657 assertions, 0 failures/errors/skips. Isolated CI migration/schema checked.
 2. Separate backup + staging schema migration, smoke and restore test.
 3. Privacy ownership/tenant scope before real client data, per-client record ACL and secrets review.
 4. Decision on UTC + Armenia/client time zone display (see ADR-001); no silent conversion.
