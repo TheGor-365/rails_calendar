@@ -35,7 +35,7 @@
 | RC-016 / PR #17 | Explicit UTC storage/display baseline, midnight/DST regressions and expired/logged-out ACL | CI+Security SUCCESS: 76 tests/601 assertions. [ADR-001](ADR001_UTC_TIMEZONE_CONTRACT_2026-11-07.md); regional client timezone UX pending decision |
 | RC-017 / PR #18 | Private-by-default production calendar read mode, explicit demo-only public opt-in | **CI+Security SUCCESS** (82 tests, 636 assertions); owner 07 Nov incognito screenshot confirms guest root → admin login in private mode; [privacy gate](RC017_PRIVATE_CALENDAR_RELEASE_GATE_2026-11-07.md) |
 | RC-018 / PR #19 | Shared PostgreSQL fixed-minute admin login throttle (atomic, fail-closed); additive rate-limit table | **CI+Security SUCCESS**. Owner `24bc1ca` checkout, backup read check, additive local migration, retained #3/#4 and 6-call model decision `false×5,true` **PASS**. Real HTTP 429, proxy trust and staging remain open; [gate](RC018_SHARED_LOGIN_THROTTLE_2026-11-07.md) |
-| RC-019 / new P1 Draft | Exact visible durations, safe search of consultation titles, UTC date/status filters, pagination and mobile parity | Implemented on independent stacked branch; CI and owner UX acceptance pending. [RC-019 acceptance](RC019_CONSULTATION_SEARCH_DURATION_2026-11-07.md) |
+| RC-019 / PR #20 | Exact durations, safe title search, UTC date/status filters, pagination and mobile parity | CI+Security SUCCESS on `01e3746`: 99 tests / 777 assertions; manual local data QA pending. [Acceptance](RC019_CONSULTATION_SEARCH_DURATION_2026-11-07.md) |
 
 All these PRs are Draft and stacked; `main` and production have not been changed by this program. #4 is a superseded duplicate (DO NOT MERGE).
 
@@ -78,6 +78,8 @@ All these PRs are Draft and stacked; `main` and production have not been changed
 **Exit:** one reviewed, reproducible staging candidate with clean test/security status.
 
 ## Phase B — useful consultation product (P1)
+
+**RC-019 candidate:** implementation and Chrome tests for exact duration, searchable/paginated records, date-overlap/status filters and responsive controls are complete in Draft PR #20. Do not infer end-user acceptance from CI. Next owner smoke: `/consultations/4` should read `Duration: 1 h 40 min`, `/consultations?q=Third` should show #4 only, UTC 13 Nov filter includes #4, Clear returns #3/#4, no mobile overflow. Remaining P1 scope below is not implemented yet.
 
 - Distinguish **Month overview**, **Day 24-hour timeline**, **Hour details**, **Consultation record** and **all-records index**. Keep clear navigation and actions.
 - Search/filter by date range/title, paginate large results, show upcoming and recent records, empty states, UTC/user-timezone labeling and scheduling conflicts policy.
