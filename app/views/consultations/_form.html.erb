@@ -63,6 +63,9 @@
     </div>
   </div>
 
+  <p class="rc-hint mb-3">Overlapping bookings are currently allowed. Any detected overlaps are advisory and must be reviewed after saving.</p>
+  <%= render "overlap_advisory", overlaps: @overlaps, more: @overlaps_more, mode: :form %>
+
   <div class="d-flex flex-wrap align-items-center gap-2">
     <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
       <%= rc_icon_label(consultation.persisted? ? "check2-circle" : "plus-lg", consultation.persisted? ? "Update Consultation" : "Create Consultation") %>
