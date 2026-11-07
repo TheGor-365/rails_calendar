@@ -86,6 +86,11 @@
           <% end %>
           <div class="rc-record-actions">
             <%= link_to rc_icon_label("eye", "View details"), consultation_path(consultation), class: "rc-text-link" %>
+            <% if admin_signed_in? %>
+              <%= link_to rc_icon_label("calendar2-week", "Reschedule"),
+                          edit_consultation_path(consultation, anchor: "consultation_start_time"),
+                          class: "rc-text-link", aria: { label: "Reschedule #{consultation.title}" } %>
+            <% end %>
             <%= link_to rc_icon_label("calendar-event", "View in calendar"),
                         calendar_day_path(date: consultation.start_time.in_time_zone.to_date.iso8601, anchor: "event-#{consultation.id}"),
                         class: "rc-text-link" %>
