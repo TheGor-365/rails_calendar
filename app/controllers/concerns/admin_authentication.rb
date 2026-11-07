@@ -62,6 +62,23 @@ module AdminAuthentication
     )
   end
 
+  # The development/test demo may use fictional public consultations.
+  # In production, existing consultation details are private by default.
+  # Explicit opt-in to public demo visibility is intended ONLY for synthetic
+  # records that the owner has approved for public display.
+  def calendar_public_read_enabled?
+    flag = ENV["RAILS_CALENDAR_PUBLIC_DEMO_MODE"]
+    return flag == "true" unless flag.nil?
+
+    !Rails.env.production?
+  end
+
+  def require_calendar_read_access!
+    return if admin_signed_in? || calendar_public_read_enabled?
+
+    redirect_to admin_login_path, alert: "Administrator sign-in required to view calendar"
+  end
+
   def require_admin!
     return if admin_signed_in?
 
