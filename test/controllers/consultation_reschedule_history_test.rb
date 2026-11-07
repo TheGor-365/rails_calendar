@@ -56,7 +56,7 @@ class ConsultationRescheduleHistoryTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_select "#consultation-form-errors", text: /Reason for rescheduling is required/
+    assert_select "#consultation-form-errors", text: /Reschedule reason is required/
     assert_select "#consultation_reschedule_reason", count: 1
     assert_equal old_start, @consultation.reload.start_time
     assert_equal old_end, @consultation.end_time
