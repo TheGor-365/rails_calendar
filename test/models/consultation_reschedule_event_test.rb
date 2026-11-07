@@ -15,10 +15,10 @@ class ConsultationRescheduleEventTest < ActiveSupport::TestCase
     )
 
     assert_predicate entry, :readonly?
-    assert_raises(ActiveRecord::ReadOnlyError) do
+    assert_raises(ActiveRecord::ReadOnlyRecord) do
       entry.update!(reason: "Tampered")
     end
-    assert_raises(ActiveRecord::ReadOnlyError) { entry.destroy! }
+    assert_raises(ActiveRecord::ReadOnlyRecord) { entry.destroy! }
     assert_equal "Approved schedule adjustment", ConsultationRescheduleEvent.find(entry.id).reason
   end
 
