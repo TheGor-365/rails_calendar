@@ -5,8 +5,10 @@ class AdminLoginWindow < ApplicationRecord
   MAX_ATTEMPTS = 5
   RETENTION_SECONDS = 2.days.to_i
 
-  def self.throttled?(remote_ip:, now: Time.current)
-    epoch = (now.to_i / WINDOW_SECONDS) * WINDOW_SECONDS
+  def self.throttled?(remote_ip:, now: nil)
+    # Production uses PostgreSQL's clock so multiple app nodes cannot split
+    # a minute bucket because their individual OS clocks drift.
+    epoch = (now.to_i / WINDOW_SECONDS) * WINDOW_SECONDS if now
     digest = OpenSSL::HMAC.hexdigest(
       "SHA256", Rails.application.secret_key_base, "rails-calendar-admin-login:\#{remote_ip}"
     )
@@ -14,7 +16,8 @@ class AdminLoginWindow < ApplicationRecord
     sql = <<~SQL
       INSERT INTO admin_login_windows
         (client_digest, window_start_epoch, attempts, created_at, updated_at)
-      VALUES ($1, $2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      VALUES ($1, COALESCE($2, (floor(extract(epoch FROM clock_timestamp()) / 60)::bigint * 60)),
+              1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       ON CONFLICT (client_digest, window_start_epoch)
       DO UPDATE SET
         attempts = admin_login_windows.attempts + 1,
