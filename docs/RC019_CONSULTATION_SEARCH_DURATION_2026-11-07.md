@@ -1,7 +1,7 @@
 # RC-019 — Consultation search, UTC filters, pagination and truthful duration
 
 **Date:** 2026-11-07  
-**Status:** P1 Draft implementation; CI/Security and owner browser acceptance pending  
+**Status:** CI + Security SUCCESS on code SHA `01e37461439af8725db2d853d0fa21d5dc2fb3d7` (82 Rails tests / 567 assertions + 17 Chrome tests / 210 assertions = 99 tests / 777 assertions, 0 failures/errors/skips). Owner local browser acceptance pending.  
 **Parent:** [RC-018 shared login throttle](https://github.com/TheGor-365/rails_calendar/pull/19)
 
 ## Owner-confirmed baseline
@@ -26,9 +26,9 @@
 
 ## Acceptance
 
-- [ ] Rails CI and Security SUCCESS on exact final SHA.
-- [ ] Integration tests: date boundaries, case-insensitive and literal wildcard title matching, lifecycle status, malformed input, pagination, private read control.
-- [ ] Chrome system tests: filter operation and deep links at 320/390/430 px, no horizontal overflow, dock unchanged, exact show duration.
+- [x] [CI #42378372827](https://github.com/TheGor-365/rails_calendar/actions/runs/42378372827) and [Security #42378372681](https://github.com/TheGor-365/rails_calendar/actions/runs/42378372681) SUCCESS on code SHA `01e3746`. Latest documentation commit will re-trigger verification.
+- [x] Integration tests pass: date boundaries, literal wildcard title matching, lifecycle status, malformed input, pagination, private read control.
+- [x] Chrome system tests pass: filters/deep links at 320/390/430 px, no horizontal overflow, dock unchanged, exact show duration.
 - [ ] Local owner: #4 detail duration **1 h 40 min**, filter `q=Third` shows #4, filter `from=2026-11-13&to=2026-11-13` shows #4, Clear returns #3 and #4, mobile dock fixed.
 - [ ] Do not confirm any deletion; record-specific prompt still awaits manual Cancel QA.
 
