@@ -161,6 +161,41 @@ class ConsultationsTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
+  test "mobile reschedule link and overlap advisory stay accessible on narrow screens" do
+    collision = Consultation.create!(
+      title: "Mobile overlap inspection",
+      start_time: Time.zone.local(2023, 1, 19, 23, 0),
+      end_time: Time.zone.local(2023, 1, 19, 23, 30)
+    )
+
+    sign_in_as_admin
+
+    [320, 390, 430].each do |width|
+      page.driver.browser.manage.window.resize_to(width, 932)
+      visit consultations_url
+      assert_selector "nav.rc-mobile-dock", visible: true
+      find("a[aria-label='Reschedule #{@consultation.title}']").click
+      assert_current_path edit_consultation_path(@consultation)
+      assert_selector "input#consultation_start_time", visible: true
+      assert_selector ".rc-overlap-notice a[href='#{consultation_path(collision)}']", visible: true
+
+      dimensions = page.evaluate_script(<<~JS)
+        (() => ({
+          page: document.documentElement.scrollWidth,
+          viewport: window.innerWidth,
+          noticeRight: document.querySelector(".rc-overlap-notice").getBoundingClientRect().right,
+          dockBottom: document.querySelector(".rc-mobile-dock").getBoundingClientRect().bottom,
+          viewportHeight: window.innerHeight
+        }))()
+      JS
+      assert_operator dimensions["page"], :<=, dimensions["viewport"] + 1
+      assert_operator dimensions["noticeRight"], :<=, dimensions["viewport"] + 1
+      assert_in_delta dimensions["viewportHeight"], dimensions["dockBottom"], 1
+    end
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
   test "desktop hides the mobile bottom dock" do
     page.driver.browser.manage.window.resize_to(1280, 900)
     visit consultation_url(@consultation)
