@@ -196,6 +196,51 @@ class ConsultationsTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
+  test "mobile reschedule reason and admin-only history fit 320 390 and 430 pixels" do
+    record = consultations(:two)
+    ConsultationRescheduleEvent.create!(
+      consultation_id: record.id,
+      old_start_time: record.start_time,
+      old_end_time: record.end_time,
+      new_start_time: record.start_time + 5.minutes,
+      new_end_time: record.end_time + 5.minutes,
+      actor_label: "administrator",
+      reason: "Mobile audit visibility regression",
+      created_at: Time.current
+    )
+    sign_in_as_admin
+
+    [320, 390, 430].each do |width|
+      page.driver.browser.manage.window.resize_to(width, 932)
+
+      visit edit_consultation_url(record)
+      assert_selector "#consultation_reschedule_reason", visible: true
+      assert_text "Reason for time change"
+      assert_selector "nav.rc-mobile-dock", visible: true
+
+      visit consultation_url(record)
+      assert_selector "#reschedule-history-title", text: "Reschedule history"
+      assert_text "Mobile audit visibility regression"
+      assert_selector "nav.rc-mobile-dock", visible: true
+
+      layout = page.evaluate_script(<<~JS)
+        (() => {
+          const dock = document.querySelector("nav.rc-mobile-dock").getBoundingClientRect();
+          return {
+            scrollWidth: document.documentElement.scrollWidth,
+            innerWidth: window.innerWidth,
+            dockBottom: dock.bottom,
+            windowHeight: window.innerHeight
+          };
+        })()
+      JS
+      assert_operator layout["scrollWidth"], :<=, layout["innerWidth"] + 1
+      assert_in_delta layout["windowHeight"], layout["dockBottom"], 1
+    end
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
   test "desktop hides the mobile bottom dock" do
     page.driver.browser.manage.window.resize_to(1280, 900)
     visit consultation_url(@consultation)
