@@ -1,7 +1,7 @@
 # RC-021 — P0 admin HTTP access, delete Cancel and recovery drill
 
 **Date:** 2026-11-07  
-**Status:** Draft security gate. Existing data untouched; CI and local owner QA pending.  
+**Status:** Draft security gate; [Rails CI #42386758850](https://github.com/TheGor-365/rails_calendar/actions/runs/42386758850) and [Security #42386758844](https://github.com/TheGor-365/rails_calendar/actions/runs/42386758844) SUCCESS on code SHA `cf6791021327cd1e00f152c739a10d53d4b3c534`: 94 server tests/636 assertions + 19 Chrome tests/245 assertions = **113 tests / 881 assertions**, 0 failures/errors/skips. Isolated test checks pass; actual staging/manual gates remain open.  
 **Stacked on:** [RC-020 #21](https://github.com/TheGor-365/rails_calendar/pull/21).
 
 ## Evidence, not assumptions
@@ -44,7 +44,7 @@ Until the business has confirmed whether a consultation is an exclusive single-p
 
 ## Next actions
 
-1. Await final SHA CI+Security on this Draft. Keep it unmerged and undeployed.
+1. **CI/Security PASS** on code SHA `cf67910` (113 tests/881 assertions). Recheck final SHA after documentation-only checkpoint commits; keep Draft unmerged/undeployed.
 2. Do **not** click Destroy on existing local records #3/#4 for manual QA. The isolated Chrome test verifies Cancel safely on a fixture; any supplementary human Cancel check must use an explicitly approved disposable staging record. The live Puma HTTP limiter may be checked on localhost without sharing credentials.
 3. Authorize a separate staging restore rehearsal and decide booking/capacity + audit scope before stateful P1 changes or any release.
 
