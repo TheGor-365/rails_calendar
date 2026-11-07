@@ -1,5 +1,4 @@
 require "test_helper"
-require "minitest/mock"
 
 # These assertions exercise the real HTTP route and session cookies rather
 # than calling the rate-limit model directly. All records are test fixtures.
@@ -47,14 +46,21 @@ class AdminSecurityHttpGateTest < ActionDispatch::IntegrationTest
   end
 
   test "database outage fails closed with HTTP 503 and no session" do
-    AdminLoginWindow.stub(:throttled?, ->(remote_ip:) {
-      raise ActiveRecord::ConnectionNotEstablished, "test-only simulated outage"
-    }) do
+    # Minitest 6 no longer ships minitest/mock; replace the singleton method
+    # temporarily and restore it in ensure, without extra gems or DB outages.
+    original_method = AdminLoginWindow.method(:throttled?)
+    begin
+      AdminLoginWindow.define_singleton_method(:throttled?) do |remote_ip:|
+        raise ActiveRecord::ConnectionNotEstablished, "test-only simulated outage"
+      end
+
       post admin_session_url, params: {
         username: ENV.fetch("RAILS_CALENDAR_ADMIN_USERNAME"),
         password: ENV.fetch("RAILS_CALENDAR_ADMIN_PASSWORD")
       }
       assert_response :service_unavailable
+    ensure
+      AdminLoginWindow.define_singleton_method(:throttled?, original_method)
     end
 
     get edit_consultation_url(consultations(:one))
