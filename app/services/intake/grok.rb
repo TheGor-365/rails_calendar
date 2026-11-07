@@ -57,7 +57,9 @@ module Intake
     end
 
     def interview_question
-      fallback = QUESTIONS.fetch([@intake.client_message_count - 1, 0].max, QUESTIONS.last)
+      # The initial prompt already asks about audience and desired visitor action.
+      # After the first answer, move to the next topic, not the audience again.
+      fallback = QUESTIONS.fetch(@intake.client_message_count, QUESTIONS.last)
       return [fallback, "template"] unless api_enabled?
 
       input = conversation_text

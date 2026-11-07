@@ -58,6 +58,8 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
          params: { answer: "The goal is a sample menu and online quote request without payments." }
     assert_redirected_to project_intake_url(intake)
     assert_equal %w[assistant client assistant], intake.intake_messages.order(:id).pluck(:role)
+    assert_equal Intake::Grok::QUESTIONS[1], intake.intake_messages.order(:id).last.body,
+                 "the first reply must advance from audience to pages, not repeat the opening question"
     assert_equal 0, IntakeAiQuota.count, "default demo must never spend AI tokens"
 
     post draft_spec_admin_project_intake_url(intake)
@@ -81,6 +83,37 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to project_intake_url(intake)
     assert spec.reload.client_reviewed_at.present?
     assert_equal "client_reviewed", intake.reload.status
+  end
+
+  test "offline interview advances through unique topics and stops at the answer limit" do
+    sign_in
+    create_demo_intake
+    intake = ProjectIntake.last
+
+    ProjectIntake::MAX_CLIENT_MESSAGES.times do |i|
+      post reply_project_intake_url(intake), params: {
+        answer: "Fictional interview response number #{i + 1}"
+      }
+      assert_redirected_to project_intake_url(intake)
+      expected = if i + 1 == ProjectIntake::MAX_CLIENT_MESSAGES
+        "Interview complete. An administrator can now generate and review the proposed specification."
+      else
+        Intake::Grok::QUESTIONS[i + 1]
+      end
+      assert_equal expected, intake.intake_messages.order(:id).last.body
+    end
+
+    assert_equal ProjectIntake::MAX_CLIENT_MESSAGES, intake.client_message_count
+    assert_equal 0, IntakeAiQuota.count
+    get project_intake_url(intake)
+    assert_response :success
+    assert_select "form[action=?]", reply_project_intake_path(intake), count: 0
+
+    count = intake.intake_messages.count
+    post reply_project_intake_url(intake), params: { answer: "Unwanted ninth answer" }
+    assert_redirected_to project_intake_url(intake)
+    assert_equal count, intake.intake_messages.count
+    assert_equal 0, IntakeAiQuota.count
   end
 
   test "a guest cannot open another browser session's client project" do
