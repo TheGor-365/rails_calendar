@@ -61,7 +61,8 @@ class ConsultationOverlapFlowTest < ActionDispatch::IntegrationTest
     new_end = new_start + 30.minutes
 
     patch consultation_url(candidate), params: {
-      consultation: { start_time: new_start.strftime("%Y-%m-%dT%H:%M"),
+      consultation: { lock_version: candidate.lock_version,
+                      start_time: new_start.strftime("%Y-%m-%dT%H:%M"),
                       end_time: new_end.strftime("%Y-%m-%dT%H:%M"),
                       reschedule_reason: "Approved overlapping consultation QA" }
     }
