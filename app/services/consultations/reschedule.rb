@@ -31,16 +31,18 @@ module Consultations
           @consultation.will_save_change_to_start_time? ||
           @consultation.will_save_change_to_end_time?
 
+        # Surface *all* actual model validation errors even when a time-change
+        # reason is missing. Otherwise year/time errors are obscured by a
+        # single reason error and the edit form gives misleading feedback.
+        @consultation.valid?
+
         if schedule_changed && @reason.blank?
           @consultation.errors.add(:reschedule_reason, "is required when changing the schedule")
-          next false
-        end
-
-        if schedule_changed && @reason.length > MAX_REASON_LENGTH
+        elsif schedule_changed && @reason.length > MAX_REASON_LENGTH
           @consultation.errors.add(:reschedule_reason, "is too long (maximum #{MAX_REASON_LENGTH} characters)")
-          next false
         end
 
+        next false if @consultation.errors.any?
         next false unless @consultation.save
 
         if schedule_changed
