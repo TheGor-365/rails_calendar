@@ -1,6 +1,6 @@
 # Rails Calendar → AI Service Operating System — development roadmap
 
-**Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-016 UTC/access regression and owner-resolved demo #2 disposition. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
+**Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-017 private-calendar release gate, owner screenshot QA of minute-only #4. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
 
 **Product contract:** evolve the existing Rails Calendar, do not rewrite it. The calendar becomes the visible scheduling layer of an AI-assisted service-delivery system for the owner's actual Ruby on Rails freelance work. Initial vertical: Rails debugging, CRUD/forms, API/PostgreSQL, tests and small integrations. Later professions require versioned playbooks, not cloned apps. The system must not invent paid engagements, commitments or approvals.
 
@@ -31,8 +31,9 @@
 | RC-012 / PR #12 | Seven visible mobile columns, month event list and mobile feature parity | CI+Security success; user screenshots at 430px show working day/event navigation |
 | RC-013 / PR #13 | Restrained icon-labeled controls and touch/focus styling across existing screens | CI+Security SUCCESS; owner mobile detail screenshot shows icons |
 | RC-014 / PR #14 | Persistent five-tab dock and single-row detail actions | **Local visual PASS** on mobile after RC-014b; authenticated New screen confirmed; CI/Security green |
-| RC-015 / PR #16 | Minute-only input/validation, unchanged legacy timestamp retention, record-specific delete confirmation | CI+Security SUCCESS; owner read-only DB check confirms #2 absent / #3 present, **owner waived restoration**. Manual HH:MM and confirmation QA pending; [safety note](RC015_MINUTE_PRECISION_DELETE_SAFETY_2026-11-07.md) |
-| RC-016 / next Draft | Explicit UTC storage/display baseline, midnight/DST regressions and expired/logged-out ACL | In code review; [ADR-001](ADR001_UTC_TIMEZONE_CONTRACT_2026-11-07.md); regional client timezone UX pending owner decision |
+| RC-015 / PR #16 | Minute-only input/validation, unchanged legacy timestamp retention, record-specific delete confirmation | CI+Security SUCCESS; owner screenshots show **minute-only form, successful #4 creation, index and anchored day card**. Record-specific delete confirmation still needs manual QA; [safety note](RC015_MINUTE_PRECISION_DELETE_SAFETY_2026-11-07.md) |
+| RC-016 / PR #17 | Explicit UTC storage/display baseline, midnight/DST regressions and expired/logged-out ACL | CI+Security SUCCESS: 76 tests/601 assertions. [ADR-001](ADR001_UTC_TIMEZONE_CONTRACT_2026-11-07.md); regional client timezone UX pending decision |
+| RC-017 / next Draft | Private-by-default production calendar read mode, explicit demo-only public opt-in | Code/tests in review; see [RC-017 privacy gate](RC017_PRIVATE_CALENDAR_RELEASE_GATE_2026-11-07.md). No production data touched |
 
 All these PRs are Draft and stacked; `main` and production have not been changed by this program. #4 is a superseded duplicate (DO NOT MERGE).
 
@@ -50,11 +51,11 @@ All these PRs are Draft and stacked; `main` and production have not been changed
 - **Manual P0 confirmed:** admin sign-in, public month/day display, admin create #3, updated #3, record index and calendar deep links.
 - **Disposition:** the original **#2** was deleted by mistake rather than temporary **#3**. Read-only Rails runner confirmed only #3 remains; owner explicitly confirmed #2 was an unneeded demonstration and **chose not to restore it**. This closes the recovery decision, not the underlying user-error risk. Do not delete #3 without further explicit authorization.
 - RC-015 changes the minute-only HTML fields (`step=60`, explicit value to HH:MM), server precision validation and preservation of legacy seconds for unchanged times; improves the confirmation with the exact title, ID and date/time. Reversible deletion/audit is a future schema decision, not implemented here.
-- **Exit:** local recovery decision resolved; RC-015 CI/Security green; manual HH:MM/delete-confirmation UI checks still required. No merge/Railway before those gates.
+- **Exit:** local recovery decision resolved; RC-015 CI/Security green; owner demonstrated HH:MM + new #4 consultation, calendar/index navigation. Deletion confirmation still needs manual UI check. No merge/Railway before those gates.
 
-### A2. Admin/security & data review
+### A2. Admin/security & data review (RC-017 READ GATE IN PROGRESS)
 - Test admin login/logout, wrong password, session expiry and explicit denial of POST/PATCH/DELETE to anonymous users; preserve real records.
-- Confirm current consultation is demo data only. Assess auth cookie/CSRF, redaction, rate limiter, HTTPS/proxy, secret manager, auditability and environment isolation.
+- RC-017 makes production read routes private unless explicit synthetic-only public demo opt-in. **Important**: all records become readable when demo mode is on; no row-level/client privacy yet. Assess auth cookie/CSRF, redaction, per-process rate limiter, HTTPS/proxy, secret manager, auditability, and environment isolation.
 - Confirm duration and boundary behavior for midnight, empty days, simultaneous bookings and invalid input. Define cancellation/no-show/reschedule policies before adding states.
 
 **Exit:** documented access matrix, negative tests and manual admin CRUD success.
@@ -121,4 +122,4 @@ Prepare ADRs and additive schema migrations, not a replacement application. Prop
 
 `readback current SHA + sources → define one user-visible acceptance outcome → write failing regression test where appropriate → smallest implementation → CI + Security on same final SHA → manual mobile and desktop QA → checkpoint with evidence`.
 
-**Next 1–3 actions:** (1) RC-016 final SHA CI/Security and review of UTC boundary, admin logout/expiry tests. (2) Locally switch safely to latest stacked RC-016 after confirming no tracked changes, verify HH:MM and identified Delete prompt **without confirming any deletion**; leave #3 intact. (3) Decide whether the next phase should expose secondary Armenia time or keep UTC-only MVP; then review shared login rate limiting/public read privacy before Railway staging. No merge/deploy without explicit owner gate.
+**Next 1–3 actions:** (1) Verify RC-017 CI/Security on exact head SHA and safely switch to it on Linux Mint without touching existing app data or other ports. (2) Local browser QA: HH:MM form and record-specific delete confirmation **Cancel** (do not delete #3/#4); optionally verify anonymous calendar is denied when running with `RAILS_CALENDAR_PUBLIC_DEMO_MODE=false`. (3) Review production read policy, shared rate limiter, secure storage and staged smoke plan. No merge/deploy or paid resources without approval.
