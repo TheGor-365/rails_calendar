@@ -19,6 +19,43 @@
       <%= render "overlap_advisory", overlaps: @overlaps, more: @overlaps_more, mode: :details %>
     <% end %>
 
+    <% if admin_signed_in? %>
+      <section class="surface-panel mt-3" aria-labelledby="reschedule-history-title">
+        <h2 id="reschedule-history-title" class="h5 mb-2">
+          <i class="bi bi-clock-history" aria-hidden="true"></i>
+          Reschedule history
+        </h2>
+        <% if @reschedule_events.any? %>
+          <p class="rc-hint mb-3">Most recent 20 recorded time changes. Original times and reason are retained.</p>
+          <ol class="rc-reschedule-history">
+            <% @reschedule_events.each do |entry| %>
+              <li>
+                <div class="rc-reschedule-heading">
+                  <strong><%= entry.created_at.in_time_zone.strftime("%d %b %Y, %H:%M UTC") %></strong>
+                  <span><%= entry.actor_label %></span>
+                </div>
+                <p class="mb-1">
+                  <strong>From:</strong>
+                  <%= entry.old_start_time.in_time_zone.strftime("%d %b %Y, %H:%M") %>
+                  –
+                  <%= entry.old_end_time.in_time_zone.strftime("%d %b %Y, %H:%M UTC") %>
+                </p>
+                <p class="mb-1">
+                  <strong>To:</strong>
+                  <%= entry.new_start_time.in_time_zone.strftime("%d %b %Y, %H:%M") %>
+                  –
+                  <%= entry.new_end_time.in_time_zone.strftime("%d %b %Y, %H:%M UTC") %>
+                </p>
+                <p class="mb-0"><strong>Reason:</strong> <%= entry.reason %></p>
+              </li>
+            <% end %>
+          </ol>
+        <% else %>
+          <p class="rc-muted mb-0">No reschedules recorded for this consultation.</p>
+        <% end %>
+      </section>
+    <% end %>
+
     <% final_date = (@consultation.end_time - 1.second).in_time_zone.to_date %>
     <% spans_multiple_days = final_date > @consultation.start_time.in_time_zone.to_date %>
 

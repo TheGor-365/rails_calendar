@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_123000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_193000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_123000) do
     t.datetime "updated_at", null: false
     t.index ["client_digest", "window_start_epoch"], name: "idx_admin_login_windows_identity_and_window", unique: true
     t.index ["window_start_epoch"], name: "idx_admin_login_windows_cleanup"
+  end
+
+  create_table "consultation_reschedule_events", force: :cascade do |t|
+    t.bigint "consultation_id", null: false
+    t.datetime "old_start_time", null: false
+    t.datetime "old_end_time", null: false
+    t.datetime "new_start_time", null: false
+    t.datetime "new_end_time", null: false
+    t.string "actor_label", limit: 80, null: false
+    t.text "reason", null: false
+    t.datetime "created_at", null: false
+    t.index ["consultation_id", "created_at", "id"], name: "idx_reschedule_history_by_consultation_and_time"
   end
 
   create_table "consultations", force: :cascade do |t|
