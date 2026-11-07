@@ -63,6 +63,24 @@
     </div>
   </div>
 
+  <% if consultation.persisted? %>
+    <div class="rc-field">
+      <%= form.label :reschedule_reason, "Reason for time change", class: "rc-field-label" %>
+      <%= form.text_area :reschedule_reason, rows: 2, maxlength: 500,
+                        placeholder: "For example: client requested a later time",
+                        class: "rc-input rc-input--area#{' rc-input--invalid' if consultation.errors.include?(:reschedule_reason)}",
+                        aria: { describedby: "reschedule-reason-help",
+                                invalid: consultation.errors.include?(:reschedule_reason) } %>
+      <p id="reschedule-reason-help" class="rc-hint mt-2">
+        Required only if the start or end time changes. A successful move is recorded in the administrator-only history.
+        Title/description edits do not need a reason.
+      </p>
+      <% if consultation.errors.include?(:reschedule_reason) %>
+        <p class="rc-field-error"><%= consultation.errors.full_messages_for(:reschedule_reason).join(", ") %></p>
+      <% end %>
+    </div>
+  <% end %>
+
   <p class="rc-hint mb-3">Overlapping bookings are currently allowed. Any detected overlaps are advisory and must be reviewed after saving.</p>
   <%= render "overlap_advisory", overlaps: @overlaps, more: @overlaps_more, mode: :form %>
 
