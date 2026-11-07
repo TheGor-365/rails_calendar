@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Read-only verification of a private Rails Calendar backup against a proposed
+# *absent* staging database. This script NEVER creates/restores/migrates a DB.
+set -euo pipefail
+
+fail() { printf 'PREFLIGHT BLOCKED: %s\n' "$1" >&2; exit 2; }
+[[ $# -eq 0 ]] || fail 'Unexpected arguments; configure RC_* environment variables.'
+[[ "${RAILS_ENV:-}" != production && "${RACK_ENV:-}" != production ]] || fail 'Production application environment is forbidden.'
+[[ -z "${DATABASE_URL:-}" ]] || fail 'Unset DATABASE_URL first; no application DB connection may be inherited.'
+
+: "${RC_RESTORE_ARCHIVE:=}"
+: "${RC_EXPECTED_SHA256:=}"
+: "${RC_STAGING_DB:=}"
+: "${RC_STAGING_PGHOST:=}"
+: "${RC_STAGING_PGPORT:=}"
+: "${RC_STAGING_PGUSER:=}"
+
+[[ "$RC_STAGING_DB" =~ ^rc_restore_[a-z0-9_]{6,48}$ ]] || fail 'Target DB must have a unique rc_restore_ name (6-48 safe suffix characters).'
+[[ "$RC_STAGING_PGHOST" =~ ^[A-Za-z0-9_.:-]+$ ]] || fail 'Explicit staging PostgreSQL host is required (no socket or blank hostname).'
+[[ "$RC_STAGING_PGPORT" =~ ^[0-9]{1,5}$ ]] && (( 10#$RC_STAGING_PGPORT > 0 && 10#$RC_STAGING_PGPORT <= 65535 )) || fail 'Explicit valid staging PostgreSQL port is required.'
+[[ "$RC_STAGING_PGUSER" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || fail 'Explicit staging PostgreSQL username is required.'
+[[ "$RC_RESTORE_ARCHIVE" = /* && -f "$RC_RESTORE_ARCHIVE" && ! -L "$RC_RESTORE_ARCHIVE" && -r "$RC_RESTORE_ARCHIVE" ]] || fail 'Private archive must be an existing, readable, non-symlink absolute regular file.'
+[[ "$(stat -c '%a' -- "$RC_RESTORE_ARCHIVE")" = 600 ]] || fail 'Private archive permissions must be exactly 0600.'
+[[ "$RC_EXPECTED_SHA256" =~ ^[0-9a-fA-F]{64}$ ]] || fail 'Supply a separately recorded, 64-character expected SHA256 checksum.'
+[[ "$(head -c 5 -- "$RC_RESTORE_ARCHIVE")" = PGDMP ]] || fail 'Archive is not a PostgreSQL custom-format PGDMP file.'
+
+actual_sha="$(sha256sum -- "$RC_RESTORE_ARCHIVE")"
+actual_sha="${actual_sha%% *}"
+[[ "${actual_sha,,}" = "${RC_EXPECTED_SHA256,,}" ]] || fail 'Archive SHA256 differs from the expected recorded checksum.'
+
+restore_bin="${RC_PG_RESTORE_BIN:-/usr/lib/postgresql/18/bin/pg_restore}"
+psql_bin="${RC_PSQL_BIN:-psql}"
+[[ -x "$restore_bin" ]] || fail 'pg_restore executable not found; expected PostgreSQL 18.'
+restore_version="$($restore_bin --version 2>/dev/null)" || fail 'Cannot execute pg_restore --version.'
+[[ "$restore_version" =~ PostgreSQL\)\ 18\. ]] || fail 'This custom archive requires PostgreSQL 18 pg_restore.'
+"$restore_bin" --list "$RC_RESTORE_ARCHIVE" >/dev/null || fail 'pg_restore cannot read archive TOC.'
+"$restore_bin" --file=/dev/null "$RC_RESTORE_ARCHIVE" >/dev/null || fail 'pg_restore failed to parse archive data (no DB was targeted).'
+
+# No database mutations. psql -w prevents interactive password prompts;
+# PGOPTIONS enforces read-only transactions. A separate, approved credential
+# file / libpq passfile may be used; do not put passwords into commands/logs.
+if [[ "$psql_bin" != */* ]]; then
+  command -v "$psql_bin" >/dev/null 2>&1 || fail 'psql not installed.'
+else
+  [[ -x "$psql_bin" ]] || fail 'psql executable not found.'
+fi
+
+query_output="$(
+  PGOPTIONS='-c default_transaction_read_only=on' \
+  "$psql_bin" -X -w -q -A -t -v ON_ERROR_STOP=1 -v "target=$RC_STAGING_DB" \
+    -h "$RC_STAGING_PGHOST" -p "$RC_STAGING_PGPORT" \
+    -U "$RC_STAGING_PGUSER" -d postgres <<'SQL'
+SELECT CASE WHEN EXISTS (
+  SELECT 1 FROM pg_database WHERE datname = :'target'
+) THEN 'EXISTS' ELSE 'ABSENT' END;
+SQL
+)" || fail 'Could not query proposed staging endpoint read-only (target remains untouched).'
+
+[[ "$query_output" = ABSENT ]] || fail 'Target database already exists, or cannot prove it is absent. No restore is permitted.'
+printf '%s\n' 'PREFLIGHT PASS: archive format, checksum and parsing verified; proposed target DB is absent.'
+printf '%s\n' 'NO RESTORE EXECUTED. Confirm staging host isolation, approvals, backup and rollback plan separately.'
