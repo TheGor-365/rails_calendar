@@ -43,6 +43,16 @@ class ProjectIntakesController < ApplicationController
       return render :show, status: :unprocessable_entity
     end
 
+    # At the eighth answer, finish the interview. Do not ask a ninth
+    # question or spend on a Grok request the user cannot answer.
+    if @intake.client_message_count >= ProjectIntake::MAX_CLIENT_MESSAGES
+      @intake.intake_messages.create!(
+        role: "assistant",
+        body: "Interview complete. An administrator can now generate and review the proposed specification."
+      )
+      return redirect_to project_intake_path(@intake), notice: "Demo interview complete"
+    end
+
     # All API calls require explicitly configured server-side credentials.
     # Public demo is disabled by default; global AI daily quota is database-backed.
     answer, source = Intake::Grok.new(@intake).interview_question
