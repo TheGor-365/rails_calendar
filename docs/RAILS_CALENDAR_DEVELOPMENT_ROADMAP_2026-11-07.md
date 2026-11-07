@@ -2,6 +2,8 @@
 
 **Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-020 desktop Reschedule navigation accepted; RC-021 CI/Security PASS; RC-022 Draft admin-only reschedule history and ADR-002 capacity policy proposal. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
 
+**Current successor master:** [RAILS_CALENDAR_SUCCESSOR_MASTER_HANDOFF_2026-11-07.md](RAILS_CALENDAR_SUCCESSOR_MASTER_HANDOFF_2026-11-07.md) — comprehensive RC-001–022 handoff, exact PR/CI evidence, safety constraints and next execution sequence. Supersedes historical 05/06 November masters as an entry point; preserve RC/ADR documents as evidence.
+
 **Product contract:** evolve the existing Rails Calendar, do not rewrite it. The calendar becomes the visible scheduling layer of an AI-assisted service-delivery system for the owner's actual Ruby on Rails freelance work. Initial vertical: Rails debugging, CRUD/forms, API/PostgreSQL, tests and small integrations. Later professions require versioned playbooks, not cloned apps. The system must not invent paid engagements, commitments or approvals.
 
 ## Permanent engineering principles
