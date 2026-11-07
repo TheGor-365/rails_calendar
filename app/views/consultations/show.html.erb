@@ -9,7 +9,7 @@
       <%= render @consultation %>
       <div class="rc-detail-meta">
         <strong>Duration:</strong>
-        <%= distance_of_time_in_words(@consultation.start_time, @consultation.end_time) %>
+        <%= rc_consultation_duration(@consultation.start_time, @consultation.end_time) %>
         <span aria-hidden="true">·</span>
         <%= @consultation.end_time <= Time.current ? "Past" : (@consultation.start_time <= Time.current ? "In progress by scheduled time" : "Upcoming") %>
       </div>

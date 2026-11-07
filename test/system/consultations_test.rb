@@ -181,6 +181,55 @@ class ConsultationsTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
+  test "mobile search form and filtered deep links remain fully reachable" do
+    [320, 390, 430].each do |viewport_width|
+      page.driver.browser.manage.window.resize_to(viewport_width, 932)
+      visit consultations_url
+
+      assert_selector "form.rc-consultation-filters[role='search']", visible: true
+      assert_selector "nav.rc-mobile-dock", visible: true
+
+      fill_in "Title contains", with: "MyString"
+      click_on "Apply filters"
+
+      assert_selector "li#consultation_#{@consultation.id}", visible: true
+      assert_selector "li.rc-record", count: 1
+      assert_link "View in calendar"
+      assert_link "Clear"
+
+      layout = page.evaluate_script(<<~JS)
+        (() => ({
+          docWidth: document.documentElement.scrollWidth,
+          viewportWidth: window.innerWidth,
+          searchWidth: document.querySelector(".rc-consultation-filters").getBoundingClientRect().width,
+          searchRight: document.querySelector(".rc-consultation-filters").getBoundingClientRect().right,
+          dockBottom: document.querySelector(".rc-mobile-dock").getBoundingClientRect().bottom,
+          viewportHeight: window.innerHeight
+        }))()
+      JS
+      assert_operator layout["docWidth"], :<=, layout["viewportWidth"] + 1
+      assert_operator layout["searchRight"], :<=, layout["viewportWidth"] + 1
+      assert_in_delta layout["viewportHeight"], layout["dockBottom"], 1
+
+      click_on "View in calendar"
+      assert_current_path calendar_day_path(date: "2023-01-19")
+    end
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  test "consultation detail shows exact scheduled duration in hours and minutes" do
+    start = Time.zone.local(2026, 11, 13, 11)
+    event = Consultation.create!(
+      title: "Duration sample",
+      start_time: start,
+      end_time: start + 100.minutes
+    )
+    visit consultation_url(event)
+    assert_selector ".rc-detail-meta", text: /Duration: 1 h 40 min/
+    assert_no_text "about 2 hours"
+  end
+
   test "anonymous visitors can browse without editing controls" do
     visit consultations_url
     assert_selector "h1", text: "Consultations"

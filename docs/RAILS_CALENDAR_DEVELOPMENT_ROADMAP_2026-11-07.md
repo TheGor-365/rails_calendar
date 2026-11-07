@@ -1,6 +1,6 @@
 # Rails Calendar → AI Service Operating System — development roadmap
 
-**Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-018 shared PostgreSQL login throttle after owner manual RC-017 private-mode PASS. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
+**Checkpoint:** 2026-11-07 (Asia/Yerevan), RC-019 P1 search/duration code after owner local RC-018 migration and model throttle PASS. **Source of truth:** [repo](https://github.com/TheGor-365/rails_calendar), [RC-012 PR](https://github.com/TheGor-365/rails_calendar/pull/12), [Notion owner vision](https://app.notion.com/p/4102cdc8e76581a7b83fd889ea0846bd), [RC-011 checkpoint](https://app.notion.com/p/4102cdc8e76581eaa500d6aab39996a6).
 
 **Product contract:** evolve the existing Rails Calendar, do not rewrite it. The calendar becomes the visible scheduling layer of an AI-assisted service-delivery system for the owner's actual Ruby on Rails freelance work. Initial vertical: Rails debugging, CRUD/forms, API/PostgreSQL, tests and small integrations. Later professions require versioned playbooks, not cloned apps. The system must not invent paid engagements, commitments or approvals.
 
@@ -34,7 +34,8 @@
 | RC-015 / PR #16 | Minute-only input/validation, unchanged legacy timestamp retention, record-specific delete confirmation | CI+Security SUCCESS; owner screenshots show **minute-only form, successful #4 creation, index and anchored day card**. Record-specific delete confirmation still needs manual QA; [safety note](RC015_MINUTE_PRECISION_DELETE_SAFETY_2026-11-07.md) |
 | RC-016 / PR #17 | Explicit UTC storage/display baseline, midnight/DST regressions and expired/logged-out ACL | CI+Security SUCCESS: 76 tests/601 assertions. [ADR-001](ADR001_UTC_TIMEZONE_CONTRACT_2026-11-07.md); regional client timezone UX pending decision |
 | RC-017 / PR #18 | Private-by-default production calendar read mode, explicit demo-only public opt-in | **CI+Security SUCCESS** (82 tests, 636 assertions); owner 07 Nov incognito screenshot confirms guest root → admin login in private mode; [privacy gate](RC017_PRIVATE_CALENDAR_RELEASE_GATE_2026-11-07.md) |
-| RC-018 / PR #19 | Shared PostgreSQL fixed-minute admin login throttle (atomic, fail-closed); additive rate-limit table | **CI+Security SUCCESS** on `39d9e44`: 86 tests/657 assertions; local/staging migration still requires backup and approval; [operational gate](RC018_SHARED_LOGIN_THROTTLE_2026-11-07.md) |
+| RC-018 / PR #19 | Shared PostgreSQL fixed-minute admin login throttle (atomic, fail-closed); additive rate-limit table | **CI+Security SUCCESS**. Owner `24bc1ca` checkout, backup read check, additive local migration, retained #3/#4 and 6-call model decision `false×5,true` **PASS**. Real HTTP 429, proxy trust and staging remain open; [gate](RC018_SHARED_LOGIN_THROTTLE_2026-11-07.md) |
+| RC-019 / PR #20 | Exact durations, safe title search, UTC date/status filters, pagination and mobile parity | CI+Security SUCCESS on `01e3746`: 99 tests / 777 assertions; manual local data QA pending. [Acceptance](RC019_CONSULTATION_SEARCH_DURATION_2026-11-07.md) |
 
 All these PRs are Draft and stacked; `main` and production have not been changed by this program. #4 is a superseded duplicate (DO NOT MERGE).
 
@@ -54,10 +55,10 @@ All these PRs are Draft and stacked; `main` and production have not been changed
 - RC-015 changes the minute-only HTML fields (`step=60`, explicit value to HH:MM), server precision validation and preservation of legacy seconds for unchanged times; improves the confirmation with the exact title, ID and date/time. Reversible deletion/audit is a future schema decision, not implemented here.
 - **Exit:** local recovery decision resolved; RC-015 CI/Security green; owner demonstrated HH:MM + new #4 consultation, calendar/index navigation. Deletion confirmation still needs manual UI check. No merge/Railway before those gates.
 
-### A2. Admin/security & data review (RC-017 READ PASS; RC-018 THROTTLE IN PROGRESS)
+### A2. Admin/security & data review (RC-017 READ PASS; RC-018 LOCAL MIGRATION + MODEL THROTTLE PASS)
 - Test admin login/logout, wrong password, session expiry and explicit denial of POST/PATCH/DELETE to anonymous users; preserve real records.
 - RC-017 makes production read routes private unless explicit synthetic-only public demo opt-in; owner screenshot shows intended guest redirect. **Important**: all records become readable when demo mode is on; no row-level/client privacy yet.
-- RC-018 replaces per-process login throttling with shared PostgreSQL atomic counters, HMAC IP pseudonyms and fail-closed DB errors. Review/additive migration on isolated staging with backup; operator-configured maintenance prune. Verify reverse-proxy trust, cookies/CSRF, secrets/HTTPS and log redaction before production.
+- RC-018 replaces per-process login throttling with shared PostgreSQL atomic counters, HMAC IP pseudonyms and fail-closed DB errors. Owner confirmed local migrated table and `false×5,true` synthetic threshold; **this does not establish HTTP 429 in an actual login browser flow**. Review migration in isolated staging with backup; schedule maintenance prune, verify reverse-proxy trust, cookies/CSRF, secrets/HTTPS and log redaction.
 - Confirm duration and boundary behavior for midnight, empty days, simultaneous bookings and invalid input. Define cancellation/no-show/reschedule policies before adding states.
 
 **Exit:** documented access matrix, negative tests and manual admin CRUD success.
@@ -77,6 +78,8 @@ All these PRs are Draft and stacked; `main` and production have not been changed
 **Exit:** one reviewed, reproducible staging candidate with clean test/security status.
 
 ## Phase B — useful consultation product (P1)
+
+**RC-019 candidate:** implementation and Chrome tests for exact duration, searchable/paginated records, date-overlap/status filters and responsive controls are complete in Draft PR #20. Do not infer end-user acceptance from CI. Next owner smoke: `/consultations/4` should read `Duration: 1 h 40 min`, `/consultations?q=Third` should show #4 only, UTC 13 Nov filter includes #4, Clear returns #3/#4, no mobile overflow. Remaining P1 scope below is not implemented yet.
 
 - Distinguish **Month overview**, **Day 24-hour timeline**, **Hour details**, **Consultation record** and **all-records index**. Keep clear navigation and actions.
 - Search/filter by date range/title, paginate large results, show upcoming and recent records, empty states, UTC/user-timezone labeling and scheduling conflicts policy.
@@ -124,4 +127,4 @@ Prepare ADRs and additive schema migrations, not a replacement application. Prop
 
 `readback current SHA + sources → define one user-visible acceptance outcome → write failing regression test where appropriate → smallest implementation → CI + Security on same final SHA → manual mobile and desktop QA → checkpoint with evidence`.
 
-**Next 1–3 actions:** (1) RC-018 CI and Security completed successfully. Before local checkout/migrate, take a verified backup of `ruby_calendar` and check current tracked file changes. (2) Review/additively migrate `admin_login_windows` in development only, restart `:3005`, verify admin sign-in and HTTP 429 after 5 attempts on disposable test session; never submit passwords to chat. (3) Review proxy-trust and per-client privacy/staging restore gates; then P1 exact duration and search/filter. No automatic Railway, production migration or merge.
+**Next 1–3 actions:** (1) Verify RC-019 final SHA CI/Security and do not change main/Railway. (2) Safely check out RC-019 on Linux Mint after closing the :3005 server; check consultation #4 exact duration `1 h 40 min`, title/date filters, Clear, and 320/430px mobile no overflow. Do not delete records. (3) Revisit P0 admin HTTP login-throttle and record-specific delete **Cancel** QA, then stage backup/restore/security review before merging. [RC-019 detailed handoff](RC019_CONSULTATION_SEARCH_DURATION_2026-11-07.md).
