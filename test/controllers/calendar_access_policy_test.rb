@@ -25,9 +25,8 @@ class CalendarAccessPolicyTest < ActionDispatch::IntegrationTest
 
   test "production defaults to private even when flag is absent" do
     ENV.delete("RAILS_CALENDAR_PUBLIC_DEMO_MODE")
-    Rails.env.stub(:production?, true) do
-      refute ApplicationController.new.send(:calendar_public_read_enabled?)
-    end
+    production = ActiveSupport::EnvironmentInquirer.new("production")
+    refute ApplicationController.new.send(:calendar_public_read_enabled?, environment: production)
   end
 
   test "private mode denies anonymous calendar and all detail read routes" do
