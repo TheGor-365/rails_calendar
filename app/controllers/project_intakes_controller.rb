@@ -52,7 +52,7 @@ class ProjectIntakesController < ApplicationController
   end
 
   def acknowledge
-    spec = @intake.latest_spec
+    spec = @intake.published_spec
     return head :conflict unless spec&.approved?
 
     spec.update!(client_reviewed_at: Time.current) if spec.client_reviewed_at.nil?
@@ -85,6 +85,6 @@ class ProjectIntakesController < ApplicationController
 
   def prepare_show
     @messages = @intake.intake_messages.order(:id).limit(20)
-    @latest_spec = @intake.latest_spec
+    @latest_spec = admin_signed_in? ? @intake.latest_spec : @intake.published_spec
   end
 end

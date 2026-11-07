@@ -23,6 +23,8 @@ Rails.application.routes.draw do
     resources :project_intakes, only: [:index] do
       member do
         post :draft_spec
+        get :edit_spec
+        patch :revise_spec
         post :approve_spec
       end
     end
