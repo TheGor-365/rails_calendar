@@ -10,7 +10,7 @@ class AdminLoginWindow < ApplicationRecord
     # a minute bucket because their individual OS clocks drift.
     epoch = (now.to_i / WINDOW_SECONDS) * WINDOW_SECONDS if now
     digest = OpenSSL::HMAC.hexdigest(
-      "SHA256", Rails.application.secret_key_base, "rails-calendar-admin-login:\#{remote_ip}"
+      "SHA256", Rails.application.secret_key_base, "rails-calendar-admin-login:#{remote_ip}"
     )
 
     sql = <<~SQL
