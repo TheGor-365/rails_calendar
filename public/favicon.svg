@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Rails Calendar">
+  <rect width="64" height="64" rx="15" fill="#152b35"/>
+  <rect x="13" y="16" width="38" height="34" rx="6" fill="#ffffff"/>
+  <rect x="13" y="16" width="38" height="12" rx="6" fill="#0a766d"/>
+  <rect x="13" y="24" width="38" height="5" fill="#0a766d"/>
+  <path d="M23 11v11M41 11v11" stroke="#a9eed9" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="23" cy="37" r="2.7" fill="#b5cbc5"/>
+  <path d="m30 38 5 5 9-11" fill="none" stroke="#0a766d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

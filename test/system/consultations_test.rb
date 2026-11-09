@@ -80,7 +80,7 @@ class ConsultationsTest < ApplicationSystemTestCase
       page.driver.browser.manage.window.resize_to(viewport_width, 932)
       visit consultation_url(multi_day)
       assert_selector "nav.rc-mobile-dock", visible: true
-      assert_no_selector ".app-nav > a.rc-nav-link", visible: true
+      assert_no_selector ".app-nav .rc-nav-group > a.rc-nav-link", visible: true
       assert_selector ".rc-detail-primary-actions > a", count: 3
 
       layout = page.evaluate_script(<<~JS)
@@ -245,7 +245,7 @@ class ConsultationsTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1280, 900)
     visit consultation_url(@consultation)
     assert_no_selector "nav.rc-mobile-dock", visible: true
-    assert_selector ".app-nav > a.rc-nav-link", visible: true
+    assert_selector ".app-nav .rc-nav-group > a.rc-nav-link", visible: true
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end

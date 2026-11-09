@@ -1,0 +1,68 @@
+<div class="container my-4 my-sm-5">
+  <header class="rc-page-hero mb-3">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow">AI SERVICE WORKSPACE / OFFLINE QUIZ MVP</p>
+    <p class="rc-muted">Synthetic owner-only demo · Step <%= @position + 1 %> of <%= @questions.size %> · Local draft</p>
+    <div class="rc-page-hero__heading">
+      <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-ui-checks-grid"></i></span>
+      <h1 class="page-title"><%= @question.fetch(:title) %></h1>
+    </div>
+    <p class="rc-hint mt-2">Choose options for this fictional project. This is not a public client order.</p>
+    </div>
+    <span class="rc-status-pill"><i class="bi bi-shield-check" aria-hidden="true"></i>Private draft</span>
+  </header>
+
+  <%= render "progress", questions: @questions, saved_answers: @saved_answers, current_key: @question.fetch(:key) %>
+
+  <div class="rc-quiz-layout mt-3">
+    <section class="surface-panel p-3 p-sm-4" aria-label="Quiz question">
+      <% if @answer.errors.any? %>
+        <div class="rc-notice rc-notice--error mb-3" role="alert"><%= @answer.errors.full_messages.to_sentence %></div>
+      <% end %>
+      <%= form_with url: project_intake_quiz_answer_path(@intake, question_key: @question.fetch(:key)), method: :patch, scope: :quiz, local: true, html: { id: "rc-quiz-answer-form", data: { controller: "quiz-live", action: "input->quiz-live#changed change->quiz-live#changed submit->quiz-live#submit turbo:submit-end->quiz-live#submitEnd" } } do %>
+        <%= hidden_field_tag "quiz[selected_options][]", "" %>
+        <fieldset class="mb-3">
+          <legend class="h5"><%= @question.fetch(:mode) == :multi ? "Select all that apply" : "Select one" %></legend>
+          <% @question.fetch(:options).each do |key, label| %>
+            <label class="rc-quiz-choice">
+              <% if @question.fetch(:mode) == :single %>
+                <%= radio_button_tag "quiz[selected_options][]", key, @answer.selected_options.include?(key) %>
+              <% else %>
+                <%= check_box_tag "quiz[selected_options][]", key, @answer.selected_options.include?(key) %>
+              <% end %>
+              <span><%= label %></span>
+            </label>
+          <% end %>
+        </fieldset>
+        <div class="rc-field mb-3">
+          <%= label_tag :quiz_other_text, "My own answer (optional)", class: "rc-field-label" %>
+          <%= text_field_tag "quiz[other_text]", @answer.other_text, id: "quiz_other_text", data: { quiz_live_target: "other" }, maxlength: 300, class: "rc-input" %>
+        </div>
+        <div class="rc-field mb-3">
+          <label class="rc-quiz-choice rc-quiz-choice--unsure"><%= check_box_tag "quiz[unsure]", "1", @answer.unsure, data: { quiz_live_target: "unsure" } %> <span>Not sure — recommend an option</span></label>
+          <p class="rc-hint">Not sure cannot be combined with selected options or your own answer.</p>
+        </div>
+        <div class="rc-field mb-3">
+          <%= label_tag :quiz_comment, "Additional comment (optional)", class: "rc-field-label" %>
+          <%= text_area_tag "quiz[comment]", @answer.comment, id: "quiz_comment", maxlength: 500, rows: 3, class: "rc-input" %>
+        </div>
+
+        <div class="rc-quiz-live-count" data-quiz-live-target="count" role="status" aria-live="polite"></div>
+        <p class="rc-quiz-live-state" data-quiz-live-target="state" data-dirty="false" role="status" aria-live="polite">No unsaved edits on this card</p>
+        <div class="rc-quiz-actions mt-3">
+          <%= button_tag rc_icon_label("check2-circle", @position == @questions.size - 1 ? "Save and review" : "Save and continue"), type: "submit", name: "quiz[navigation]", value: "continue", class: "rc-action rc-action--primary" %>
+          <% if @position.positive? %>
+            <%= button_tag rc_icon_label("arrow-left", "Save and go back"), type: "submit", name: "quiz[navigation]", value: "back", class: "rc-action rc-action--quiet" %>
+          <% end %>
+          <%= button_tag rc_icon_label("clipboard2-check", "Save and open review"), type: "submit", name: "quiz[navigation]", value: "review", class: "rc-action rc-action--quiet" %>
+          <%= button_tag rc_icon_label("house-door", "Save and return to intake"), type: "submit", name: "quiz[navigation]", value: "intake", class: "rc-action rc-action--quiet" %>
+        </div>
+        <p class="rc-hint mt-3 mb-0" role="note">All four actions save this answer before navigating. Browser Back, refresh, tab closing, or external links do not save edits automatically.</p>
+      <% end %>
+    </section>
+
+    <aside class="rc-quiz-sidebar">
+      <%= render "saved_summary", questions: @questions, saved_answers: @saved_answers %>
+    </aside>
+  </div>
+</div>
