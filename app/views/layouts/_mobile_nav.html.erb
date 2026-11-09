@@ -35,15 +35,15 @@
   <% end %>
 
   <% if admin_signed_in? %>
-    <%= button_to admin_logout_path, method: :delete,
+    <%= button_to(owner_signed_in? ? sign_out_path : admin_logout_path, method: :delete,
                   form: { class: "rc-mobile-dock-form" },
                   class: "rc-mobile-dock-item",
-                  aria: { label: "Sign out of administrator session" } do %>
+                  aria: { label: "Sign out of administrator session" }) do %>
       <i class="bi bi-box-arrow-right rc-mobile-dock-icon" aria-hidden="true"></i>
       <span class="rc-mobile-dock-label">Sign out</span>
     <% end %>
   <% else %>
-    <%= link_to admin_login_path, class: "rc-mobile-dock-item #{'is-active' if access_active}",
+    <%= link_to sign_in_path, class: "rc-mobile-dock-item #{'is-active' if access_active}",
                 aria: { current: ("page" if access_active) } do %>
       <i class="bi bi-person-circle rc-mobile-dock-icon" aria-hidden="true"></i>
       <span class="rc-mobile-dock-label">Admin</span>

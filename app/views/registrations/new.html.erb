@@ -1,0 +1,32 @@
+<div class="container my-4 my-sm-5">
+  <div class="form-page">
+    <header class="mb-4">
+      <p class="eyebrow mb-2">WORKSPACE / LOCAL BOOTSTRAP</p>
+      <h1 class="page-title mb-2">Create owner account</h1>
+      <p class="rc-muted">Available only on this development computer. Client registration is not enabled.</p>
+    </header>
+    <section class="surface-panel" aria-label="Create workspace owner">
+      <% if @user.errors.any? %>
+        <div role="alert" class="rc-notice rc-notice--error mb-3">
+          <ul><% @user.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul>
+        </div>
+      <% end %>
+      <%= form_with model: @user, url: sign_up_path, local: true, html: { class: "rc-form" } do |form| %>
+        <div class="rc-field">
+          <%= form.label :email, "Email", class: "rc-field-label" %>
+          <%= form.email_field :email, required: true, maxlength: 254, autocomplete: "email", class: "rc-input" %>
+        </div>
+        <div class="rc-field">
+          <%= form.label :password, "Password (minimum 12 characters)", class: "rc-field-label" %>
+          <%= form.password_field :password, required: true, minlength: 12, autocomplete: "new-password", class: "rc-input" %>
+        </div>
+        <div class="rc-field">
+          <%= form.label :password_confirmation, "Confirm password", class: "rc-field-label" %>
+          <%= form.password_field :password_confirmation, required: true, minlength: 12, autocomplete: "new-password", class: "rc-input" %>
+        </div>
+        <%= form.submit "Create owner account", class: "rc-action rc-action--primary" %>
+      <% end %>
+      <p class="rc-muted mt-3 mb-0"><%= link_to "Already have an account? Sign in", sign_in_path %></p>
+    </section>
+  </div>
+</div>
