@@ -12,6 +12,7 @@ module AdminAuthentication
   private
 
   def admin_signed_in?
+    return true if owner_signed_in?
     return false unless admin_credentials_configured?
 
     issued_at = session[:admin_signed_in_at]

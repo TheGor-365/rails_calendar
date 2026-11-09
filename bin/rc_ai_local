@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+APP="$HOME/rails_calendar_ai_workspace_dev"
+cd "$APP"
+export ASDF_RUBY_VERSION=3.4.12
+export RAILS_ENV=development
+unset DATABASE_URL PGHOST PGPORT PGUSER PGDATABASE PGPASSWORD RC_LOCAL_OWNER_SIGNUP || true
+# shellcheck disable=SC1090
+source "$HOME/.config/rails_calendar_ai_workspace/local.env"
+export RC_INTAKE_PUBLIC_DEMO=false
+export RAILS_CALENDAR_PUBLIC_DEMO_MODE=false
+export RC_GROK_ENABLED=false
+bin/rails runner '
+  c = ActiveRecord::Base.connection_db_config.configuration_hash
+  db, db_user = ActiveRecord::Base.connection.select_rows("SELECT current_database(), current_user").first
+  abort "STOP: wrong local database" unless c[:host] == "127.0.0.1" && c[:port].to_i == 55415 &&
+    db == "rails_calendar_ai_dev_20261108" && db_user == "rails_ai_dev"
+  puts "Local workspace database verified"
+'
+exec bin/rails server -b 127.0.0.1 -p 3015

@@ -33,6 +33,7 @@ jobs:
       PGPORT: 5432
       PGUSER: postgres
       PGPASSWORD: postgres
+      RC_LOCAL_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/ruby_calendar_test
 
     steps:
       - uses: actions/checkout@v4

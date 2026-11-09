@@ -18,11 +18,14 @@
     <% end %>
 
     <div class="ms-auto d-flex align-items-center gap-2">
-      <% if admin_signed_in? %>
+      <% if owner_signed_in? %>
+        <span class="rc-nav-admin d-none d-sm-inline">Owner: <%= current_user.email %></span>
+        <%= button_to rc_icon_label("box-arrow-right", "Sign out"), sign_out_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
+      <% elsif admin_signed_in? %>
         <span class="rc-nav-admin d-none d-sm-inline">Administrator</span>
         <%= button_to rc_icon_label("box-arrow-right", "Sign out"), admin_logout_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
       <% else %>
-        <%= link_to rc_icon_label("box-arrow-in-right", "Admin sign in"), admin_login_path, class: "rc-action rc-action--quiet rc-action--small" %>
+        <%= link_to rc_icon_label("box-arrow-in-right", "Sign in"), sign_in_path, class: "rc-action rc-action--quiet rc-action--small" %>
       <% end %>
     </div>
   </nav>

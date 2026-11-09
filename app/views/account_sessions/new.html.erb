@@ -1,0 +1,25 @@
+<div class="container my-4 my-sm-5">
+  <div class="form-page">
+    <header class="mb-4">
+      <p class="eyebrow mb-2">WORKSPACE / SECURE ACCESS</p>
+      <h1 class="page-title mb-2">Sign in to your workspace</h1>
+      <p class="rc-muted">Owner account. Client invitations and public registration are not yet enabled.</p>
+    </header>
+    <section class="surface-panel" aria-label="Workspace sign in">
+      <%= form_with url: account_session_path, method: :post, local: true, html: { class: "rc-form" } do |form| %>
+        <div class="rc-field">
+          <%= form.label :email, "Email", class: "rc-field-label" %>
+          <%= form.email_field :email, required: true, autocomplete: "email", class: "rc-input" %>
+        </div>
+        <div class="rc-field">
+          <%= form.label :password, "Password", class: "rc-field-label" %>
+          <%= form.password_field :password, required: true, autocomplete: "current-password", class: "rc-input" %>
+        </div>
+        <%= form.submit "Sign in", class: "rc-action rc-action--primary" %>
+      <% end %>
+      <% if (Rails.env.development? || Rails.env.test?) && ENV["RC_LOCAL_OWNER_SIGNUP"] == "true" && !User.exists? %>
+        <p class="rc-muted mt-3 mb-0"><%= link_to "Create local owner account", sign_up_path %></p>
+      <% end %>
+    </section>
+  </div>
+</div>

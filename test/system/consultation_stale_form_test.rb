@@ -11,7 +11,7 @@ class ConsultationStaleFormTest < ApplicationSystemTestCase
     visit admin_login_url
     fill_in "Username", with: ENV.fetch("RAILS_CALENDAR_ADMIN_USERNAME")
     fill_in "Password", with: ENV.fetch("RAILS_CALENDAR_ADMIN_PASSWORD")
-    click_on "Sign in"
+    click_button "Sign in"
     assert_text "Administrator signed in"
 
     visit edit_consultation_url(@consultation)

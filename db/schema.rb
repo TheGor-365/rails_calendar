@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_08_143000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_224500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -105,8 +105,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_143000) do
     t.integer "lock_version", default: 0, null: false
   end
 
+  create_table "user_sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "token_digest", limit: 64, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_user_sessions_on_expires_at"
+    t.index ["token_digest"], name: "index_user_sessions_on_token_digest", unique: true
+    t.index ["user_id"], name: "index_user_sessions_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "email", limit: 254, null: false
+    t.string "password_digest", null: false
+    t.string "role", limit: 20, default: "owner", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((email)::text)", name: "idx_users_email_case_insensitive", unique: true
+  end
+
   add_foreign_key "intake_messages", "project_intakes"
   add_foreign_key "intake_spec_versions", "project_intakes"
   add_foreign_key "project_milestones", "project_intakes"
   add_foreign_key "project_milestones", "intake_spec_versions"
+  add_foreign_key "user_sessions", "users"
 end
