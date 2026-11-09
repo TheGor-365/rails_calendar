@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_08_224500) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_09_190000) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "admin_login_windows", force: :cascade do |t|
     t.string "client_digest", limit: 64, null: false
@@ -36,6 +36,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_224500) do
     t.index ["consultation_id", "created_at", "id"], name: "idx_reschedule_history_by_consultation_and_time"
   end
 
+  create_table "consultations", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.datetime "start_time"
+    t.datetime "end_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "lock_version", default: 0, null: false
+  end
+
   create_table "intake_ai_quotas", force: :cascade do |t|
     t.date "usage_day", null: false
     t.integer "call_count", default: 0, null: false
@@ -44,15 +54,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_224500) do
     t.index ["usage_day"], name: "index_intake_ai_quotas_on_usage_day", unique: true
   end
 
-  create_table "project_intakes", force: :cascade do |t|
-    t.string "title", limit: 120, null: false
-    t.string "project_type", limit: 32, null: false
-    t.text "goal", null: false
-    t.string "status", limit: 32, default: "interviewing", null: false
-    t.integer "ai_call_count", default: 0, null: false
-    t.datetime "demo_consent_at", null: false
+  create_table "intake_answer_revisions", force: :cascade do |t|
+    t.bigint "intake_answer_id", null: false
+    t.integer "revision", null: false
+    t.jsonb "snapshot", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["intake_answer_id", "revision"], name: "idx_intake_answer_revisions_unique", unique: true
+    t.index ["intake_answer_id"], name: "index_intake_answer_revisions_on_intake_answer_id"
+  end
+
+  create_table "intake_answers", force: :cascade do |t|
+    t.bigint "project_intake_id", null: false
+    t.string "question_key", limit: 64, null: false
+    t.jsonb "selected_options", default: [], null: false
+    t.string "other_text", limit: 300
+    t.boolean "unsure", default: false, null: false
+    t.text "comment"
+    t.integer "revision", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_intake_id", "question_key"], name: "idx_intake_answers_unique_question", unique: true
+    t.index ["project_intake_id"], name: "index_intake_answers_on_project_intake_id"
   end
 
   create_table "intake_messages", force: :cascade do |t|
@@ -61,8 +84,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_224500) do
     t.text "body", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["project_intake_id"], name: "index_intake_messages_on_project_intake_id"
     t.index ["project_intake_id", "created_at", "id"], name: "idx_intake_conversation_order"
+    t.index ["project_intake_id"], name: "index_intake_messages_on_project_intake_id"
   end
 
   create_table "intake_spec_versions", force: :cascade do |t|
@@ -74,8 +97,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_224500) do
     t.datetime "client_reviewed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["project_intake_id"], name: "index_intake_spec_versions_on_project_intake_id"
     t.index ["project_intake_id", "version"], name: "idx_intake_spec_immutable_version", unique: true
+    t.index ["project_intake_id"], name: "index_intake_spec_versions_on_project_intake_id"
+  end
+
+  create_table "project_intakes", force: :cascade do |t|
+    t.string "title", limit: 120, null: false
+    t.string "project_type", limit: 32, null: false
+    t.text "goal", null: false
+    t.string "status", limit: 32, default: "interviewing", null: false
+    t.integer "ai_call_count", default: 0, null: false
+    t.datetime "demo_consent_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "project_milestones", force: :cascade do |t|
@@ -90,19 +124,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_224500) do
     t.string "status", limit: 24, default: "proposed", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["project_intake_id"], name: "index_project_milestones_on_project_intake_id"
     t.index ["intake_spec_version_id"], name: "index_project_milestones_on_intake_spec_version_id"
     t.index ["project_intake_id", "position"], name: "idx_project_milestone_position", unique: true
-  end
-
-  create_table "consultations", force: :cascade do |t|
-    t.string "title"
-    t.text "description"
-    t.datetime "start_time"
-    t.datetime "end_time"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "lock_version", default: 0, null: false
+    t.index ["project_intake_id"], name: "index_project_milestones_on_project_intake_id"
   end
 
   create_table "user_sessions", force: :cascade do |t|
@@ -125,9 +149,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_224500) do
     t.index "lower((email)::text)", name: "idx_users_email_case_insensitive", unique: true
   end
 
+  add_foreign_key "intake_answer_revisions", "intake_answers"
+  add_foreign_key "intake_answers", "project_intakes"
   add_foreign_key "intake_messages", "project_intakes"
   add_foreign_key "intake_spec_versions", "project_intakes"
-  add_foreign_key "project_milestones", "project_intakes"
   add_foreign_key "project_milestones", "intake_spec_versions"
+  add_foreign_key "project_milestones", "project_intakes"
   add_foreign_key "user_sessions", "users"
 end

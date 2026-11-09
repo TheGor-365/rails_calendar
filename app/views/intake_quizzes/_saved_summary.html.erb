@@ -1,0 +1,32 @@
+<section class="surface-panel p-3 p-sm-4 rc-quiz-summary" aria-label="Previously saved quiz answers">
+  <p class="eyebrow mb-1">BRIEF SNAPSHOT</p>
+  <h2 class="h5 mb-2"><i class="bi bi-card-checklist me-2" aria-hidden="true"></i>Saved answers</h2>
+  <p class="rc-hint mb-3">Data below is persisted in the private local draft. Unsaved selections are never presented as saved.</p>
+  <% questions.each_with_index do |question, index| %>
+    <% answer = saved_answers[question.fetch(:key)] %>
+    <article class="rc-quiz-summary__item">
+      <div class="rc-quiz-summary__heading">
+        <strong><%= index + 1 %>. <%= index == 0 ? 'Outcome' : 'Features' %></strong>
+        <span class="rc-quiz-status <%= answer ? 'rc-quiz-status--saved' : 'rc-quiz-status--empty' %>"><i class="bi bi-<%= answer ? 'check-circle' : 'dash-circle' %> me-1" aria-hidden="true"></i><%= answer ? 'Saved' : 'Missing' %></span>
+      </div>
+      <% if answer %>
+        <% if answer.unsure? %>
+          <p class="mb-1">Not sure — recommendation needed</p>
+        <% else %>
+          <% if answer.selected_options.any? %>
+            <ul class="rc-quiz-summary__choices">
+              <% answer.selected_options.each do |option| %>
+                <li><%= question.fetch(:options).fetch(option, option) %></li>
+              <% end %>
+            </ul>
+          <% end %>
+          <% if answer.other_text.present? %><p class="mb-1">Own answer: <%= answer.other_text %></p><% end %>
+        <% end %>
+        <% if answer.comment.present? %><p class="rc-hint mb-1">Comment: <%= answer.comment %></p><% end %>
+        <p class="rc-hint mb-0"><i class="bi bi-clock-history me-1" aria-hidden="true"></i>Revision <%= answer.revision %></p>
+      <% else %>
+        <p class="rc-hint mb-0">No saved answer yet</p>
+      <% end %>
+    </article>
+  <% end %>
+</section>

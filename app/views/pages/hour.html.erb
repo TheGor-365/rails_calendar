@@ -3,11 +3,11 @@
     <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
       <div>
         <p class="eyebrow mb-2">TIME / INTERVAL</p>
-        <h1 class="page-title mb-2">
+        <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clock-history"></i></span><h1 class="page-title mb-2">
           <time datetime="<%= @hour_start.iso8601 %>"><%= @hour_start.strftime("%H:%M") %></time>
           <span aria-hidden="true">–</span>
           <time datetime="<%= @hour_end.iso8601 %>"><%= @hour_end.strftime("%H:%M") %></time>
-        </h1>
+        </h1></div>
         <p class="rc-muted mb-0">
           <time datetime="<%= @selected_date.iso8601 %>"><%= @selected_date.strftime("%A, %d %B %Y") %></time>
           <span aria-hidden="true">·</span>
@@ -28,7 +28,7 @@
       </div>
     </header>
 
-    <section aria-label="Consultations overlapping selected interval">
+    <section class="surface-panel" aria-label="Consultations overlapping selected interval">
       <% if @consultations.any? %>
         <ul class="rc-record-list">
           <% @consultations.each do |event| %>

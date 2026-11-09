@@ -1,0 +1,15 @@
+<%# Shared process map. Status reflects the current local workflow, not a confirmed client contract. %>
+<nav class="rc-flow mb-4" aria-label="<%= title %>">
+  <div class="rc-flow__heading">
+    <span><i class="bi bi-diagram-3 me-2" aria-hidden="true"></i><%= title %></span>
+    <span class="rc-status-pill rc-status-pill--muted">Demo workflow</span>
+  </div>
+  <ol class="rc-flow__steps">
+    <% steps.each do |key, icon, name, detail| %>
+      <li class="rc-flow__step <%= 'rc-flow__step--current' if key == current %>" aria-current="<%= key == current ? 'step' : 'false' %>">
+        <i class="bi bi-<%= icon %>" aria-hidden="true"></i>
+        <span><%= name %><small><%= detail %></small></span>
+      </li>
+    <% end %>
+  </ol>
+</nav>

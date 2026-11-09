@@ -1,67 +1,47 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>The page you were looking for doesn't exist (404)</title>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>404 — Page not found · Rails Calendar</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" type="image/x-icon" href="/favicon.ico">
   <style>
-  .rails-default-error-page {
-    background-color: #EFEFEF;
-    color: #2E2F30;
-    text-align: center;
-    font-family: arial, sans-serif;
-    margin: 0;
-  }
-
-  .rails-default-error-page div.dialog {
-    width: 95%;
-    max-width: 33em;
-    margin: 4em auto 0;
-  }
-
-  .rails-default-error-page div.dialog > div {
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #BBB;
-    border-top: #B00100 solid 4px;
-    border-top-left-radius: 9px;
-    border-top-right-radius: 9px;
-    background-color: white;
-    padding: 7px 12% 0;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
-  }
-
-  .rails-default-error-page h1 {
-    font-size: 100%;
-    color: #730E15;
-    line-height: 1.5em;
-  }
-
-  .rails-default-error-page div.dialog > p {
-    margin: 0 0 1em;
-    padding: 1em;
-    background-color: #F7F7F7;
-    border: 1px solid #CCC;
-    border-right-color: #999;
-    border-left-color: #999;
-    border-bottom-color: #999;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-top-color: #DADADA;
-    color: #666;
-    box-shadow: 0 3px 8px rgba(50, 50, 50, 0.17);
-  }
-  </style>
+:root{color-scheme:light;--ink:#152b35;--muted:#647884;--accent:#0a766d;--ground:#f8fafb;--line:#e8eef0;--paper:#fff}
+*{box-sizing:border-box}
+html{min-width:320px;min-height:100%;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+body{min-height:100vh;margin:0;color:var(--ink);background:var(--ground);display:flex;flex-direction:column}
+a{color:var(--accent)}a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.header{background:var(--paper);box-shadow:0 1px 0 #e8eef0}
+.header-inner{max-width:1024px;margin:auto;display:flex;align-items:center;gap:12px;padding:17px clamp(20px,5vw,44px);font-size:15px;font-weight:750;letter-spacing:-.02em}
+.brand{width:36px;height:36px;flex-shrink:0}
+main{flex:1;max-width:1024px;width:100%;margin:auto;padding:clamp(32px,8vw,100px) clamp(20px,5vw,44px)}
+.panel{padding:clamp(24px,6vw,58px);border:0;border-radius:24px;background:var(--paper);box-shadow:0 18px 40px -34px #152b355c}
+.eyebrow{margin:0 0 14px;font-weight:750;font-size:12px;letter-spacing:.13em;color:var(--accent)}
+h1{font-size:clamp(30px,5.6vw,52px);letter-spacing:-.055em;line-height:1.1;margin:0 0 20px;max-width:670px}
+.lead{font-size:clamp(16px,2vw,19px);max-width:620px;margin:0 0 14px}
+.note{color:var(--muted);font-size:14px;max-width:620px;margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:35px}
+.action{display:inline-flex;min-height:44px;align-items:center;justify-content:center;text-decoration:none;border-radius:13px;padding:10px 18px;font-size:14px;font-weight:700}
+.action-primary{background:var(--accent);color:white}.action-primary:hover{background:#07574f}
+.action-secondary{border:1px solid var(--line);color:var(--ink);background:#fff}.action-secondary:hover{background:var(--ground)}
+footer{max-width:1024px;width:100%;margin:auto;padding:18px clamp(20px,5vw,44px) 32px;color:var(--muted);font-size:12px}
+@media(max-width:360px){.panel{padding:22px 18px}.action{width:100%}}
+</style>
 </head>
-
-<body class="rails-default-error-page">
-  <!-- This file lives in public/404.html -->
-  <div class="dialog">
-    <div>
-      <h1>The page you were looking for doesn't exist.</h1>
-      <p>You may have mistyped the address or the page may have moved.</p>
-    </div>
-    <p>If you are the application owner check the logs for more information.</p>
-  </div>
+<body>
+  <header class="header"><div class="header-inner"><svg class="brand" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect width="64" height="64" rx="15" fill="#152b35"/><rect x="13" y="16" width="38" height="34" rx="6" fill="#fff"/><rect x="13" y="16" width="38" height="12" rx="6" fill="#0a766d"/><rect x="13" y="24" width="38" height="5" fill="#0a766d"/><path d="M23 11v11M41 11v11" stroke="#a9eed9" stroke-width="4" stroke-linecap="round"/><circle cx="23" cy="37" r="2.7" fill="#b5cbc5"/><path d="m30 38 5 5 9-11" fill="none" stroke="#0a766d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Rails Calendar <span style="font-weight:400;color:var(--muted)">/ AI Service Workspace</span></span></div></header>
+  <main id="main-content"><section class="panel" aria-labelledby="error-title">
+    <p class="eyebrow">WORKSPACE / ERROR 404</p>
+    <h1 id="error-title">Page not found</h1>
+    <p class="lead">This page is unavailable. Check the address or return to the workspace.</p>
+    <p class="note">This link may have moved or may not be accessible to you.</p>
+    <nav class="actions" aria-label="Recovery navigation">
+      <a class="action action-primary" href="/">Return home</a>
+      <a class="action action-secondary" href="/sign_in">Sign in</a>
+    </nav>
+  </section></main>
+  <footer>Rails Calendar · AI Service Workspace</footer>
 </body>
 </html>

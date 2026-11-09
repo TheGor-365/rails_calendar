@@ -1,9 +1,12 @@
 <div class="container my-4 my-sm-5">
-  <header class="mb-4">
+  <header class="rc-page-hero mb-4">
+    <div class="rc-page-hero__content">
     <p class="eyebrow">AI SERVICE WORKSPACE / DEMO</p>
-    <h1 class="page-title">Describe a website request</h1>
+    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-plus"></i></span><h1 class="page-title">Describe a website request</h1></div>
     <p class="rc-muted">A protected, synthetic-data demonstration: interview → reviewable specification → proposed milestones. No quote, timeline or contract is committed automatically.</p>
+    </div>
   </header>
+  <%= render "shared/workflow", title: "How a draft becomes a plan", current: "request", steps: [ ["request", "clipboard2-plus", "Request", "Describe scope"], ["interview", "chat-left-text", "Interview", "Clarify requirements"], ["review", "clipboard2-check", "Review", "Approve a draft"], ["plan", "calendar-range", "Plan", "Proposed phases"] ] %>
   <div class="surface-panel p-4">
     <% if @intake.errors.any? %>
       <div class="rc-notice rc-notice--error" role="alert"><%= @intake.errors.full_messages.to_sentence %></div>
@@ -30,7 +33,7 @@
         <%= label_tag :demo_consent, "I will use fictional data only. I understand that, when enabled, the interview may be sent to the xAI Grok API." %>
       </div>
       <p class="rc-hint">Do not enter real names, contacts, client content, credentials, tokens or confidential details. Demo records are not paid orders.</p>
-      <%= f.submit "Start intake demo", class: "rc-action rc-action--primary" %>
+      <%= f.button type: :submit, class: "rc-action rc-action--primary" do %><%= rc_icon_label("arrow-right-circle", "Start fictional intake") %><% end %>
     <% end %>
   </div>
 </div>

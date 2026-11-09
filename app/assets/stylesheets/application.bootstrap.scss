@@ -1,9 +1,9 @@
 // Rails Calendar — RC-009 / Slate & Tide.
 // Bootstrap remains for responsive grid/utilities, not for visual components.
-$primary: #17675c;
-$body-color: #192a2e;
-$body-bg: #f6f7f5;
-$border-color: #dbe1df;
+$primary: #0a766d;
+$body-color: #152b35;
+$body-bg: #f8fafb;
+$border-color: #e8eef0;
 $font-family-sans-serif: "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
 
 @import 'bootstrap/scss/bootstrap';
@@ -1624,3 +1624,120 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   .rc-reschedule-history > li { padding: .7rem 0; }
   .rc-reschedule-heading { flex-direction: column; gap: .15rem; }
 }
+
+
+// RC-034 UX: persistent progress, saved-answer summary and lossless in-app navigation.
+.rc-quiz-progress {
+  padding: .9rem 1rem 1rem;
+  border: 1px solid var(--rc-line);
+  border-radius: .7rem;
+  background: var(--rc-paper);
+}
+
+.rc-quiz-progress__header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .35rem 1rem;
+  margin-bottom: .8rem;
+  color: var(--rc-muted);
+  font-size: .82rem;
+}
+
+.rc-quiz-progress__header strong { color: var(--rc-ink); font-variant-numeric: tabular-nums; }
+
+.rc-quiz-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .6rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.rc-quiz-step {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: .65rem;
+  padding: .8rem;
+  border: 1px solid var(--rc-line);
+  border-radius: .55rem;
+  background: var(--rc-ground);
+}
+
+.rc-quiz-step--done { border-color: #b7d9cf; background: var(--rc-accent-wash); }
+.rc-quiz-step--active { border-color: var(--rc-accent); box-shadow: inset 0 0 0 1px var(--rc-accent); background: white; }
+
+.rc-quiz-step__number {
+  display: grid;
+  flex: 0 0 2rem;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #e3eae7;
+  color: var(--rc-ink);
+  font-weight: 750;
+}
+
+.rc-quiz-step--done .rc-quiz-step__number,
+.rc-quiz-step--active .rc-quiz-step__number { background: var(--rc-accent); color: white; }
+
+.rc-quiz-step__label { display: flex; flex-direction: column; min-width: 0; gap: .05rem; }
+.rc-quiz-step__label strong { font-size: .86rem; }
+.rc-quiz-step__label small { color: var(--rc-muted); font-size: .72rem; }
+
+.rc-quiz-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 310px);
+  align-items: start;
+  gap: 1rem;
+}
+
+.rc-quiz-layout > * { min-width: 0; }
+.rc-quiz-sidebar { position: sticky; top: 1rem; }
+.rc-quiz-summary { overflow-wrap: anywhere; }
+.rc-quiz-summary__item { border-top: 1px solid var(--rc-line); padding-top: .9rem; margin-top: .9rem; }
+.rc-quiz-summary__heading { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .45rem; }
+.rc-quiz-summary__heading strong { font-size: .87rem; }
+.rc-quiz-summary__choices { margin: .35rem 0 .45rem; padding-left: 1.2rem; }
+.rc-quiz-summary__choices li { padding-bottom: .2rem; }
+
+.rc-quiz-status { display: inline-flex; align-items: center; border-radius: 999px; padding: .18rem .55rem; font-size: .72rem; font-weight: 750; white-space: nowrap; }
+.rc-quiz-status--saved { background: var(--rc-accent-wash); color: var(--rc-accent-dark); }
+.rc-quiz-status--empty { background: #fff5de; color: #73571a; }
+
+.rc-quiz-choice { display: flex; align-items: center; gap: .7rem; border-radius: .5rem; padding: .7rem .65rem; margin: .3rem 0; border: 1px solid var(--rc-soft-line); cursor: pointer; min-height: 44px; }
+.rc-quiz-choice:hover { background: var(--rc-accent-wash); border-color: #b7d9cf; }
+.rc-quiz-choice input { flex: 0 0 auto; width: 1rem; height: 1rem; accent-color: var(--rc-accent); }
+.rc-quiz-choice:has(input:checked) { background: var(--rc-accent-wash); border-color: #a3d0c3; }
+.rc-quiz-actions, .rc-quiz-review-footer { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; }
+.rc-quiz-actions .rc-action, .rc-quiz-review-footer .rc-action { min-height: 44px; }
+
+.rc-quiz-review-item { padding: 1.15rem 0; border-top: 1px solid var(--rc-line); overflow-wrap: anywhere; }
+.rc-quiz-review-item__heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .55rem; margin-bottom: .8rem; }
+.rc-quiz-review-choices { padding-left: 1.35rem; }
+.rc-quiz-review-choices li { margin: .4rem 0; }
+.rc-quiz-review-footer { padding-top: 1rem; border-top: 1px solid var(--rc-line); }
+.rc-quiz-review-alert, .rc-quiz-review-ready { padding: 1rem; border-radius: .6rem; border: 1px solid #e8d7af; background: #fffaf0; }
+.rc-quiz-review-ready { border-color: #b7d9cf; background: var(--rc-accent-wash); }
+.rc-quiz-intake-entry { margin: .9rem 0 0; }
+
+@media (max-width: 991.98px) {
+  .rc-quiz-layout { grid-template-columns: minmax(0, 1fr); }
+  .rc-quiz-sidebar { position: static; }
+}
+
+@media (max-width: 575.98px) {
+  .rc-quiz-progress { padding: .75rem; }
+  .rc-quiz-steps { gap: .35rem; }
+  .rc-quiz-step { flex-direction: column; align-items: flex-start; gap: .35rem; padding: .6rem .45rem; }
+  .rc-quiz-step__number { width: 1.65rem; height: 1.65rem; flex-basis: 1.65rem; font-size: .78rem; }
+  .rc-quiz-step__label strong { font-size: .78rem; }
+  .rc-quiz-step__label small { font-size: .65rem; }
+  .rc-quiz-actions .rc-action, .rc-quiz-review-footer .rc-action { width: 100%; justify-content: center; }
+}
+
+// RC-034C / White Atlas: shared visual system for every application screen.
+@import 'rc_design_system';

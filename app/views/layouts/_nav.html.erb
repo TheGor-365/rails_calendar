@@ -1,25 +1,39 @@
 <div class="container">
-  <nav aria-label="Main navigation" class="app-nav d-flex flex-wrap align-items-center gap-2 gap-sm-3 py-3">
-    <%= link_to "Rails Calendar", root_path, class: "app-brand me-2" %>
-    <%= link_to "Calendar", root_path,
-                class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",
-                aria: { current: ("page" if controller_name == 'pages' && action_name == 'home') } %>
-    <%= link_to "Today · 24h", calendar_day_path(date: Time.zone.today.iso8601),
-                class: "rc-nav-link #{'active' if controller_name == 'pages' && %w[day hour].include?(action_name)}",
-                aria: { current: ("page" if controller_name == 'pages' && action_name == 'day') } %>
-    <%= link_to "Consultations", consultations_path,
-                class: "rc-nav-link #{'active' if controller_name == 'consultations' && action_name == 'index'}",
-                aria: { current: ("page" if controller_name == 'consultations' && action_name == 'index') } %>
-    <% if admin_signed_in? || ENV["RC_INTAKE_PUBLIC_DEMO"] == "true" %>
-      <%= link_to "AI request", new_project_intake_path, class: "rc-nav-link" %>
-      <% if admin_signed_in? %>
-        <%= link_to "Intake inbox", admin_project_intakes_path, class: "rc-nav-link" %>
-      <% end %>
+  <nav aria-label="Main navigation" class="app-nav d-flex flex-wrap align-items-center gap-2 py-3">
+    <%= link_to root_path, class: "app-brand", aria: { label: "Rails Calendar — calendar overview" } do %>
+      <span class="rc-brand-symbol" aria-hidden="true"><i class="bi bi-calendar2-check"></i></span>
+      <span>Rails Calendar</span>
     <% end %>
+
+    <div class="rc-nav-group" aria-label="Workspace sections">
+      <%= link_to root_path,
+                  class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",
+                  aria: { current: ("page" if controller_name == 'pages' && action_name == 'home') } do %>
+        <%= rc_icon_label("calendar3", "Calendar") %>
+      <% end %>
+      <%= link_to calendar_day_path(date: Time.zone.today.iso8601),
+                  class: "rc-nav-link #{'active' if controller_name == 'pages' && %w[day hour].include?(action_name)}",
+                  aria: { current: ("page" if controller_name == 'pages' && %w[day hour].include?(action_name)) } do %>
+        <%= rc_icon_label("clock-history", "Today · 24h") %>
+      <% end %>
+      <%= link_to consultations_path,
+                  class: "rc-nav-link #{'active' if controller_name == 'consultations'}",
+                  aria: { current: ("page" if controller_name == 'consultations') } do %>
+        <%= rc_icon_label("journal-text", "Consultations") %>
+      <% end %>
+      <% if admin_signed_in? || ENV["RC_INTAKE_PUBLIC_DEMO"] == "true" %>
+        <%= link_to rc_icon_label("clipboard2-plus", "AI request"), new_project_intake_path,
+                    class: "rc-nav-link #{'active' if controller_path == 'project_intakes' && action_name == 'new'}" %>
+        <% if admin_signed_in? %>
+          <%= link_to rc_icon_label("inboxes", "Intake inbox"), admin_project_intakes_path,
+                      class: "rc-nav-link #{'active' if controller_path == 'admin/project_intakes' && action_name == 'index'}" %>
+        <% end %>
+      <% end %>
+    </div>
 
     <div class="ms-auto d-flex align-items-center gap-2">
       <% if owner_signed_in? %>
-        <span class="rc-nav-admin d-none d-sm-inline">Owner: <%= current_user.email %></span>
+        <span class="rc-nav-admin d-none d-sm-inline" title="Owner session">Owner: <%= current_user.email %></span>
         <%= button_to rc_icon_label("box-arrow-right", "Sign out"), sign_out_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
       <% elsif admin_signed_in? %>
         <span class="rc-nav-admin d-none d-sm-inline">Administrator</span>

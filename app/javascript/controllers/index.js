@@ -6,3 +6,9 @@ import { application } from "./application"
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+// White Atlas: progressive, no-extra-request interaction helpers.
+import UiFeedbackController from "./ui_feedback_controller"
+application.register("ui-feedback", UiFeedbackController)
+import QuizLiveController from "./quiz_live_controller"
+application.register("quiz-live", QuizLiveController)

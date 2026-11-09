@@ -1,7 +1,7 @@
 <div class="container my-4 my-sm-5">
   <header class="mb-4">
     <p class="eyebrow">ADMIN / SPECIFICATION REVIEW</p>
-    <h1 class="page-title">Review proposal #<%= @intake.id %></h1>
+    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span><h1 class="page-title">Review proposal #<%= @intake.id %></h1></div>
     <p class="rc-muted">Editing creates a new immutable draft version. Nothing is sent to the client until you approve that version.</p>
   </header>
   <section class="surface-panel p-3 p-sm-4">
@@ -25,8 +25,8 @@
         </div>
       <% end %>
       <p class="rc-hint">AI-proposed milestone durations remain unchanged here. Dates, scope, fees and client acceptance are not automatically confirmed.</p>
-      <%= f.submit "Save a new reviewed draft", class: "rc-action rc-action--primary" %>
-      <%= link_to "Cancel without changes", project_intake_path(@intake),
+      <%= f.button type: :submit, class: "rc-action rc-action--primary" do %><%= rc_icon_label("check2-circle", "Save a new reviewed draft") %><% end %>
+      <%= link_to rc_icon_label("x-circle", "Cancel without changes"), project_intake_path(@intake),
           class: "rc-action rc-action--quiet" %>
     <% end %>
   </section>

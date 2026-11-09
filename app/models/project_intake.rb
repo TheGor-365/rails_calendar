@@ -4,6 +4,7 @@ class ProjectIntake < ApplicationRecord
   MAX_CLIENT_MESSAGES = 8
 
   has_many :intake_messages, dependent: :restrict_with_exception
+  has_many :intake_answers, dependent: :restrict_with_exception
   has_many :intake_spec_versions, dependent: :restrict_with_exception
   has_many :project_milestones, dependent: :restrict_with_exception
 

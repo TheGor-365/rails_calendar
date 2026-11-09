@@ -2,14 +2,14 @@
   <div class="form-page">
     <header class="mb-4">
       <p class="eyebrow mb-2">Scheduling</p>
-      <h1 class="page-title mb-2">Editing consultation</h1>
+      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-pencil-square"></i></span><h1 class="page-title mb-2">Editing consultation</h1></div>
       <p class="text-secondary mb-0">Update the time or details of this consultation.</p>
     </header>
     <section class="surface-panel" aria-label="Consultation details">
       <%= render "form", consultation: @consultation %>
     </section>
     <div class="mt-3">
-      <%= link_to rc_icon_label("eye", "Show this consultation"), @consultation, class: "link-secondary" %>
+      <%= link_to rc_icon_label("eye", "Show this consultation"), @consultation, class: "rc-action rc-action--soft" %>
     </div>
   </div>
 </div>

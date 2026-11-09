@@ -3,14 +3,19 @@
   <head>
     <title>Rails Calendar</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   </head>
 
-  <body class="app-shell">
+  <body class="app-shell" data-controller="ui-feedback"
+        data-action="turbo:submit-start->ui-feedback#start turbo:submit-end->ui-feedback#finish turbo:load@document->ui-feedback#reset">
     <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="app-header">
       <%= render "layouts/nav" %>

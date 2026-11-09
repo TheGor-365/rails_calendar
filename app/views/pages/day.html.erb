@@ -1,10 +1,10 @@
 <div class="container my-4 my-sm-5">
-  <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <header class="rc-page-hero mb-4">
     <div>
       <p class="eyebrow mb-2">DAY / <%= @selected_date.strftime("%j") %></p>
-      <h1 class="page-title mb-1">
+      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-day"></i></span><h1 class="page-title mb-1">
         <time datetime="<%= @selected_date.iso8601 %>"><%= @selected_date.strftime("%A, %d %B %Y") %></time>
-      </h1>
+      </h1></div>
       <p class="rc-muted mb-0">
         <span class="rc-data-number"><%= pluralize(@consultations.size, "consultation") %></span>
         <span aria-hidden="true">·</span> 00:00–24:00
