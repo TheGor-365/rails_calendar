@@ -137,6 +137,7 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
+    minitest-mock (5.27.0)
     msgpack (1.8.7)
     net-imap (0.6.8)
       date
@@ -263,6 +264,7 @@ DEPENDENCIES
   debug
   jbuilder
   jsbundling-rails
+  minitest-mock (~> 5.27)
   pg (~> 1.5)
   puma (~> 8.0, >= 8.0.2)
   rails (= 8.1.4.1)
