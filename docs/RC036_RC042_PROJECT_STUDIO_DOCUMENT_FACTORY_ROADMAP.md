@@ -127,3 +127,11 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 - Bounded ProjectSourceRetention deletes expired object bytes and revokes metadata, retains source history. No production cleanup scheduler.
 - Dedicated branch-only GitHub Actions spins up temporary maintained SILO S3-compatible storage plus genuine clamd with a **test-only EICAR signature**, then tests S3 upload/quarantine/scan/download, anonymous object denial, ACL/IDOR/revocation and expiry.
 - **Not production-ready:** no deployed private durable bucket, live updated ClamAV signatures, worker/scheduler, monitoring, real client identity/consent or actual provider security acceptance. No production/billing changes. No backup work per owner decision.
+
+## RC-036 Stage 3 Slice E — nonproduction mailbox-possession proof (2026-11-10)
+
+- The user requested continuing with no separately approved paid cloud resources. No durable bucket or real production ClamAV was provisioned; Slice D already proved S3-compatible API + genuine clamd with a synthetic signature in CI.
+- Added ProjectInvitationEmailProof (one per invitation), HMAC/SHA256 challenge digest, 10-minute expiry, five failed attempts, one-time confirmation, plus anonymous nonproduction-only JSON endpoints and test/local email delivery. No raw recipient email, token, or OTP is stored in the new proof table; generic initiation response avoids revealing known invites.
+- Mailbox proof is **not** account authentication, not government identity/KYC, not a tenant membership, not consent, and **not** invitation acceptance. ProjectInvitation remains strictly pending/revoked and non-redeemable; workspace and all source/file HTTP routes remain owner-only.
+- Production request routes return 404 regardless of supplied flags; no live email provider configured. Manual client login, verified recipient-account binding, password/session controls, consent, and per-action ACL matrices remain separate release gates.
+- Negative HTTP tests: token-only/recipient mismatch, expired/revoked invite, exhausted attempts, replay/duplicates, revoked owner membership and forbidden access to source metadata after mailbox confirmation. Production untouched.

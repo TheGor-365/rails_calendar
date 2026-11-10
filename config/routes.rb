@@ -25,6 +25,13 @@ Rails.application.routes.draw do
   post "/workspaces/:workspace_id/project_intakes/:id/source_preview",
        to: "studio/source_previews#create"
 
+  # RC-036 Stage 3 Slice E: synthetic, nonproduction-only email possession proof.
+  # No account creation, client login, invitation acceptance or data access.
+  post "/studio/invitations/email_proofs",
+       to: "studio/invitation_email_proofs#create", as: :studio_invitation_email_proofs
+  post "/studio/invitations/email_proofs/confirm",
+       to: "studio/invitation_email_proofs#confirm", as: :confirm_studio_invitation_email_proof
+
   # RC-036 Stage 3 Slice B: owner-only metadata and pending invitations.
   scope "/workspaces/:workspace_id/clients/:client_id/project_intakes/:project_intake_id" do
     get "/sources", to: "studio/project_sources#index", as: :studio_project_sources

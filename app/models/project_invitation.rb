@@ -3,6 +3,7 @@ class ProjectInvitation < ApplicationRecord
   belongs_to :client
   belongs_to :project_intake
   belongs_to :issued_by, class_name: "User"
+  has_one :project_invitation_email_proof, dependent: :restrict_with_exception
 
   ROLES = %w[reviewer].freeze
   STATES = %w[pending revoked].freeze

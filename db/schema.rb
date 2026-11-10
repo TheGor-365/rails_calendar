@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_232000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_233000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -163,6 +163,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_232000) do
     t.index ["client_id", "workspace_id"], name: "idx_project_intakes_client_workspace"
   end
 
+  create_table "project_invitation_email_proofs", force: :cascade do |t|
+    t.bigint "project_invitation_id", null: false
+    t.string "challenge_digest", limit: 64, null: false
+    t.integer "failed_attempts", default: 0, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "verified_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_invitation_id"], name: "idx_invitation_email_proofs_one_per_invite", unique: true
+  end
+
   create_table "project_invitations", force: :cascade do |t|
     t.bigint "workspace_id", null: false
     t.bigint "client_id", null: false
@@ -292,6 +303,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_232000) do
   add_foreign_key "intake_spec_versions", "project_intakes"
   add_foreign_key "project_intakes", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_intakes_scoped_client"
   add_foreign_key "project_intakes", "workspaces"
+  add_foreign_key "project_invitation_email_proofs", "project_invitations"
   add_foreign_key "project_invitations", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_invitations_client_tenant"
   add_foreign_key "project_invitations", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_project_invitations_intake_tenant"
   add_foreign_key "project_invitations", "users", column: "issued_by_id"
@@ -311,6 +323,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_232000) do
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
   add_check_constraint "project_intakes", "client_id IS NULL OR workspace_id IS NOT NULL", name: "chk_project_intakes_client_needs_workspace"
+  add_check_constraint "project_invitation_email_proofs", %q(challenge_digest ~ '^[0-9a-f]{64}$'), name: "chk_invitation_email_proof_digest"
+  add_check_constraint "project_invitation_email_proofs", "failed_attempts BETWEEN 0 AND 5", name: "chk_invitation_email_proof_attempts"
+  add_check_constraint "project_invitation_email_proofs", "expires_at > created_at AND expires_at <= created_at + interval '15 minutes'", name: "chk_invitation_email_proof_expiry"
+  add_check_constraint "project_invitation_email_proofs", "verified_at IS NULL OR verified_at <= expires_at", name: "chk_invitation_email_proof_verified_before_expiry"
   add_check_constraint "project_invitations", "role = 'reviewer'", name: "chk_project_invitations_role"
   add_check_constraint "project_invitations", "status IN ('pending', 'revoked')", name: "chk_project_invitations_no_granted_access"
   add_check_constraint "project_invitations", %q(token_digest ~ '^[0-9a-f]{64}$'), name: "chk_project_invitations_token_digest"
