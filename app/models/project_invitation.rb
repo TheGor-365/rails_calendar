@@ -4,6 +4,8 @@ class ProjectInvitation < ApplicationRecord
   belongs_to :project_intake
   belongs_to :issued_by, class_name: "User"
   has_one :project_invitation_email_proof, dependent: :restrict_with_exception
+  has_one :client_project_grant, class_name: "Studio::ClientProjectGrant",
+          dependent: :restrict_with_exception
 
   ROLES = %w[reviewer].freeze
   STATES = %w[pending revoked].freeze

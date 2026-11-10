@@ -43,7 +43,12 @@ module Studio
 
     def revoke!(client:, intake:, id:)
       invitation = checked_scope!(client: client, intake: intake).find(id)
-      invitation.update!(status: "revoked") unless invitation.status == "revoked"
+      ProjectInvitation.transaction do
+        invitation.lock!
+        invitation.update!(status: "revoked") unless invitation.status == "revoked"
+        grant = invitation.client_project_grant
+        grant.update!(status: "revoked") if grant && grant.status != "revoked"
+      end
       invitation
     end
 

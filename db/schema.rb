@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_233000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_234000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -188,6 +188,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_233000) do
     t.datetime "updated_at", null: false
     t.index ["issued_by_id"], name: "index_project_invitations_on_issued_by_id"
     t.index ["token_digest"], name: "idx_project_invitations_unique_token", unique: true
+    t.index ["id", "workspace_id", "client_id", "project_intake_id"], name: "idx_project_invitation_client_grant_scope", unique: true
     t.index ["workspace_id", "client_id", "project_intake_id"], name: "idx_project_invitations_tenant_scope"
     t.index ["workspace_id"], name: "index_project_invitations_on_workspace_id"
   end
@@ -245,6 +246,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_233000) do
     t.index ["intake_spec_version_id"], name: "index_project_milestones_on_intake_spec_version_id"
     t.index ["project_intake_id", "position"], name: "idx_project_milestone_position", unique: true
     t.index ["project_intake_id"], name: "index_project_milestones_on_project_intake_id"
+  end
+
+  create_table "studio_client_accounts", force: :cascade do |t|
+    t.string "email_digest", limit: 64, null: false
+    t.string "password_digest", null: false
+    t.string "status", limit: 16, default: "active", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_digest"], name: "idx_studio_client_accounts_email_digest", unique: true
+  end
+
+  create_table "studio_client_project_grants", force: :cascade do |t|
+    t.bigint "studio_client_account_id", null: false
+    t.bigint "project_invitation_id", null: false
+    t.bigint "workspace_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "project_intake_id", null: false
+    t.string "role", limit: 20, default: "reviewer", null: false
+    t.string "status", limit: 16, default: "active", null: false
+    t.string "consent_policy", limit: 32, null: false
+    t.datetime "consented_at", null: false
+    t.datetime "accepted_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["studio_client_account_id"], name: "idx_studio_grants_account"
+    t.index ["project_invitation_id"], name: "idx_studio_grants_single_use_invitation", unique: true
+    t.index ["studio_client_account_id", "workspace_id", "client_id", "project_intake_id"], name: "idx_studio_grants_account_tenant"
+  end
+
+  create_table "studio_client_sessions", force: :cascade do |t|
+    t.bigint "studio_client_account_id", null: false
+    t.string "token_digest", limit: 64, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["studio_client_account_id"], name: "idx_studio_client_sessions_account"
+    t.index ["token_digest"], name: "idx_studio_client_sessions_token", unique: true
   end
 
   create_table "user_sessions", force: :cascade do |t|
@@ -318,10 +356,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_233000) do
   add_foreign_key "project_sources", "workspaces"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
+  add_foreign_key "studio_client_project_grants", "studio_client_accounts"
+  add_foreign_key "studio_client_project_grants", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_grants_client_tenant"
+  add_foreign_key "studio_client_project_grants", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_studio_grants_intake_tenant"
+  add_foreign_key "studio_client_project_grants", "project_invitations", column: ["project_invitation_id", "workspace_id", "client_id", "project_intake_id"], primary_key: ["id", "workspace_id", "client_id", "project_intake_id"], name: "fk_studio_grants_invitation_tenant"
+  add_foreign_key "studio_client_sessions", "studio_client_accounts"
   add_foreign_key "user_sessions", "users"
   add_foreign_key "workspace_memberships", "users"
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
+  add_check_constraint "studio_client_accounts", %q(email_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_client_account_digest"
+  add_check_constraint "studio_client_accounts", "status IN ('active', 'suspended')", name: "chk_studio_client_account_status"
+  add_check_constraint "studio_client_sessions", %q(token_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_client_session_digest"
+  add_check_constraint "studio_client_sessions", "expires_at > created_at AND expires_at <= created_at + interval '8 hours'", name: "chk_studio_client_session_expiry"
+  add_check_constraint "studio_client_project_grants", "role = 'reviewer'", name: "chk_studio_grants_reviewer_only"
+  add_check_constraint "studio_client_project_grants", "status IN ('active','revoked')", name: "chk_studio_grants_status"
+  add_check_constraint "studio_client_project_grants", "consent_policy = 'studio_review_v1'", name: "chk_studio_grants_consent_policy"
+  add_check_constraint "studio_client_project_grants", "consented_at <= accepted_at", name: "chk_studio_grants_consent_first"
   add_check_constraint "project_intakes", "client_id IS NULL OR workspace_id IS NOT NULL", name: "chk_project_intakes_client_needs_workspace"
   add_check_constraint "project_invitation_email_proofs", %q(challenge_digest ~ '^[0-9a-f]{64}$'), name: "chk_invitation_email_proof_digest"
   add_check_constraint "project_invitation_email_proofs", "failed_attempts BETWEEN 0 AND 5", name: "chk_invitation_email_proof_attempts"

@@ -25,6 +25,15 @@ Rails.application.routes.draw do
   post "/workspaces/:workspace_id/project_intakes/:id/source_preview",
        to: "studio/source_previews#create"
 
+  # RC-036 Stage 3 Slice F: invitation-bound client identity in test/local only.
+  # No public sign-up, no files, and all client routes deny production.
+  post "/studio/client_accounts", to: "studio/client_accounts#create", as: :studio_client_accounts
+  post "/studio/client_sessions", to: "studio/client_sessions#create", as: :studio_client_sessions
+  delete "/studio/client_sessions", to: "studio/client_sessions#destroy"
+  get "/studio/client_projects", to: "studio/client_projects#index", as: :studio_client_projects
+  post "/studio/client_projects/accept", to: "studio/client_projects#accept", as: :accept_studio_client_project
+  get "/studio/client_projects/:id", to: "studio/client_projects#show", as: :studio_client_project
+
   # RC-036 Stage 3 Slice E: synthetic, nonproduction-only email possession proof.
   # No account creation, client login, invitation acceptance or data access.
   post "/studio/invitations/email_proofs",
