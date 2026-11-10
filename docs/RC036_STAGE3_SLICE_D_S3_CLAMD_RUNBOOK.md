@@ -20,7 +20,7 @@ The config/storage.yml S3 service uses force_path_style: true, public: false, bo
 .github/workflows/rc036-private-s3-clamd.yml runs only on pushes to the RC-036 feature branch and creates disposable resources:
 
 1. PostgreSQL 15 test DB + pinned aws-sdk-s3 Ruby dependency.
-2. Pinned archived MinIO image, CI only (NOT recommended for production), loopback 127.0.0.1:9000, randomly generated root password per runner, private rc036-ci-quarantine bucket.
+2. Maintained S3-compatible PGSTY SILO image (released 2026-11-09), digest-pinned and used ONLY in CI, loopback 127.0.0.1:9000, randomly generated root password per runner, private rc036-ci-quarantine bucket.
 3. GENUINE clamd daemon installed via apt, accessed using a private UNIX socket with INSTREAM. It loads a single synthetic **EICAR test signature**, not continuously updated official signatures. This proves protocol and test signature handling, NOT real-world malware protection coverage.
 4. Explicit integration suite: bin/rails test test/integration/rc036_private_s3_clamd.rb. Intentionally excluded from the default *_test.rb test glob. Checks quarantine blocking, genuine clean/infected scan, owner-only HTTP attachment, unsigned direct S3 GET returns 403, cross-workspace/client/intake IDOR denial, revoked membership and expired object deletion.
 5. No customer uploads, payment/billing changes, public domains, Railway deployment or external AI.

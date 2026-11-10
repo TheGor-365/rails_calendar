@@ -125,5 +125,5 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 - Pinned official AWS S3 SDK gem. Production-disabled PrivateSourceStorage opt-in S3 backend with nonproduction-only config, no public ACL or direct download URLs. See [Slice D runbook](RC036_STAGE3_SLICE_D_S3_CLAMD_RUNBOOK.md).
 - Owner-only synchronous /sources/:id/scan exists ONLY for synthetic test/local development, using ClamAvScanner UNIX INSTREAM.
 - Bounded ProjectSourceRetention deletes expired object bytes and revokes metadata, retains source history. No production cleanup scheduler.
-- Dedicated branch-only GitHub Actions spins up temporary local MinIO plus genuine clamd with a **test-only EICAR signature**, then tests S3 upload/quarantine/scan/download, anonymous object denial, ACL/IDOR/revocation and expiry.
+- Dedicated branch-only GitHub Actions spins up temporary maintained SILO S3-compatible storage plus genuine clamd with a **test-only EICAR signature**, then tests S3 upload/quarantine/scan/download, anonymous object denial, ACL/IDOR/revocation and expiry.
 - **Not production-ready:** no deployed private durable bucket, live updated ClamAV signatures, worker/scheduler, monitoring, real client identity/consent or actual provider security acceptance. No production/billing changes. No backup work per owner decision.

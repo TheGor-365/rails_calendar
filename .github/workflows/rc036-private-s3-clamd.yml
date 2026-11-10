@@ -50,16 +50,16 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Start isolated MinIO (temporary CI bucket only)
+      - name: Start isolated maintained S3 SILO (temporary CI bucket only)
         shell: bash
         run: |
           set -euo pipefail
           root_pass="$(openssl rand -hex 24)"
-          docker run --detach --name rc036-minio \
+          docker run --detach --name rc036-silo \
             --publish 127.0.0.1:9000:9000 \
             --env MINIO_ROOT_USER=rc036synthetic \
             --env MINIO_ROOT_PASSWORD="$root_pass" \
-            minio/minio:RELEASE.2025-09-07T16-13-09Z server /data
+            docker.io/pgsty/silo@sha256:08ce1505b5eacefbad1ca07159b242b9ce045a11c2817e3bc257b25f77bbc02d server /data
           {
             echo "RC_STUDIO_S3_ACCESS_KEY_ID=rc036synthetic"
             echo "RC_STUDIO_S3_SECRET_ACCESS_KEY=$root_pass"
@@ -70,7 +70,7 @@ jobs:
             fi
             sleep 2
           done
-          docker logs rc036-minio
+          docker logs rc036-silo
           exit 1
 
       - name: Start genuine clamd with isolated EICAR test signature only
@@ -130,5 +130,5 @@ jobs:
       - name: Diagnose isolated services on failure
         if: failure()
         run: |
-          docker logs --tail 50 rc036-minio || true
+          docker logs --tail 50 rc036-silo || true
           tail -n 50 "$RUNNER_TEMP/rc036-clamav/clamd.log" || true

@@ -33,7 +33,7 @@ class Rc036PrivateS3ClamdIntegrationTest < ActionDispatch::IntegrationTest
     @keys.each { |key| @storage.delete!(key: key) }
   end
 
-  test "real MinIO and clamd: quarantine, clean verdict, scoped HTTP attachment, anonymous S3 denied" do
+  test "real S3-compatible SILO and clamd: quarantine, clean verdict, scoped HTTP attachment, anonymous S3 denied" do
     sign_in(@owner)
     upload_md("# Synthetic approved-for-test text\n", "application/octet-stream")
     assert_response :created
