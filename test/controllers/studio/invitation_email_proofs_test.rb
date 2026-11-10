@@ -27,7 +27,7 @@ class StudioInvitationEmailProofsTest < ActionDispatch::IntegrationTest
     end
     assert_response :accepted
     assert_match(/no-store/, response.headers.fetch("Cache-Control"))
-    assert_equal "no-referrer", response.headers.fetch("Referrer-Policy"))
+    assert_equal "no-referrer", response.headers.fetch("Referrer-Policy")
     assert_equal 1, ActionMailer::Base.deliveries.length
     message = ActionMailer::Base.deliveries.last
     assert_equal ["receiver@example.test"], message.to
