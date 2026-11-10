@@ -3,6 +3,7 @@ class ProjectSource < ApplicationRecord
   belongs_to :client
   belongs_to :project_intake
   belongs_to :recorded_by, class_name: "User"
+  has_one :project_source_blob, dependent: :restrict_with_exception
 
   FORMATS = %w[markdown text json].freeze
   PARSER_VERSION = "rc036-preview-v1"

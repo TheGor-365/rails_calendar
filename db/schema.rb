@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_231000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_232000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -181,6 +181,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_231000) do
     t.index ["workspace_id"], name: "index_project_invitations_on_workspace_id"
   end
 
+  create_table "project_source_blobs", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "project_intake_id", null: false
+    t.bigint "project_source_id", null: false
+    t.string "object_key", limit: 66, null: false
+    t.string "scan_state", limit: 24, default: "quarantined", null: false
+    t.string "scanner_engine", limit: 80
+    t.string "scan_sha256", limit: 64
+    t.datetime "scanned_at"
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_project_source_blobs_on_workspace_id"
+    t.index ["project_source_id"], name: "idx_project_source_blobs_one_per_source", unique: true
+    t.index ["object_key"], name: "idx_project_source_blobs_private_object_key", unique: true
+    t.index ["workspace_id", "client_id", "project_intake_id"], name: "idx_project_source_blobs_tenant_scope"
+  end
+
   create_table "project_sources", force: :cascade do |t|
     t.bigint "workspace_id", null: false
     t.bigint "client_id", null: false
@@ -195,6 +214,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_231000) do
     t.datetime "updated_at", null: false
     t.index ["project_intake_id", "source_sha256", "parser_version"], name: "idx_project_sources_idempotency", unique: true
     t.index ["recorded_by_id"], name: "index_project_sources_on_recorded_by_id"
+    t.index ["id", "workspace_id", "client_id", "project_intake_id"], name: "idx_project_sources_blob_scope", unique: true
     t.index ["workspace_id", "client_id", "project_intake_id"], name: "idx_project_sources_tenant_scope"
     t.index ["workspace_id"], name: "index_project_sources_on_workspace_id"
   end
@@ -276,6 +296,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_231000) do
   add_foreign_key "project_invitations", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_project_invitations_intake_tenant"
   add_foreign_key "project_invitations", "users", column: "issued_by_id"
   add_foreign_key "project_invitations", "workspaces"
+  add_foreign_key "project_source_blobs", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_source_blobs_client_tenant"
+  add_foreign_key "project_source_blobs", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_project_source_blobs_intake_tenant"
+  add_foreign_key "project_source_blobs", "project_sources", column: ["project_source_id", "workspace_id", "client_id", "project_intake_id"], primary_key: ["id", "workspace_id", "client_id", "project_intake_id"], name: "fk_project_source_blobs_source_tenant"
+  add_foreign_key "project_source_blobs", "workspaces"
   add_foreign_key "project_sources", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_sources_client_tenant"
   add_foreign_key "project_sources", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_project_sources_intake_tenant"
   add_foreign_key "project_sources", "users", column: "recorded_by_id"
@@ -292,6 +316,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_231000) do
   add_check_constraint "project_invitations", %q(token_digest ~ '^[0-9a-f]{64}$'), name: "chk_project_invitations_token_digest"
   add_check_constraint "project_invitations", %q(recipient_digest ~ '^[0-9a-f]{64}$'), name: "chk_project_invitations_recipient_digest"
   add_check_constraint "project_invitations", "expires_at > created_at AND expires_at <= created_at + interval '72 hours'", name: "chk_project_invitations_expiry_window"
+  add_check_constraint "project_source_blobs", "scan_state IN ('quarantined', 'clean', 'infected', 'failed', 'revoked')", name: "chk_project_source_blob_scan_state"
+  add_check_constraint "project_source_blobs", "scan_state <> 'clean' OR (scanner_engine IS NOT NULL AND scan_sha256 IS NOT NULL AND scanned_at IS NOT NULL)", name: "chk_project_source_blob_clean_requires_attestation"
+  add_check_constraint "project_source_blobs", %q(object_key ~ '^q/[0-9a-f]{64}$'), name: "chk_project_source_blob_random_key"
+  add_check_constraint "project_source_blobs", "scan_sha256 IS NULL OR scan_sha256 ~ '^[0-9a-f]{64}$'", name: "chk_project_source_blob_scan_sha"
+  add_check_constraint "project_source_blobs", "expires_at > created_at AND expires_at <= created_at + interval '8 days'", name: "chk_project_source_blob_expiry_window"
   add_check_constraint "project_sources", "state = 'metadata_only'", name: "chk_project_sources_no_release_before_privacy_gate"
   add_check_constraint "project_sources", "byte_size BETWEEN 1 AND 262144", name: "chk_project_sources_preview_size"
   add_check_constraint "project_sources", %q(source_sha256 ~ '^[0-9a-f]{64}$'), name: "chk_project_sources_sha256"

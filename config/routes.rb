@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   # RC-036 Stage 3 Slice B: owner-only metadata and pending invitations.
   scope "/workspaces/:workspace_id/clients/:client_id/project_intakes/:project_intake_id" do
     get "/sources", to: "studio/project_sources#index", as: :studio_project_sources
+    post "/sources", to: "studio/project_sources#create"
     get "/sources/:id/download", to: "studio/project_sources#download", as: :studio_project_source_download
     get "/invitations", to: "studio/project_invitations#index", as: :studio_project_invitations
     post "/invitations", to: "studio/project_invitations#create"
