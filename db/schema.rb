@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,51 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_190000) do
     t.datetime "updated_at", null: false
     t.index ["client_digest", "window_start_epoch"], name: "idx_admin_login_windows_identity_and_window", unique: true
     t.index ["window_start_epoch"], name: "idx_admin_login_windows_cleanup"
+  end
+
+  create_table "client_consents", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "recorded_by_id", null: false
+    t.string "purpose", limit: 24, null: false
+    t.boolean "granted", null: false
+    t.string "source_ref", limit: 160, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id", "purpose", "created_at", "id"], name: "idx_client_consent_chronology"
+    t.index ["recorded_by_id"], name: "index_client_consents_on_recorded_by_id"
+    t.index ["workspace_id"], name: "index_client_consents_on_workspace_id"
+  end
+
+  create_table "client_facts", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "recorded_by_id", null: false
+    t.string "field_key", limit: 80, null: false
+    t.integer "revision", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.string "status", limit: 20, null: false
+    t.string "sensitivity", limit: 20, null: false
+    t.string "purpose", limit: 24, null: false
+    t.string "source_kind", limit: 24, null: false
+    t.string "source_ref", limit: 160, null: false
+    t.datetime "expires_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id", "field_key", "revision"], name: "idx_client_fact_revision_unique", unique: true
+    t.index ["recorded_by_id"], name: "index_client_facts_on_recorded_by_id"
+    t.index ["workspace_id", "client_id", "field_key"], name: "idx_client_facts_scoped_lookup"
+    t.index ["workspace_id"], name: "index_client_facts_on_workspace_id"
+  end
+
+  create_table "clients", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.string "display_name", limit: 120, null: false
+    t.string "status", limit: 20, default: "prospect", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["id", "workspace_id"], name: "idx_clients_id_workspace_unique", unique: true
+    t.index ["workspace_id"], name: "index_clients_on_workspace_id"
   end
 
   create_table "consultation_reschedule_events", force: :cascade do |t|
@@ -150,6 +195,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_190000) do
     t.index "lower((email)::text)", name: "idx_users_email_case_insensitive", unique: true
   end
 
+  create_table "workspace_memberships", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "user_id", null: false
+    t.string "role", limit: 20, null: false
+    t.string "status", limit: 20, default: "active", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_workspace_memberships_on_user_id"
+    t.index ["workspace_id", "user_id"], name: "idx_workspace_member_unique", unique: true
+    t.index ["workspace_id"], name: "index_workspace_memberships_on_workspace_id"
+  end
+
+  create_table "workspaces", force: :cascade do |t|
+    t.bigint "owner_user_id", null: false
+    t.string "name", limit: 120, null: false
+    t.string "slug", limit: 64, null: false
+    t.string "state", limit: 20, default: "internal", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_user_id"], name: "index_workspaces_on_owner_user_id"
+    t.index ["slug"], name: "index_workspaces_on_slug", unique: true
+  end
+
+  add_foreign_key "client_consents", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_client_consents_scoped_client"
+  add_foreign_key "client_consents", "users", column: "recorded_by_id"
+  add_foreign_key "client_consents", "workspaces"
+  add_foreign_key "client_facts", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_client_facts_scoped_client"
+  add_foreign_key "client_facts", "users", column: "recorded_by_id"
+  add_foreign_key "client_facts", "workspaces"
+  add_foreign_key "clients", "workspaces"
   add_foreign_key "intake_answer_revisions", "intake_answers"
   add_foreign_key "intake_answers", "project_intakes"
   add_foreign_key "intake_messages", "project_intakes"
@@ -157,4 +232,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_190000) do
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
   add_foreign_key "user_sessions", "users"
+  add_foreign_key "workspace_memberships", "users"
+  add_foreign_key "workspace_memberships", "workspaces"
+  add_foreign_key "workspaces", "users", column: "owner_user_id"
 end
