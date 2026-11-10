@@ -56,11 +56,11 @@ class AdaptiveIntakeQuizzesController < ApplicationController
             newly_hidden = newly_hidden_saved_count
             if newly_hidden.positive? && input[:confirm_branch_change] != "1"
               @needs_branch_confirmation = true
-              @answer.errors.add(:base, "This change will hide #{'#{newly_hidden}'} previously saved answer(s). Confirm below before saving.")
+              @answer.errors.add(:base, "This change will hide #{newly_hidden} previously saved answer(s). Confirm below before saving.")
             else
               if @answer.new_record? || @answer.changed?
                 @answer.revision += 1
-              @answer.save!
+                @answer.save!
                 @answer.intake_answer_revisions.create!(
                   revision: @answer.revision,
                   snapshot: @answer.snapshot.merge("catalog_version" => Intake::AdaptiveQuestionCatalog::VERSION)
