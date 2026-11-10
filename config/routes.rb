@@ -19,6 +19,12 @@ Rails.application.routes.draw do
   patch "/project_intakes/:project_intake_id/quiz/adaptive/:question_key",
         to: "adaptive_intake_quizzes#update", as: :adaptive_project_intake_quiz_answer
 
+  # Owner-only Studio preview. No client access, persistence or AI calls.
+  get "/workspaces/:workspace_id/project_intakes/:id/source_preview",
+      to: "studio/source_previews#new", as: :workspace_source_preview
+  post "/workspaces/:workspace_id/project_intakes/:id/source_preview",
+       to: "studio/source_previews#create"
+
   root "pages#home"
   get "calendar/day", to: "pages#day", as: :calendar_day
   get "calendar/hour", to: "pages#hour", as: :calendar_hour

@@ -89,6 +89,15 @@ class ProjectIntakesController < ApplicationController
   end
 
   def require_intake_access!
+    if @intake.workspace_id.present?
+      # Legacy public demo/admin actions must never expose or mutate a
+      # workspace-owned intake. Only its owner may read the old show view.
+      return head :not_found unless action_name == "show" &&
+                                    @intake.workspace.owner_access?(current_user)
+
+      return
+    end
+
     return if admin_signed_in?
     return if ENV["RC_INTAKE_PUBLIC_DEMO"] == "true" && session[:project_intake_id] == @intake.id
 

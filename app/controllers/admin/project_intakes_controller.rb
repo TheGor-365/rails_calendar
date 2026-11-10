@@ -4,7 +4,10 @@ module Admin
     before_action :set_intake, only: %i[draft_spec approve_spec edit_spec revise_spec plan]
 
     def index
-      @intakes = ProjectIntake.order(created_at: :desc, id: :desc).limit(50)
+      # Legacy administrator is NOT a workspace member. Project Studio
+      # intakes require dedicated ACL controllers; never leak them in inbox.
+      @intakes = ProjectIntake.where(workspace_id: nil)
+                              .order(created_at: :desc, id: :desc).limit(50)
     end
 
     def draft_spec
@@ -167,7 +170,9 @@ module Admin
     end
 
     def set_intake
-      @intake = ProjectIntake.find(params[:id])
+      # Legacy AI draft/approval/plan actions are not allowed on a new
+      # client/workspace intake until RC-036/037 permissions are complete.
+      @intake = ProjectIntake.where(workspace_id: nil).find(params[:id])
     end
   end
 end
