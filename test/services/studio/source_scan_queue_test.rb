@@ -104,13 +104,14 @@ class StudioSourceScanQueueTest < ActiveSupport::TestCase
     assert_equal 1, queue.process_due!
     travel 6.minutes do
       assert_equal 1, queue.process_due!
-      travel 31.minutes do
-        assert_equal 1, queue.process_due!
-        assert_equal "exhausted", task.reload.state
-        assert_equal 3, task.attempts
-        assert_equal "scan_denied", task.last_error_code
-        assert_equal 0, queue.process_due!
-      end
+    end
+    # Third attempt is due 30 minutes after the second attempt at +6m.
+    travel 37.minutes do
+      assert_equal 1, queue.process_due!
+      assert_equal "exhausted", task.reload.state
+      assert_equal 3, task.attempts
+      assert_equal "scan_denied", task.last_error_code
+      assert_equal 0, queue.process_due!
     end
     assert_equal "failed", @source.project_source_blob.reload.scan_state
     assert_not @source.project_source_blob.downloadable?

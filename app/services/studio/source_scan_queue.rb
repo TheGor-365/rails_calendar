@@ -34,10 +34,14 @@ module Studio
         raise Denied, "Source is not eligible for a queued synthetic scan"
       end
 
-      @workspace.studio_source_scan_tasks.create_or_find_by!(project_source_blob_id: blob.id) do |task|
-        task.state = "queued"
-        task.next_attempt_at = Time.current
-      end
+      scope = @workspace.studio_source_scan_tasks
+      scope.find_by(project_source_blob_id: blob.id) ||
+        scope.create!(project_source_blob_id: blob.id, state: "queued",
+                      next_attempt_at: Time.current)
+    rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+      # Concurrent enqueue can win between SELECT and INSERT; return the
+      # existing immutable task without resetting a retry or terminal state.
+      scope.find_by!(project_source_blob_id: blob.id)
     end
 
     def process_due!(limit: MAX_BATCH)
