@@ -1,0 +1,22 @@
+# LOCAL DEV ONLY — launch explicitly with:
+# docker compose -f deploy/rc036/clamav.compose.yml up -d
+# Official Talos ClamAV image with preloaded official signature DB and
+# FreshClam update daemon. Bind TCP to IPv4 LOOPBACK ONLY; clamd TCP has
+# no authentication or encryption. Never map port 3310 publicly.
+# Requires approximately 4GB RAM; not suited to tiny Railway instances.
+services:
+  rc036-clamav:
+    image: clamav/clamav:1.4
+    container_name: rc036-local-clamav
+    restart: unless-stopped
+    environment:
+      CLAMAV_NO_CLAMD: "false"
+      CLAMAV_NO_FRESHCLAMD: "false"
+      FRESHCLAM_CHECKS: "12"
+    ports:
+      - "127.0.0.1:3310:3310"
+    volumes:
+      - rc036-clamav-definitions:/var/lib/clamav
+
+volumes:
+  rc036-clamav-definitions:
