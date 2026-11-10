@@ -1,0 +1,80 @@
+<div class="container my-4 my-sm-5">
+  <header class="rc-page-hero mb-3">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow">AI SERVICE WORKSPACE / ADAPTIVE QUIZ REVIEW · SECTION H</p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span>
+        <h1 class="page-title">Review your adaptive brief</h1>
+      </div>
+      <p class="rc-muted"><%= @intake.title %> · Section A: <%= @intake.project_type.humanize %></p>
+      <p class="rc-hint">Owner-only draft. This is not a submitted client order or an AI-produced specification.</p>
+    </div>
+    <span class="rc-status-pill">Saved to private PostgreSQL · <%= Intake::AdaptiveQuestionCatalog::VERSION %></span>
+  </header>
+  <div class="rc-quiz-layout mt-3">
+    <section class="surface-panel p-3 p-sm-4" aria-label="Adaptive quiz saved review">
+      <% if @unfinished_question %>
+        <div class="rc-quiz-review-alert mb-3" role="status">
+          <h2 class="h5">Your adaptive brief is not finished yet</h2>
+          <p>Only visible and completed questions count. Inactive branches are not considered.</p>
+          <%= link_to "Continue unfinished quiz",
+                      adaptive_project_intake_quiz_path(@intake, step: @unfinished_question.fetch(:key)),
+                      class: "rc-action rc-action--primary" %>
+        </div>
+      <% else %>
+        <div class="rc-quiz-review-ready mb-3" role="status">
+          <h2 class="h5">All <%= @questions.size %> visible questions saved</h2>
+          <p class="mb-0">This is still a private draft; no public submit or paid AI action was performed.</p>
+        </div>
+      <% end %>
+      <% if @hidden_saved_count.positive? %>
+        <div class="rc-notice rc-notice--neutral mb-3" role="status">
+          <%= @hidden_saved_count %> historic answer(s) are currently inactive because a parent answer changed.
+          Their immutable revisions remain in the database and are excluded from the active brief.
+        </div>
+      <% end %>
+      <% @questions.each_with_index do |question, index| %>
+        <% answer = @saved_answers[question.fetch(:key)] %>
+        <section class="rc-quiz-review-item" aria-label="<%= question.fetch(:title) %>">
+          <div class="rc-quiz-review-item__heading">
+            <h2 class="h5 mb-0"><%= index + 1 %>. [<%= question.fetch(:section) %>] <%= question.fetch(:title) %></h2>
+            <span class="rc-quiz-status <%= answer ? 'rc-quiz-status--saved' : 'rc-quiz-status--empty' %>"><%= answer ? "Saved" : "Missing" %></span>
+          </div>
+          <% if answer %>
+            <% if answer.unsure? %>
+              <p>Unknown / recommendation needed</p>
+            <% else %>
+              <% if answer.selected_options.any? %>
+                <ul class="rc-quiz-review-choices">
+                  <% answer.selected_options.each do |option| %>
+                    <li>
+                      <%= question.fetch(:options).fetch(option, option) %>
+                      <% if answer.feature_priorities[option].present? %>
+                        <span class="rc-hint">— <%= { "must" => "Must", "should" => "Should", "later" => "Later" }.fetch(answer.feature_priorities[option]) %></span>
+                      <% elsif Intake::AdaptiveQuestionCatalog.prioritizable?(question.fetch(:key)) %>
+                        <span class="rc-hint">— Not prioritized (earlier version)</span>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ul>
+              <% end %>
+              <% if answer.other_text.present? %><p>Own answer: <%= answer.other_text %></p><% end %>
+            <% end %>
+            <% if answer.comment.present? %><p class="rc-muted">Comment: <%= answer.comment %></p><% end %>
+            <p class="rc-hint">Revision <%= answer.revision %> · <%= answer.intake_answer_revisions.size %> immutable snapshot(s)</p>
+          <% else %>
+            <p class="rc-muted">Not answered</p>
+          <% end %>
+          <%= link_to "Edit this answer",
+                      adaptive_project_intake_quiz_path(@intake, step: question.fetch(:key)),
+                      class: "rc-action rc-action--soft rc-action--small" %>
+        </section>
+      <% end %>
+      <div class="rc-quiz-review-footer">
+        <%= link_to "Return to adaptive quiz", adaptive_project_intake_quiz_path(@intake, step: @questions.first.fetch(:key)),
+                    class: "rc-action rc-action--quiet" %>
+        <%= link_to "Return to intake (draft saved)", project_intake_path(@intake), class: "rc-action rc-action--quiet" %>
+      </div>
+    </section>
+  </div>
+</div>

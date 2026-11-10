@@ -12,3 +12,5 @@ import UiFeedbackController from "./ui_feedback_controller"
 application.register("ui-feedback", UiFeedbackController)
 import QuizLiveController from "./quiz_live_controller"
 application.register("quiz-live", QuizLiveController)
+import AdaptivePriorityController from "./adaptive_priority_controller"
+application.register("adaptive-priority", AdaptivePriorityController)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_09_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -74,6 +74,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_190000) do
     t.integer "revision", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "feature_priorities", default: {}, null: false
     t.index ["project_intake_id", "question_key"], name: "idx_intake_answers_unique_question", unique: true
     t.index ["project_intake_id"], name: "index_intake_answers_on_project_intake_id"
   end

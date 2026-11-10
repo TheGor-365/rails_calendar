@@ -1,0 +1,133 @@
+<div class="container my-4 my-sm-5">
+  <header class="rc-page-hero mb-3">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow">AI SERVICE WORKSPACE / RC-035B ADAPTIVE PREVIEW</p>
+      <p class="rc-muted"><%= @intake.title %> · Section A: <%= @intake.project_type.humanize %> ·
+        Section <%= @question.fetch(:section) %> · Question <%= @position + 1 %> of <%= @questions.size %></p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-diagram-3"></i></span>
+        <h1 class="page-title"><%= @question.fetch(:title) %></h1>
+      </div>
+      <p class="rc-hint">Private deterministic draft; no Grok API calls, client submission, or contractual approval.</p>
+    </div>
+    <span class="rc-status-pill">Owner-only · <%= Intake::AdaptiveQuestionCatalog::VERSION %></span>
+  </header>
+
+  <% completed = @questions.count { |question| @saved_answers.key?(question.fetch(:key)) } %>
+  <section class="surface-panel p-3 mb-3" aria-label="Adaptive quiz progress">
+    <div class="rc-quiz-progress__header">
+      <span>Sections B–G · <%= completed %> of <%= @questions.size %> visible questions saved</span>
+      <strong>Section H: Review</strong>
+    </div>
+    <div class="rc-quiz-meter" role="progressbar" aria-valuenow="<%= completed %>" aria-valuemin="0"
+         aria-valuemax="<%= @questions.size %>" aria-label="Saved visible answers">
+      <span class="rc-quiz-meter__fill" style="width: <%= (completed * 100.0 / @questions.size).round %>%"></span>
+    </div>
+    <% if @hidden_saved_count.positive? %>
+      <p class="rc-hint mt-2 mb-0" role="status"><%= @hidden_saved_count %> saved answer(s) belong to inactive branches.
+        They remain in the revision history but are excluded from this review.</p>
+    <% end %>
+  </section>
+
+  <div class="rc-quiz-layout">
+    <section class="surface-panel p-3 p-sm-4" aria-label="Adaptive quiz question">
+      <% if @answer.errors.any? %>
+        <div class="rc-notice rc-notice--error mb-3" role="alert"><%= @answer.errors.full_messages.to_sentence %></div>
+      <% end %>
+      <%= form_with url: adaptive_project_intake_quiz_answer_path(@intake, question_key: @question.fetch(:key)),
+                    scope: :quiz, method: :patch, local: true,
+                    html: { data: { controller: "adaptive-priority", action: "change->adaptive-priority#refresh" } } do %>
+        <%= hidden_field_tag "quiz[revision]", @answer.revision %>
+        <%= hidden_field_tag "quiz[selected_options][]", "" %>
+        <fieldset class="mb-3">
+          <legend class="h5"><%= @question.fetch(:mode) == :multi ? "Select all that apply" : "Select one" %></legend>
+          <% @question.fetch(:options).each do |key, description| %>
+            <div data-rc-priority-row class="d-flex flex-wrap gap-2 align-items-center mb-2">
+              <label class="rc-quiz-choice flex-grow-1 mb-0">
+                <% if @question.fetch(:mode) == :single %>
+                  <%= radio_button_tag "quiz[selected_options][]", key, @answer.selected_options.include?(key) %>
+                <% else %>
+                  <%= check_box_tag "quiz[selected_options][]", key, @answer.selected_options.include?(key) %>
+                <% end %>
+                <span><%= description %></span>
+              </label>
+              <% if Intake::AdaptiveQuestionCatalog.prioritizable?(@question.fetch(:key)) %>
+                <div data-rc-priority-field class="rc-field mb-0">
+                  <%= label_tag "quiz_priority_#{key}", "Priority for #{description}", class: "rc-field-label small" %>
+                  <%= select_tag "quiz[feature_priorities][#{key}]",
+                                 options_for_select([["Choose priority", ""], ["Must have", "must"],
+                                                     ["Should have", "should"], ["Later", "later"]],
+                                                    @answer.feature_priorities[key]),
+                                 id: "quiz_priority_#{key}", class: "rc-input", data: { rc_priority_select: true } %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </fieldset>
+        <div class="rc-field mb-3">
+          <%= label_tag :quiz_other_text, "Other answer (optional)", class: "rc-field-label" %>
+          <%= text_field_tag "quiz[other_text]", @answer.other_text, maxlength: 300, id: "quiz_other_text", class: "rc-input" %>
+        </div>
+        <div class="rc-field mb-3">
+          <label class="rc-quiz-choice rc-quiz-choice--unsure">
+            <%= check_box_tag "quiz[unsure]", "1", @answer.unsure %>
+            <span>Not sure — suggest options later</span>
+          </label>
+          <p class="rc-hint">Not sure cannot be combined with selected options or your own answer.</p>
+        </div>
+        <div class="rc-field mb-3">
+          <%= label_tag :quiz_comment, "Additional context (optional)", class: "rc-field-label" %>
+          <%= text_area_tag "quiz[comment]", @answer.comment, maxlength: 500, rows: 3, id: "quiz_comment", class: "rc-input" %>
+          <p class="rc-hint">Do not include passwords, API keys, tokens, customer data or private documents.</p>
+        </div>
+
+        <% if @needs_branch_confirmation %>
+          <div class="rc-notice rc-notice--neutral mb-3" role="status">
+            Your original answer is unchanged. Confirm to hide inactive branches
+            from the current brief while preserving all saved answers and revisions.
+          </div>
+          <div class="rc-quiz-actions mt-3">
+            <%= button_tag "Confirm branch change", type: "submit",
+                           name: "quiz[confirm_branch_change]", value: "1",
+                           class: "rc-action rc-action--primary", data: { disable_with: "Confirming…" } %>
+            <%= link_to "Cancel changes",
+                        adaptive_project_intake_quiz_path(@intake, step: @question.fetch(:key)),
+                        class: "rc-action rc-action--quiet" %>
+          </div>
+        <% else %>
+          <div class="rc-quiz-actions mt-3">
+            <%= button_tag "Save and continue", type: "submit", name: "quiz[navigation]", value: "continue",
+                           class: "rc-action rc-action--primary", data: { disable_with: "Saving…" } %>
+            <% if @position.positive? %>
+              <%= button_tag "Save and go back", type: "submit", name: "quiz[navigation]", value: "back",
+                             class: "rc-action rc-action--quiet", data: { disable_with: "Saving…" } %>
+            <% end %>
+            <%= button_tag "Save and review", type: "submit", name: "quiz[navigation]", value: "review",
+                           class: "rc-action rc-action--quiet", data: { disable_with: "Saving…" } %>
+            <%= button_tag "Save and return to intake", type: "submit", name: "quiz[navigation]", value: "intake",
+                           class: "rc-action rc-action--quiet", data: { disable_with: "Saving…" } %>
+          </div>
+        <% end %>
+        <p class="rc-hint mt-3 mb-0">Each button saves explicitly before navigation. Refresh or browser Back alone does not save edits.</p>
+      <% end %>
+    </section>
+
+    <aside class="rc-quiz-sidebar">
+      <section class="surface-panel p-3 p-sm-4" aria-label="Saved adaptive answers">
+        <p class="eyebrow">PRIVATE BRIEF SNAPSHOT</p>
+        <h2 class="h5">Visible answers</h2>
+        <ol class="rc-record-list">
+          <% @questions.each do |question| %>
+            <% answer = @saved_answers[question.fetch(:key)] %>
+            <li class="rc-record">
+              <strong><%= question.fetch(:section) %> · <%= question.fetch(:title) %></strong>
+              <p class="rc-hint mb-0"><%= answer ? "Revision #{answer.revision} saved" : "Not answered" %></p>
+            </li>
+          <% end %>
+        </ol>
+        <%= link_to "Open draft review", review_adaptive_project_intake_quiz_path(@intake),
+                    class: "rc-action rc-action--soft rc-action--small mt-2" %>
+      </section>
+    </aside>
+  </div>
+</div>
