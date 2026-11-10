@@ -172,7 +172,8 @@ module Admin
     def set_intake
       # Legacy AI draft/approval/plan actions are not allowed on a new
       # client/workspace intake until RC-036/037 permissions are complete.
-      @intake = ProjectIntake.where(workspace_id: nil).find(params[:id])
+      @intake = ProjectIntake.where(workspace_id: nil).find_by(id: params[:id])
+      head :not_found unless @intake
     end
   end
 end
