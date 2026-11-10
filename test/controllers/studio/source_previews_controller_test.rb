@@ -61,6 +61,23 @@ class StudioSourcePreviewsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/<script>/, response.body)
   end
 
+  test "owner can download an unapproved MD brief from a synthetic source" do
+    sign_in(@alice)
+    with_upload("# Fictional Roadmap\n## Scope\n- [ ] Document traceability\n", ".md") do |upload|
+      post workspace_source_preview_path(@a, @intake),
+           params: { source_file: upload, intent: "download" }
+    end
+    assert_response :success
+    assert_equal "text/markdown", response.media_type
+    assert_match(/attachment/, response.headers.fetch("Content-Disposition"))
+    assert_match(/discovery-unapproved\.md/, response.headers.fetch("Content-Disposition"))
+    assert_includes response.body, "# Draft discovery brief — NOT APPROVED"
+    assert_includes response.body, "Document traceability"
+    assert_includes response.body, "Source SHA256:"
+    assert_not_includes response.body, "Approved price:"
+    assert_match(/no-store/, response.headers.fetch("Cache-Control"))
+  end
+
   test "nonallowlisted uploads or oversized content fail without persistence" do
     sign_in(@alice)
     with_upload("Fake PDF", ".pdf") do |upload|

@@ -21,6 +21,13 @@ module Studio
         bytes: upload.read(SourceInspector::MAX_BYTES + 1)
       )
       @plan = DocumentGenerationPlan.new.call(evidence: { "source_inspected" => true })
+      if params[:intent] == "download"
+        markdown = DraftBriefRenderer.new.call(intake: @intake, report: @report, actor: current_user)
+        return send_data markdown, type: "text/markdown; charset=utf-8",
+                         filename: "project-#{@intake.id}-discovery-unapproved.md",
+                         disposition: "attachment"
+      end
+      raise ArgumentError, "Unknown preview action" unless params[:intent].blank? || params[:intent] == "analyze"
       render :new
     rescue ArgumentError => error
       @error = error.message

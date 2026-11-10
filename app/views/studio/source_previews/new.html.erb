@@ -40,9 +40,18 @@
             </p>
           </div>
         </div>
-        <%= button_tag type: :submit, class: "rc-action rc-action--primary" do %>
-          <i class="bi bi-search me-2" aria-hidden="true"></i>Analyze privately
-        <% end %>
+        <div class="d-flex flex-wrap gap-2">
+          <%= button_tag type: :submit, name: "intent", value: "analyze",
+                         class: "rc-action rc-action--primary" do %>
+            <i class="bi bi-search me-2" aria-hidden="true"></i>Analyze privately
+          <% end %>
+          <%= button_tag type: :submit, name: "intent", value: "download",
+                         class: "rc-action rc-action--soft", data: { turbo: false } do %>
+            <i class="bi bi-download me-2" aria-hidden="true"></i>Download draft .md
+          <% end %>
+        </div>
+        <p class="rc-hint mt-2">Download is a synthetic, unapproved discovery outline with source fingerprint.
+          It is not a full specification, financial model or client agreement.</p>
       <% end %>
 
       <%= turbo_frame_tag "studio_preview" do %>
