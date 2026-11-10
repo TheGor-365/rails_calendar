@@ -47,6 +47,20 @@ module Studio
       render json: { error: "Source scan not cleared" }, status: :unprocessable_entity
     end
 
+    # Owner-only enqueue: no network scan in a web request; an explicitly
+    # local nonproduction runner will process due work. No cloud scheduler.
+    def queue_scan
+      return head :not_found unless PrivateSourceStorage.enabled?
+
+      task = SourceScanQueue.new(actor: current_user, workspace: @workspace)
+                            .enqueue!(client: @client, intake: @intake, source_id: params[:id])
+      render json: { task_id: task.id, state: task.state,
+                     attempts: task.attempts, downloadable: false },
+             status: :accepted
+    rescue ActiveRecord::RecordNotFound, SecurityError, SourceScanQueue::Denied
+      head :not_found
+    end
+
     def download
       # Every access rechecks actor, membership, workspace, client and intake.
       result = pipeline.download!(client: @client, intake: @intake, source_id: params[:id])

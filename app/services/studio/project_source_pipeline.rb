@@ -53,24 +53,41 @@ module Studio
     def scan!(client:, intake:, source_id:)
       source = @registry.find!(client: client, intake: intake, id: source_id)
       blob = source.project_source_blob
-      raise Denied, "Source is not staged" unless blob && %w[quarantined failed].include?(blob.scan_state)
-      raise Denied, "Quarantine expired" unless blob.expires_at > Time.current
+      raise Denied, "Source is not staged" unless blob
 
-      begin
-        raw = @storage.read!(key: blob.object_key)
-        raise Denied, "Quarantined bytes have changed" unless digest_matches?(source, raw)
-        verdict = @scanner.scan!(raw)
-        unless verdict.respond_to?(:state) && %w[clean infected].include?(verdict.state) &&
-               verdict.engine.to_s.match?(/\A[a-zA-Z0-9._-]{1,80}\z/)
-          raise Denied, "Scanner returned an unsupported verdict"
+      # Lock the blob over the bounded synthetic scan. A competing HTTP scan
+      # or retention sweep cannot mark a deleted/revoked object clean again.
+      failure = nil
+      blob.with_lock do
+        unless %w[quarantined failed].include?(blob.scan_state) &&
+               blob.expires_at > Time.current
+          raise Denied, "Source is not eligible for scan"
         end
 
-        blob.update!(scan_state: verdict.state, scanned_at: Time.current,
-                     scan_sha256: Digest::SHA256.hexdigest(raw), scanner_engine: verdict.engine)
-      rescue StandardError => error
-        blob.update!(scan_state: "failed", scanned_at: nil, scanner_engine: nil, scan_sha256: nil) if blob.reload.scan_state != "failed"
-        raise Denied, "Source scanning could not be verified (#{error.class})"
+        begin
+          raw = @storage.read!(key: blob.object_key)
+          raise Denied, "Quarantined bytes have changed" unless digest_matches?(source, raw)
+          verdict = @scanner.scan!(raw)
+          unless verdict.respond_to?(:state) && %w[clean infected].include?(verdict.state) &&
+                 verdict.engine.to_s.match?(/\A[a-zA-Z0-9._-]{1,80}\z/)
+            raise Denied, "Scanner returned an unsupported verdict"
+          end
+          # Revalidate membership and expiry before accepting the verdict.
+          @access.assert_client!(client)
+          raise Denied, "Quarantine expired during scan" unless blob.expires_at > Time.current
+
+          blob.update!(scan_state: verdict.state, scanned_at: Time.current,
+                       scan_sha256: Digest::SHA256.hexdigest(raw), scanner_engine: verdict.engine)
+        rescue StandardError => error
+          if blob.scan_state != "failed"
+            blob.update!(scan_state: "failed", scanned_at: nil,
+                         scanner_engine: nil, scan_sha256: nil)
+          end
+          failure = Denied.new("Source scanning could not be verified (#{error.class})")
+        end
       end
+
+      raise failure if failure
       blob
     end
 

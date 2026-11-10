@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_234000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_002000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -210,6 +210,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_234000) do
     t.index ["project_source_id"], name: "idx_project_source_blobs_one_per_source", unique: true
     t.index ["object_key"], name: "idx_project_source_blobs_private_object_key", unique: true
     t.index ["workspace_id", "client_id", "project_intake_id"], name: "idx_project_source_blobs_tenant_scope"
+    t.index ["id", "workspace_id"], name: "idx_project_source_blobs_scan_task_tenant", unique: true
   end
 
   create_table "project_sources", force: :cascade do |t|
@@ -246,6 +247,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_234000) do
     t.index ["intake_spec_version_id"], name: "index_project_milestones_on_intake_spec_version_id"
     t.index ["project_intake_id", "position"], name: "idx_project_milestone_position", unique: true
     t.index ["project_intake_id"], name: "index_project_milestones_on_project_intake_id"
+  end
+
+  create_table "studio_source_scan_tasks", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "project_source_blob_id", null: false
+    t.string "state", limit: 24, default: "queued", null: false
+    t.integer "attempts", default: 0, null: false
+    t.datetime "next_attempt_at", null: false
+    t.string "last_error_code", limit: 32
+    t.datetime "finished_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_studio_source_scan_tasks_on_workspace_id"
+    t.index ["project_source_blob_id"], name: "idx_studio_scan_task_one_per_blob", unique: true
+    t.index ["workspace_id", "state", "next_attempt_at", "id"], name: "idx_studio_scan_task_due"
   end
 
   create_table "studio_client_accounts", force: :cascade do |t|
@@ -356,6 +372,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_234000) do
   add_foreign_key "project_sources", "workspaces"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
+  add_foreign_key "studio_source_scan_tasks", "project_source_blobs", column: ["project_source_blob_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_scan_task_blob_tenant"
+  add_foreign_key "studio_source_scan_tasks", "workspaces"
   add_foreign_key "studio_client_project_grants", "studio_client_accounts"
   add_foreign_key "studio_client_project_grants", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_grants_client_tenant"
   add_foreign_key "studio_client_project_grants", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_studio_grants_intake_tenant"
@@ -365,6 +383,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_234000) do
   add_foreign_key "workspace_memberships", "users"
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
+  add_check_constraint "studio_source_scan_tasks", "state IN ('queued','retry_wait','complete_clean','complete_infected','exhausted','expired','cancelled')", name: "chk_studio_scan_task_state"
+  add_check_constraint "studio_source_scan_tasks", "attempts BETWEEN 0 AND 3", name: "chk_studio_scan_task_attempts"
+  add_check_constraint "studio_source_scan_tasks", "last_error_code IS NULL OR last_error_code = 'scan_denied'", name: "chk_studio_scan_task_error"
+  add_check_constraint "studio_source_scan_tasks", "(state IN ('queued','retry_wait')) = (finished_at IS NULL)", name: "chk_studio_scan_task_finish"
   add_check_constraint "studio_client_accounts", %q(email_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_client_account_digest"
   add_check_constraint "studio_client_accounts", "status IN ('active', 'suspended')", name: "chk_studio_client_account_status"
   add_check_constraint "studio_client_sessions", %q(token_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_client_session_digest"

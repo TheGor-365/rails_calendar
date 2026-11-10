@@ -46,6 +46,8 @@ Rails.application.routes.draw do
     get "/sources", to: "studio/project_sources#index", as: :studio_project_sources
     post "/sources", to: "studio/project_sources#create"
     post "/sources/:id/scan", to: "studio/project_sources#scan", as: :studio_project_source_scan
+    post "/sources/:id/queue_scan", to: "studio/project_sources#queue_scan",
+         as: :studio_project_source_queue_scan
     get "/sources/:id/download", to: "studio/project_sources#download", as: :studio_project_source_download
     get "/invitations", to: "studio/project_invitations#index", as: :studio_project_invitations
     post "/invitations", to: "studio/project_invitations#create"

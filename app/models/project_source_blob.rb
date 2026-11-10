@@ -3,6 +3,8 @@ class ProjectSourceBlob < ApplicationRecord
   belongs_to :client
   belongs_to :project_intake
   belongs_to :project_source
+  has_one :studio_source_scan_task, class_name: "Studio::SourceScanTask",
+          dependent: :restrict_with_exception
 
   STATES = %w[quarantined clean infected failed revoked].freeze
 

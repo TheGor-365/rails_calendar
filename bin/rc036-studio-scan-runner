@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+# Developer-invoked, synthetic-only, bounded PostgreSQL queue drain.
+# This command uses the workspace's owner identity and MUST NOT be exposed
+# via HTTP, cron, Railway CLI, or production. No real client files.
+require "json"
+
+ENV["RAILS_ENV"] ||= "development"
+require_relative "../config/environment"
+
+unless Rails.env.development? &&
+       ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true" &&
+       ENV["RC_STUDIO_LOCAL_SCAN_RUNNER"] == "true" &&
+       Studio::PrivateSourceStorage.enabled?
+  warn "Refusing to run outside explicitly enabled local synthetic development"
+  exit 1
+end
+
+begin
+  workspace_id = Integer(ENV.fetch("RC_STUDIO_SCAN_WORKSPACE_ID"), 10)
+  limit = Integer(ENV.fetch("RC_STUDIO_SCAN_LIMIT", "5"), 10)
+  raise ArgumentError unless workspace_id.positive? &&
+                             limit.between?(1, Studio::SourceScanQueue::MAX_BATCH)
+
+  workspace = Workspace.find(workspace_id)
+  queue = Studio::SourceScanQueue.new(actor: workspace.owner_user, workspace: workspace)
+  processed = queue.process_due!(limit: limit)
+  puts JSON.generate(processed: processed, summary: queue.summary,
+                     production_enabled: false, customer_files_permitted: false)
+rescue ArgumentError, KeyError, ActiveRecord::RecordNotFound, Studio::SourceScanQueue::Denied,
+       SecurityError
+  warn "Synthetic scan runner refused an invalid environment, workspace or task"
+  exit 1
+end

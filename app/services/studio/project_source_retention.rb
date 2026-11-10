@@ -21,13 +21,22 @@ module Studio
                              .where("expires_at <= ?", Time.current)
                              .where.not(scan_state: "revoked")
                              .order(:expires_at, :id).limit(limit).to_a
+      removed = 0
       candidates.each do |blob|
         @access.assert_owner!
-        # An S3/Disk failure aborts without marking metadata as cleaned up.
-        @storage.delete!(key: blob.object_key)
-        blob.update!(scan_state: "revoked")
+        blob.with_lock do
+          # Recheck after row lock: a scan or another cleanup worker may have
+          # changed the state. Deleting bytes while holding the same blob lock
+          # prevents an in-flight scan from reviving a revoked source.
+          next if blob.scan_state == "revoked" || blob.expires_at > Time.current
+
+          # Storage failure prevents any false "deleted" audit conclusion.
+          @storage.delete!(key: blob.object_key)
+          blob.update!(scan_state: "revoked")
+          removed += 1
+        end
       end
-      candidates.length
+      removed
     end
   end
 end
