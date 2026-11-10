@@ -11,6 +11,22 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# Slice D: S3-compatible quarantine in explicit test/local-dev only.
+# The application refuses to use this in production. No public ACL or URLs.
+# All values are supplied by temporary CI env or nonproduction developer env.
+studio_nonproduction_s3_quarantine:
+  service: S3
+  access_key_id: <%= ENV["RC_STUDIO_S3_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["RC_STUDIO_S3_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV["RC_STUDIO_S3_REGION"] %>
+  endpoint: <%= ENV["RC_STUDIO_S3_ENDPOINT"] %>
+  bucket: <%= ENV["RC_STUDIO_S3_BUCKET"] %>
+  force_path_style: true
+  public: false
+  http_open_timeout: 5
+  http_read_timeout: 8
+  retry_limit: 1
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

@@ -119,3 +119,11 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 - Owner-only source download proxy rechecks workspace, membership, client and project intake on each request. No public ActiveStorage controller/link and no client redemption. Tampered or missing objects, revocation, expiry, infected/failed/unscanned files fail closed.
 - Negative HTTP/DB and scanner-gate tests use **only synthetic fixtures**. Do not claim the real private durable object store, AV deployment, malware detection effectiveness, data-at-rest encryption, file purge, real client consent or login is complete. Never enable real customer uploads without those gates and explicit release approval.
 - Owner has skipped backups/restore for this development iteration. This does not certify recovery; production is untouched. Next: provision private durable object bucket in separate non-production environment, external scan integration/retention deletion, verified client identity and consent, manual owner UX/HTTP security QA.
+
+## RC-036 Stage 3 Slice D — isolated S3 + real clamd integration (2026-11-10)
+
+- Pinned official AWS S3 SDK gem. Production-disabled PrivateSourceStorage opt-in S3 backend with nonproduction-only config, no public ACL or direct download URLs. See [Slice D runbook](RC036_STAGE3_SLICE_D_S3_CLAMD_RUNBOOK.md).
+- Owner-only synchronous /sources/:id/scan exists ONLY for synthetic test/local development, using ClamAvScanner UNIX INSTREAM.
+- Bounded ProjectSourceRetention deletes expired object bytes and revokes metadata, retains source history. No production cleanup scheduler.
+- Dedicated branch-only GitHub Actions spins up temporary local MinIO plus genuine clamd with a **test-only EICAR signature**, then tests S3 upload/quarantine/scan/download, anonymous object denial, ACL/IDOR/revocation and expiry.
+- **Not production-ready:** no deployed private durable bucket, live updated ClamAV signatures, worker/scheduler, monitoring, real client identity/consent or actual provider security acceptance. No production/billing changes. No backup work per owner decision.

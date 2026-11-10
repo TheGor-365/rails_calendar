@@ -1,0 +1,134 @@
+name: RC-036 Private S3 + ClamAV Synthetic Integration
+
+on:
+  push:
+    branches:
+      - feat/rc036-workspace-privacy-foundation-2026-11-10
+
+permissions:
+  contents: read
+
+jobs:
+  s3-clamd:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 22
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ruby_calendar_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      RC_LOCAL_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/ruby_calendar_test
+      RC_STUDIO_QUARANTINE_BACKEND: s3
+      RC_STUDIO_S3_PURPOSE: nonproduction-synthetic
+      RC_STUDIO_S3_BUCKET: rc036-ci-quarantine
+      RC_STUDIO_S3_REGION: us-east-1
+      RC_STUDIO_S3_ENDPOINT: http://127.0.0.1:9000
+      RC_STUDIO_S3_INTEGRATION_TEST: "true"
+      STUDIO_CLAMD_UNIX_SOCKET: /tmp/rc036-ci-clamd.sock
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Start isolated MinIO (temporary CI bucket only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          root_pass="$(openssl rand -hex 24)"
+          docker run --detach --name rc036-minio \
+            --publish 127.0.0.1:9000:9000 \
+            --env MINIO_ROOT_USER=rc036synthetic \
+            --env MINIO_ROOT_PASSWORD="$root_pass" \
+            minio/minio:RELEASE.2025-09-07T16-13-09Z server /data
+          {
+            echo "RC_STUDIO_S3_ACCESS_KEY_ID=rc036synthetic"
+            echo "RC_STUDIO_S3_SECRET_ACCESS_KEY=$root_pass"
+          } >> "$GITHUB_ENV"
+          for attempt in $(seq 1 50); do
+            if curl --silent --fail http://127.0.0.1:9000/minio/health/live > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs rc036-minio
+          exit 1
+
+      - name: Start genuine clamd with isolated EICAR test signature only
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq clamav-daemon
+          mkdir -p "$RUNNER_TEMP/rc036-clamav/database"
+          echo "44d88612fea8a8f36de82e1278abb02f:68:RC036.Test.EICAR" \
+            > "$RUNNER_TEMP/rc036-clamav/database/test.hdb"
+          cat > "$RUNNER_TEMP/rc036-clamav/clamd.conf" <<EOF
+          DatabaseDirectory $RUNNER_TEMP/rc036-clamav/database
+          LocalSocket /tmp/rc036-ci-clamd.sock
+          LocalSocketMode 600
+          Foreground yes
+          FixStaleSocket yes
+          User runner
+          ReadTimeout 30
+          CommandReadTimeout 30
+          StreamMaxLength 5M
+          MaxFileSize 5M
+          MaxScanSize 5M
+          EOF
+          nohup clamd --foreground --config-file="$RUNNER_TEMP/rc036-clamav/clamd.conf" \
+            > "$RUNNER_TEMP/rc036-clamav/clamd.log" 2>&1 &
+          for attempt in $(seq 1 50); do
+            if [ -S /tmp/rc036-ci-clamd.sock ] &&
+              ruby -rsocket -e 'UNIXSocket.open("/tmp/rc036-ci-clamd.sock"){|s|s.write("zPING\0");abort unless s.gets("\0")=="PONG\0"}' ; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat "$RUNNER_TEMP/rc036-clamav/clamd.log"
+          exit 1
+
+      - name: Create isolated private S3 bucket
+        shell: bash
+        run: |
+          bundle exec ruby -raws-sdk-s3 -e '
+            client = Aws::S3::Client.new(
+              endpoint: ENV.fetch("RC_STUDIO_S3_ENDPOINT"),
+              region: ENV.fetch("RC_STUDIO_S3_REGION"),
+              access_key_id: ENV.fetch("RC_STUDIO_S3_ACCESS_KEY_ID"),
+              secret_access_key: ENV.fetch("RC_STUDIO_S3_SECRET_ACCESS_KEY"),
+              force_path_style: true
+            )
+            client.create_bucket(bucket: ENV.fetch("RC_STUDIO_S3_BUCKET"))
+            puts "CI-only S3 bucket created without public read grants"
+          '
+
+      - name: Prepare disposable PostgreSQL and run real S3+clamd HTTP integration
+        run: |
+          bin/rails db:prepare
+          bin/rails test test/integration/rc036_private_s3_clamd.rb
+
+      - name: Diagnose isolated services on failure
+        if: failure()
+        run: |
+          docker logs --tail 50 rc036-minio || true
+          tail -n 50 "$RUNNER_TEMP/rc036-clamav/clamd.log" || true

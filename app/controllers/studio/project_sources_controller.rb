@@ -33,6 +33,20 @@ module Studio
       head :not_found
     end
 
+    # Owner-only synchronous scan for synthetic nonproduction fixtures.
+    # Production endpoint always returns 404; never enable for client content.
+    def scan
+      return head :not_found unless PrivateSourceStorage.enabled?
+
+      blob = pipeline.scan!(client: @client, intake: @intake, source_id: params[:id])
+      render json: { source_id: blob.project_source_id,
+                     scan_state: blob.scan_state, downloadable: blob.downloadable? }
+    rescue ActiveRecord::RecordNotFound, SecurityError, PrivateSourceStorage::Unavailable
+      head :not_found
+    rescue ProjectSourcePipeline::Denied
+      render json: { error: "Source scan not cleared" }, status: :unprocessable_entity
+    end
+
     def download
       # Every access rechecks actor, membership, workspace, client and intake.
       result = pipeline.download!(client: @client, intake: @intake, source_id: params[:id])
