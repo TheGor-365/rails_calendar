@@ -2,6 +2,7 @@ class Workspace < ApplicationRecord
   belongs_to :owner_user, class_name: "User"
   has_many :workspace_memberships, dependent: :restrict_with_exception
   has_many :clients, dependent: :restrict_with_exception
+  has_many :project_intakes, dependent: :restrict_with_exception
   has_many :client_facts, dependent: :restrict_with_exception
   has_many :client_consents, dependent: :restrict_with_exception
 

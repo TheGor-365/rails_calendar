@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_220000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -156,6 +156,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_210000) do
     t.datetime "demo_consent_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "workspace_id"
+    t.bigint "client_id"
+    t.index ["workspace_id"], name: "index_project_intakes_on_workspace_id"
+    t.index ["client_id", "workspace_id"], name: "idx_project_intakes_client_workspace"
   end
 
   create_table "project_milestones", force: :cascade do |t|
@@ -229,10 +233,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_210000) do
   add_foreign_key "intake_answers", "project_intakes"
   add_foreign_key "intake_messages", "project_intakes"
   add_foreign_key "intake_spec_versions", "project_intakes"
+  add_foreign_key "project_intakes", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_intakes_scoped_client"
+  add_foreign_key "project_intakes", "workspaces"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
   add_foreign_key "user_sessions", "users"
   add_foreign_key "workspace_memberships", "users"
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
+  add_check_constraint "project_intakes", "client_id IS NULL OR workspace_id IS NOT NULL", name: "chk_project_intakes_client_needs_workspace"
 end

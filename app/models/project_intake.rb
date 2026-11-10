@@ -1,4 +1,6 @@
 class ProjectIntake < ApplicationRecord
+  belongs_to :workspace, optional: true
+  belongs_to :client, optional: true
   TYPES = %w[website redesign rails_bugfix api_integration].freeze
   STATUSES = %w[interviewing draft_spec owner_approved client_reviewed].freeze
   MAX_CLIENT_MESSAGES = 8
@@ -13,6 +15,13 @@ class ProjectIntake < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :goal, presence: true, length: { minimum: 10, maximum: 3000 }
   validates :demo_consent_at, presence: true
+  validate :client_belongs_to_workspace
+
+  def client_belongs_to_workspace
+    return if client.nil?
+
+    errors.add(:workspace, "must match the selected client") if workspace_id.nil? || workspace_id != client.workspace_id
+  end
 
   def latest_spec
     intake_spec_versions.order(version: :desc).first
