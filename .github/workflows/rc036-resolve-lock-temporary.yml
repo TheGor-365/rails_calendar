@@ -1,0 +1,28 @@
+name: RC-036 S3 lockfile bootstrap (temporary)
+
+on:
+  push:
+    branches:
+      - feat/rc036-workspace-privacy-foundation-2026-11-10
+
+permissions:
+  contents: read
+
+jobs:
+  resolve-lock:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: false
+      - name: Resolve new S3 Ruby gems without installing and print lock for committed sync
+        run: |
+          gem install bundler -v 2.6.9 --no-document
+          bundle lock
+          echo RC036_LOCK_BEGIN
+          base64 -w 0 Gemfile.lock
+          echo
+          echo RC036_LOCK_END
