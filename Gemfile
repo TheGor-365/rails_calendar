@@ -31,3 +31,5 @@ group :test do
   gem "selenium-webdriver"
   # Removed the obsolete webdrivers gem. CI installs matching ChromeDriver.
 end
+
+gem "minitest-mock", "~> 5.27", group: :test
