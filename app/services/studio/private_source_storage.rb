@@ -58,6 +58,13 @@ module Studio
       @service.delete(key)
     end
 
+    # HEAD/existence check only; never downloads bytes for audit purposes.
+    # Transport or credential errors propagate (must not masquerade as absent).
+    def exists?(key:)
+      validate_key!(key)
+      @service.exist?(key)
+    end
+
     private
 
     def verify_s3_configuration!

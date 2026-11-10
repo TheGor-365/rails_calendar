@@ -4,6 +4,7 @@ module Studio
   # policy, audit, and independent recovery design have been approved.
   class ProjectSourceRetention
     MAX_BATCH = 50
+    class VerificationFailed < StandardError; end
 
     def initialize(actor:, workspace:, storage: nil)
       @workspace = workspace
@@ -32,6 +33,9 @@ module Studio
 
           # Storage failure prevents any false "deleted" audit conclusion.
           @storage.delete!(key: blob.object_key)
+          if @storage.exists?(key: blob.object_key)
+            raise VerificationFailed, "Physical object is still present after deletion"
+          end
           blob.update!(scan_state: "revoked")
           removed += 1
         end

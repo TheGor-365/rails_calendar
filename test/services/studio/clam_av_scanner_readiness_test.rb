@@ -100,4 +100,35 @@ class StudioClamAvScannerReadinessTest < ActiveSupport::TestCase
       Studio::ClamAvScanner.new(socket_factory: -> { raise "should not connect" }).scan!("test")
     end
   end
+  test "readiness probes ClamAV VERSION age and PING without scanning any bytes" do
+    date = 2.hours.ago.utc.strftime("%a %b %d %H:%M:%S %Y")
+    version = FakeSocket.new(reply: "ClamAV 1.4.6/28699/#{date}")
+    ping = FakeSocket.new(reply: "PONG")
+    sockets = [version, ping]
+    scanner = Studio::ClamAvScanner.new(socket_factory: -> { sockets.shift })
+    assert scanner.readiness!
+    assert_equal ["zVERSION\0"], version.writes
+    assert_equal ["zPING\0"], ping.writes
+    assert version.closed
+    assert ping.closed
+  end
+
+  test "readiness denies stale versions and unacknowledged ping" do
+    stale = 7.days.ago.utc.strftime("%a %b %d %H:%M:%S %Y")
+    assert_raises(Studio::ClamAvScanner::Unavailable) do
+      Studio::ClamAvScanner.new(socket_factory: -> {
+        FakeSocket.new(reply: "ClamAV 1.4.6/28699/#{stale}")
+      }).readiness!
+    end
+
+    date = 1.hour.ago.utc.strftime("%a %b %d %H:%M:%S %Y")
+    sockets = [
+      FakeSocket.new(reply: "ClamAV 1.4.6/28699/#{date}"),
+      FakeSocket.new(reply: "UNKNOWN")
+    ]
+    assert_raises(Studio::ClamAvScanner::Unavailable) do
+      Studio::ClamAvScanner.new(socket_factory: -> { sockets.shift }).readiness!
+    end
+  end
+
 end

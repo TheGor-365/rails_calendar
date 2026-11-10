@@ -161,3 +161,11 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 - Scan and physical expiry cleanup now lock the same quarantine blob row to prevent in-flight scans from restoring clean state after retention deletion; membership and expiry are rechecked after scan. No automatic physical cleanup or orphan reconciliation yet.
 - Tests cover clean/infected, failed/retry/exhaust, expiry and physical deletion, wrong tenant/client, revoked owner, fake scanner and production-disabled routes. Existing real S3 + ClamAV CI remains synthetic-EICAR only.
 - Remaining real infrastructure, spend, official FreshClam update proof, worker/scheduler/monitoring and identity/consent signoff release gates unchanged. See [Slice H Runbook](RC036_STAGE3_SLICE_H_SCAN_QUEUE_AND_RETENTION.md).
+
+## RC-036 Stage 3 Slice I — operations audit and orphan-candidate detection (2026-11-11)
+
+- Owner-only read-only Studio::SourceOperationalAudit reports due/overdue queue, oldest due task, exhausted tasks, failed scans, expired-not-revoked, and clamd VERSION timestamp + PING health. Verified official AV signature provenance remains FALSE.
+- PrivateSourceStorage#exists? plus retention post-delete HEAD verification: failure to verify absence does not mark a blob revoked; no false physical deletion receipt.
+- Owner-only read-only Studio::SourceInventoryAudit: bounded S3 q/ listing (up to 100) and sampled scoped HEAD; global tenant lookup protects other workspace keys from orphan misclassification; minimum 2-hour grace for review candidate, no automatic removal and no keys in output.
+- Manual local-only bin/rc036-studio-operations-audit with synthetic dev opt-in, no scheduled alerts or paid services. Negative tests cover stale ClamAV, false delete acknowledgment, partial listing, foreign tenant and provider failures.
+- Further steps require explicit paid-provider/budget choice, verified maintained official ClamAV, durable protected storage, scheduler and comprehensive reconciliation, consent/E2E security acceptance. See Slice I Runbook: RC036_STAGE3_SLICE_I_OPERATIONS_INVENTORY.md.

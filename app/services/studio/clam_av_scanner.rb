@@ -40,6 +40,22 @@ module Studio
       raise Unavailable, "ClamAV is unavailable (#{error.class})"
     end
 
+    # Independent non-mutating operational readiness check. A current
+    # timestamp does not establish the authenticity of vendor signatures.
+    # The monitoring service must label this as protocol/age only.
+    def readiness!
+      Timeout.timeout(MAX_DURATION) do
+        verify_database_age!
+        with_socket do |socket|
+          socket.write("zPING\0")
+          raise Unavailable, "ClamAV PING was not acknowledged" unless socket.gets("\0") == "PONG\0"
+        end
+        true
+      end
+    rescue Timeout::Error, SystemCallError, IOError, ArgumentError => error
+      raise Unavailable, "ClamAV readiness unavailable (#{error.class})"
+    end
+
     private
 
     def require_fresh_db?
