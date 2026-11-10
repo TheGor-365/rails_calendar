@@ -74,7 +74,7 @@ class StudioSourcePreviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "# Draft discovery brief — NOT APPROVED"
     assert_includes response.body, "Document traceability"
     assert_includes response.body, "Source SHA256:"
-    assert_not_includes response.body, "Approved price:"
+    refute_includes response.body, "Approved price:"
     assert_match(/no-store/, response.headers.fetch("Cache-Control"))
   end
 
