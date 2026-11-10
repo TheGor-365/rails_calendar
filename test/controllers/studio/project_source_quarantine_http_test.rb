@@ -112,6 +112,7 @@ class StudioProjectSourceQuarantineHttpTest < ActionDispatch::IntegrationTest
     source = staged_clean
     sign_in(@owner)
     travel 8.days do
+      sign_in(@owner) # owner session expires before the file; test the file gate
       denied(source)
     end
   end
