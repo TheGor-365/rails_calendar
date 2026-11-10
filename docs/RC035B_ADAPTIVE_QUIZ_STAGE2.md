@@ -8,7 +8,7 @@
 - New **owner-only** adaptive preview at \`/project_intakes/:id/quiz/adaptive\`; section A is the existing intake type, sections B–G are deterministic, section H is private review.
 - Direct deep links require owner authentication; conditional questions are rejected with 404 when no longer visible.
 - Changes to upstream selections retain all previously saved child answers and revision snapshots for audit, but exclude inactive branches from active progress and review, with a visible inactive-branch notice. Active choices reappear if their parent condition becomes true again.
-- Parent changes that hide previously saved branches require an explicit confirmation checkbox (422 without it). All historical child records remain intact.
+- Parent changes that hide previously saved branches require an explicit server-validated confirmation action (422 before confirmation). All historical child records remain intact.
 - Answer revisions are transactional and immutable; optimistic \`quiz[revision]\` guard prevents silent stale-tab overwrites.
 - Server validates choices via catalog definitions; visibility is checked inside \`ProjectIntake#with_lock\`.
 - Existing White Atlas classes reused; navigation saves explicitly; there is no auto-save guarantee.

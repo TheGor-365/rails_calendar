@@ -42,9 +42,8 @@ class AdaptiveQuizFlowTest < ApplicationSystemTestCase
     select "Should have", from: "Priority for Landing page"
     click_button "Save and continue"
     assert_selector "[role='alert']", text: /will hide 1 previously saved answer/
-    assert_selector "input[name='quiz[confirm_branch_change]']", visible: true
-    check "I understand: preserve historic answers and hide inactive branches"
-    click_button "Save and continue"
+    assert_selector "button[name='quiz[confirm_branch_change]'][value='1']", visible: true
+    click_button "Confirm branch change"
     assert_text "Adaptive quiz draft saved"
 
     visit review_adaptive_project_intake_quiz_url(@intake)
