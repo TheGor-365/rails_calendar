@@ -267,8 +267,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_230000) do
   add_check_constraint "project_intakes", "client_id IS NULL OR workspace_id IS NOT NULL", name: "chk_project_intakes_client_needs_workspace"
   add_check_constraint "project_sources", "state = 'metadata_only'", name: "chk_project_sources_no_release_before_privacy_gate"
   add_check_constraint "project_sources", "byte_size BETWEEN 1 AND 262144", name: "chk_project_sources_preview_size"
-  add_check_constraint "project_sources", "source_sha256 ~ '^[0-9a-f]{64}
-end
-", name: "chk_project_sources_sha256"
+  add_check_constraint "project_sources", %q(source_sha256 ~ '^[0-9a-f]{64}$'), name: "chk_project_sources_sha256"
   add_check_constraint "project_sources", "source_format IN ('markdown', 'text', 'json')", name: "chk_project_sources_format"
 end

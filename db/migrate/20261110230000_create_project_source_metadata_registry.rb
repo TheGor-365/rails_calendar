@@ -38,7 +38,7 @@ class CreateProjectSourceMetadataRegistry < ActiveRecord::Migration[8.1]
                          "byte_size BETWEEN 1 AND 262144",
                          name: "chk_project_sources_preview_size"
     add_check_constraint :project_sources,
-                         "source_sha256 ~ '^[0-9a-f]{64}$'",
+                         %q(source_sha256 ~ '^[0-9a-f]{64}$'),
                          name: "chk_project_sources_sha256"
     add_check_constraint :project_sources,
                          "source_format IN ('markdown', 'text', 'json')",
