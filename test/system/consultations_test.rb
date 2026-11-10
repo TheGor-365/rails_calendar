@@ -271,6 +271,9 @@ class ConsultationsTest < ApplicationSystemTestCase
 
       fill_in "Title contains", with: "MyString"
       click_on "Apply filters"
+      # Wait for the GET navigation to finish before clicking another link.
+      # Otherwise the old pre-filtered DOM can win the click/navigation race.
+      assert_current_path(%r{\A/consultations\?q=MyString(?:&|\z)}, ignore_query: false)
 
       assert_selector "li#consultation_#{@consultation.id}", visible: true
       assert_selector "li.rc-record", count: 1

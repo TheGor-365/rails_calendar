@@ -59,6 +59,7 @@ class AdaptiveQuizFlowTest < ApplicationSystemTestCase
     fill_in "Email", with: @owner.email
     fill_in "Password", with: @password
     click_button "Sign in"
+    assert_current_path consultations_path
 
     [320, 390, 430].each do |width|
       page.driver.browser.manage.window.resize_to(width, 932)
