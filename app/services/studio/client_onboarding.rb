@@ -13,11 +13,12 @@ module Studio
       )
     end
 
-    def register_and_accept!(token:, email:, password:, consent_policy:, consent_confirmation:)
+    def register_and_accept!(token:, email:, password:, consent_policy:, consent_confirmation:, session_proof_digest:)
       verify_demo!
       digest = ClientAccount.email_digest_for(email)
       validate_consent!(consent_policy, consent_confirmation)
       raise Denied, "Password outside permitted bounds" unless valid_password?(password)
+      require_same_browser_proof!(token, session_proof_digest)
 
       result = nil
       ActiveRecord::Base.transaction do
@@ -34,10 +35,11 @@ module Studio
       raise Denied, "Client onboarding rejected"
     end
 
-    def accept_existing!(account:, token:, consent_policy:, consent_confirmation:)
+    def accept_existing!(account:, token:, consent_policy:, consent_confirmation:, session_proof_digest:)
       verify_demo!
       raise Denied, "Authenticated client session required" unless account.is_a?(ClientAccount) && account.persisted? && account.active?
       validate_consent!(consent_policy, consent_confirmation)
+      require_same_browser_proof!(token, session_proof_digest)
       grant = nil
       ActiveRecord::Base.transaction do
         invitation = locked_invitation!(token, account.email_digest)
@@ -63,6 +65,16 @@ module Studio
 
     def valid_password?(password)
       password.is_a?(String) && password.bytesize.between?(12, 72)
+    end
+
+    def require_same_browser_proof!(token, session_proof_digest)
+      unless token.to_s.match?(/\A[0-9a-f]{64}\z/) &&
+             session_proof_digest.to_s.match?(/\A[0-9a-f]{64}\z/) &&
+             ActiveSupport::SecurityUtils.secure_compare(
+               Digest::SHA256.hexdigest(token), session_proof_digest
+             )
+        raise Denied, "Mailbox proof must be confirmed in the accepting browser session"
+      end
     end
 
     def locked_invitation!(token, recipient_digest)

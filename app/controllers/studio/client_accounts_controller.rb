@@ -10,7 +10,8 @@ module Studio
       result = ClientOnboarding.new.register_and_accept!(
         token: params[:invitation_token], email: params[:recipient_email],
         password: params[:password], consent_policy: params[:consent_policy],
-        consent_confirmation: params[:consent_confirmation]
+        consent_confirmation: params[:consent_confirmation],
+        session_proof_digest: session[:studio_verified_invite_digest]
       )
       start_studio_client_session!(result.fetch(:account))
       render json: { grant_id: result.fetch(:grant).id, role: "reviewer",

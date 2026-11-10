@@ -142,6 +142,25 @@ class StudioClientOnboardingHttpTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "confirmed mailbox in one browser cannot be hijacked by token holder in another session" do
+    confirm_mailbox
+    attacker = open_session
+    assert_no_difference({"Studio::ClientAccount.count" => 0, "Studio::ClientProjectGrant.count" => 0}) do
+      attacker.post "/studio/client_accounts",
+        params: { invitation_token: @invitation.token,
+                  recipient_email: "receiver@example.test",
+                  password: "attacker-known-secret-123456",
+                  consent_policy: "studio_review_v1",
+                  consent_confirmation: "yes" }
+    end
+    assert_equal 422, attacker.response.status
+
+    # Mailbox-confirming browser still has the encrypted proof-bound claim.
+    signup
+    assert_response :created
+    assert_equal 1, Studio::ClientProjectGrant.count
+  end
+
   test "revoking accepted invitation removes immediately visible grant and cannot be replayed" do
     confirm_mailbox
     signup

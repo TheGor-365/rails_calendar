@@ -22,8 +22,13 @@ module Studio
         code: params[:verification_code]
       )
       if valid
+        # Bind the successfully confirmed mailbox to this encrypted Rails
+        # browser session. A leaked invitation token cannot re-use a proof
+        # confirmed in another browser.
+        session[:studio_verified_invite_digest] = Digest::SHA256.hexdigest(params[:invitation_token].to_s)
         render json: { email_possession_confirmed: true, access_granted: false }
       else
+        session.delete(:studio_verified_invite_digest)
         render json: { email_possession_confirmed: false, access_granted: false },
                status: :unprocessable_entity
       end

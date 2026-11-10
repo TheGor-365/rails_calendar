@@ -32,8 +32,10 @@ module Studio
       grant = ClientOnboarding.new.accept_existing!(
         account: current_studio_client, token: params[:invitation_token],
         consent_policy: params[:consent_policy],
-        consent_confirmation: params[:consent_confirmation]
+        consent_confirmation: params[:consent_confirmation],
+        session_proof_digest: session[:studio_verified_invite_digest]
       )
+      session.delete(:studio_verified_invite_digest)
       render json: { grant_id: grant.id, role: grant.role,
                      scope: "project_summary_only" }, status: :created
     rescue ClientOnboarding::Denied, ArgumentError, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
