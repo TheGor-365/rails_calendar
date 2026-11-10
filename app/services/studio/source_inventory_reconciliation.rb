@@ -117,6 +117,8 @@ module Studio
         object_keys_exported: false,
         production_ready: false
       }
+    rescue ArgumentError
+      raise # caller-supplied unsafe bounds are validation failures, not an S3 incident
     rescue StandardError, SecurityError => error
       raise SecurityError, "S3 reconciliation failed closed (#{error.class})"
     end
