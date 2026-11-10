@@ -79,7 +79,7 @@ class StudioProjectPrivacyHttpTest < ActionDispatch::IntegrationTest
     assert_not invitation.attributes.key?("token")
     assert_not invitation.attributes.values.include?("recipient@example.test")
     assert_match(/no-store/, response.headers.fetch("Cache-Control"))
-    assert_equal "no-referrer", response.headers.fetch("Referrer-Policy"))
+    assert_equal "no-referrer", response.headers.fetch("Referrer-Policy")
 
     get "#{base_path}/invitations"
     assert_response :success
