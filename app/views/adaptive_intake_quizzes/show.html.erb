@@ -83,26 +83,31 @@
 
         <% if @needs_branch_confirmation %>
           <div class="rc-notice rc-notice--neutral mb-3" role="status">
-            Your previous answer is preserved until you explicitly confirm the branch change.
-            Inactive answers and revision history will be retained, but excluded from the active review.
+            Your original answer is unchanged. Confirm to hide inactive branches
+            from the current brief while preserving all saved answers and revisions.
           </div>
-          <label class="rc-quiz-choice mb-3">
-            <%= check_box_tag "quiz[confirm_branch_change]", "1", false, required: true %>
-            <span>I understand: preserve historic answers and hide inactive branches</span>
-          </label>
-        <% end %>
-        <div class="rc-quiz-actions mt-3">
-          <%= button_tag "Save and continue", type: "submit", name: "quiz[navigation]", value: "continue",
-                         class: "rc-action rc-action--primary", data: { disable_with: "Saving…" } %>
-          <% if @position.positive? %>
-            <%= button_tag "Save and go back", type: "submit", name: "quiz[navigation]", value: "back",
+          <div class="rc-quiz-actions mt-3">
+            <%= button_tag "Confirm branch change", type: "submit",
+                           name: "quiz[confirm_branch_change]", value: "1",
+                           class: "rc-action rc-action--primary", data: { disable_with: "Confirming…" } %>
+            <%= link_to "Cancel changes",
+                        adaptive_project_intake_quiz_path(@intake, step: @question.fetch(:key)),
+                        class: "rc-action rc-action--quiet" %>
+          </div>
+        <% else %>
+          <div class="rc-quiz-actions mt-3">
+            <%= button_tag "Save and continue", type: "submit", name: "quiz[navigation]", value: "continue",
+                           class: "rc-action rc-action--primary", data: { disable_with: "Saving…" } %>
+            <% if @position.positive? %>
+              <%= button_tag "Save and go back", type: "submit", name: "quiz[navigation]", value: "back",
+                             class: "rc-action rc-action--quiet", data: { disable_with: "Saving…" } %>
+            <% end %>
+            <%= button_tag "Save and review", type: "submit", name: "quiz[navigation]", value: "review",
                            class: "rc-action rc-action--quiet", data: { disable_with: "Saving…" } %>
-          <% end %>
-          <%= button_tag "Save and review", type: "submit", name: "quiz[navigation]", value: "review",
-                         class: "rc-action rc-action--quiet", data: { disable_with: "Saving…" } %>
-          <%= button_tag "Save and return to intake", type: "submit", name: "quiz[navigation]", value: "intake",
-                         class: "rc-action rc-action--quiet", data: { disable_with: "Saving…" } %>
-        </div>
+            <%= button_tag "Save and return to intake", type: "submit", name: "quiz[navigation]", value: "intake",
+                           class: "rc-action rc-action--quiet", data: { disable_with: "Saving…" } %>
+          </div>
+        <% end %>
         <p class="rc-hint mt-3 mb-0">Each button saves explicitly before navigation. Refresh or browser Back alone does not save edits.</p>
       <% end %>
     </section>

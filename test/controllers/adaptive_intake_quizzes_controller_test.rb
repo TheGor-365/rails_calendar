@@ -100,7 +100,7 @@ class AdaptiveIntakeQuizzesControllerTest < ActionDispatch::IntegrationTest
       patch_answer("website_pages", ["landing"], revision: "1")
     end
     assert_response :unprocessable_entity
-    assert_select "input[name='quiz[confirm_branch_change]'][required]"
+    assert_select "button[name='quiz[confirm_branch_change]'][value='1']"
     assert_equal ["catalogue"], @intake.intake_answers.find_by!(question_key: "website_pages").selected_options
 
     patch_answer("website_pages", ["landing"], revision: "1", confirmation: "1")
