@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -159,7 +159,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_220000) do
     t.bigint "workspace_id"
     t.bigint "client_id"
     t.index ["workspace_id"], name: "index_project_intakes_on_workspace_id"
+    t.index ["id", "workspace_id", "client_id"], name: "idx_project_intakes_scoped_source_reference", unique: true
     t.index ["client_id", "workspace_id"], name: "idx_project_intakes_client_workspace"
+  end
+
+  create_table "project_sources", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "project_intake_id", null: false
+    t.bigint "recorded_by_id", null: false
+    t.string "source_sha256", limit: 64, null: false
+    t.integer "byte_size", null: false
+    t.string "source_format", limit: 20, null: false
+    t.string "parser_version", limit: 32, null: false
+    t.string "state", limit: 32, default: "metadata_only", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_intake_id", "source_sha256", "parser_version"], name: "idx_project_sources_idempotency", unique: true
+    t.index ["recorded_by_id"], name: "index_project_sources_on_recorded_by_id"
+    t.index ["workspace_id", "client_id", "project_intake_id"], name: "idx_project_sources_tenant_scope"
+    t.index ["workspace_id"], name: "index_project_sources_on_workspace_id"
   end
 
   create_table "project_milestones", force: :cascade do |t|
@@ -235,6 +254,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_220000) do
   add_foreign_key "intake_spec_versions", "project_intakes"
   add_foreign_key "project_intakes", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_intakes_scoped_client"
   add_foreign_key "project_intakes", "workspaces"
+  add_foreign_key "project_sources", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_sources_client_tenant"
+  add_foreign_key "project_sources", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_project_sources_intake_tenant"
+  add_foreign_key "project_sources", "users", column: "recorded_by_id"
+  add_foreign_key "project_sources", "workspaces"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
   add_foreign_key "user_sessions", "users"
@@ -242,4 +265,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_220000) do
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
   add_check_constraint "project_intakes", "client_id IS NULL OR workspace_id IS NOT NULL", name: "chk_project_intakes_client_needs_workspace"
+  add_check_constraint "project_sources", "state = 'metadata_only'", name: "chk_project_sources_no_release_before_privacy_gate"
+  add_check_constraint "project_sources", "byte_size BETWEEN 1 AND 262144", name: "chk_project_sources_preview_size"
+  add_check_constraint "project_sources", "source_sha256 ~ '^[0-9a-f]{64}
+end
+", name: "chk_project_sources_sha256"
+  add_check_constraint "project_sources", "source_format IN ('markdown', 'text', 'json')", name: "chk_project_sources_format"
 end

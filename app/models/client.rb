@@ -2,6 +2,7 @@ class Client < ApplicationRecord
   belongs_to :workspace
   has_many :client_facts, dependent: :restrict_with_exception
   has_many :project_intakes, dependent: :restrict_with_exception
+  has_many :project_sources, dependent: :restrict_with_exception
   has_many :client_consents, dependent: :restrict_with_exception
 
   STATUSES = %w[prospect active inactive].freeze
