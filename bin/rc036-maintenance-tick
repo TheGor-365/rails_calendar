@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# Explicit LOCAL invocation only. No cron, background daemon, alerts or
+# customer data. Synthetic queue processing; physical retention separately
+# gated. No production environment can enable this CLI.
+require "json"
+
+ENV["RAILS_ENV"] ||= "development"
+require_relative "../config/environment"
+unless Rails.env.development? &&
+       ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true" &&
+       ENV["RC_STUDIO_LOCAL_MAINTENANCE_TICK"] == "true"
+  warn "Refusing maintenance outside explicitly enabled synthetic development"
+  exit 1
+end
+
+begin
+  workspace_id = Integer(ENV.fetch("RC_STUDIO_MAINTENANCE_WORKSPACE_ID"), 10)
+  raise ArgumentError unless workspace_id.positive?
+  kind = ENV.fetch("RC_STUDIO_MAINTENANCE_KIND", "health")
+  workspace = Workspace.find(workspace_id)
+  scheduler = Studio::SourceMaintenanceScheduler.new(actor: workspace.owner_user,
+                                                      workspace: workspace)
+  run = scheduler.tick!(kind: kind,
+                         allow_retention: ENV["RC_STUDIO_ALLOW_LOCAL_PURGE"] == "true")
+  puts JSON.generate(
+    claimed_or_prior_state: run&.state || "blocked_pending_prior_run",
+    kind: kind, result_summary: run&.result_summary || {},
+    continuous_scheduler_enabled: false, auto_orphan_delete: false,
+    production_enabled: false
+  )
+  exit 1 if run.nil? || run.state == "failed"
+rescue StandardError, SecurityError
+  warn "Synthetic maintenance tick failed or permission was denied"
+  exit 1
+end

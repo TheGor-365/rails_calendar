@@ -7,6 +7,8 @@ class Workspace < ApplicationRecord
   has_many :project_source_blobs, dependent: :restrict_with_exception
   has_many :studio_source_scan_tasks, class_name: "Studio::SourceScanTask",
            dependent: :restrict_with_exception
+  has_many :studio_maintenance_runs, class_name: "Studio::MaintenanceRun",
+           dependent: :restrict_with_exception
   has_many :project_invitations, dependent: :restrict_with_exception
   has_many :client_facts, dependent: :restrict_with_exception
   has_many :client_consents, dependent: :restrict_with_exception

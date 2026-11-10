@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_002000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_003000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -249,6 +249,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_002000) do
     t.index ["project_intake_id"], name: "index_project_milestones_on_project_intake_id"
   end
 
+  create_table "studio_maintenance_runs", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.string "kind", limit: 16, null: false
+    t.string "state", limit: 16, default: "running", null: false
+    t.bigint "slot", null: false
+    t.datetime "started_at", null: false
+    t.datetime "finished_at"
+    t.string "error_code", limit: 32
+    t.jsonb "result_summary", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_studio_maintenance_runs_on_workspace_id"
+    t.index ["workspace_id", "kind", "slot"], name: "idx_studio_maintenance_unique_slot", unique: true
+    t.index ["workspace_id", "kind", "state"], name: "idx_studio_maintenance_live"
+  end
+
   create_table "studio_source_scan_tasks", force: :cascade do |t|
     t.bigint "workspace_id", null: false
     t.bigint "project_source_blob_id", null: false
@@ -372,6 +388,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_002000) do
   add_foreign_key "project_sources", "workspaces"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
+  add_foreign_key "studio_maintenance_runs", "workspaces"
   add_foreign_key "studio_source_scan_tasks", "project_source_blobs", column: ["project_source_blob_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_scan_task_blob_tenant"
   add_foreign_key "studio_source_scan_tasks", "workspaces"
   add_foreign_key "studio_client_project_grants", "studio_client_accounts"
@@ -383,6 +400,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_002000) do
   add_foreign_key "workspace_memberships", "users"
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
+  add_check_constraint "studio_maintenance_runs", "kind IN ('health', 'scan', 'retention', 'inventory')", name: "chk_studio_maintenance_kind"
+  add_check_constraint "studio_maintenance_runs", "state IN ('running', 'succeeded', 'failed')", name: "chk_studio_maintenance_state"
+  add_check_constraint "studio_maintenance_runs", "(state = 'running') = (finished_at IS NULL)", name: "chk_studio_maintenance_finished"
+  add_check_constraint "studio_maintenance_runs", "error_code IS NULL OR error_code = 'operation_failed'", name: "chk_studio_maintenance_error"
+  add_check_constraint "studio_maintenance_runs", "jsonb_typeof(result_summary) = 'object'", name: "chk_studio_maintenance_summary"
   add_check_constraint "studio_source_scan_tasks", "state IN ('queued','retry_wait','complete_clean','complete_infected','exhausted','expired','cancelled')", name: "chk_studio_scan_task_state"
   add_check_constraint "studio_source_scan_tasks", "attempts BETWEEN 0 AND 3", name: "chk_studio_scan_task_attempts"
   add_check_constraint "studio_source_scan_tasks", "last_error_code IS NULL OR last_error_code = 'scan_denied'", name: "chk_studio_scan_task_error"
