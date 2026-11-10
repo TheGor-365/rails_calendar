@@ -71,7 +71,13 @@ class AdaptiveIntakeQuizzesController < ApplicationController
                 @answer.save!
                 @answer.intake_answer_revisions.create!(
                   revision: @answer.revision,
-                  snapshot: @answer.snapshot.merge("catalog_version" => Intake::AdaptiveQuestionCatalog::VERSION)
+                  snapshot: @answer.snapshot.merge(
+                    "catalog_version" => Intake::AdaptiveQuestionCatalog::VERSION,
+                    "question_title" => @question.fetch(:title),
+                    "selected_labels" => @answer.selected_options.to_h do |key|
+                      [key, @question.fetch(:options).fetch(key)]
+                    end
+                  )
                 )
               end
               saved = true

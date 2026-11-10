@@ -17,13 +17,19 @@ module Intake
         questions.filter_map do |question|
           key = question.fetch(:key)
           answer = @answers[key]
-          next if answer && !answer.unsure?
+          next if answer && !answer.unsure? && !answer.selected_options.include?("unknown")
 
           {
             "question_key" => key,
             "section" => question.fetch(:section),
             "title" => question.fetch(:title),
-            "reason" => answer&.unsure? ? "owner_selected_not_sure" : "missing_saved_answer",
+            "reason" => if answer&.unsure?
+                          "owner_selected_not_sure"
+                        elsif answer&.selected_options&.include?("unknown")
+                          "respondent_reported_unknown"
+                        else
+                          "missing_saved_answer"
+                        end,
             "priority" => focus.include?(key) ? "high" : "normal",
             "source" => "catalog:#{Intake::AdaptiveQuestionCatalog::VERSION}:#{key}",
             "status" => "suggested_question_not_sent"

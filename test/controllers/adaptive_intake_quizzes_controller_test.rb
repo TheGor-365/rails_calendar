@@ -58,6 +58,10 @@ class AdaptiveIntakeQuizzesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, answer.revision
     assert_equal Intake::AdaptiveQuestionCatalog::VERSION,
                  answer.intake_answer_revisions.sole.snapshot["catalog_version"]
+    assert_equal "What should this work achieve?",
+                 answer.intake_answer_revisions.sole.snapshot["question_title"]
+    assert_equal({ "leads" => "More enquiries", "reliability" => "Better reliability" },
+                 answer.intake_answer_revisions.sole.snapshot.fetch("selected_labels"))
 
     get adaptive_project_intake_quiz_path(@intake)
     assert_response :success

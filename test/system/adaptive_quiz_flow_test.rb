@@ -65,6 +65,8 @@ class AdaptiveQuizFlowTest < ApplicationSystemTestCase
       page.driver.browser.manage.window.resize_to(width, 932)
       visit adaptive_project_intake_quiz_url(@intake)
       assert_selector "h1", text: "What should this work achieve?"
+      visit adaptive_project_intake_quiz_url(@intake, step: "website_pages")
+      assert_selector "h1", text: "Which website pages or features are needed?"
       size = page.evaluate_script(<<~JS)
         (() => ({
           content: document.documentElement.scrollWidth,

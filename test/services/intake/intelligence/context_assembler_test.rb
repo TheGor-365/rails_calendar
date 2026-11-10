@@ -81,6 +81,20 @@ class IntakeIntelligenceContextAssemblerTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::RecordNotFound) { assembler.spec_for(version: 777) }
   end
 
+  test "unknown option is explicitly uncertain and deterministic followup is sourced" do
+    save_answer(@intake, "market_locales", ["unknown"], revision: 1)
+    packet = assembler.build
+    fact = packet.fetch("reported_facts").find { |row| row["question_key"] == "market_locales" }
+    assert_equal "unknown", fact.fetch("status")
+    assert_includes fact.fetch("selected_labels"), "Not decided"
+    item = packet.fetch("clarifying_questions").find { |row| row["question_key"] == "market_locales" }
+    # The limited top-three list may prioritize other high-impact missing facts.
+    if item
+      assert_equal "respondent_reported_unknown", item.fetch("reason")
+      assert_match(/\Acatalog:/, item.fetch("source"))
+    end
+  end
+
   test "restricted actors and provider access are rejected" do
     assert_raises(SecurityError) do
       Intake::Intelligence::ContextAssembler.new(intake: @intake, actor: nil)

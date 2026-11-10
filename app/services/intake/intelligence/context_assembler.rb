@@ -38,12 +38,14 @@ module Intake
             "question_key" => answer.question_key,
             "section" => question.fetch(:section),
             "selected_options" => answer.selected_options,
+            "selected_labels" => answer.selected_options.map { |key| question.fetch(:options).fetch(key, key) },
             "feature_priorities" => answer.feature_priorities,
             "other_text" => answer.other_text.to_s,
             "comment" => answer.comment.to_s,
             "unsure" => answer.unsure?,
             # A user selection is evidence of a reported preference, NOT proof of a delivered requirement.
-            "status" => answer.unsure? ? "unknown" : "reported_by_respondent",
+            "status" => (answer.unsure? || answer.selected_options.include?("unknown")) ?
+              "unknown" : "reported_by_respondent",
             "source" => "intake_answer:#{answer.id}:revision:#{answer.revision}"
           }
         end
