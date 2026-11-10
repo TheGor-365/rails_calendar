@@ -109,14 +109,16 @@ class Rc036PrivateS3ClamdIntegrationTest < ActionDispatch::IntegrationTest
     @keys << blob.object_key
     assert_includes @storage.read!(key: blob.object_key), "retention check"
 
-    travel 8.days do
-      sweeper = Studio::ProjectSourceRetention.new(actor: @owner, workspace: @workspace,
-        storage: @storage)
-      assert_equal 1, sweeper.sweep_expired!
-      assert_equal "revoked", blob.reload.scan_state
-      assert_raises(Studio::PrivateSourceStorage::MissingObject) { @storage.read!(key: blob.object_key) }
-      assert_equal 0, sweeper.sweep_expired!
-    end
+    # Do not mock Time.now while sending S3 requests: AWS v4 signatures
+    # must use the runner's real clock. Test-only backdated DB timestamps
+    # preserve the 7-day expiry constraint without touching system time.
+    blob.update_columns(created_at: 10.days.ago, expires_at: 3.days.ago)
+    sweeper = Studio::ProjectSourceRetention.new(actor: @owner, workspace: @workspace,
+      storage: @storage)
+    assert_equal 1, sweeper.sweep_expired!
+    assert_equal "revoked", blob.reload.scan_state
+    assert_raises(Studio::PrivateSourceStorage::MissingObject) { @storage.read!(key: blob.object_key) }
+    assert_equal 0, sweeper.sweep_expired!
   end
 
   private
