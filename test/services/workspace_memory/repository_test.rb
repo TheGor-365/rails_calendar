@@ -83,6 +83,45 @@ class WorkspaceMemoryRepositoryTest < ActiveSupport::TestCase
     assert_not membership.valid?
   end
 
+  test "Postgres composite foreign keys reject forged cross-tenant writes" do
+    now = Time.current
+    attrs = {
+      workspace_id: @workspace.id,
+      client_id: @outsider.id,
+      recorded_by_id: @owner.id,
+      field_key: "current_stack",
+      revision: 1,
+      payload: { "value" => "forged tenant scope" },
+      status: "reported",
+      sensitivity: "internal",
+      purpose: "discovery",
+      source_kind: "owner_note",
+      source_ref: "synthetic:forged",
+      created_at: now,
+      updated_at: now
+    }
+    assert_raises(ActiveRecord::InvalidForeignKey) do
+      ClientFact.insert_all!([attrs])
+    end
+
+    consent_attrs = {
+      workspace_id: @workspace.id,
+      client_id: @outsider.id,
+      recorded_by_id: @owner.id,
+      purpose: "external_ai",
+      granted: true,
+      source_ref: "synthetic:forged",
+      created_at: now,
+      updated_at: now
+    }
+    assert_raises(ActiveRecord::InvalidForeignKey) do
+      ClientConsent.insert_all!([consent_attrs])
+    end
+
+    assert_empty @client.client_facts
+    assert_empty @outsider.client_consents
+  end
+
   test "revoking membership or suspending workspace immediately removes read access" do
     member = @workspace.workspace_memberships.find_by!(user: @owner)
     member.update!(status: "revoked")
