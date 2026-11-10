@@ -43,8 +43,16 @@ class AdaptiveIntakeQuizzesController < ApplicationController
         if !submitted_revision.match?(/\A\d+\z/) || submitted_revision.to_i != @answer.revision
           @answer.errors.add(:base, "This answer changed in another tab. Reload before saving.")
         else
+          selections = Array(input[:selected_options]).map(&:to_s).map(&:strip).reject(&:blank?)
+          submitted_priorities = input[:feature_priorities]&.to_h || {}
+          selected_priorities = if Intake::AdaptiveQuestionCatalog.prioritizable?(@question.fetch(:key))
+                                  submitted_priorities.slice(*selections)
+                                else
+                                  {}
+                                end
           @answer.assign_attributes(
-            selected_options: Array(input[:selected_options]).map(&:to_s).map(&:strip).reject(&:blank?),
+            selected_options: selections,
+            feature_priorities: selected_priorities,
             other_text: input[:other_text].to_s.strip,
             unsure: input[:unsure] == "1",
             comment: input[:comment].to_s.strip
@@ -135,6 +143,7 @@ class AdaptiveIntakeQuizzesController < ApplicationController
 
   def quiz_params
     params.require(:quiz).permit(:revision, :other_text, :comment, :unsure,
-                                 :navigation, :confirm_branch_change, selected_options: [])
+                                 :navigation, :confirm_branch_change,
+                                 selected_options: [], feature_priorities: {})
   end
 end

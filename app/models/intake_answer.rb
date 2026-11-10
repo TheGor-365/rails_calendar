@@ -13,6 +13,7 @@ class IntakeAnswer < ApplicationRecord
     {
       "question_key" => question_key,
       "selected_options" => selected_options,
+      "feature_priorities" => feature_priorities,
       "other_text" => other_text.to_s,
       "unsure" => unsure,
       "comment" => comment.to_s
@@ -34,6 +35,20 @@ class IntakeAnswer < ApplicationRecord
            selected_options.uniq.length == selected_options.length
       errors.add(:selected_options, "contain invalid or duplicate options")
       return
+    end
+
+    valid_priorities = feature_priorities.is_a?(Hash) &&
+                       feature_priorities.all? do |key, value|
+                         selected_options.include?(key) &&
+                           Intake::AdaptiveQuestionCatalog.prioritizable?(question_key) &&
+                           %w[must should later].include?(value)
+                       end
+    errors.add(:feature_priorities, "contain invalid options or priority values") unless valid_priorities
+
+    if Intake::AdaptiveQuestionCatalog.prioritizable?(question_key) &&
+       selected_options.any? && !unsure &&
+       (selected_options - feature_priorities.keys).any?
+      errors.add(:feature_priorities, "must be set for every selected feature")
     end
 
     if question[:mode] == :single && selected_options.length > 1

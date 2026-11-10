@@ -27,9 +27,11 @@ class AdaptiveQuizFlowTest < ApplicationSystemTestCase
     visit adaptive_project_intake_quiz_url(@intake, step: "website_pages")
     assert_selector "h1", text: "Which website pages or features are needed?"
     check "Catalogue or store"
+    select "Must have", from: "Priority for Catalogue or store"
     click_button "Save and continue"
     assert_current_path adaptive_project_intake_quiz_path(@intake, step: "website_checkout")
     check "Checkout"
+    select "Must have", from: "Priority for Checkout"
     click_button "Save and review"
     assert_current_path review_adaptive_project_intake_quiz_path(@intake)
     assert_text "What must the catalogue support?"
@@ -37,6 +39,7 @@ class AdaptiveQuizFlowTest < ApplicationSystemTestCase
     visit adaptive_project_intake_quiz_url(@intake, step: "website_pages")
     uncheck "Catalogue or store"
     check "Landing page"
+    select "Should have", from: "Priority for Landing page"
     click_button "Save and continue"
     assert_selector "[role='alert']", text: /will hide 1 previously saved answer/
     assert_selector "input[name='quiz[confirm_branch_change]']", visible: true

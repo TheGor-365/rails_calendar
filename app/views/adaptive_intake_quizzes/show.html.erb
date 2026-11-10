@@ -35,20 +35,33 @@
         <div class="rc-notice rc-notice--error mb-3" role="alert"><%= @answer.errors.full_messages.to_sentence %></div>
       <% end %>
       <%= form_with url: adaptive_project_intake_quiz_answer_path(@intake, question_key: @question.fetch(:key)),
-                    scope: :quiz, method: :patch, local: true do %>
+                    scope: :quiz, method: :patch, local: true,
+                    html: { data: { controller: "adaptive-priority", action: "change->adaptive-priority#refresh" } } do %>
         <%= hidden_field_tag "quiz[revision]", @answer.revision %>
         <%= hidden_field_tag "quiz[selected_options][]", "" %>
         <fieldset class="mb-3">
           <legend class="h5"><%= @question.fetch(:mode) == :multi ? "Select all that apply" : "Select one" %></legend>
           <% @question.fetch(:options).each do |key, description| %>
-            <label class="rc-quiz-choice">
-              <% if @question.fetch(:mode) == :single %>
-                <%= radio_button_tag "quiz[selected_options][]", key, @answer.selected_options.include?(key) %>
-              <% else %>
-                <%= check_box_tag "quiz[selected_options][]", key, @answer.selected_options.include?(key) %>
+            <div data-rc-priority-row class="d-flex flex-wrap gap-2 align-items-center mb-2">
+              <label class="rc-quiz-choice flex-grow-1 mb-0">
+                <% if @question.fetch(:mode) == :single %>
+                  <%= radio_button_tag "quiz[selected_options][]", key, @answer.selected_options.include?(key) %>
+                <% else %>
+                  <%= check_box_tag "quiz[selected_options][]", key, @answer.selected_options.include?(key) %>
+                <% end %>
+                <span><%= description %></span>
+              </label>
+              <% if Intake::AdaptiveQuestionCatalog.prioritizable?(@question.fetch(:key)) %>
+                <div data-rc-priority-field class="rc-field mb-0">
+                  <%= label_tag "quiz_priority_#{key}", "Priority for #{description}", class: "rc-field-label small" %>
+                  <%= select_tag "quiz[feature_priorities][#{key}]",
+                                 options_for_select([["Choose priority", ""], ["Must have", "must"],
+                                                     ["Should have", "should"], ["Later", "later"]],
+                                                    @answer.feature_priorities[key]),
+                                 id: "quiz_priority_#{key}", class: "rc-input", data: { rc_priority_select: true } %>
+                </div>
               <% end %>
-              <span><%= description %></span>
-            </label>
+            </div>
           <% end %>
         </fieldset>
         <div class="rc-field mb-3">

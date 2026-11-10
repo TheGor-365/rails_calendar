@@ -142,6 +142,29 @@ class AdaptiveIntakeQuizzesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[role='alert']"
   end
 
+  test "feature priorities persist in snapshots and invalid priority writes are rejected" do
+    sign_in_owner
+    patch_answer("website_pages", %w[landing catalogue], revision: "0",
+                 priorities: { "landing" => "must", "catalogue" => "should" })
+    assert_response :redirect
+    answer = @intake.intake_answers.find_by!(question_key: "website_pages")
+    assert_equal({ "landing" => "must", "catalogue" => "should" }, answer.feature_priorities)
+    assert_equal answer.feature_priorities,
+                 answer.intake_answer_revisions.sole.snapshot.fetch("feature_priorities")
+
+    assert_no_difference "IntakeAnswerRevision.count" do
+      patch_answer("website_pages", ["landing"], revision: "1",
+                   priorities: { "landing" => "unexpected" })
+    end
+    assert_response :unprocessable_entity
+    assert_equal %w[landing catalogue], answer.reload.selected_options
+
+    assert_no_difference "IntakeAnswerRevision.count" do
+      patch_answer("website_pages", ["landing"], revision: "1", priorities: {})
+    end
+    assert_response :unprocessable_entity
+  end
+
   test "all visible questions can be saved offline and review is a private draft" do
     sign_in_owner
     questions = Intake::AdaptiveQuestionCatalog.for("website")

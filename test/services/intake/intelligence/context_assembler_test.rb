@@ -54,6 +54,33 @@ class IntakeIntelligenceContextAssemblerTest < ActiveSupport::TestCase
     refute packet.fetch("reported_facts").to_json.include?("catalogue")
   end
 
+  test "full conversation is retrievable only for the scoped intake" do
+    @intake.intake_messages.create!(role: "client", body: "Synthetic clarification #1")
+    @intake.intake_messages.create!(role: "assistant", body: "Synthetic clarification #2")
+    @other.intake_messages.create!(role: "client", body: "Other customer's private note")
+    packet = assembler.build
+    assert_equal 2, packet.fetch("conversation_index").size
+    refute packet.to_json.include?("Synthetic clarification #1")
+    history = assembler.conversation_for
+    assert_equal %w[client assistant], history.map { |item| item["role"] }
+    assert_equal "Synthetic clarification #1", history.first["body"]
+    refute history.to_json.include?("Other customer's private note")
+    assert_raises(ArgumentError) { assembler.conversation_for(limit: 100) }
+  end
+
+  test "specification history is indexed and retrieved by exact version" do
+    document = {
+      "summary" => "A synthetic specification",
+      "goals" => [], "deliverables" => [], "acceptance_criteria" => [],
+      "unknowns" => [], "exclusions" => [], "milestones" => []
+    }
+    @intake.intake_spec_versions.create!(version: 1, document: document, source: "human")
+    packet = assembler.build
+    assert_equal false, packet.fetch("spec_index").first.fetch("owner_approved")
+    assert_equal "A synthetic specification", assembler.spec_for(version: 1).dig("document", "summary")
+    assert_raises(ActiveRecord::RecordNotFound) { assembler.spec_for(version: 777) }
+  end
+
   test "restricted actors and provider access are rejected" do
     assert_raises(SecurityError) do
       Intake::Intelligence::ContextAssembler.new(intake: @intake, actor: nil)

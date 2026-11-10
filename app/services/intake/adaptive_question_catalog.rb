@@ -4,7 +4,14 @@ module Intake
   # The selected ProjectIntake#project_type represents section A; section H
   # remains an owner-only draft review until the ACL/privacy gate is complete.
   class AdaptiveQuestionCatalog
-    VERSION = "rc035b.v1".freeze
+    VERSION = "rc035b.v2".freeze
+    # Existing v1 snapshots remain immutable and readable. Never rewrite them.
+    SUPPORTED_HISTORY_VERSIONS = %w[rc035b.v1 rc035b.v2].freeze
+    PRIORITIZABLE_KEYS = %w[scope website_pages website_checkout redesign_problems].freeze
+
+    def self.prioritizable?(key)
+      PRIORITIZABLE_KEYS.include?(key.to_s)
+    end
     SECTION_ORDER = %w[B C D E F G].freeze
 
     COMMON = [
@@ -27,6 +34,14 @@ module Intake
         }
       },
       {
+        key: "market_locales", section: "C", mode: :multi,
+        title: "Which markets and languages must be supported?",
+        options: {
+          "ru" => "Russian", "en" => "English", "hy" => "Armenian",
+          "other" => "Other languages", "unknown" => "Not decided"
+        }
+      },
+      {
         key: "scope", section: "D", mode: :multi,
         title: "Which parts of the work matter most?",
         options: {
@@ -42,6 +57,26 @@ module Intake
           "none" => "No external services", "email" => "Email provider",
           "crm" => "CRM", "api" => "Third-party API",
           "payments" => "Payment provider", "unknown" => "Need advice"
+        }
+      },
+      {
+        key: "data_sensitivity", section: "F", mode: :single,
+        title: "What categories of data will the project handle?",
+        options: {
+          "public" => "Public or demonstration data only",
+          "accounts" => "User accounts and contact details",
+          "confidential" => "Confidential business data",
+          "sensitive" => "Sensitive or regulated personal data",
+          "unknown" => "Not assessed yet"
+        }
+      },
+      {
+        key: "existing_assets", section: "G", mode: :multi,
+        title: "What already exists for this project?",
+        options: {
+          "source" => "Source code", "hosting" => "Hosting or domain",
+          "tests" => "Automated tests", "documentation" => "Technical docs",
+          "none" => "Starting from scratch", "unknown" => "Need investigation"
         }
       },
       {

@@ -47,7 +47,14 @@
               <% if answer.selected_options.any? %>
                 <ul class="rc-quiz-review-choices">
                   <% answer.selected_options.each do |option| %>
-                    <li><%= question.fetch(:options).fetch(option, option) %></li>
+                    <li>
+                      <%= question.fetch(:options).fetch(option, option) %>
+                      <% if answer.feature_priorities[option].present? %>
+                        <span class="rc-hint">— <%= { "must" => "Must", "should" => "Should", "later" => "Later" }.fetch(answer.feature_priorities[option]) %></span>
+                      <% elsif Intake::AdaptiveQuestionCatalog.prioritizable?(question.fetch(:key)) %>
+                        <span class="rc-hint">— Not prioritized (earlier version)</span>
+                      <% end %>
+                    </li>
                   <% end %>
                 </ul>
               <% end %>

@@ -38,6 +38,7 @@ module Intake
             "question_key" => answer.question_key,
             "section" => question.fetch(:section),
             "selected_options" => answer.selected_options,
+            "feature_priorities" => answer.feature_priorities,
             "other_text" => answer.other_text.to_s,
             "comment" => answer.comment.to_s,
             "unsure" => answer.unsure?,
@@ -71,6 +72,17 @@ module Intake
           }
         end.sort_by { |entry| entry.fetch("question_key") }
 
+        # Full conversation and specification histories are indexed here. Their
+        # raw bodies/documents are never copied into routine clarification packets.
+        conversation_index = @intake.intake_messages.order(:created_at, :id).pluck(:id, :role).map do |id, role|
+          { "source" => "intake_message:#{id}", "role" => role }
+        end
+        spec_index = @intake.intake_spec_versions.order(:version, :id)
+                            .pluck(:id, :version, :owner_approved_at).map do |id, version, approved|
+          { "source" => "intake_spec_version:#{id}", "version" => version,
+            "owner_approved" => approved.present? }
+        end
+
         {
           "schema_version" => VERSION,
           "classification" => "OWNER_INTERNAL_ONLY_DO_NOT_SEND_TO_PROVIDER",
@@ -83,6 +95,9 @@ module Intake
           "reported_facts" => selected,
           "omitted_fact_keys" => omitted,
           "history_index" => history_index,
+          "conversation_index" => conversation_index,
+          "spec_index" => spec_index,
+          "fact_budget_bytes" => char_budget,
           "clarifying_questions" => ClarificationPlanner.new(
             project_type: @intake.project_type, answers: rows
           ).call,
@@ -110,6 +125,32 @@ module Intake
             "snapshot" => revision.snapshot.deep_dup
           }
         end
+      end
+
+      # The owner can inspect exact chronological exchanges when clarification
+      # depends on them. Never prepend full chat history to every AI request.
+      def conversation_for(limit: 20)
+        raise ArgumentError, "Invalid history limit" unless (1..20).cover?(limit)
+
+        @intake.intake_messages.order(:created_at, :id).limit(limit).map do |message|
+          {
+            "source" => "intake_message:#{message.id}",
+            "role" => message.role,
+            "recorded_at" => message.created_at.iso8601,
+            "body" => message.body
+          }
+        end
+      end
+
+      # Approved status is a real recorded owner action, not an inference.
+      def spec_for(version:)
+        spec = @intake.intake_spec_versions.find_by!(version: version)
+        {
+          "source" => "intake_spec_version:#{spec.id}",
+          "version" => spec.version,
+          "owner_approved" => spec.approved?,
+          "document" => spec.document.deep_dup
+        }
       end
 
       def provider_payload
