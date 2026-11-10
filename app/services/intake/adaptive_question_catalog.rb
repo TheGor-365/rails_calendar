@@ -176,6 +176,15 @@ module Intake
                 end
     end
 
+    # Lookup for persistence validation. Visibility is checked separately by the
+    # owner-only controller inside a transaction; hidden answers are not writable.
+    def self.definition(project_type, question_key)
+      type = project_type.to_s
+      return nil unless BRANCHES.key?(type)
+
+      (COMMON + BRANCHES.fetch(type)).find { |entry| entry.fetch(:key) == question_key }
+    end
+
     def self.question(project_type, question_key, answers: {})
       self.for(project_type, answers: answers).find { |entry| entry.fetch(:key) == question_key }
     end

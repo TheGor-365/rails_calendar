@@ -22,7 +22,8 @@ class IntakeAnswer < ApplicationRecord
   private
 
   def valid_quiz_choice
-    question = Intake::QuizCatalog.question(project_intake&.project_type, question_key)
+    question = Intake::QuizCatalog.question(project_intake&.project_type, question_key) ||
+               Intake::AdaptiveQuestionCatalog.definition(project_intake&.project_type, question_key)
     unless question
       errors.add(:question_key, "is not part of this demo questionnaire")
       return

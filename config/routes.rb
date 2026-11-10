@@ -11,6 +11,14 @@ Rails.application.routes.draw do
   get "/project_intakes/:project_intake_id/quiz/review", to: "intake_quizzes#review", as: :review_project_intake_quiz
   patch "/project_intakes/:project_intake_id/quiz/:question_key", to: "intake_quizzes#update", as: :project_intake_quiz_answer
 
+  # RC-035B: separate owner-only adaptive workflow; legacy two-card quiz unchanged.
+  get "/project_intakes/:project_intake_id/quiz/adaptive",
+      to: "adaptive_intake_quizzes#show", as: :adaptive_project_intake_quiz
+  get "/project_intakes/:project_intake_id/quiz/adaptive/review",
+      to: "adaptive_intake_quizzes#review", as: :review_adaptive_project_intake_quiz
+  patch "/project_intakes/:project_intake_id/quiz/adaptive/:question_key",
+        to: "adaptive_intake_quizzes#update", as: :adaptive_project_intake_quiz_answer
+
   root "pages#home"
   get "calendar/day", to: "pages#day", as: :calendar_day
   get "calendar/hour", to: "pages#hour", as: :calendar_hour

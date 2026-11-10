@@ -10,7 +10,15 @@ module Intake
     end
 
     def self.selected_options(value)
-      payload = value.is_a?(Hash) ? (value[:selected_options] || value["selected_options"]) : value
+      payload = if value.is_a?(Hash)
+                  value[:selected_options] || value["selected_options"]
+                elsif value.respond_to?(:selected_options)
+                  # Persisted IntakeAnswer records are used by the owner-only
+                  # controller after the transaction-safe database read.
+                  value.selected_options
+                else
+                  value
+                end
       Array(payload).grep(String)
     end
   end

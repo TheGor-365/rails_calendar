@@ -12,6 +12,9 @@
       <div class="rc-quiz-intake-entry">
         <%= link_to rc_icon_label("ui-checks-grid", quiz_label), project_intake_quiz_path(@intake), class: "rc-action rc-action--primary" %>
         <p class="rc-hint mb-0 mt-2"><%= quiz_saved %> / <%= quiz_questions.size %> quiz answers saved locally · Your draft remains available when you return.</p>
+        <%= link_to rc_icon_label("diagram-3", "Open adaptive Quiz (private preview)"),
+              adaptive_project_intake_quiz_path(@intake), class: "rc-action rc-action--soft rc-action--small mt-2" %>
+        <p class="rc-hint mb-0 mt-2">RC-035B private preview · no AI charges or client submission.</p>
       </div>
     <% end %>
     </div>
