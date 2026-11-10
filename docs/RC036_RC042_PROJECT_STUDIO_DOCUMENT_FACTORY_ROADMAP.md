@@ -102,3 +102,11 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 - Dedicated AI Settings: provider/model registry and selection per task; `off/offline/reviewed provider` modes; prompt/template/schema versions; allowed purposes/data classes; explicit external-AI consent; per-call/project/day/month token and USD caps; retry/timeout/cache controls; region/retention policy, model response validation, circuit breaker, audit and deterministic fallback.
 - Default external AI OFF, billable calls disabled even if project switch is ON until owner-approved model, price and budget. Keep sensitive client content out of normal logs and provider prompts. Add negative tests for feature escalation, revoked consent, stale policy, cost limit and cross-project leakage. Distinguish `configured`, `enabled`, `available`, `approved`, `actually executed`.
 - Settings UI and stored policy models belong to RC-037 foundation; toggles and Project Hub dashboard integration RC-039; export/notification-specific gates RC-040/041; E2E policy/a11y/perf RC-042. No effect on current production.
+
+## RC-036 Stage 3 Slice B — scoped HTTP and non-redeemable invitations (2026-11-10)
+
+- Owner-only HTTP lists source metadata with exact workspace/client/intake scope; every file-byte download (including owner's) returns 404 until private storage and scan are implemented.
+- Owner-issued ProjectInvitation: HMAC recipient digest, SHA256 token digest, 48-hour expiry, owner-only list and revoke, single plaintext token returned only once with no-store. Tokens cannot be redeemed, and never grant client identity or access.
+- PostgreSQL tenant FKs and hard state constraints; negative HTTP/service tests for guests, foreign owners, client/intake IDOR, revoked membership, forged active state and cross-client DB writes.
+- No private object bucket, malware scanner, actual customer upload, client login or shared attachment links; all remain release gates. The decision to skip backups applies to this development iteration, not an assertion of production recoverability. Production untouched.
+- Next: privately configured durable object storage in authorized nonproduction, quarantine+AV/CDR release gate and request-time ACL download streaming; then client identity verification and invitation redemption.

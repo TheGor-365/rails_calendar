@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_231000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -163,6 +163,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_230000) do
     t.index ["client_id", "workspace_id"], name: "idx_project_intakes_client_workspace"
   end
 
+  create_table "project_invitations", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "project_intake_id", null: false
+    t.bigint "issued_by_id", null: false
+    t.string "recipient_digest", limit: 64, null: false
+    t.string "token_digest", limit: 64, null: false
+    t.string "role", limit: 20, default: "reviewer", null: false
+    t.string "status", limit: 20, default: "pending", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["issued_by_id"], name: "index_project_invitations_on_issued_by_id"
+    t.index ["token_digest"], name: "idx_project_invitations_unique_token", unique: true
+    t.index ["workspace_id", "client_id", "project_intake_id"], name: "idx_project_invitations_tenant_scope"
+    t.index ["workspace_id"], name: "index_project_invitations_on_workspace_id"
+  end
+
   create_table "project_sources", force: :cascade do |t|
     t.bigint "workspace_id", null: false
     t.bigint "client_id", null: false
@@ -254,6 +272,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_230000) do
   add_foreign_key "intake_spec_versions", "project_intakes"
   add_foreign_key "project_intakes", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_intakes_scoped_client"
   add_foreign_key "project_intakes", "workspaces"
+  add_foreign_key "project_invitations", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_invitations_client_tenant"
+  add_foreign_key "project_invitations", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_project_invitations_intake_tenant"
+  add_foreign_key "project_invitations", "users", column: "issued_by_id"
+  add_foreign_key "project_invitations", "workspaces"
   add_foreign_key "project_sources", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_project_sources_client_tenant"
   add_foreign_key "project_sources", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_project_sources_intake_tenant"
   add_foreign_key "project_sources", "users", column: "recorded_by_id"
@@ -265,6 +287,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_230000) do
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
   add_check_constraint "project_intakes", "client_id IS NULL OR workspace_id IS NOT NULL", name: "chk_project_intakes_client_needs_workspace"
+  add_check_constraint "project_invitations", "role = 'reviewer'", name: "chk_project_invitations_role"
+  add_check_constraint "project_invitations", "status IN ('pending', 'revoked')", name: "chk_project_invitations_no_granted_access"
+  add_check_constraint "project_invitations", %q(token_digest ~ '^[0-9a-f]{64} 'metadata_only'", name: "chk_project_sources_no_release_before_privacy_gate"
+  add_check_constraint "project_sources", "byte_size BETWEEN 1 AND 262144", name: "chk_project_sources_preview_size"
+  add_check_constraint "project_sources", %q(source_sha256 ~ '^[0-9a-f]{64}$'), name: "chk_project_sources_sha256"
+  add_check_constraint "project_sources", "source_format IN ('markdown', 'text', 'json')", name: "chk_project_sources_format"
+end
+), name: "chk_project_invitations_token_digest"
+  add_check_constraint "project_invitations", %q(recipient_digest ~ '^[0-9a-f]{64} 'metadata_only'", name: "chk_project_sources_no_release_before_privacy_gate"
+  add_check_constraint "project_sources", "byte_size BETWEEN 1 AND 262144", name: "chk_project_sources_preview_size"
+  add_check_constraint "project_sources", %q(source_sha256 ~ '^[0-9a-f]{64}$'), name: "chk_project_sources_sha256"
+  add_check_constraint "project_sources", "source_format IN ('markdown', 'text', 'json')", name: "chk_project_sources_format"
+end
+), name: "chk_project_invitations_recipient_digest"
+  add_check_constraint "project_invitations", "expires_at > created_at AND expires_at <= created_at + interval '72 hours'", name: "chk_project_invitations_expiry_window"
   add_check_constraint "project_sources", "state = 'metadata_only'", name: "chk_project_sources_no_release_before_privacy_gate"
   add_check_constraint "project_sources", "byte_size BETWEEN 1 AND 262144", name: "chk_project_sources_preview_size"
   add_check_constraint "project_sources", %q(source_sha256 ~ '^[0-9a-f]{64}$'), name: "chk_project_sources_sha256"
