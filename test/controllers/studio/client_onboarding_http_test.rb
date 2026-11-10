@@ -121,6 +121,9 @@ class StudioClientOnboardingHttpTest < ActionDispatch::IntegrationTest
                    consent_policy: "studio_review_v1", consent_confirmation: "yes" }
     assert_response :unprocessable_entity
 
+    # A second customer journey happens in a distinct throttle window;
+    # reset the isolated test counter without changing application limits.
+    AdminLoginWindow.delete_all
     verify_invitation(next_invitation)
     post "/studio/client_projects/accept",
          params: { invitation_token: next_invitation.token,
@@ -217,10 +220,14 @@ class StudioClientOnboardingHttpTest < ActionDispatch::IntegrationTest
                                           recipient_email: "other@example.test")
     # Composite FK denies wrong workspace/client even through raw SQL insert.
     assert_raises(ActiveRecord::InvalidForeignKey) do
-      Studio::ClientProjectGrant.insert_all!([values.merge(project_invitation_id: foreign_invite.invitation.id)])
+      ActiveRecord::Base.transaction(requires_new: true) do
+        Studio::ClientProjectGrant.insert_all!([values.merge(project_invitation_id: foreign_invite.invitation.id)])
+      end
     end
     assert_raises(ActiveRecord::RecordNotUnique) do
-      Studio::ClientProjectGrant.insert_all!([values.merge(client_id: @client.id)])
+      ActiveRecord::Base.transaction(requires_new: true) do
+        Studio::ClientProjectGrant.insert_all!([values.merge(client_id: @client.id)])
+      end
     end
   end
 
