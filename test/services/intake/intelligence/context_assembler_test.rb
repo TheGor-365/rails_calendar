@@ -46,7 +46,7 @@ class IntakeIntelligenceContextAssemblerTest < ActiveSupport::TestCase
 
   test "previous revisions are preserved and can be retrieved without dumping all history" do
     row = save_answer(@intake, "website_pages", ["catalogue"], revision: 1)
-    row.update!(selected_options: ["landing"], revision: 2)
+    row.update!(selected_options: ["landing"], feature_priorities: { "landing" => "must" }, revision: 2)
     row.intake_answer_revisions.create!(revision: 2, snapshot: row.snapshot)
     packet = assembler.build
     assert_equal 2, packet.fetch("history_index").first.fetch("snapshot_count")
@@ -118,8 +118,10 @@ class IntakeIntelligenceContextAssemblerTest < ActiveSupport::TestCase
   end
 
   def save_answer(intake, key, options, revision:, comment: "")
+    priorities = Intake::AdaptiveQuestionCatalog.prioritizable?(key) ? options.index_with { "must" } : {}
     record = intake.intake_answers.create!(
-      question_key: key, selected_options: options, comment: comment, revision: revision
+      question_key: key, selected_options: options, feature_priorities: priorities,
+      comment: comment, revision: revision
     )
     record.intake_answer_revisions.create!(revision: revision, snapshot: record.snapshot)
     record

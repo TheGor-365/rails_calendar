@@ -38,7 +38,7 @@ class AdaptiveQuestionCatalogTest < ActiveSupport::TestCase
 
   test "unknown type stays on a safe generic track and invalid type has no questions" do
     unknown = Intake::AdaptiveQuestionCatalog.for("unknown")
-    assert_equal %w[B C D F G], unknown.map { |q| q[:section] }
+    assert_equal %w[B C D F G], unknown.map { |q| q[:section] }.uniq
     assert_empty Intake::AdaptiveQuestionCatalog.for("surprise")
   end
 

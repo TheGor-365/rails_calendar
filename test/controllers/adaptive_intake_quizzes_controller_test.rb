@@ -194,9 +194,10 @@ class AdaptiveIntakeQuizzesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to consultations_path
   end
 
-  def patch_answer(key, choices, revision:, navigation: "continue", confirmation: nil)
+  def patch_answer(key, choices, revision:, navigation: "continue", confirmation: nil, priorities: nil)
+    priorities ||= Intake::AdaptiveQuestionCatalog.prioritizable?(key) ? choices.index_with { "must" } : {}
     patch adaptive_project_intake_quiz_answer_path(@intake, question_key: key),
           params: { quiz: { revision: revision, selected_options: choices, navigation: navigation,
-                            confirm_branch_change: confirmation } }
+                            confirm_branch_change: confirmation, feature_priorities: priorities } }
   end
 end
