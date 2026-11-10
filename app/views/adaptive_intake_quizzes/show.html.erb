@@ -68,6 +68,16 @@
           <p class="rc-hint">Do not include passwords, API keys, tokens, customer data or private documents.</p>
         </div>
 
+        <% if @needs_branch_confirmation %>
+          <div class="rc-notice rc-notice--neutral mb-3" role="status">
+            Your previous answer is preserved until you explicitly confirm the branch change.
+            Inactive answers and revision history will be retained, but excluded from the active review.
+          </div>
+          <label class="rc-quiz-choice mb-3">
+            <%= check_box_tag "quiz[confirm_branch_change]", "1", false, required: true %>
+            <span>I understand: preserve historic answers and hide inactive branches</span>
+          </label>
+        <% end %>
         <div class="rc-quiz-actions mt-3">
           <%= button_tag "Save and continue", type: "submit", name: "quiz[navigation]", value: "continue",
                          class: "rc-action rc-action--primary", data: { disable_with: "Saving…" } %>

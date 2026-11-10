@@ -50,15 +50,24 @@ class AdaptiveIntakeQuizzesController < ApplicationController
             comment: input[:comment].to_s.strip
           )
           if @answer.valid?
-            if @answer.new_record? || @answer.changed?
-              @answer.revision += 1
+            # Changing a parent can make already-saved child answers inactive.
+            # Never do so silently: require an explicit confirmation while
+            # keeping all child records and immutable snapshots intact.
+            newly_hidden = newly_hidden_saved_count
+            if newly_hidden.positive? && input[:confirm_branch_change] != "1"
+              @needs_branch_confirmation = true
+              @answer.errors.add(:base, "This change will hide #{'#{newly_hidden}'} previously saved answer(s). Confirm below before saving.")
+            else
+              if @answer.new_record? || @answer.changed?
+                @answer.revision += 1
               @answer.save!
-              @answer.intake_answer_revisions.create!(
-                revision: @answer.revision,
-                snapshot: @answer.snapshot.merge("catalog_version" => Intake::AdaptiveQuestionCatalog::VERSION)
-              )
+                @answer.intake_answer_revisions.create!(
+                  revision: @answer.revision,
+                  snapshot: @answer.snapshot.merge("catalog_version" => Intake::AdaptiveQuestionCatalog::VERSION)
+                )
+              end
+              saved = true
             end
-            saved = true
           end
         end
       end
@@ -116,7 +125,16 @@ class AdaptiveIntakeQuizzesController < ApplicationController
     end
   end
 
+  def newly_hidden_saved_count
+    proposed = @intake.intake_answers.to_a.index_by(&:question_key)
+    proposed[@question.fetch(:key)] = { "selected_options" => @answer.selected_options }
+    after_keys = Intake::AdaptiveQuestionCatalog.for(@intake.project_type, answers: proposed)
+                                                .map { |entry| entry.fetch(:key) }
+    @saved_answers.keys.count { |key| !after_keys.include?(key) }
+  end
+
   def quiz_params
-    params.require(:quiz).permit(:revision, :other_text, :comment, :unsure, :navigation, selected_options: [])
+    params.require(:quiz).permit(:revision, :other_text, :comment, :unsure,
+                                 :navigation, :confirm_branch_change, selected_options: [])
   end
 end

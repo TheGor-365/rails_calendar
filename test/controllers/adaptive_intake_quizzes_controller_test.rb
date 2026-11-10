@@ -92,7 +92,14 @@ class AdaptiveIntakeQuizzesControllerTest < ActionDispatch::IntegrationTest
     patch_answer("website_checkout", ["checkout"], revision: "0")
     assert_equal 1, @intake.intake_answers.find_by!(question_key: "website_checkout").revision
 
-    patch_answer("website_pages", ["landing"], revision: "1")
+    assert_no_difference "IntakeAnswerRevision.count" do
+      patch_answer("website_pages", ["landing"], revision: "1")
+    end
+    assert_response :unprocessable_entity
+    assert_select "input[name='quiz[confirm_branch_change]'][required]"
+    assert_equal ["catalogue"], @intake.intake_answers.find_by!(question_key: "website_pages").selected_options
+
+    patch_answer("website_pages", ["landing"], revision: "1", confirmation: "1")
     assert_response :redirect
     get adaptive_project_intake_quiz_path(@intake, step: "website_checkout")
     assert_response :not_found
@@ -164,8 +171,9 @@ class AdaptiveIntakeQuizzesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to consultations_path
   end
 
-  def patch_answer(key, choices, revision:, navigation: "continue")
+  def patch_answer(key, choices, revision:, navigation: "continue", confirmation: nil)
     patch adaptive_project_intake_quiz_answer_path(@intake, question_key: key),
-          params: { quiz: { revision: revision, selected_options: choices, navigation: navigation } }
+          params: { quiz: { revision: revision, selected_options: choices, navigation: navigation,
+                            confirm_branch_change: confirmation } }
   end
 end

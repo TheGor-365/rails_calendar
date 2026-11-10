@@ -8,6 +8,7 @@
 - New **owner-only** adaptive preview at \`/project_intakes/:id/quiz/adaptive\`; section A is the existing intake type, sections B–G are deterministic, section H is private review.
 - Direct deep links require owner authentication; conditional questions are rejected with 404 when no longer visible.
 - Changes to upstream selections retain all previously saved child answers and revision snapshots for audit, but exclude inactive branches from active progress and review, with a visible inactive-branch notice. Active choices reappear if their parent condition becomes true again.
+- Parent changes that hide previously saved branches require an explicit confirmation checkbox (422 without it). All historical child records remain intact.
 - Answer revisions are transactional and immutable; optimistic \`quiz[revision]\` guard prevents silent stale-tab overwrites.
 - Server validates choices via catalog definitions; visibility is checked inside \`ProjectIntake#with_lock\`.
 - Existing White Atlas classes reused; navigation saves explicitly; there is no auto-save guarantee.
@@ -26,7 +27,7 @@
 
 - Expand primary project types beyond the four existing persisted categories;
   add \`must/should/later\` priorities and finer detail about regions/languages/budget/deadline;
-  explicit branch-change confirmation before active answers become inactive;
+  stronger browser UX for branch-change confirmation;
   catalog migration/version pinning across future releases;
   comprehensive mobile/keyboard/system-browser QA.
 - RC-036 privacy/ACL, real client submissions and paid AI remain prohibited until separately reviewed.
