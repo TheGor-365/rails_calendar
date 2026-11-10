@@ -83,7 +83,7 @@ class WorkspaceMemoryRepositoryTest < ActiveSupport::TestCase
     assert_not membership.valid?
   end
 
-  test "Postgres composite foreign keys reject forged cross-tenant writes" do
+  test "Postgres composite FK rejects forged cross-tenant fact even without Rails validation" do
     now = Time.current
     attrs = {
       workspace_id: @workspace.id,
@@ -100,11 +100,14 @@ class WorkspaceMemoryRepositoryTest < ActiveSupport::TestCase
       created_at: now,
       updated_at: now
     }
-    assert_raises(ActiveRecord::InvalidForeignKey) do
-      ClientFact.insert_all!([attrs])
-    end
+    assert_raises(ActiveRecord::InvalidForeignKey) { ClientFact.insert_all!([attrs]) }
+    # One failed PostgreSQL INSERT aborts the current transactional test.
+    # Do not run further SQL until the test transaction is rolled back.
+  end
 
-    consent_attrs = {
+  test "Postgres composite FK rejects forged cross-tenant consent even without Rails validation" do
+    now = Time.current
+    attrs = {
       workspace_id: @workspace.id,
       client_id: @outsider.id,
       recorded_by_id: @owner.id,
@@ -114,12 +117,7 @@ class WorkspaceMemoryRepositoryTest < ActiveSupport::TestCase
       created_at: now,
       updated_at: now
     }
-    assert_raises(ActiveRecord::InvalidForeignKey) do
-      ClientConsent.insert_all!([consent_attrs])
-    end
-
-    assert_empty @client.client_facts
-    assert_empty @outsider.client_consents
+    assert_raises(ActiveRecord::InvalidForeignKey) { ClientConsent.insert_all!([attrs]) }
   end
 
   test "revoking membership or suspending workspace immediately removes read access" do
