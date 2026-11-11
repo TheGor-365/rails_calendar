@@ -1,0 +1,137 @@
+<div class="container my-4 my-sm-5">
+  <header class="rc-page-hero mb-3">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow">PROJECT STUDIO / RC-036 · PRIVATE SOURCE PREVIEW</p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-file-earmark-arrow-up"></i></span>
+        <h1 class="page-title">Inspect a project source</h1>
+      </div>
+      <p class="rc-muted"><%= @intake.title %> · Workspace: <%= @workspace.name %></p>
+      <p class="rc-hint">
+        Owner-only sandbox for synthetic, non-sensitive MD/TXT/JSON (max. 256 KB).
+        Preview is not saved in PostgreSQL or durable storage; nothing is sent to AI or to a client.
+      </p>
+    </div>
+  </header>
+
+  <div class="rc-quiz-layout">
+    <section class="surface-panel p-3 p-sm-4" aria-label="Upload source preview">
+      <div class="rc-studio-progress" aria-label="Project workflow">
+        <% [["Sources", true], ["Clarify", false], ["Documents", false], ["Roadmap", false], ["Export", false]].each do |name, current| %>
+          <span class="rc-studio-chip" aria-current="<%= current ? 'step' : 'false' %>"><%= name %></span>
+        <% end %>
+      </div>
+
+      <%= form_with url: workspace_source_preview_path(@workspace, @intake), method: :post,
+                    html: { multipart: true, class: "rc-form" },
+                    data: { controller: "studio-dropzone", turbo_frame: "studio_preview" } do %>
+        <div class="rc-field mb-3">
+          <div class="rc-studio-dropzone" data-studio-dropzone-target="zone"
+               data-action="dragover->studio-dropzone#dragOver dragleave->studio-dropzone#dragLeave drop->studio-dropzone#drop">
+            <%= label_tag :source_file, "Choose or drop a project source", class: "rc-field-label" %>
+            <p class="rc-hint mb-1">Only .md, .markdown, .txt or .json. Other formats remain blocked until private storage and scanning are implemented.</p>
+            <%= file_field_tag :source_file, accept: ".md,.markdown,.txt,.json,text/plain,text/markdown,application/json",
+                               required: true, class: "rc-input", data: {
+                                 studio_dropzone_target: "input",
+                                 action: "change->studio-dropzone#changed"
+                               } %>
+            <p class="rc-hint mt-2 mb-0" role="status" data-studio-dropzone-target="filename">
+              No source selected. Nothing will be sent until you choose Analyze.
+            </p>
+          </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <%= button_tag type: :submit, name: "intent", value: "analyze",
+                         class: "rc-action rc-action--primary" do %>
+            <i class="bi bi-search me-2" aria-hidden="true"></i>Analyze privately
+          <% end %>
+          <%= button_tag type: :submit, name: "intent", value: "download",
+                         class: "rc-action rc-action--soft", data: { turbo: false } do %>
+            <i class="bi bi-download me-2" aria-hidden="true"></i>Download draft .md
+          <% end %>
+        </div>
+        <p class="rc-hint mt-2">Download is a synthetic, unapproved discovery outline with source fingerprint.
+          It is not a full specification, financial model or client agreement.</p>
+      <% end %>
+
+      <%= turbo_frame_tag "studio_preview" do %>
+        <% if @error.present? %>
+          <div class="rc-notice rc-notice--error mt-3" role="alert"><%= @error %> — no document was saved.</div>
+        <% elsif @report.present? %>
+          <section class="mt-4" aria-label="Source analysis result">
+            <h2 class="h4">Source outline</h2>
+            <p class="rc-hint">
+              <%= @report.fetch("format").upcase %> ·
+              <%= @report.fetch("bytes") %> bytes ·
+              <%= @report.fetch("line_count") %> lines · SHA256 <code><%= @report.fetch("sha256").first(12) %>…</code>
+            </p>
+            <p class="rc-notice rc-notice--neutral" role="status">
+              File content is untrusted evidence. This preview is not a confirmed requirement or approved document.
+            </p>
+            <% if @report.fetch("outline").any? %>
+              <h3 class="h5 mt-3">Detected sections</h3>
+              <ol class="rc-record-list">
+                <% @report.fetch("outline").each do |section| %>
+                  <li class="rc-record rc-studio-line">
+                    <strong><%= section.fetch("title") %></strong>
+                    <span class="rc-hint"> · line <%= section.fetch("line") %>, level <%= section.fetch("level") %></span>
+                  </li>
+                <% end %>
+              </ol>
+            <% end %>
+            <% if @report.fetch("checklist").any? %>
+              <h3 class="h5 mt-3">Checklist candidates</h3>
+              <ul class="rc-record-list">
+                <% @report.fetch("checklist").each do |item| %>
+                  <li class="rc-record rc-studio-line">
+                    <%= item.fetch("done") ? "Completed in source:" : "Open in source:" %>
+                    <%= item.fetch("text") %>
+                    <span class="rc-hint"> · line <%= item.fetch("line") %></span>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+            <% if @report["json_root"].present? %>
+              <p class="rc-hint">JSON root: <%= @report.fetch("json_root") %>. Top-level keys:
+                <%= @report.fetch("json_top_level_keys").join(", ").presence || "none" %>.</p>
+            <% end %>
+          </section>
+        <% else %>
+          <div class="rc-notice rc-notice--neutral mt-3" role="status">
+            Select a synthetic file to preview its structure. No source is currently imported.
+          </div>
+        <% end %>
+
+        <section class="mt-4" aria-label="Proposed document generation sequence">
+          <h2 class="h4">What can be prepared next?</h2>
+          <p class="rc-hint">This is a deterministic readiness report, not a generation run.</p>
+          <ol class="rc-record-list">
+            <% @plan.fetch("artifacts").each do |artifact| %>
+              <li class="rc-record">
+                <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                  <strong><%= artifact.fetch("key").humanize %></strong>
+                  <span class="rc-hint"><%= artifact.fetch("status") == "ready_to_propose" ? "Ready for review" : "Needs more evidence" %></span>
+                </div>
+                <% if artifact.fetch("missing_evidence").any? %>
+                  <p class="rc-hint mb-0">Missing: <%= artifact.fetch("missing_evidence").map(&:humanize).join(", ") %></p>
+                <% else %>
+                  <p class="rc-hint mb-0">Still requires explicit human review before use.</p>
+                <% end %>
+              </li>
+            <% end %>
+          </ol>
+        </section>
+      <% end %>
+    </section>
+
+    <aside class="rc-quiz-sidebar">
+      <section class="surface-panel p-3 p-sm-4" aria-label="Privacy and workflow notes">
+        <p class="eyebrow">SECURE WORKFLOW</p>
+        <h2 class="h5">Source → Review → Documents</h2>
+        <p class="rc-hint">The full private storage, invitation and document export pipeline is scheduled for RC-036–040. Do not upload genuine client secrets or personal documents to this preview.</p>
+        <%= link_to "Return to project draft", project_intake_path(@intake),
+                    class: "rc-action rc-action--soft rc-action--small mt-2", data: { turbo_frame: "_top" } %>
+      </section>
+    </aside>
+  </div>
+</div>

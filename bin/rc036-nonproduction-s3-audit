@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+# Run locally ONLY with test/dev env and dedicated nonproduction bucket credentials.
+# Never pass secrets on the command line; source them from a private shell/env.
+# Report contains only booleans, never bucket names or credentials.
+ENV["RAILS_ENV"] ||= "development"
+require_relative "../config/environment"
+require "json"
+
+result = Studio::NonproductionStorageAudit.new.call
+puts JSON.pretty_generate(
+  checks: result.checks,
+  storage_capability_checks_passed: result.storage_checks_passed?,
+  real_client_data_permitted: false,
+  production_deployment_permitted: false
+)
+exit(result.storage_checks_passed? ? 0 : 1)

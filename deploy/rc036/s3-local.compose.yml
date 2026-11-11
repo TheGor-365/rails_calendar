@@ -1,0 +1,15 @@
+# Synthetic local-only object store. Never use customer data.
+# Credentials must be supplied through a private shell, never Git.
+services:
+  rc036-local-s3:
+    image: docker.io/pgsty/silo@sha256:08ce1505b5eacefbad1ca07159b242b9ce045a11c2817e3bc257b25f77bbc02d
+    command: ["server", "/data"]
+    environment:
+      MINIO_ROOT_USER: ${RC_STUDIO_S3_ACCESS_KEY_ID:?Required synthetic local user}
+      MINIO_ROOT_PASSWORD: ${RC_STUDIO_S3_SECRET_ACCESS_KEY:?Required synthetic local secret}
+    ports:
+      - "127.0.0.1:9000:9000"
+    volumes:
+      - rc036-local-synthetic-s3-data:/data
+volumes:
+  rc036-local-synthetic-s3-data:

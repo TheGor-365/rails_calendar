@@ -15,6 +15,11 @@
         <%= link_to rc_icon_label("diagram-3", "Open adaptive Quiz (private preview)"),
               adaptive_project_intake_quiz_path(@intake), class: "rc-action rc-action--soft rc-action--small mt-2" %>
         <p class="rc-hint mb-0 mt-2">RC-035B private preview · no AI charges or client submission.</p>
+        <% if @intake.workspace_id.present? && @intake.workspace.owner_access?(current_user) %>
+          <%= link_to rc_icon_label("file-earmark-arrow-up", "Inspect project file (private preview)"),
+                workspace_source_preview_path(@intake.workspace, @intake),
+                class: "rc-action rc-action--soft rc-action--small mt-2" %>
+        <% end %>
       </div>
     <% end %>
     </div>

@@ -14,3 +14,5 @@ import QuizLiveController from "./quiz_live_controller"
 application.register("quiz-live", QuizLiveController)
 import AdaptivePriorityController from "./adaptive_priority_controller"
 application.register("adaptive-priority", AdaptivePriorityController)
+import StudioDropzoneController from "./studio_dropzone_controller"
+application.register("studio-dropzone", StudioDropzoneController)

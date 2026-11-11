@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+# Manual, irreversible review of a crashed synthetic maintenance RUN ONLY.
+# This never repeats the operation, scans files or deletes storage objects.
+require "json"
+ENV["RAILS_ENV"] ||= "development"
+require_relative "../config/environment"
+
+unless Rails.env.development? &&
+       ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true" &&
+       ENV["RC_STUDIO_OPERATOR_RECOVERY"] == "true"
+  warn "Synthetic local operator recovery is disabled"
+  exit 1
+end
+
+begin
+  ws_id = Integer(ENV.fetch("RC_STUDIO_REVIEW_WORKSPACE_ID"), 10)
+  run_id = Integer(ENV.fetch("RC_STUDIO_REVIEW_RUN_ID"), 10)
+  raise ArgumentError unless ws_id.positive? && run_id.positive?
+  workspace = Workspace.find(ws_id)
+  review = Studio::OperatorRecovery.new(
+    actor: workspace.owner_user, workspace: workspace
+  ).close_abandoned!(
+    run_id: run_id,
+    reason_code: ENV.fetch("RC_STUDIO_REVIEW_REASON"),
+    confirmation: ENV.fetch("RC_STUDIO_REVIEW_CONFIRM")
+  )
+  puts JSON.generate(review_id: review.id, reviewed_run_id: run_id,
+                     run_closed_without_replay: true,
+                     effects_independently_verified: false,
+                     production_enabled: false)
+rescue StandardError, SecurityError
+  warn "Review rejected; inspect this run and its side effects before retrying"
+  exit 1
+end

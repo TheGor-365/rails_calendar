@@ -123,6 +123,9 @@ class AdaptiveIntakeQuizzesController < ApplicationController
 
   def set_intake
     @intake = ProjectIntake.find(params[:project_intake_id])
+    if @intake.workspace_id.present? && !@intake.workspace.owner_access?(current_user)
+      head :not_found
+    end
   end
 
   def refresh_questions

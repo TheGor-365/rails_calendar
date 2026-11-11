@@ -5,6 +5,8 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby "3.4.12"
 gem "rails", "= 8.1.4.1"
 gem "bcrypt", "~> 3.1.22"
+# RC-036 Slice D: S3-compatible private quarantine storage (nonproduction only).
+gem "aws-sdk-s3", "= 1.233.2", require: false
 
 gem "sprockets-rails"
 gem "pg", "~> 1.5"

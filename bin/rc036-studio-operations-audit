@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+# Manual, read-only diagnostics on a trusted developer machine.
+# Never schedule or run in production; no object keys or customer PII output.
+require "json"
+
+ENV["RAILS_ENV"] ||= "development"
+require_relative "../config/environment"
+
+unless Rails.env.development? &&
+       ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true" &&
+       ENV["RC_STUDIO_LOCAL_OPERATIONS_AUDIT"] == "true"
+  warn "Refusing to inspect storage outside explicit synthetic local development"
+  exit 1
+end
+
+begin
+  workspace_id = Integer(ENV.fetch("RC_STUDIO_AUDIT_WORKSPACE_ID"), 10)
+  raise ArgumentError unless workspace_id.positive?
+  workspace = Workspace.find(workspace_id)
+  actor = workspace.owner_user
+  output = Studio::SourceOperatorDashboard.new(actor: actor, workspace: workspace).call
+  if ENV["RC_STUDIO_AUDIT_S3_INVENTORY"] == "true"
+    output[:s3_inventory] = Studio::SourceInventoryAudit.new(
+      actor: actor, workspace: workspace
+    ).call(limit: 50)
+  end
+  puts JSON.pretty_generate(output)
+rescue StandardError, SecurityError
+  warn "Synthetic operations audit failed or access was denied"
+  exit 1
+end

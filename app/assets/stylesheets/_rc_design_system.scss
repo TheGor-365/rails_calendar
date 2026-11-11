@@ -239,3 +239,21 @@ input[type="checkbox"],input[type="radio"] { accent-color: var(--rc-accent); }
   .rc-action, .rc-quiz-choice, .rc-quiz-meter__fill { transition: none; transform: none; }
   .rc-turbo-pending .rc-action[type="submit"]::after { animation: none; }
 }
+
+/* RC-036 owner-only Studio source preview. */
+.rc-studio-dropzone {
+  display: block; padding: 1.4rem;
+  border: 2px dashed rgba(10,118,109,.38);
+  border-radius: 18px;
+  background: var(--rc-accent-wash, #e7f7f4);
+  cursor: pointer; transition: border-color .15s ease, background-color .15s ease;
+}
+.rc-studio-dropzone:hover, .rc-studio-dropzone:focus-within, .rc-studio-dropzone--hover {
+  border-color: var(--rc-accent, #0a766d); background: #daf2ec;
+}
+.rc-studio-dropzone input[type="file"] { display: block; max-width: 100%; margin-top: .6rem; }
+.rc-studio-progress { display: flex; gap: .5rem; flex-wrap: wrap; margin: .7rem 0; }
+.rc-studio-chip { padding: .35rem .65rem; border-radius: 999px; background: #e7f7f4; color: #0a766d; font-size: .8rem; }
+.rc-studio-line { overflow-wrap: anywhere; }
+@media (max-width: 575.98px) { .rc-studio-dropzone { padding: 1rem; } }
+@media (prefers-reduced-motion: reduce) { .rc-studio-dropzone { transition: none; } }

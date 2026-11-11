@@ -19,6 +19,41 @@ Rails.application.routes.draw do
   patch "/project_intakes/:project_intake_id/quiz/adaptive/:question_key",
         to: "adaptive_intake_quizzes#update", as: :adaptive_project_intake_quiz_answer
 
+  # Owner-only Studio preview. No client access, persistence or AI calls.
+  get "/workspaces/:workspace_id/project_intakes/:id/source_preview",
+      to: "studio/source_previews#new", as: :workspace_source_preview
+  post "/workspaces/:workspace_id/project_intakes/:id/source_preview",
+       to: "studio/source_previews#create"
+
+  # RC-036 Stage 3 Slice F: invitation-bound client identity in test/local only.
+  # No public sign-up, no files, and all client routes deny production.
+  post "/studio/client_accounts", to: "studio/client_accounts#create", as: :studio_client_accounts
+  post "/studio/client_sessions", to: "studio/client_sessions#create", as: :studio_client_sessions
+  delete "/studio/client_sessions", to: "studio/client_sessions#destroy"
+  get "/studio/client_projects", to: "studio/client_projects#index", as: :studio_client_projects
+  post "/studio/client_projects/accept", to: "studio/client_projects#accept", as: :accept_studio_client_project
+  get "/studio/client_projects/:id", to: "studio/client_projects#show", as: :studio_client_project
+
+  # RC-036 Stage 3 Slice E: synthetic, nonproduction-only email possession proof.
+  # No account creation, client login, invitation acceptance or data access.
+  post "/studio/invitations/email_proofs",
+       to: "studio/invitation_email_proofs#create", as: :studio_invitation_email_proofs
+  post "/studio/invitations/email_proofs/confirm",
+       to: "studio/invitation_email_proofs#confirm", as: :confirm_studio_invitation_email_proof
+
+  # RC-036 Stage 3 Slice B: owner-only metadata and pending invitations.
+  scope "/workspaces/:workspace_id/clients/:client_id/project_intakes/:project_intake_id" do
+    get "/sources", to: "studio/project_sources#index", as: :studio_project_sources
+    post "/sources", to: "studio/project_sources#create"
+    post "/sources/:id/scan", to: "studio/project_sources#scan", as: :studio_project_source_scan
+    post "/sources/:id/queue_scan", to: "studio/project_sources#queue_scan",
+         as: :studio_project_source_queue_scan
+    get "/sources/:id/download", to: "studio/project_sources#download", as: :studio_project_source_download
+    get "/invitations", to: "studio/project_invitations#index", as: :studio_project_invitations
+    post "/invitations", to: "studio/project_invitations#create"
+    delete "/invitations/:id", to: "studio/project_invitations#destroy", as: :studio_project_invitation
+  end
+
   root "pages#home"
   get "calendar/day", to: "pages#day", as: :calendar_day
   get "calendar/hour", to: "pages#hour", as: :calendar_hour

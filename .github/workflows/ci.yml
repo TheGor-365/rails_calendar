@@ -67,6 +67,9 @@ jobs:
       - name: Run model and controller tests
         run: bin/rails test
 
+      - name: Verify standalone RC-036 synthetic local smoke command
+        run: bin/rc036-local-smoke
+
       - uses: browser-actions/setup-chrome@v2
         id: browser
         with:
