@@ -34,3 +34,11 @@
 3. Send terminal last lines and optionally owner-page screenshots at 320/390/430; review UI on keyboard and note actual overflow, clipping, source-selection and duplicate-review errors. This is separate from CI passing on Ubuntu.
 
 **Production remains RC-035 on Railway; `$0` added paid resources.** No release/merge/deploy. After evidence, decide whether to open a separately stacked synthetic-only RC-038 Draft PR; this does not imply RC-037 is production-ready.
+
+
+## Linux Mint browser-width fix (11 Nov 2026)
+
+- Owner ran the test locally with Ruby 3.4.12, Bundler 2.6.9 and all gems installed. Isolated DB migration and targeted Rails tests **PASS: 31 runs, 438 assertions, 0 failures/errors/skips**.
+- Selenium's headed desktop Chrome window was clamped to **500 CSS px** despite `manage.window.resize_to(320, 932)`. Local browser step failed on **2 viewport assertions out of 25 system tests**, before accepting the owner UI. This is not proof of a CSS overflow.
+- Replaced physical Chrome resizing **only in the RC-037 system test** with `Emulation.setDeviceMetricsOverride` (width exactly 320/390/430, 932 height, deviceScaleFactor 1, mobile false); each test clears device metrics in `ensure`. A stricter explicit width assertion prevents false positive checks at 500px. This tests responsive layout, **not** touch/mobile hardware behavior.
+- Repeat the same guarded local command on the updated Draft branch. A green GitHub CI remains separate from actual owner Linux Mint acceptance. Release gates unchanged.

@@ -29,7 +29,7 @@ class StudioOfflineReviewFlowTest < ApplicationSystemTestCase
   test "320 390 430px owner preview record and review remain operable without horizontal overflow" do
     sign_in_as_synthetic_owner
     [320, 390, 430].each_with_index do |width, index|
-      page.driver.browser.manage.window.resize_to(width, 932)
+      emulate_css_viewport!(width)
       visit workspace_ai_settings_url(@workspace, @intake)
 
       assert_selector "h1", text: "Offline AI settings"
@@ -70,12 +70,12 @@ class StudioOfflineReviewFlowTest < ApplicationSystemTestCase
       .where(studio_offline_runs: { project_intake_id: @intake.id }).count
     assert @workspace.studio_offline_runs.all? { |run| run.verified_payload!.fetch(:billable_usd).zero? }
   ensure
-    page.driver.browser.manage.window.resize_to(1400, 1400)
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
   end
 
   test "narrow-screen denied preview and tampered history cannot be reviewed" do
     sign_in_as_synthetic_owner
-    page.driver.browser.manage.window.resize_to(320, 932)
+    emulate_css_viewport!(320)
     root = @workspace.studio_ai_policies.find_by!(project_intake_id: nil)
     root.update!(mode: "off")
     visit workspace_ai_settings_url(@workspace, @intake)
@@ -99,10 +99,20 @@ class StudioOfflineReviewFlowTest < ApplicationSystemTestCase
     assert_no_button "Discard synthetic run"
     assert_fits_mobile_width(320)
   ensure
-    page.driver.browser.manage.window.resize_to(1400, 1400)
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
   end
 
   private
+
+  # Resizing a desktop Chrome window can be clamped to a 500px minimum on Linux.
+  # Pin CSS viewport metrics directly instead, in both local Chrome and CI headless.
+  # This is viewport emulation (not real-device or touch/keyboard acceptance).
+  def emulate_css_viewport!(width)
+    page.driver.browser.execute_cdp(
+      "Emulation.setDeviceMetricsOverride",
+      width: width, height: 932, deviceScaleFactor: 1, mobile: false
+    )
+  end
 
   def sign_in_as_synthetic_owner
     visit sign_in_url
@@ -132,7 +142,8 @@ class StudioOfflineReviewFlowTest < ApplicationSystemTestCase
         };
       })()
     JS
-    assert_operator metrics.fetch("viewport"), :<=, width + 1
+    assert_in_delta width, metrics.fetch("viewport"), 1,
+                    "Chrome did not emulate the required #{width}px CSS viewport: #{metrics.inspect}"
     assert_operator metrics.fetch("doc"), :<=, metrics.fetch("viewport") + 1,
                     "RC-037 layout overflows at #{width}px: #{metrics.inspect}"
     assert_empty metrics.fetch("overflowing"),
