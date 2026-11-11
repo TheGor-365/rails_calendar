@@ -126,6 +126,37 @@ class StudioSourcePreviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+
+  test "preview refuses production even for owner; no unscanned bytes are parsed" do
+    sign_in(@alice)
+    Rails.env.stub(:production?, true) do
+      get workspace_source_preview_path(@a, @intake)
+      assert_response :not_found
+      with_upload("# Purely fake\\n", ".md") do |upload|
+        post workspace_source_preview_path(@a, @intake), params: { source_file: upload }
+      end
+      assert_response :not_found
+    end
+    assert_equal 0, ProjectSourceBlob.count
+  end
+
+  test "untrusted markdown HTML is escaped and never persisted or converted to active JS" do
+    sign_in(@alice)
+    assert_no_difference "ProjectSourceBlob.count" do
+      with_upload("# <img src=x onerror=alert(1)>\\n- [ ] <script>alert(2)</script>\\n", ".md") do |upload|
+        post workspace_source_preview_path(@a, @intake), params: { source_file: upload }
+      end
+    end
+    assert_response :success
+    assert_match(/&lt;img src=x onerror=alert\\(1\\)&gt;/, response.body)
+    assert_match(/&lt;script&gt;alert\\(2\\)&lt;\\/script&gt;/, response.body)
+    assert_no_match(/<img src=x onerror=/, response.body)
+    assert_no_match(/<script>alert\\(2\\)<\\/script>/, response.body)
+    assert_equal "no-referrer", response.headers.fetch("Referrer-Policy")
+    assert_match(/no-store/, response.headers.fetch("Cache-Control"))
+    assert_equal "nosniff", response.headers.fetch("X-Content-Type-Options")
+  end
+
   private
 
   def sign_in(user)

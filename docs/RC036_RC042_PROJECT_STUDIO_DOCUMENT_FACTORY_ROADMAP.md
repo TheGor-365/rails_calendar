@@ -198,3 +198,8 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-036 Stage 3 Slice M — operator-only read-only status (2026-11-11)
 - Added `Studio::SourceOperatorDashboard` to the existing manual local audit CLI: tenant-scoped queue/ClamAV/retention plus running/abandoned maintenance and incomplete inventory checkpoint counts. Zero automatic retry, recovery, deletion or S3 cursor advancement; no private IDs/keys/cursors.
 - New security tests; standalone Slice L smoke executable now runs as a distinct Rails CI step. [Slice M runbook](RC036_STAGE3_SLICE_M_READ_ONLY_OPERATOR_STATUS.md). **Exact-HEAD CI/owner-machine validation pending.**
+
+
+## RC-036 Stage 3 Slice N — preview hard-deny and untrusted HTML regression (2026-11-11)
+- Found that preexisting owner preview could parse unscanned bytes in production despite synthetic-only policy. Patched `Studio::SourcePreviewsController` to require nonproduction test/explicit synthetic development, return 404 in production even for owner, and emit no-store/nosniff/no-referrer on early denied responses.
+- Negative HTTP tests assert production 404 and safe escaping for raw Markdown HTML/JS with no persisted blob. [Stage N security boundary](RC036_STAGE3_SLICE_N_SECURITY_GATES.md). Other security/manual/legal/production gates remain explicitly pending until independent proof.
