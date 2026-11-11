@@ -109,7 +109,9 @@ class StudioSyntheticRequirementRevisionDiffTest < ActiveSupport::TestCase
     assert_raises(SecurityError) do
       Studio::SyntheticRequirementRevisionDiff.new(actor: @other_owner, workspace: @ws)
     end
-    assert_raises(SecurityError) do
+    # The forged client is in this workspace, but the source+intake pair
+    # belongs to another client. Scoped normalizer denies the lookup.
+    assert_raises(Studio::SyntheticSourceNormalizer::Denied) do
       @service.call(client: @other_client, intake: @intake,
         previous: previous.except(:comparison), current: current.except(:comparison),
         explicit_synthetic: true)
