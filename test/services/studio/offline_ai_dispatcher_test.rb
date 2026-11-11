@@ -125,6 +125,17 @@ class StudioOfflineAiDispatcherTest < ActiveSupport::TestCase
     end
   end
 
+  test "forged SQL allowlist rows cannot bypass the policy validator" do
+    Studio::AiPolicy.insert_all!([{
+      workspace_id: @ws.id, project_intake_id: nil,
+      mode: "offline", allowed_purposes: ["document_plan", "unreviewed_external"],
+      allowed_data_classes: ["synthetic"],
+      created_at: Time.current, updated_at: Time.current
+    }])
+    assert_equal "invalid_policy",
+      dispatcher.call(purpose: "document_plan", data_class: "synthetic").fetch(:reason)
+  end
+
   private
 
   def dispatcher

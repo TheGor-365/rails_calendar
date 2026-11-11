@@ -203,3 +203,13 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-036 Stage 3 Slice N — preview hard-deny and untrusted HTML regression (2026-11-11)
 - Found that preexisting owner preview could parse unscanned bytes in production despite synthetic-only policy. Patched `Studio::SourcePreviewsController` to require nonproduction test/explicit synthetic development, return 404 in production even for owner, and emit no-store/nosniff/no-referrer on early denied responses.
 - Negative HTTP tests assert production 404 and safe escaping for raw Markdown HTML/JS with no persisted blob. [Stage N security boundary](RC036_STAGE3_SLICE_N_SECURITY_GATES.md). Other security/manual/legal/production gates remain explicitly pending until independent proof.
+
+## RC-037 Stage 1–2 — nonproduction offline policy foundation (2026-11-11)
+
+Implemented in the existing stacked Draft PR #36 (no merge/deploy): \`studio_ai_policies\` workspace defaults plus per-assigned-project restrictions, PostgreSQL unique/composite tenant constraints, typed nonnegative token/USD budget **configuration** and explicit modes \`off/offline/reviewed_provider\`. No provider/model SDK, credentials, paid calls, client source retrieval or actual budget reservation. Unset workspace defaults deny all requests. Project overrides cannot loosen workspace policy; direct SQL malformed allowlists are denied by the dispatcher.
+
+\`Studio::OfflineAiDispatcher\` reauthorizes the owner and exact assigned intake for every call, permits only the fictional \`synthetic\` data class and \`document_plan\` purpose in Rails test / opted-in local development, and calls the existing deterministic document planner. Output is an unapproved proposal, zero tokens / $0 USD / zero external calls. Production/client access remains blocked.
+
+Owner-only White Atlas GET/PATCH Settings at \`/workspaces/:workspace_id/project_intakes/:id/ai_settings\`, reachable from synthetic source preview. Workspace and project policies have separate forms, explicit controls, no secrets; invalid scope/mode yields 422. Guest/tenant/revocation/production HTTP negatives covered by tests. Details: [Stage 1](RC037_STAGE1_OFFLINE_POLICY_FOUNDATION.md) and [Stage 2](RC037_STAGE2_OWNER_SETTINGS_UI.md).
+
+**Not complete RC-037:** typed provider/model registry, budget accounting reservations, consent-aware input selection, schema/output validator versioning, offline UI/browser manual acceptance and a future reviewed external provider pilot. No billable resources may be enabled without explicit approval; real client files still forbidden.

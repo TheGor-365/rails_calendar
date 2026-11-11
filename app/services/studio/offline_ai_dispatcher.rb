@@ -32,6 +32,7 @@ module Studio
       return denied("project_restriction") if project_policy && project_policy.mode != "offline"
 
       [workspace_policy, project_policy].compact.each do |policy|
+        return denied("invalid_policy") unless policy.valid?
         return denied("purpose_restricted") unless policy.allowed_purposes.include?(purpose)
         return denied("data_class_restricted") unless policy.allowed_data_classes.include?(data_class)
       end
