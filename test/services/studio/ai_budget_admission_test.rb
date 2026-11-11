@@ -30,7 +30,7 @@ class StudioAiBudgetAdmissionTest < ActiveSupport::TestCase
     assert_equal false, result.fetch(:billing_permitted)
     assert_equal 0, result.fetch(:tokens_reserved)
     assert_equal 0, result.fetch(:usd_reserved)
-    assert_equal 7, result.size
+    assert_equal 8, result.size
   end
 
   test "positive budget preferences and apparent consent never permit a billable provider" do
