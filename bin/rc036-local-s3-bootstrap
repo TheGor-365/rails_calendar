@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+# Creates only a synthetic bucket on a LOOPBACK S3 container.
+# Never reaches public storage and never provisions paid infrastructure.
+require "aws-sdk-s3"
+require "uri"
+ENV["RAILS_ENV"] ||= "development"
+require_relative "../config/environment"
+
+begin
+  endpoint = URI.parse(ENV.fetch("RC_STUDIO_S3_ENDPOINT"))
+  unless Rails.env.development? &&
+         ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true" &&
+         ENV["RC_STUDIO_LOCAL_S3_HTTP"] == "true" &&
+         ENV["RC_STUDIO_QUARANTINE_BACKEND"] == "s3" &&
+         %w[127.0.0.1 localhost ::1].include?(endpoint.host) &&
+         endpoint.scheme == "http"
+    raise SecurityError, "Local-only synthetic S3 setup required"
+  end
+  Studio::PrivateSourceStorage.new(service: Object.new) # enforce all app gates
+  client = Aws::S3::Client.new(
+    endpoint: ENV.fetch("RC_STUDIO_S3_ENDPOINT"),
+    region: ENV.fetch("RC_STUDIO_S3_REGION"),
+    access_key_id: ENV.fetch("RC_STUDIO_S3_ACCESS_KEY_ID"),
+    secret_access_key: ENV.fetch("RC_STUDIO_S3_SECRET_ACCESS_KEY"),
+    force_path_style: true, retry_limit: 0, http_open_timeout: 3, http_read_timeout: 5
+  )
+  bucket = ENV.fetch("RC_STUDIO_S3_BUCKET")
+  begin
+    client.head_bucket(bucket: bucket)
+  rescue Aws::S3::Errors::NotFound, Aws::S3::Errors::NoSuchBucket
+    client.create_bucket(bucket: bucket)
+  end
+  puts "Synthetic loopback bucket exists; encryption/lifecycle NOT certified"
+rescue StandardError, SecurityError
+  warn "Local S3 setup refused or connection unavailable"
+  exit 1
+end

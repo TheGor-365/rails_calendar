@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_003000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_004000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -249,6 +249,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_003000) do
     t.index ["project_intake_id"], name: "index_project_milestones_on_project_intake_id"
   end
 
+  create_table "studio_inventory_checkpoints", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.string "state", limit: 16, default: "listing", null: false
+    t.string "config_digest", limit: 64, null: false
+    t.text "encrypted_cursor"
+    t.jsonb "seen_cursor_digests", default: [], null: false
+    t.jsonb "counts", default: {}, null: false
+    t.integer "pages_scanned", default: 0, null: false
+    t.bigint "last_db_blob_id", default: 0, null: false
+    t.bigint "db_target_max_id", default: 0, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "finished_at"
+    t.string "error_code", limit: 32
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_studio_inventory_checkpoints_on_workspace_id"
+    t.index ["workspace_id", "state"], name: "idx_studio_inventory_state"
+    t.index ["workspace_id"], name: "idx_studio_inventory_one_active_per_workspace", unique: true, where: "state IN ('listing','checking')"
+  end
+
   create_table "studio_maintenance_runs", force: :cascade do |t|
     t.bigint "workspace_id", null: false
     t.string "kind", limit: 16, null: false
@@ -263,6 +283,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_003000) do
     t.index ["workspace_id"], name: "index_studio_maintenance_runs_on_workspace_id"
     t.index ["workspace_id", "kind", "slot"], name: "idx_studio_maintenance_unique_slot", unique: true
     t.index ["workspace_id", "kind", "state"], name: "idx_studio_maintenance_live"
+    t.index ["id", "workspace_id"], name: "idx_studio_maintenance_run_tenant_reference", unique: true
+  end
+
+  create_table "studio_operator_reviews", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "studio_maintenance_run_id", null: false
+    t.bigint "reviewed_by_id", null: false
+    t.string "reason_code", limit: 40, null: false
+    t.datetime "reviewed_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_studio_operator_reviews_on_workspace_id"
+    t.index ["reviewed_by_id"], name: "index_studio_operator_reviews_on_reviewed_by_id"
+    t.index ["studio_maintenance_run_id"], name: "idx_studio_operator_reviews_one_per_run", unique: true
   end
 
   create_table "studio_source_scan_tasks", force: :cascade do |t|
@@ -388,7 +422,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_003000) do
   add_foreign_key "project_sources", "workspaces"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
+  add_foreign_key "studio_inventory_checkpoints", "workspaces"
   add_foreign_key "studio_maintenance_runs", "workspaces"
+  add_foreign_key "studio_operator_reviews", "workspaces"
+  add_foreign_key "studio_operator_reviews", "users", column: "reviewed_by_id"
+  add_foreign_key "studio_operator_reviews", "studio_maintenance_runs", column: ["studio_maintenance_run_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_operator_review_run_tenant"
   add_foreign_key "studio_source_scan_tasks", "project_source_blobs", column: ["project_source_blob_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_scan_task_blob_tenant"
   add_foreign_key "studio_source_scan_tasks", "workspaces"
   add_foreign_key "studio_client_project_grants", "studio_client_accounts"
@@ -400,6 +438,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_003000) do
   add_foreign_key "workspace_memberships", "users"
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
+  add_check_constraint "studio_inventory_checkpoints", "state IN ('listing','checking','completed','failed')", name: "chk_studio_inventory_checkpoint_state"
+  add_check_constraint "studio_inventory_checkpoints", "(state IN ('listing','checking')) = (finished_at IS NULL)", name: "chk_studio_inventory_checkpoint_terminal"
+  add_check_constraint "studio_inventory_checkpoints", "pages_scanned BETWEEN 0 AND 10000 AND last_db_blob_id >= 0 AND db_target_max_id >= 0", name: "chk_studio_inventory_checkpoint_progress"
+  add_check_constraint "studio_inventory_checkpoints", "jsonb_typeof(counts) = 'object' AND jsonb_typeof(seen_cursor_digests) = 'array'", name: "chk_studio_inventory_checkpoint_json"
+  add_check_constraint "studio_inventory_checkpoints", %q(config_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_inventory_config_digest"
+  add_check_constraint "studio_inventory_checkpoints", "error_code IS NULL OR error_code IN ('expired','manual_stop')", name: "chk_studio_inventory_checkpoint_error"
+  add_check_constraint "studio_operator_reviews", "reason_code IN ('health_inspected', 'inventory_inspected', 'scan_tasks_inspected', 'retention_objects_inspected')", name: "chk_studio_operator_review_reason"
   add_check_constraint "studio_maintenance_runs", "kind IN ('health', 'scan', 'retention', 'inventory')", name: "chk_studio_maintenance_kind"
   add_check_constraint "studio_maintenance_runs", "state IN ('running', 'succeeded', 'failed')", name: "chk_studio_maintenance_state"
   add_check_constraint "studio_maintenance_runs", "(state = 'running') = (finished_at IS NULL)", name: "chk_studio_maintenance_finished"

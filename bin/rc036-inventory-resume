@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+# Explicit one-page or one-small-DB-batch READ ONLY synthetic S3 inventory.
+# No persistent cloud resource is created; no S3 keys/cursors are printed.
+require "json"
+ENV["RAILS_ENV"] ||= "development"
+require_relative "../config/environment"
+
+unless Rails.env.development? &&
+       ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true" &&
+       ENV["RC_STUDIO_LOCAL_INVENTORY_RESUME"] == "true" &&
+       Studio::PrivateSourceStorage.s3_backend?
+  warn "Refusing S3 inventory outside explicit synthetic local development"
+  exit 1
+end
+
+begin
+  ws_id = Integer(ENV.fetch("RC_STUDIO_INVENTORY_WORKSPACE_ID"), 10)
+  raise ArgumentError unless ws_id.positive?
+  workspace = Workspace.find(ws_id)
+  service = Studio::SourceInventoryResume.new(actor: workspace.owner_user,
+                                              workspace: workspace)
+  mode = ENV.fetch("RC_STUDIO_INVENTORY_ACTION", "begin")
+  case mode
+  when "begin"
+    checkpoint = service.begin!
+    puts JSON.pretty_generate(service.report(checkpoint))
+  when "step"
+    id = Integer(ENV.fetch("RC_STUDIO_INVENTORY_CHECKPOINT_ID"), 10)
+    raise ArgumentError unless id.positive?
+    puts JSON.pretty_generate(service.step!(checkpoint_id: id))
+  else
+    raise ArgumentError, "Unknown inventory command"
+  end
+rescue StandardError, SecurityError
+  warn "Inventory step failed; no provider writes or automatic retry performed"
+  exit 1
+end

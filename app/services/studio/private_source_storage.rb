@@ -80,9 +80,12 @@ module Studio
       endpoint = URI.parse(ENV.fetch("RC_STUDIO_S3_ENDPOINT"))
       loopback = %w[localhost 127.0.0.1 ::1].include?(endpoint.host)
       secure = endpoint.scheme == "https"
+      local_demo = loopback && Rails.env.development? &&
+        ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true" &&
+        ENV["RC_STUDIO_LOCAL_S3_HTTP"] == "true"
       unless endpoint.userinfo.nil? && endpoint.query.nil? && endpoint.fragment.nil? &&
-             endpoint.host.present? && (secure || (loopback && Rails.env.test?))
-        raise Unavailable, "S3 endpoint must use HTTPS (except CI loopback)"
+             endpoint.host.present? && (secure || (loopback && Rails.env.test?) || local_demo)
+        raise Unavailable, "S3 requires HTTPS, except explicit nonproduction loopback"
       end
     rescue URI::InvalidURIError
       raise Unavailable, "Invalid S3 endpoint"

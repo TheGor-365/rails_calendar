@@ -9,6 +9,10 @@ class Workspace < ApplicationRecord
            dependent: :restrict_with_exception
   has_many :studio_maintenance_runs, class_name: "Studio::MaintenanceRun",
            dependent: :restrict_with_exception
+  has_many :studio_operator_reviews, class_name: "Studio::OperatorReview",
+           dependent: :restrict_with_exception
+  has_many :studio_inventory_checkpoints, class_name: "Studio::InventoryCheckpoint",
+           dependent: :restrict_with_exception
   has_many :project_invitations, dependent: :restrict_with_exception
   has_many :client_facts, dependent: :restrict_with_exception
   has_many :client_consents, dependent: :restrict_with_exception
