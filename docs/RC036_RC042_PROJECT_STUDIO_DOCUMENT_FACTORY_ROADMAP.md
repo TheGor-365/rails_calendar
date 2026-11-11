@@ -231,3 +231,6 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-037 Slice E / phase 2 — zero-paid AI admission + golden tests (2026-11-11)
 - `Studio::AiBudgetAdmission` guards owner/tenant/purpose/data-class/production status and permits only `offline_template` with **zero estimated tokens and USD**. Persisted positive spending ceilings or external consent cannot permit a billable provider. Dispatcher calls gate before source selection. No API integration, token or budget reservation with real providers.
 - Added independent static golden YAML expected outputs for 3 purposes and adversarial synthetic intake prompt injection fixture. [Slice E runbook](RC037_SLICE_E_AUDIT_BUDGET_GOLDEN.md); nonprod only and no customer/production claims.
+
+## RC-037 Slice E — read-only audit history on existing settings screen (2026-11-11)
+- Reused the existing owner-only project AI settings view to show the last 15 safe, scoped policy revision summaries (action, mode, event time, attribution) with no raw HMAC digests, email or source text; verified by HTTP tests. Does not change the zero-cost gate or production-deny boundary.

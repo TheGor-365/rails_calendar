@@ -40,6 +40,25 @@
         </fieldset>
         <%= button_tag "Save offline preference", type: :submit, class: "rc-action rc-action--primary" %>
       <% end %>
+      <% versions = scope == "workspace" ? @workspace_history : @project_history %>
+      <div class="mt-3" aria-label="<%= "#{heading} revision history" %>">
+        <h3 class="h6">Recent policy changes</h3>
+        <% if versions.empty? %>
+          <p class="rc-hint">No revisions recorded yet.</p>
+        <% else %>
+          <ol class="rc-record-list">
+            <% versions.each do |entry| %>
+              <li class="rc-record">
+                Revision <%= entry.revision %> · <%= entry.action %> ·
+                <%= entry.settings.fetch("mode") %> ·
+                <%= entry.recorded_at.utc.iso8601 %> ·
+                <%= entry.origin == "owner_ui" ? "Owner UI" : "Internal change (actor not attributed)" %>
+              </li>
+            <% end %>
+          </ol>
+        <% end %>
+        <p class="rc-hint">History is read-only. Records do not authorize external AI or paid calls.</p>
+      </div>
     </section>
   <% end %>
 

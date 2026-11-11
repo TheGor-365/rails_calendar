@@ -55,6 +55,15 @@ class StudioAiSettingsHttpTest < ActionDispatch::IntegrationTest
     assert_equal 0, policy.usd_cap_per_month
     assert_equal ["clarify"], policy.purposes
 
+    get path
+    assert_response :success
+    assert_select "[aria-label='Workspace policy revision history']", 1
+    assert_select "[aria-label='Project restriction revision history']", 1
+    assert_select "[aria-label='Workspace policy revision history']", text: /Revision 1/
+    assert_select "[aria-label='Project restriction revision history']", text: /Revision 1/
+    assert_not_includes response.body, root.revisions.sole.event_digest
+    assert_not_includes response.body, @owner.email
+
     result = Studio::OfflineAiDispatcher.new(actor: @owner, workspace: @ws, intake: @intake)
       .call(purpose: "clarify")
     assert_equal 0, result[:external_calls]

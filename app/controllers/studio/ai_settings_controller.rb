@@ -42,6 +42,13 @@ module Studio
     def load_policies
       @workspace_policy = @workspace.studio_ai_policies.find_by(project_intake_id: nil)
       @project_policy = @workspace.studio_ai_policies.find_by(project_intake_id: @intake.id)
+      # Only safe revision metadata for an already-authorized owner.
+      # Never expose digests, source content, credentials or actor emails.
+      history = @workspace.studio_ai_policy_revisions
+      @workspace_history = history.where(project_intake_id: nil)
+        .order(revision: :desc).limit(15)
+      @project_history = history.where(project_intake_id: @intake.id)
+        .order(revision: :desc).limit(15)
     end
 
     def synthetic_only!

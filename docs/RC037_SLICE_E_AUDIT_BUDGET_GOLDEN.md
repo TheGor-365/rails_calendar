@@ -17,3 +17,9 @@ Acceptance: owner policy UI saves create HMAC-linked revisions, unchanged saves 
 `test/golden/rc037_offline_outputs.yml` supplies three independent fixed synthetic expected texts. The evaluation asserts exact output, no claim of approval, zero spend, no interpolation of hostile intake instructions, and stable registered template versions. No external LLM or actual customer file is tested.
 
 Outstanding RC-037: real provider registry and reviews, project/day/month concurrency-safe reservation/reconciliation, attribution and retention of genuine use, optional encrypted private source retrieval after RC-036 production gates, a11y/mobile owner acceptance and quantitative model comparison. **External AI remains OFF.**
+
+## Owner-visible revision history (same settings screen)
+
+The existing White Atlas AI Settings page now shows only the latest 15 authorized workspace and project revisions in each section: sequence, action, mode, timestamp and explicit owner-vs-internal attribution. No secret HMAC, actor email, prompts, source bodies or client files. Query scope comes exclusively from the already-authorized current workspace and intake. History is read-only; there is no user-facing delete/edit action.
+
+No new page, job, external service or production capability has been created. HTML tests assert the read-only sections and absence of HMAC digest and owner email.
