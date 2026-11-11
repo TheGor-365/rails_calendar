@@ -61,6 +61,7 @@ class StudioOfflineReviewFlowTest < ApplicationSystemTestCase
       find("section[aria-label='Synthetic run history'] form", match: :first)
         .click_button("Mark reviewed (synthetic only)")
       assert_current_path workspace_ai_settings_path(@workspace, @intake)
+      assert_text "Synthetic-only review decision recorded. No client artifact was approved."
       assert_selector "section[aria-label='Synthetic run history']", text: "Reviewed synthetic"
       assert_fits_mobile_width(width)
     end
