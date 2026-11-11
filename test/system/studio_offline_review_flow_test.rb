@@ -88,6 +88,8 @@ class StudioOfflineReviewFlowTest < ApplicationSystemTestCase
     visit workspace_ai_settings_url(@workspace, @intake)
     click_button "Generate synthetic offline preview"
     click_button "Record this synthetic run for review"
+    assert_current_path workspace_ai_settings_path(@workspace, @intake)
+    assert_text "Synthetic run version 1 recorded for human review."
     run = @workspace.studio_offline_runs.order(version: :desc).first
     run.update_columns(event_digest: "f" * 64) # only disposable test DB
 
