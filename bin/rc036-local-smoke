@@ -38,7 +38,7 @@ stdout, stderr, result = Open3.capture3(
 warn stdout unless stdout.empty?
 warn stderr unless stderr.empty?
 
-match = stdout.match(/(\d+) tests, (\d+) assertions, (\d+) failures, (\d+) errors, (\d+) skips/)
+match = stdout.match(/(\d+) (?:runs|tests), (\d+) assertions, (\d+) failures, (\d+) errors, (\d+) skips/)
 passed = result.success? && match && match[3] == "0" && match[4] == "0"
 puts JSON.generate(
   status: passed ? "PASS" : "FAIL",

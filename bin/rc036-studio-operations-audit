@@ -18,8 +18,7 @@ begin
   raise ArgumentError unless workspace_id.positive?
   workspace = Workspace.find(workspace_id)
   actor = workspace.owner_user
-  operational = Studio::SourceOperationalAudit.new(actor: actor, workspace: workspace).call
-  output = { operational: operational }
+  output = Studio::SourceOperatorDashboard.new(actor: actor, workspace: workspace).call
   if ENV["RC_STUDIO_AUDIT_S3_INVENTORY"] == "true"
     output[:s3_inventory] = Studio::SourceInventoryAudit.new(
       actor: actor, workspace: workspace

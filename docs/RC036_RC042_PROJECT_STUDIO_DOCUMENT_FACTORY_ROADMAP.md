@@ -193,3 +193,8 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 - New `test/integration/rc036_local_smoke_test.rb` checks a fictional MD/TXT/JSON upload → quarantine → queued PostgreSQL task → **FAKE TEST-ONLY** clean/infected verdict → request-time owner/tenant/intake ACL → expiry/physical retention → sanitized operational health. This does **not** grant any development blob a fake clean verdict.
 - Optional existing disposable S3+genuine clamd EICAR CI remains separate; it is not official FreshClam malware-coverage evidence. No customer files, external AI/paid resource, merge or Railway production changes.
 - Runbook: [Slice L local synthetic smoke](RC036_STAGE3_SLICE_L_LOCAL_SYNTHETIC_SMOKE.md). **CI/owner machine acceptance pending new exact HEAD; do not infer PASS from source code alone.**
+
+
+## RC-036 Stage 3 Slice M — operator-only read-only status (2026-11-11)
+- Added `Studio::SourceOperatorDashboard` to the existing manual local audit CLI: tenant-scoped queue/ClamAV/retention plus running/abandoned maintenance and incomplete inventory checkpoint counts. Zero automatic retry, recovery, deletion or S3 cursor advancement; no private IDs/keys/cursors.
+- New security tests; standalone Slice L smoke executable now runs as a distinct Rails CI step. [Slice M runbook](RC036_STAGE3_SLICE_M_READ_ONLY_OPERATOR_STATUS.md). **Exact-HEAD CI/owner-machine validation pending.**
