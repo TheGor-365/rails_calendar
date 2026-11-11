@@ -25,6 +25,10 @@ Rails.application.routes.draw do
   patch "/workspaces/:workspace_id/project_intakes/:id/ai_settings",
         to: "studio/ai_settings#update"
 
+  # RC-037: explicit deterministic offline proposal, never provider execution.
+  post "/workspaces/:workspace_id/project_intakes/:id/offline_proposal",
+       to: "studio/ai_settings#preview", as: :workspace_offline_proposal
+
   # Owner-only Studio preview. No client access, persistence or AI calls.
   get "/workspaces/:workspace_id/project_intakes/:id/source_preview",
       to: "studio/source_previews#new", as: :workspace_source_preview

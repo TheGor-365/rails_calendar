@@ -62,6 +62,48 @@
     </section>
   <% end %>
 
+  <section class="surface-panel p-3 p-sm-4 mb-3" aria-label="Synthetic offline proposal">
+    <h2 class="h4">Preview an offline proposal</h2>
+    <p class="rc-hint">Explicit action only. Deterministic, unapproved templates using synthetic source metadata, never source file contents. No external AI calls or charges.</p>
+    <%= form_with url: workspace_offline_proposal_path(@workspace, @intake), method: :post, local: true do %>
+      <div class="rc-field mb-3">
+        <%= label_tag :offline_purpose, "Proposal type", class: "rc-field-label" %>
+        <%= select_tag :purpose,
+              options_for_select(Studio::AiPolicy::PURPOSES.map { |purpose| [purpose.humanize, purpose] }),
+              id: "offline_purpose", class: "rc-input" %>
+      </div>
+      <fieldset class="mb-3">
+        <legend class="h6">Optional source metadata (maximum 10)</legend>
+        <% if @synthetic_sources.empty? %>
+          <p class="rc-hint">No synthetic metadata sources are registered for this project.</p>
+        <% else %>
+          <% @synthetic_sources.each do |source| %>
+            <div class="form-check mb-2">
+              <%= check_box_tag "source_ids[]", source.id, false,
+                    id: "offline_source_#{source.id}", class: "form-check-input" %>
+              <%= label_tag "offline_source_#{source.id}",
+                    "Source ##{source.id} · #{source.source_format} · #{source.byte_size} bytes",
+                    class: "form-check-label" %>
+            </div>
+          <% end %>
+        <% end %>
+      </fieldset>
+      <%= button_tag "Generate synthetic offline preview", type: :submit,
+                    class: "rc-action rc-action--primary" %>
+    <% end %>
+
+    <% if @proposal.present? %>
+      <section class="mt-3" aria-label="Unapproved offline proposal" role="status">
+        <h3 class="h5">Needs human review</h3>
+        <p class="rc-hint"><%= @proposal.fetch(:purpose).humanize %> ·
+          <%= @proposal.fetch(:source_metadata_count) %> metadata sources ·
+          0 external calls · $0 cost</p>
+        <pre class="rc-studio-line"><%= @proposal.fetch(:text) %></pre>
+        <p class="rc-hint">UNVERIFIED SYNTHETIC ONLY. No customer agreement, generated specification or approval.</p>
+      </section>
+    <% end %>
+  </section>
+
   <section class="surface-panel p-3 p-sm-4" aria-label="AI security limits">
     <h2 class="h5">Security and cost limits</h2>
     <p class="rc-hint">Production AI: disabled. External AI: disabled. Automatic approval: disabled. Actual provider calls: 0. Spending: $0. These preferences do not constitute client consent or approval to process customer files.</p>

@@ -239,3 +239,8 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-037 Slice F — fail-closed audit verification at request-time admission (2026-11-11)
 - Hardened `Studio::AiBudgetAdmission`: verify HMAC-linked revision history and latest persisted snapshot of both workspace and project AI policies before any synthetic offline response. Direct SQL tampering, missing chain, changed scope and forged revision digest deny execution with no implicit repair. This is not independent WORM audit or permission for external billable AI.
 - Negative service/dispatcher tests demonstrate bypass denial. [Slice F runbook](RC037_SLICE_F_POLICY_INTEGRITY_ADMISSION.md). Exact HEAD CI evidence recorded separately.
+
+
+## RC-037 Slice G — explicit owner-only synthetic offline proposal (2026-11-11)
+- Added POST `offline_proposal` on the existing AI Settings screen, after exact owner/tenant/intake ACL and synthetic-only production hard deny. UI selects only bounded per-intake `metadata_only` source IDs; controller strictly validates IDs and executes existing audited zero-budget gate + safe deterministic output. Displays unapproved text without storage, raw bytes, API calls, spending or auto-approval.
+- HTTP negative tests for foreign/duplicate/oversized selection, owner revocation, production 404, forged provider/cost fields and audit SQL bypass. [Slice G runbook](RC037_SLICE_G_OFFLINE_PROPOSAL_UI.md). Human mobile/browser acceptance pending.

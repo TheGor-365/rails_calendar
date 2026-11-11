@@ -10,6 +10,31 @@ module Studio
       load_policies
     end
 
+    # Explicit user action only. No background generation, file bytes or AI call.
+    def preview
+      raw_ids = params[:source_ids]
+      unless raw_ids.nil? || raw_ids.is_a?(Array)
+        raise ArgumentError, "Invalid source selection"
+      end
+      source_ids = Array(raw_ids)
+      unless source_ids.length <= OfflineSourceSelector::MAX_SELECTED &&
+             source_ids.all? { |id| id.is_a?(String) &&
+               id.match?(/\\A[1-9][0-9]{0,17}\\z/) }
+        raise ArgumentError, "Invalid source selection"
+      end
+
+      @proposal = OfflineAiDispatcher.new(
+        actor: current_user, workspace: @workspace, intake: @intake
+      ).call(purpose: params[:purpose], source_ids: source_ids.map(&:to_i))
+      load_policies
+      render :show
+    rescue ArgumentError, OfflineSourceSelector::Denied,
+           OfflineAiDispatcher::Denied, OfflineOutputContract::Denied
+      load_policies
+      @error = "Offline proposal rejected. Check active policies and source selection."
+      render :show, status: :unprocessable_entity
+    end
+
     def update
       target = params[:target].to_s
       mode = params[:mode].to_s
@@ -49,6 +74,10 @@ module Studio
         .order(revision: :desc).limit(15)
       @project_history = history.where(project_intake_id: @intake.id)
         .order(revision: :desc).limit(15)
+      @synthetic_sources = @workspace.project_sources.where(
+        client_id: @intake.client_id, project_intake_id: @intake.id,
+        state: "metadata_only"
+      ).order(:id).limit(OfflineSourceSelector::MAX_SELECTED)
     end
 
     def synthetic_only!
