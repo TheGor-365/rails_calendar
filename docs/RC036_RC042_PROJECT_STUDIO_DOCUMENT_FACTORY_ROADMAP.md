@@ -223,3 +223,7 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-037 Slice D — explicit source selection without private retrieval (2026-11-11)
 - Added `Studio::OfflineSourceSelector`: owner scoped, <=10 explicit unique integer IDs, matching workspace+client+intake and metadata_only state, denied foreign/missing/duplicate/revoked. Offline dispatcher now counts only selected synthetic source metadata. No body/URL/object key is read or supplied to a provider.
 - [Slice D runbook](RC037_SLICE_D_SOURCE_SELECTION.md); not RAG/content retrieval or client-data authorization. Encrypted durable storage, consent and approved provider policy remain unimplemented.
+
+## RC-037 Slice E / phase 1 — append-only policy audit (2026-11-11)
+- Added model-level immutable `Studio::AiPolicyRevision` rows with sequential HMAC-linked versions and a tenant-composite policy FK, scoped intake FK, actor attribution for owner UI, and explicit `internal_unattributed` marker for model writes without an actor. No email, prompts or source bytes in snapshots.
+- `Studio::AiPolicy` now appends policy revisions transactionally for meaningful create/change; unchanged saves are not audited as changes. Direct SQL and DB administrators can bypass Rails callbacks, so independent backup/role hardening remain mandatory; do not claim this is tamper-proof storage.

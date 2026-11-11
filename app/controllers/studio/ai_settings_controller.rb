@@ -26,6 +26,7 @@ module Studio
       policy = @workspace.studio_ai_policies.find_or_initialize_by(project_intake_id: scope_id)
       # Never permit these fields through the UI:
       # external_consent, provider names, API keys, token or USD caps.
+      policy.audit_actor = current_user
       policy.assign_attributes(mode: mode, purposes: purposes)
       policy.save!
       redirect_to workspace_ai_settings_path(@workspace, @intake),

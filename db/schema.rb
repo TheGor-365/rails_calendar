@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_020000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -265,6 +265,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_020000) do
     t.index ["workspace_id"], name: "index_studio_ai_policies_on_workspace_id"
     t.index ["workspace_id"], name: "idx_studio_ai_workspace_default", unique: true, where: "project_intake_id IS NULL"
     t.index ["workspace_id", "project_intake_id"], name: "idx_studio_ai_project_override", unique: true, where: "project_intake_id IS NOT NULL"
+    t.index ["id", "workspace_id"], name: "idx_studio_ai_policy_scoped_reference", unique: true
+  end
+
+  create_table "studio_ai_policy_revisions", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "studio_ai_policy_id", null: false
+    t.bigint "project_intake_id"
+    t.bigint "actor_user_id"
+    t.integer "revision", null: false
+    t.string "action", limit: 16, null: false
+    t.string "origin", limit: 32, null: false
+    t.jsonb "settings", default: {}, null: false
+    t.string "previous_digest", limit: 64, null: false
+    t.string "event_digest", limit: 64, null: false
+    t.datetime "recorded_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_studio_ai_policy_revisions_on_workspace_id"
+    t.index ["studio_ai_policy_id", "revision"], name: "idx_studio_ai_policy_revisions_sequence", unique: true
+    t.index ["workspace_id", "project_intake_id", "id"], name: "idx_studio_ai_policy_revisions_scope"
   end
 
   create_table "studio_inventory_checkpoints", force: :cascade do |t|
@@ -440,6 +460,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_020000) do
   add_foreign_key "project_sources", "workspaces"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
+  add_foreign_key "studio_ai_policy_revisions", "workspaces"
+  add_foreign_key "studio_ai_policy_revisions", "studio_ai_policies", column: ["studio_ai_policy_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_ai_policy_revision_scoped_policy"
+  add_foreign_key "studio_ai_policy_revisions", "project_intakes", column: ["project_intake_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_ai_policy_revision_scoped_intake"
+  add_foreign_key "studio_ai_policy_revisions", "users", column: "actor_user_id", name: "fk_studio_ai_policy_revision_actor"
   add_foreign_key "studio_ai_policies", "workspaces"
   add_foreign_key "studio_ai_policies", "project_intakes", column: ["project_intake_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_ai_project_tenant"
   add_foreign_key "studio_inventory_checkpoints", "workspaces"
@@ -458,6 +482,105 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_020000) do
   add_foreign_key "workspace_memberships", "users"
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
+  add_check_constraint "studio_ai_policy_revisions", "revision >= 1", name: "chk_studio_ai_policy_revision_positive"
+  add_check_constraint "studio_ai_policy_revisions", "action IN ('created', 'updated')", name: "chk_studio_ai_policy_revision_action"
+  add_check_constraint "studio_ai_policy_revisions", "origin IN ('owner_ui', 'internal_unattributed')", name: "chk_studio_ai_policy_revision_origin"
+  add_check_constraint "studio_ai_policy_revisions", "jsonb_typeof(settings) = 'object'", name: "chk_studio_ai_policy_revision_settings"
+  add_check_constraint "studio_ai_policy_revisions", %q(previous_digest ~ '^[0-9a-f]{64} ('off','offline','reviewed_provider')", name: "chk_studio_ai_policy_mode"
+  add_check_constraint "studio_ai_policies", "jsonb_typeof(purposes) = 'array'", name: "chk_studio_ai_policy_purposes_array"
+  add_check_constraint "studio_ai_policies", "token_cap_per_call >= 0 AND token_cap_per_day >= 0 AND usd_cap_per_call >= 0 AND usd_cap_per_month >= 0", name: "chk_studio_ai_policy_caps"
+  add_check_constraint "studio_inventory_checkpoints", "state IN ('listing','checking','completed','failed')", name: "chk_studio_inventory_checkpoint_state"
+  add_check_constraint "studio_inventory_checkpoints", "(state IN ('listing','checking')) = (finished_at IS NULL)", name: "chk_studio_inventory_checkpoint_terminal"
+  add_check_constraint "studio_inventory_checkpoints", "pages_scanned BETWEEN 0 AND 10000 AND last_db_blob_id >= 0 AND db_target_max_id >= 0", name: "chk_studio_inventory_checkpoint_progress"
+  add_check_constraint "studio_inventory_checkpoints", "jsonb_typeof(counts) = 'object' AND jsonb_typeof(seen_cursor_digests) = 'array'", name: "chk_studio_inventory_checkpoint_json"
+  add_check_constraint "studio_inventory_checkpoints", %q(config_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_inventory_config_digest"
+  add_check_constraint "studio_inventory_checkpoints", "error_code IS NULL OR error_code IN ('expired','manual_stop')", name: "chk_studio_inventory_checkpoint_error"
+  add_check_constraint "studio_operator_reviews", "reason_code IN ('health_inspected', 'inventory_inspected', 'scan_tasks_inspected', 'retention_objects_inspected')", name: "chk_studio_operator_review_reason"
+  add_check_constraint "studio_maintenance_runs", "kind IN ('health', 'scan', 'retention', 'inventory')", name: "chk_studio_maintenance_kind"
+  add_check_constraint "studio_maintenance_runs", "state IN ('running', 'succeeded', 'failed')", name: "chk_studio_maintenance_state"
+  add_check_constraint "studio_maintenance_runs", "(state = 'running') = (finished_at IS NULL)", name: "chk_studio_maintenance_finished"
+  add_check_constraint "studio_maintenance_runs", "error_code IS NULL OR error_code = 'operation_failed'", name: "chk_studio_maintenance_error"
+  add_check_constraint "studio_maintenance_runs", "jsonb_typeof(result_summary) = 'object'", name: "chk_studio_maintenance_summary"
+  add_check_constraint "studio_source_scan_tasks", "state IN ('queued','retry_wait','complete_clean','complete_infected','exhausted','expired','cancelled')", name: "chk_studio_scan_task_state"
+  add_check_constraint "studio_source_scan_tasks", "attempts BETWEEN 0 AND 3", name: "chk_studio_scan_task_attempts"
+  add_check_constraint "studio_source_scan_tasks", "last_error_code IS NULL OR last_error_code = 'scan_denied'", name: "chk_studio_scan_task_error"
+  add_check_constraint "studio_source_scan_tasks", "(state IN ('queued','retry_wait')) = (finished_at IS NULL)", name: "chk_studio_scan_task_finish"
+  add_check_constraint "studio_client_accounts", %q(email_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_client_account_digest"
+  add_check_constraint "studio_client_accounts", "status IN ('active', 'suspended')", name: "chk_studio_client_account_status"
+  add_check_constraint "studio_client_sessions", %q(token_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_client_session_digest"
+  add_check_constraint "studio_client_sessions", "expires_at > created_at AND expires_at <= created_at + interval '8 hours'", name: "chk_studio_client_session_expiry"
+  add_check_constraint "studio_client_project_grants", "role = 'reviewer'", name: "chk_studio_grants_reviewer_only"
+  add_check_constraint "studio_client_project_grants", "status IN ('active','revoked')", name: "chk_studio_grants_status"
+  add_check_constraint "studio_client_project_grants", "consent_policy = 'studio_review_v1'", name: "chk_studio_grants_consent_policy"
+  add_check_constraint "studio_client_project_grants", "consented_at <= accepted_at", name: "chk_studio_grants_consent_first"
+  add_check_constraint "project_intakes", "client_id IS NULL OR workspace_id IS NOT NULL", name: "chk_project_intakes_client_needs_workspace"
+  add_check_constraint "project_invitation_email_proofs", %q(challenge_digest ~ '^[0-9a-f]{64}$'), name: "chk_invitation_email_proof_digest"
+  add_check_constraint "project_invitation_email_proofs", "failed_attempts BETWEEN 0 AND 5", name: "chk_invitation_email_proof_attempts"
+  add_check_constraint "project_invitation_email_proofs", "expires_at > created_at AND expires_at <= created_at + interval '15 minutes'", name: "chk_invitation_email_proof_expiry"
+  add_check_constraint "project_invitation_email_proofs", "verified_at IS NULL OR verified_at <= expires_at", name: "chk_invitation_email_proof_verified_before_expiry"
+  add_check_constraint "project_invitations", "role = 'reviewer'", name: "chk_project_invitations_role"
+  add_check_constraint "project_invitations", "status IN ('pending', 'revoked')", name: "chk_project_invitations_no_granted_access"
+  add_check_constraint "project_invitations", %q(token_digest ~ '^[0-9a-f]{64}$'), name: "chk_project_invitations_token_digest"
+  add_check_constraint "project_invitations", %q(recipient_digest ~ '^[0-9a-f]{64}$'), name: "chk_project_invitations_recipient_digest"
+  add_check_constraint "project_invitations", "expires_at > created_at AND expires_at <= created_at + interval '72 hours'", name: "chk_project_invitations_expiry_window"
+  add_check_constraint "project_source_blobs", "scan_state IN ('quarantined', 'clean', 'infected', 'failed', 'revoked')", name: "chk_project_source_blob_scan_state"
+  add_check_constraint "project_source_blobs", "scan_state <> 'clean' OR (scanner_engine IS NOT NULL AND scan_sha256 IS NOT NULL AND scanned_at IS NOT NULL)", name: "chk_project_source_blob_clean_requires_attestation"
+  add_check_constraint "project_source_blobs", %q(object_key ~ '^q/[0-9a-f]{64}$'), name: "chk_project_source_blob_random_key"
+  add_check_constraint "project_source_blobs", "scan_sha256 IS NULL OR scan_sha256 ~ '^[0-9a-f]{64}$'", name: "chk_project_source_blob_scan_sha"
+  add_check_constraint "project_source_blobs", "expires_at > created_at AND expires_at <= created_at + interval '8 days'", name: "chk_project_source_blob_expiry_window"
+  add_check_constraint "project_sources", "state = 'metadata_only'", name: "chk_project_sources_no_release_before_privacy_gate"
+  add_check_constraint "project_sources", "byte_size BETWEEN 1 AND 262144", name: "chk_project_sources_preview_size"
+  add_check_constraint "project_sources", %q(source_sha256 ~ '^[0-9a-f]{64}$'), name: "chk_project_sources_sha256"
+  add_check_constraint "project_sources", "source_format IN ('markdown', 'text', 'json')", name: "chk_project_sources_format"
+end
+ AND event_digest ~ '^[0-9a-f]{64} ('off','offline','reviewed_provider')", name: "chk_studio_ai_policy_mode"
+  add_check_constraint "studio_ai_policies", "jsonb_typeof(purposes) = 'array'", name: "chk_studio_ai_policy_purposes_array"
+  add_check_constraint "studio_ai_policies", "token_cap_per_call >= 0 AND token_cap_per_day >= 0 AND usd_cap_per_call >= 0 AND usd_cap_per_month >= 0", name: "chk_studio_ai_policy_caps"
+  add_check_constraint "studio_inventory_checkpoints", "state IN ('listing','checking','completed','failed')", name: "chk_studio_inventory_checkpoint_state"
+  add_check_constraint "studio_inventory_checkpoints", "(state IN ('listing','checking')) = (finished_at IS NULL)", name: "chk_studio_inventory_checkpoint_terminal"
+  add_check_constraint "studio_inventory_checkpoints", "pages_scanned BETWEEN 0 AND 10000 AND last_db_blob_id >= 0 AND db_target_max_id >= 0", name: "chk_studio_inventory_checkpoint_progress"
+  add_check_constraint "studio_inventory_checkpoints", "jsonb_typeof(counts) = 'object' AND jsonb_typeof(seen_cursor_digests) = 'array'", name: "chk_studio_inventory_checkpoint_json"
+  add_check_constraint "studio_inventory_checkpoints", %q(config_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_inventory_config_digest"
+  add_check_constraint "studio_inventory_checkpoints", "error_code IS NULL OR error_code IN ('expired','manual_stop')", name: "chk_studio_inventory_checkpoint_error"
+  add_check_constraint "studio_operator_reviews", "reason_code IN ('health_inspected', 'inventory_inspected', 'scan_tasks_inspected', 'retention_objects_inspected')", name: "chk_studio_operator_review_reason"
+  add_check_constraint "studio_maintenance_runs", "kind IN ('health', 'scan', 'retention', 'inventory')", name: "chk_studio_maintenance_kind"
+  add_check_constraint "studio_maintenance_runs", "state IN ('running', 'succeeded', 'failed')", name: "chk_studio_maintenance_state"
+  add_check_constraint "studio_maintenance_runs", "(state = 'running') = (finished_at IS NULL)", name: "chk_studio_maintenance_finished"
+  add_check_constraint "studio_maintenance_runs", "error_code IS NULL OR error_code = 'operation_failed'", name: "chk_studio_maintenance_error"
+  add_check_constraint "studio_maintenance_runs", "jsonb_typeof(result_summary) = 'object'", name: "chk_studio_maintenance_summary"
+  add_check_constraint "studio_source_scan_tasks", "state IN ('queued','retry_wait','complete_clean','complete_infected','exhausted','expired','cancelled')", name: "chk_studio_scan_task_state"
+  add_check_constraint "studio_source_scan_tasks", "attempts BETWEEN 0 AND 3", name: "chk_studio_scan_task_attempts"
+  add_check_constraint "studio_source_scan_tasks", "last_error_code IS NULL OR last_error_code = 'scan_denied'", name: "chk_studio_scan_task_error"
+  add_check_constraint "studio_source_scan_tasks", "(state IN ('queued','retry_wait')) = (finished_at IS NULL)", name: "chk_studio_scan_task_finish"
+  add_check_constraint "studio_client_accounts", %q(email_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_client_account_digest"
+  add_check_constraint "studio_client_accounts", "status IN ('active', 'suspended')", name: "chk_studio_client_account_status"
+  add_check_constraint "studio_client_sessions", %q(token_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_client_session_digest"
+  add_check_constraint "studio_client_sessions", "expires_at > created_at AND expires_at <= created_at + interval '8 hours'", name: "chk_studio_client_session_expiry"
+  add_check_constraint "studio_client_project_grants", "role = 'reviewer'", name: "chk_studio_grants_reviewer_only"
+  add_check_constraint "studio_client_project_grants", "status IN ('active','revoked')", name: "chk_studio_grants_status"
+  add_check_constraint "studio_client_project_grants", "consent_policy = 'studio_review_v1'", name: "chk_studio_grants_consent_policy"
+  add_check_constraint "studio_client_project_grants", "consented_at <= accepted_at", name: "chk_studio_grants_consent_first"
+  add_check_constraint "project_intakes", "client_id IS NULL OR workspace_id IS NOT NULL", name: "chk_project_intakes_client_needs_workspace"
+  add_check_constraint "project_invitation_email_proofs", %q(challenge_digest ~ '^[0-9a-f]{64}$'), name: "chk_invitation_email_proof_digest"
+  add_check_constraint "project_invitation_email_proofs", "failed_attempts BETWEEN 0 AND 5", name: "chk_invitation_email_proof_attempts"
+  add_check_constraint "project_invitation_email_proofs", "expires_at > created_at AND expires_at <= created_at + interval '15 minutes'", name: "chk_invitation_email_proof_expiry"
+  add_check_constraint "project_invitation_email_proofs", "verified_at IS NULL OR verified_at <= expires_at", name: "chk_invitation_email_proof_verified_before_expiry"
+  add_check_constraint "project_invitations", "role = 'reviewer'", name: "chk_project_invitations_role"
+  add_check_constraint "project_invitations", "status IN ('pending', 'revoked')", name: "chk_project_invitations_no_granted_access"
+  add_check_constraint "project_invitations", %q(token_digest ~ '^[0-9a-f]{64}$'), name: "chk_project_invitations_token_digest"
+  add_check_constraint "project_invitations", %q(recipient_digest ~ '^[0-9a-f]{64}$'), name: "chk_project_invitations_recipient_digest"
+  add_check_constraint "project_invitations", "expires_at > created_at AND expires_at <= created_at + interval '72 hours'", name: "chk_project_invitations_expiry_window"
+  add_check_constraint "project_source_blobs", "scan_state IN ('quarantined', 'clean', 'infected', 'failed', 'revoked')", name: "chk_project_source_blob_scan_state"
+  add_check_constraint "project_source_blobs", "scan_state <> 'clean' OR (scanner_engine IS NOT NULL AND scan_sha256 IS NOT NULL AND scanned_at IS NOT NULL)", name: "chk_project_source_blob_clean_requires_attestation"
+  add_check_constraint "project_source_blobs", %q(object_key ~ '^q/[0-9a-f]{64}$'), name: "chk_project_source_blob_random_key"
+  add_check_constraint "project_source_blobs", "scan_sha256 IS NULL OR scan_sha256 ~ '^[0-9a-f]{64}$'", name: "chk_project_source_blob_scan_sha"
+  add_check_constraint "project_source_blobs", "expires_at > created_at AND expires_at <= created_at + interval '8 days'", name: "chk_project_source_blob_expiry_window"
+  add_check_constraint "project_sources", "state = 'metadata_only'", name: "chk_project_sources_no_release_before_privacy_gate"
+  add_check_constraint "project_sources", "byte_size BETWEEN 1 AND 262144", name: "chk_project_sources_preview_size"
+  add_check_constraint "project_sources", %q(source_sha256 ~ '^[0-9a-f]{64}$'), name: "chk_project_sources_sha256"
+  add_check_constraint "project_sources", "source_format IN ('markdown', 'text', 'json')", name: "chk_project_sources_format"
+end
+), name: "chk_studio_ai_policy_revision_digest"
   add_check_constraint "studio_ai_policies", "mode IN ('off','offline','reviewed_provider')", name: "chk_studio_ai_policy_mode"
   add_check_constraint "studio_ai_policies", "jsonb_typeof(purposes) = 'array'", name: "chk_studio_ai_policy_purposes_array"
   add_check_constraint "studio_ai_policies", "token_cap_per_call >= 0 AND token_cap_per_day >= 0 AND usd_cap_per_call >= 0 AND usd_cap_per_month >= 0", name: "chk_studio_ai_policy_caps"
