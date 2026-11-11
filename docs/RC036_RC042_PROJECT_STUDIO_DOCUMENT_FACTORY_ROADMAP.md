@@ -312,3 +312,9 @@ A separate append-only metadata-only \`Studio::SyntheticReviewDecision\` stores 
 - A strictly test-environment registered JSON HTTP contract (GET closed board+cards, POST fixed fictional catalog card, PATCH state with exact optimistic version) reuses RC-039 Slice A/B and existing DB-backed owner session. No routes in development or production, and runtime hard-denial independently verifies production/test predicates.
 - Private no-store/nosniff/referrer response headers, per-request workspace/client/intake scoping, denied revoked/foreign owners, opaque fixed metadata, blocked document generation, no arbitrary card fields or real content. Request tests exercise read/write/ACL/CSRF/version conflict/forged approvals.
 - No HTML/Turbo/Stimulus UI, project scheduling, real user tasks, comments, client access, storage/AI/provider use. [Slice C test-only HTTP runbook](RC039_SLICE_C_SYNTHETIC_PROJECT_HUB_HTTP.md). Exact-HEAD CI and Linux Mint owner regression are mandatory.
+
+
+## RC-039 Slice D — mobile-friendly synthetic owner HTML board (2026-11-12)
+- Added **test-environment-only** HTML preview routes and a keyboard-form board rendered from Slice A's four lanes/nine future document types; Slice B's existing scoped card transitions provide the only state-changing effects. JSON endpoints from Slice C retain their original semantics.
+- \`White Atlas\` CSS grid collapses without horizontal scroll, and all actions are explicit form POST/PATCH with standard CSRF and optimistic version checks. The screen never displays customer names, project titles, raw sources, tasks, unapproved client decisions or production capabilities.
+- New HTTP and Chrome tests cover owner admission, foreign/revoked denial, stale version and mobile 320/390/430px clipping. [Slice D runbook](RC039_SLICE_D_SYNTHETIC_PROJECT_HUB_UI.md). Full keyboard/screen-reader and manual UI checks are not yet complete; release remains test-only/no deploy.

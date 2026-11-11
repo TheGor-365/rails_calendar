@@ -81,6 +81,14 @@ Rails.application.routes.draw do
            as: :rc039_synthetic_project_cards
       patch "/project_hub/cards/:card_id", to: "studio/synthetic_project_cards#update",
             as: :rc039_synthetic_project_card
+      # RC-039 Slice D: HTML UI available ONLY under the test-only parent scope.
+      get "/project_hub/preview", to: "studio/synthetic_project_cards#show_preview",
+          as: :rc039_synthetic_project_hub_preview
+      post "/project_hub/preview/cards", to: "studio/synthetic_project_cards#create_preview_card",
+           as: :rc039_synthetic_project_hub_preview_cards
+      patch "/project_hub/preview/cards/:card_id",
+            to: "studio/synthetic_project_cards#transition_preview_card",
+            as: :rc039_synthetic_project_hub_preview_card
     end
   end
 

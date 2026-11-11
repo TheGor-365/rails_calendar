@@ -1,0 +1,80 @@
+<div class="container rc-project-hub my-4 my-sm-5">
+  <header class="rc-page-hero mb-3">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow">PROJECT STUDIO / RC-039 · TEST-ONLY BOARD</p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-kanban"></i></span>
+        <h1 class="page-title">Project Hub preview</h1>
+      </div>
+      <p class="rc-muted">Four workflow lanes · Nine fictional artifact types</p>
+      <p class="rc-hint">Fictional owner-only test screen. No client confirmation, generated document, delivery task, deadline or paid AI call.</p>
+    </div>
+  </header>
+
+  <section class="surface-panel rc-hub-guardrails mb-3" aria-label="Project Hub safety limits">
+    <h2 class="h5 mb-2">Review-only prototype</h2>
+    <p class="rc-hint mb-0">All document-generation gates remain blocked. Moving a card records only a synthetic owner action; it never approves requirements or updates the consultation calendar.</p>
+  </section>
+
+  <div class="rc-hub-board" aria-label="Project Hub workflow lanes">
+    <% @board.fetch("lanes").each do |lane| %>
+      <% preview_cards = @board.fetch("cards").select { |item| item.fetch("lane_key") == lane.fetch("key") } %>
+      <section class="rc-hub-lane" aria-label="<%= "#{lane.fetch('label')} lane" %>">
+        <header class="rc-hub-lane__header">
+          <h2 class="h5 mb-0"><%= lane.fetch("label") %></h2>
+          <span class="rc-status-pill rc-status-pill--muted"><%= preview_cards.length %> types</span>
+        </header>
+        <ol class="rc-hub-card-list">
+          <% preview_cards.each do |candidate| %>
+            <% key = candidate.fetch("key") %>
+            <% saved = @saved_cards_by_key[key] %>
+            <li class="rc-hub-card" data-artifact-key="<%= key %>">
+              <div class="rc-hub-card__top">
+                <h3 class="h6 mb-0"><%= key.humanize %></h3>
+                <span class="rc-status-pill rc-status-pill--muted"><%= saved ? saved.fetch("state").humanize : "Untracked" %></span>
+              </div>
+              <p class="rc-hint mt-2 mb-2">Unverified synthetic proposal — no document generated.</p>
+              <details class="rc-hub-details">
+                <summary>Missing prerequisites (<%= candidate.fetch("prerequisites").size %>)</summary>
+                <ul>
+                  <% candidate.fetch("prerequisites").each do |item| %>
+                    <li><%= item.humanize %></li>
+                  <% end %>
+                </ul>
+              </details>
+
+              <% if saved %>
+                <% options = Studio::SyntheticProjectCardWorkflow::ALLOWED.fetch(saved.fetch("state")) %>
+                <%= form_with url: rc039_synthetic_project_hub_preview_card_path(
+                               @workspace, @client, @intake, saved.fetch("card_id")),
+                              method: :patch, local: true, data: { turbo: false },
+                              html: { class: "rc-hub-transition-form" } do %>
+                  <%= hidden_field_tag :expected_state, saved.fetch("state") %>
+                  <%= hidden_field_tag :expected_version, saved.fetch("version") %>
+                  <%= label_tag "hub_next_state_#{saved.fetch('card_id')}", "Move to", class: "rc-field-label" %>
+                  <%= select_tag :to_state,
+                        options_for_select(options.map { |value| [value.humanize, value] }),
+                        id: "hub_next_state_#{saved.fetch('card_id')}", class: "rc-input" %>
+                  <%= button_tag "Move synthetic card", type: :submit,
+                                 class: "rc-action rc-action--soft rc-action--small" %>
+                <% end %>
+                <p class="rc-hub-version mb-0">Revision <%= saved.fetch("version") %> · no client approval</p>
+              <% else %>
+                <%= button_to "Create synthetic card",
+                              rc039_synthetic_project_hub_preview_cards_path(
+                                @workspace, @client, @intake),
+                              method: :post, params: { artifact_key: key },
+                              form: { data: { turbo: false } },
+                              class: "rc-action rc-action--soft rc-action--small rc-hub-create" %>
+              <% end %>
+            </li>
+          <% end %>
+        </ol>
+      </section>
+    <% end %>
+  </div>
+
+  <footer class="rc-hub-footer rc-hint">
+    No drag and drop, auto-scheduling, real client access or document production. Keyboard forms are intentionally the only state-changing interface.
+  </footer>
+</div>

@@ -22,6 +22,52 @@ module Studio
       head :not_found
     end
 
+    # Human-readable, keyboard-operable preview for fictitious internal cards.
+    # Separate from Slice C JSON endpoints to preserve their original contract.
+    def show_preview
+      @board = SyntheticProjectHubBoardPreview.new(
+        actor: current_user, workspace: @workspace
+      ).call(client: @client, intake: @intake, explicit_synthetic: true)
+      @saved_cards_by_key = workflow.list(
+        client: @client, intake: @intake, explicit_synthetic: true
+      ).index_by { |row| row.fetch("artifact_key") }
+    rescue SecurityError, SyntheticProjectHubBoardPreview::Denied,
+           SyntheticProjectCardWorkflow::Denied
+      head :not_found
+    end
+
+    # These two HTML-only actions reuse Slice B's locked workflow; never
+    # mutate columns directly and never accept arbitrary task/approval text.
+    def create_preview_card
+      workflow.create!(
+        client: @client, intake: @intake, artifact_key: params[:artifact_key],
+        explicit_synthetic: true
+      )
+      redirect_to preview_path, notice: "Fictional card recorded. No scope approved."
+    rescue SyntheticProjectCardWorkflow::Denied, ActiveRecord::RecordInvalid,
+           ActiveRecord::RecordNotUnique
+      render plain: "Synthetic card request rejected", status: :unprocessable_entity
+    rescue ActiveRecord::RecordNotFound, SecurityError
+      head :not_found
+    end
+
+    def transition_preview_card
+      workflow.transition!(
+        client: @client, intake: @intake, card_id: params[:card_id],
+        expected_state: params[:expected_state],
+        expected_version: expected_version!, to_state: params[:to_state],
+        explicit_synthetic: true
+      )
+      redirect_to preview_path, notice: "Fictional card state recorded. No approval granted."
+    rescue SyntheticProjectCardWorkflow::Conflict, ActiveRecord::StaleObjectError
+      render plain: "Card was changed; reload the board", status: :conflict
+    rescue ArgumentError, SyntheticProjectCardWorkflow::Denied,
+           ActiveRecord::RecordInvalid
+      render plain: "Synthetic transition rejected", status: :unprocessable_entity
+    rescue ActiveRecord::RecordNotFound, SecurityError
+      head :not_found
+    end
+
     def create
       card = workflow.create!(
         client: @client, intake: @intake,
@@ -55,6 +101,10 @@ module Studio
     end
 
     private
+
+    def preview_path
+      rc039_synthetic_project_hub_preview_path(@workspace, @client, @intake)
+    end
 
     def workflow
       @workflow ||= SyntheticProjectCardWorkflow.new(
