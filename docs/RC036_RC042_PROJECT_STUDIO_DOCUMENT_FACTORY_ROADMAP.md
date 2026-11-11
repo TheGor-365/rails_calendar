@@ -203,3 +203,8 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-036 Stage 3 Slice N — preview hard-deny and untrusted HTML regression (2026-11-11)
 - Found that preexisting owner preview could parse unscanned bytes in production despite synthetic-only policy. Patched `Studio::SourcePreviewsController` to require nonproduction test/explicit synthetic development, return 404 in production even for owner, and emit no-store/nosniff/no-referrer on early denied responses.
 - Negative HTTP tests assert production 404 and safe escaping for raw Markdown HTML/JS with no persisted blob. [Stage N security boundary](RC036_STAGE3_SLICE_N_SECURITY_GATES.md). Other security/manual/legal/production gates remain explicitly pending until independent proof.
+
+
+## RC-037 Slice A — scoped offline AI policy foundation (2026-11-11)
+- Stacked Draft PR on RC-036: synthetic-only `studio_ai_policies` with project override, workspace hard-deny and PG composite tenant FK; `Studio::OfflineAiDispatcher` returns unapproved static offline proposal with zero external provider calls and zero billing. Project cannot escalate workspace restrictions; reviewed provider stays unavailable.
+- Test suite for foreign/revoked owner, invalid classes and purposes, duplicate defaults and forged tenant SQL. [Slice A runbook](RC037_SLICE_A_OFFLINE_AI_POLICY.md). Full RC-037 dispatch/structured outputs/budget enforcement and UI remain future work.

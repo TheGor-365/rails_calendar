@@ -3,6 +3,7 @@ class Workspace < ApplicationRecord
   has_many :workspace_memberships, dependent: :restrict_with_exception
   has_many :clients, dependent: :restrict_with_exception
   has_many :project_intakes, dependent: :restrict_with_exception
+  has_many :studio_ai_policies, class_name: "Studio::AiPolicy", dependent: :restrict_with_exception
   has_many :project_sources, dependent: :restrict_with_exception
   has_many :project_source_blobs, dependent: :restrict_with_exception
   has_many :studio_source_scan_tasks, class_name: "Studio::SourceScanTask",

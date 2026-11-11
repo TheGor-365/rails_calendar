@@ -9,6 +9,7 @@ class ProjectIntake < ApplicationRecord
   has_many :intake_answers, dependent: :restrict_with_exception
   has_many :intake_spec_versions, dependent: :restrict_with_exception
   has_many :project_milestones, dependent: :restrict_with_exception
+  has_one :studio_ai_policy, class_name: "Studio::AiPolicy", dependent: :restrict_with_exception
   has_many :project_sources, dependent: :restrict_with_exception
   has_many :project_source_blobs, dependent: :restrict_with_exception
   has_many :project_invitations, dependent: :restrict_with_exception
