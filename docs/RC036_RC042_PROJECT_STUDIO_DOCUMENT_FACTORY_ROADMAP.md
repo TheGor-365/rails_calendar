@@ -306,3 +306,9 @@ A separate append-only metadata-only \`Studio::SyntheticReviewDecision\` stores 
 - \`Studio::SyntheticProjectCardWorkflow\` now supports strictly test-only creation, listing and serialized state transitions of scoped **fictional metadata cards**. DB composite client/intake foreign keys, fixed artifact catalog and nonapproval states are enforced by additive tables and checks. Append-only transition receipts and expected-version checks reject stale/invalid operations.
 - No client-facing or owner HTTP endpoints, UI, real project data, due dates, board drag/drop, document approval or calendar coupling. [Slice B runbook](RC039_SLICE_B_SYNTHETIC_PROJECT_CARDS.md).
 - Gate remains exact-head GitHub CI/Security and isolated Linux Mint tests. Production deployments, full private storage/consent and future real-role ACL need separate review.
+
+
+## RC-039 Slice C — test-only owner HTTP board operations (2026-11-12)
+- A strictly test-environment registered JSON HTTP contract (GET closed board+cards, POST fixed fictional catalog card, PATCH state with exact optimistic version) reuses RC-039 Slice A/B and existing DB-backed owner session. No routes in development or production, and runtime hard-denial independently verifies production/test predicates.
+- Private no-store/nosniff/referrer response headers, per-request workspace/client/intake scoping, denied revoked/foreign owners, opaque fixed metadata, blocked document generation, no arbitrary card fields or real content. Request tests exercise read/write/ACL/CSRF/version conflict/forged approvals.
+- No HTML/Turbo/Stimulus UI, project scheduling, real user tasks, comments, client access, storage/AI/provider use. [Slice C test-only HTTP runbook](RC039_SLICE_C_SYNTHETIC_PROJECT_HUB_HTTP.md). Exact-HEAD CI and Linux Mint owner regression are mandatory.

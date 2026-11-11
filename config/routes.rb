@@ -70,6 +70,20 @@ Rails.application.routes.draw do
     delete "/invitations/:id", to: "studio/project_invitations#destroy", as: :studio_project_invitation
   end
 
+
+  # RC-039 Slice C: fictional metadata HTTP contract is registered ONLY in
+  # Rails test mode. Never expose card writes via development or production.
+  if Rails.env.test?
+    scope "/workspaces/:workspace_id/clients/:client_id/project_intakes/:project_intake_id" do
+      get "/project_hub", to: "studio/synthetic_project_cards#index",
+          as: :rc039_synthetic_project_hub
+      post "/project_hub/cards", to: "studio/synthetic_project_cards#create",
+           as: :rc039_synthetic_project_cards
+      patch "/project_hub/cards/:card_id", to: "studio/synthetic_project_cards#update",
+            as: :rc039_synthetic_project_card
+    end
+  end
+
   root "pages#home"
   get "calendar/day", to: "pages#day", as: :calendar_day
   get "calendar/hour", to: "pages#hour", as: :calendar_hour
