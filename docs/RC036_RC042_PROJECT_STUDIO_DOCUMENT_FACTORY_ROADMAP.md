@@ -300,3 +300,9 @@ A separate append-only metadata-only \`Studio::SyntheticReviewDecision\` stores 
 - First independent **stacked Draft PR** above accepted RC-038, without changes to RC-038 itself. Read-only \`Studio::SyntheticProjectHubBoardPreview\` exposes four fictional lanes and nine future document-planning cards with unmet prerequisite edges derived from \`Studio::DocumentGenerationPlan\`, using only test environment and explicit synthetic opt-in.
 - Owner/client/intake ACL checked again on every call; project and customer free text are never returned. All cards remain blocked for generation, no clients, tasks, milestones, schedules, approval, money, AI, HTTP, or persistence.
 - [Slice A contract and acceptance runbook](RC039_SLICE_A_SYNTHETIC_PROJECT_HUB_BOARD.md); exact-head CI/Security and owner's Linux Mint tests required. **Not an actual Project Hub UI or persistent kanban**; further slices will require reviewed tenant-scoped models, E2E permissions, Turbo/Stimulus operations, keyboard a11y, and a project-only calendar.
+
+
+## RC-039 Slice B — synthetic-only persisted card transitions (2026-11-12)
+- \`Studio::SyntheticProjectCardWorkflow\` now supports strictly test-only creation, listing and serialized state transitions of scoped **fictional metadata cards**. DB composite client/intake foreign keys, fixed artifact catalog and nonapproval states are enforced by additive tables and checks. Append-only transition receipts and expected-version checks reject stale/invalid operations.
+- No client-facing or owner HTTP endpoints, UI, real project data, due dates, board drag/drop, document approval or calendar coupling. [Slice B runbook](RC039_SLICE_B_SYNTHETIC_PROJECT_CARDS.md).
+- Gate remains exact-head GitHub CI/Security and isolated Linux Mint tests. Production deployments, full private storage/consent and future real-role ACL need separate review.
