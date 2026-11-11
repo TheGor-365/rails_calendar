@@ -255,3 +255,42 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 - Added targeted Selenium owner path at 320/390/430px, with no horizontal overflow, preview→versioned run→synthetic-only review, denied-policy and corrupted-signature checks; updated fixed-template `<pre>` wrapping for narrow screens.
 - Added `bin/rc037-local-acceptance` (localhost `ruby_calendar_test` only, reject production/remote and unknown args) with `--check-only` and negative guard tests. It runs synthetic Rails and Chrome system tests; does not certify owner's actual Linux Mint run until user executes it.
 - [RC-037 release gates/owner acceptance runbook](RC037_OWNER_ACCEPTANCE_RELEASE_GATES_2026-11-11.md) records infrastructure blockers and evidence requirements, including official antivirus signatures, encrypted durable store, DB+blob backup AND restore, legal consent and separate deploy approval. **Production blocked.**
+
+## RC-037 — owner Linux Mint automated acceptance (2026-11-11)
+- Owner's actual isolated localhost `ruby_calendar_test` run on Linux Mint: **PASS** with Ruby 3.4.12 and Bundler 2.6.9; targeted Rails **31 runs / 438 assertions**, local Chrome/Selenium **25 runs / 474 assertions** at CSS viewport **320/390/430px**, zero failures/errors/skips. See PR #37 checkpoint. Local generated `db/schema.rb` remained modified in owner's checkout and must not be reset or included in unrelated commits without examination.
+- This validates isolated scripted checks, **not manual visual/keyboard acceptance**, genuine malware signature provenance, encrypted durable storage, client identity/consent or backup plus restore. Production and real-client release gates remain blocked.
+
+## RC-038 Slice A — synthetic-only source normalization and fact provenance (2026-11-11)
+- New stacked Draft PR #38 based on unmerged PR #37. In-memory `Studio::SyntheticSourceNormalizer` requires explicit synthetic opt-in, active owner+exact tenant/client/intake/source metadata match and correct SHA256/format/size. Production and quarantined bytes are hard denied; **no HTTP, DB migrations, stored source text or paid AI**.
+- Deterministic bounded MD/TXT lines/JSON pointer segments with cryptographic text/source references; unverified `reported`/`unknown` candidate facts each linked to one emitted segment. Fenced code does not become a requirement, duplicate JSON keys are rejected, truncated/omitted evidence signals `partial` coverage. No client approval, verified facts, invoices or documents can be inferred.
+- Isolated tests cover determinism, cross-tenant IDOR, revoked owner, stale hash, ambiguous input and no content persistence. [RC-038 Slice A runbook](RC038_SLICE_A_SYNTHETIC_SOURCE_GRAPH.md). Exact-head CI/Security results in PR #38 checkpoints, not presumed from file creation.
+- Next: Slice B in-memory conflict/reconciliation preview, then human-review rules and persistent encrypted segments only after independent privacy/consent/storage gates.
+
+## RC-038 Slice B — synthetic reconciliation preview (2026-11-11)
+
+An additional in-memory service compares two already validated synthetic source graphs for one exact authorized workspace/client/intake. Candidate outcomes \`new/corroborates/conflicts/unknown\` and an explicit zero automatic supersede count; all require human review. Partial source coverage prevents claiming unobserved claims are absent; null values remain unknown. No persistent source text, approval, HTTP endpoint, AI call or production exposure. See [Slice B runbook](RC038_SLICE_B_SYNTHETIC_RECONCILIATION.md). Stage C can introduce owner reviewed decision previews and immutable storage architecture without weakening current production gates.
+
+## RC-038 Slice C — synthetic-only owner conflict triage (2026-11-11)
+
+A separate append-only metadata-only \`Studio::SyntheticReviewDecision\` stores owner triage after **recomputing both source graphs** with source SHA/ACL/quarantine checks, verifying exact comparison digest and hashed candidate ID, and demanding typed confirmation. Allowed decisions: \`needs_information\`, \`retain_for_review\` (only \`new\`/\`corroborates\` candidates), \`exclude_from_draft\`. Never creates \`ClientFact\`, approved scope, client consent or deliverable. One decision per source-pair revision and incoming candidate; no silent overwrite, exact retry idempotent, explicit review of changed source after revision. PostgreSQL composite tenant FKs cover both sources, intake/client/workspace, and model prevents update/delete. No raw bytes, filenames, freeform reviewer text or AI provider calls persisted. Only test/opted-in development; no production HTTP routes or client data. See [Slice C runbook](RC038_SLICE_C_SYNTHETIC_REVIEW_TRIAGE.md). Future: reviewed source segments/facts and document revisions only behind real privacy/consent gates.
+
+
+## RC-038 Slice D — read-only synthetic review readiness (2026-11-11)
+- Nonproduction-only \`Studio::SyntheticReviewReadiness\` recomputes source reconciliation and validates immutable owner triage metadata. A strictly internal \`eligible_for_unapproved_synthetic_outline_review\` flag is true only for fully triaged, complete, nonconflicting synthetic evidence with at least one retained candidate. It is **never** authorization to generate a document, approve scope or treat a client as confirmed. No source text is persisted, no routes or paid API. [Slice D runbook](RC038_SLICE_D_SYNTHETIC_REVIEW_READINESS.md).
+
+## RC-038 Slice E — synthetic requirement trace preview (2026-11-11)
+- Read-only \`Studio::SyntheticRequirementTracePreview\` composes validated in-memory comparison with existing owner triage, returning deterministic opaque trace IDs, source/segment/locator and reviewer receipt for strictly \`retain_for_review\` candidates in \`new/corroborates\` state. All requirement and client approvals remain **false**, no generated documents, persisted text or actual customer data. [Slice E runbook](RC038_SLICE_E_SYNTHETIC_REQUIREMENT_TRACE_PREVIEW.md).
+- Exact-HEAD CI/Security and owner-machine tests required for Slice E acceptance. Future persistent fact graph, artifact revisions and actual document generation remain blocked by storage, AV, consent, backup/restore and manual release gates.
+
+
+## RC-038 Slice F — synthetic requirement-revision delta, no document persistence (2026-11-12)
+
+- Added in-memory \`Studio::SyntheticRequirementRevisionDiff\`: compares two independently owner-triaged, exact-source validated fictional candidate snapshots for the same workspace/client/intake. Uses bounded source locator + type only as a temporary coordinate and compares localized value hashes internally, without exporting source content or hashes.
+- Classifications \`unchanged_unverified / changed_unverified / newly_retained_unverified / no_longer_retained_unverified\`; the latter is NOT proof of removed client scope, and changed/moved coordinates never auto-supersede or auto-delete. If either source comparison has partial coverage or unresolved/review-pending candidates, the diff is blocked.
+- No persistent documents, revision approvals, HTTP, exports, cloud storage, paid AI or production features. All real-source, identity, encryption, maintained AV, consent, backup+restore and release gates remain open. See [Slice F runbook](RC038_SLICE_F_SYNTHETIC_REQUIREMENT_REVISION_DIFF.md). **Exact-HEAD CI and owner local acceptance required.**
+
+
+## RC-038 Slice G — fictional document revision impact gate (2026-11-12)
+- \`Studio::SyntheticDocumentRevisionImpact\` composes Slice F's exact-source checked in-memory diffs with the existing \`Studio::DocumentGenerationPlan\`. Changed/new/no-longer-retained synthetic candidates become human **assessment questions only**; unchanged claims do not create a revision request, and missing coordinates never authorize deletions.
+- All future document artifact types and missing prerequisites are taken from the deterministic planner with \`evidence: {}\` — no fictional triage becomes a client-verified fact, document approval or permission to generate.
+- No HTTP, database migration, document bytes, artifact revisions, real client data, provider billing or production access. [Slice G runbook](RC038_SLICE_G_SYNTHETIC_DOCUMENT_REVISION_IMPACT.md). Acceptance requires exact-HEAD CI/security and isolated Linux Mint Rails tests. RC-039 Project Hub and RC-040 actual Document Factory remain subsequent gated releases.

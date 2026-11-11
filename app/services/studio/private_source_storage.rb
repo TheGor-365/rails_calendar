@@ -16,7 +16,11 @@ module Studio
     PURPOSE = "nonproduction-synthetic"
 
     def self.enabled?
-      Rails.env.test? || (Rails.env.development? && ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true")
+      # Explicit hard deny protects production even if a test-only flag
+      # or environment predicate is accidentally overridden.
+      !Rails.env.production? &&
+        (Rails.env.test? || (Rails.env.development? &&
+          ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true"))
     end
 
     def self.s3_backend?
@@ -35,9 +39,10 @@ module Studio
         end
         name = :studio_synthetic_quarantine
       end
-      @service = service || ActiveStorage::Service.configure(
-        name, Rails.application.config.active_storage.service_configurations
-      )
+      # Active Storage reads storage.yml lazily when Blob is first loaded.
+      # Direct Service.configure may receive nil on non-eager test boot.
+      # Use the framework-managed registry so the initialization hook runs.
+      @service = service || ActiveStorage::Blob.services.fetch(name)
     end
 
     def upload!(key:, bytes:)
