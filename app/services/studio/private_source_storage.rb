@@ -16,7 +16,11 @@ module Studio
     PURPOSE = "nonproduction-synthetic"
 
     def self.enabled?
-      Rails.env.test? || (Rails.env.development? && ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true")
+      # Explicit hard deny protects production even if a test-only flag
+      # or environment predicate is accidentally overridden.
+      !Rails.env.production? &&
+        (Rails.env.test? || (Rails.env.development? &&
+          ENV["RC_STUDIO_SYNTHETIC_STORAGE"] == "true"))
     end
 
     def self.s3_backend?
