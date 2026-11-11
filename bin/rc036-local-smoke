@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+# RC-036 Slice L: no-clamav, fake-scanner TEST-ONLY synthetic smoke.
+# Never uses development/production DB, never accepts customer files.
+require "json"
+require "open3"
+require "rbconfig"
+require "uri"
+
+root = File.expand_path("..", __dir__)
+url = ENV["RC_LOCAL_TEST_DATABASE_URL"].to_s
+host = ENV.fetch("PGHOST", "localhost")
+safe = begin
+  parsed = URI.parse(url)
+  %w[postgres postgresql].include?(parsed.scheme) &&
+    %w[localhost 127.0.0.1 ::1].include?(parsed.host) &&
+    parsed.path == "/ruby_calendar_test" &&
+    %w[localhost 127.0.0.1 ::1].include?(host)
+rescue URI::InvalidURIError
+  false
+end
+
+unless safe && ENV["DATABASE_URL"].to_s.empty? &&
+       ENV["RAILS_ENV"] != "production" && ENV["RACK_ENV"] != "production"
+  warn "REFUSED: configure a dedicated local PostgreSQL ruby_calendar_test database; no production/remote URLs"
+  puts JSON.generate(status: "REFUSED", mode: "synthetic-test-only", production_ready: false)
+  exit 2
+end
+
+environment = {
+  "RAILS_ENV" => "test",
+  "RC_STUDIO_QUARANTINE_BACKEND" => "disk",
+  "RC_STUDIO_S3_INTEGRATION_TEST" => "false"
+}
+stdout, stderr, result = Open3.capture3(
+  environment, RbConfig.ruby, "bin/rails", "test",
+  "test/integration/rc036_local_smoke_test.rb", chdir: root
+)
+warn stdout unless stdout.empty?
+warn stderr unless stderr.empty?
+
+match = stdout.match(/(\d+) tests, (\d+) assertions, (\d+) failures, (\d+) errors, (\d+) skips/)
+passed = result.success? && match && match[3] == "0" && match[4] == "0"
+puts JSON.generate(
+  status: passed ? "PASS" : "FAIL",
+  mode: "test-db-disk-quarantine",
+  verdict_source: "FAKE_TEST_SCANNER_NOT_ANTIVIRUS",
+  checks: %w[md_upload quarantine queued fake_clean owner_http_acl
+             guest_foreign_tenant_denials fake_infected json_expiry
+             retention_physical_delete health_redaction archive_rejection],
+  tests: match && match[1].to_i, assertions: match && match[2].to_i,
+  production_ready: false, real_clamav_tested: false,
+  customer_files_permitted: false
+)
+exit(passed ? 0 : 1)

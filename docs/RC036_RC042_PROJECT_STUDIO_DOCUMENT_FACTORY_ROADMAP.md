@@ -186,3 +186,10 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 - Added free, optional localhost S3-compatible SILO Docker Compose using existing CI-pinned image and private shell-provided synthetic credentials; explicitly opted-in HTTP only on development loopback. Disk storage remains the default no-S3 local path. Nothing deployed or purchased on Railway.
 - Added local owner CLI bin/rc036-review-abandoned and bin/rc036-inventory-resume; no cron, paid background daemon or production access. Negative tests include wrong tenant, replay, tampered cursor, expired checkpoint and denied public HTTP.
 - Read [Slice K local runbook](RC036_STAGE3_SLICE_K_LOCAL_RECOVERY_AND_CHECKPOINTS.md). RC-036 and RC-037 still blocked for real data/production pending separate privacy, identity, official AV signatures and explicit release approvals.
+
+
+## RC-036 Stage 3 Slice L — independent synthetic local smoke (2026-11-11)
+- Added `bin/rc036-local-smoke`, a nonproduction-only command that rejects remote/production database URLs, forces the dedicated `ruby_calendar_test` database and disk test backend, and runs a Rails HTTP/queue/retention integration suite. Failure exits nonzero; summary JSON discloses no real source bytes, keys or identities.
+- New `test/integration/rc036_local_smoke_test.rb` checks a fictional MD/TXT/JSON upload → quarantine → queued PostgreSQL task → **FAKE TEST-ONLY** clean/infected verdict → request-time owner/tenant/intake ACL → expiry/physical retention → sanitized operational health. This does **not** grant any development blob a fake clean verdict.
+- Optional existing disposable S3+genuine clamd EICAR CI remains separate; it is not official FreshClam malware-coverage evidence. No customer files, external AI/paid resource, merge or Railway production changes.
+- Runbook: [Slice L local synthetic smoke](RC036_STAGE3_SLICE_L_LOCAL_SYNTHETIC_SMOKE.md). **CI/owner machine acceptance pending new exact HEAD; do not infer PASS from source code alone.**
