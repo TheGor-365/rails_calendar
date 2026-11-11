@@ -47,7 +47,7 @@ class StudioOfflineSourceSelectorTest < ActiveSupport::TestCase
     assert_raises(SecurityError) do
       Studio::OfflineSourceSelector.new(actor: @outsider, workspace: @ws, intake: @intake)
     end
-    assert_raises(Studio::OfflineSourceSelector::Denied) do
+    assert_raises(SecurityError) do
       Studio::OfflineSourceSelector.new(actor: @owner, workspace: @foreign, intake: @intake)
     end
   end
