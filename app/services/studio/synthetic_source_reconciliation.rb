@@ -89,7 +89,8 @@ module Studio
         "schema_version" => VERSION,
         "classification" => "UNTRUSTED_SYNTHETIC_EPHEMERAL",
         "comparison_digest" => Digest::SHA256.hexdigest(
-          JSON.generate([VERSION, older.fetch("source_sha256"), newer.fetch("source_sha256")])
+          JSON.generate([VERSION, older.fetch("source_id"), newer.fetch("source_id"),
+                         older.fetch("source_sha256"), newer.fetch("source_sha256")])
         ),
         "baseline_source_id" => older.fetch("source_id"),
         "incoming_source_id" => newer.fetch("source_id"),

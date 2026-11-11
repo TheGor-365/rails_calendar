@@ -11,6 +11,7 @@ class ProjectIntake < ApplicationRecord
   has_many :project_milestones, dependent: :restrict_with_exception
   has_one :studio_ai_policy, class_name: "Studio::AiPolicy", dependent: :restrict_with_exception
   has_many :studio_offline_runs, class_name: "Studio::OfflineRun", dependent: :restrict_with_exception
+  has_many :studio_synthetic_review_decisions, class_name: "Studio::SyntheticReviewDecision", dependent: :restrict_with_exception
   has_many :project_sources, dependent: :restrict_with_exception
   has_many :project_source_blobs, dependent: :restrict_with_exception
   has_many :project_invitations, dependent: :restrict_with_exception
