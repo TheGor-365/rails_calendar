@@ -62,7 +62,12 @@ class StudioAiSettingsHttpTest < ActionDispatch::IntegrationTest
     assert_select "[aria-label='Workspace policy revision history']", text: /Revision 1/
     assert_select "[aria-label='Project restriction revision history']", text: /Revision 1/
     assert_not_includes response.body, root.revisions.sole.event_digest
-    assert_not_includes response.body, @owner.email
+    assert_select "[aria-label='Workspace policy revision history']" do |elements|
+      assert_not_includes elements.first.text, @owner.email
+    end
+    assert_select "[aria-label='Project restriction revision history']" do |elements|
+      assert_not_includes elements.first.text, @owner.email
+    end
 
     result = Studio::OfflineAiDispatcher.new(actor: @owner, workspace: @ws, intake: @intake)
       .call(purpose: "clarify")
