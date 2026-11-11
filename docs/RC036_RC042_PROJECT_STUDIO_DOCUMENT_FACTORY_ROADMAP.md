@@ -281,3 +281,10 @@ A separate append-only metadata-only \`Studio::SyntheticReviewDecision\` stores 
 ## RC-038 Slice E — synthetic requirement trace preview (2026-11-11)
 - Read-only \`Studio::SyntheticRequirementTracePreview\` composes validated in-memory comparison with existing owner triage, returning deterministic opaque trace IDs, source/segment/locator and reviewer receipt for strictly \`retain_for_review\` candidates in \`new/corroborates\` state. All requirement and client approvals remain **false**, no generated documents, persisted text or actual customer data. [Slice E runbook](RC038_SLICE_E_SYNTHETIC_REQUIREMENT_TRACE_PREVIEW.md).
 - Exact-HEAD CI/Security and owner-machine tests required for Slice E acceptance. Future persistent fact graph, artifact revisions and actual document generation remain blocked by storage, AV, consent, backup/restore and manual release gates.
+
+
+## RC-038 Slice F — synthetic requirement-revision delta, no document persistence (2026-11-12)
+
+- Added in-memory \`Studio::SyntheticRequirementRevisionDiff\`: compares two independently owner-triaged, exact-source validated fictional candidate snapshots for the same workspace/client/intake. Uses bounded source locator + type only as a temporary coordinate and compares localized value hashes internally, without exporting source content or hashes.
+- Classifications \`unchanged_unverified / changed_unverified / newly_retained_unverified / no_longer_retained_unverified\`; the latter is NOT proof of removed client scope, and changed/moved coordinates never auto-supersede or auto-delete. If either source comparison has partial coverage or unresolved/review-pending candidates, the diff is blocked.
+- No persistent documents, revision approvals, HTTP, exports, cloud storage, paid AI or production features. All real-source, identity, encryption, maintained AV, consent, backup+restore and release gates remain open. See [Slice F runbook](RC038_SLICE_F_SYNTHETIC_REQUIREMENT_REVISION_DIFF.md). **Exact-HEAD CI and owner local acceptance required.**
