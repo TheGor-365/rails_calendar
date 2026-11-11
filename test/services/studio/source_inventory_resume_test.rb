@@ -179,7 +179,7 @@ class StudioSourceInventoryResumeTest < ActiveSupport::TestCase
     assert_equal 0, fake.calls.length
     assert_nil cp.reload.encrypted_cursor
     assert_equal "expired", cp.error_code
-    assert_raises(Studio::SourceInventoryResume::Denied) do
+    assert_raises(SecurityError) do
       Studio::SourceInventoryResume.new(actor: @owner, workspace: @foreign,
         s3_client: fake, storage: FakeStorage.new).step!(checkpoint_id: cp.id)
     end
