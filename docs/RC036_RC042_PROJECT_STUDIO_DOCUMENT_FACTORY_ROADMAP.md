@@ -234,3 +234,8 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 
 ## RC-037 Slice E — read-only audit history on existing settings screen (2026-11-11)
 - Reused the existing owner-only project AI settings view to show the last 15 safe, scoped policy revision summaries (action, mode, event time, attribution) with no raw HMAC digests, email or source text; verified by HTTP tests. Does not change the zero-cost gate or production-deny boundary.
+
+
+## RC-037 Slice F — fail-closed audit verification at request-time admission (2026-11-11)
+- Hardened `Studio::AiBudgetAdmission`: verify HMAC-linked revision history and latest persisted snapshot of both workspace and project AI policies before any synthetic offline response. Direct SQL tampering, missing chain, changed scope and forged revision digest deny execution with no implicit repair. This is not independent WORM audit or permission for external billable AI.
+- Negative service/dispatcher tests demonstrate bypass denial. [Slice F runbook](RC037_SLICE_F_POLICY_INTEGRITY_ADMISSION.md). Exact HEAD CI evidence recorded separately.

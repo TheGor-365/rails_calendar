@@ -29,6 +29,19 @@ module Studio
 
       defaults = @workspace.studio_ai_policies.find_by(project_intake_id: nil)
       override = @workspace.studio_ai_policies.find_by(project_intake_id: @intake.id)
+
+      # An audited preference is not trusted solely because its current row
+      # looks permitted. Detect SQL-bypassed policy changes and broken revision
+      # chains on EVERY admission, including a restrictive project override.
+      # A broken or absent audit is a hard deny, never an implicit repair.
+      [defaults, override].compact.each do |policy|
+        begin
+          AiPolicyRevision.verify_chain!(policy: policy)
+        rescue SecurityError
+          raise Denied, "AI policy audit integrity check failed"
+        end
+      end
+
       unless defaults && AiPolicy::MODES.include?(defaults.mode) &&
              defaults.mode != "off" && defaults.purposes.include?(purpose)
         raise Denied, "Workspace policy does not allow offline assistance"
