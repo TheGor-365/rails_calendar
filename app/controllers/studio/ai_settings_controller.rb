@@ -12,16 +12,8 @@ module Studio
 
     # Explicit user action only. No background generation, file bytes or AI call.
     def preview
-      raw_ids = params[:source_ids]
-      unless raw_ids.nil? || raw_ids.is_a?(Array)
-        raise ArgumentError, "Invalid source selection"
-      end
-      source_ids = Array(raw_ids)
-      unless source_ids.length <= OfflineSourceSelector::MAX_SELECTED &&
-             source_ids.all? { |id| id.is_a?(String) &&
-               id.match?(/\A[1-9][0-9]{0,17}\z/) }
-        raise ArgumentError, "Invalid source selection"
-      end
+      source_ids = parsed_source_ids!
+      @selected_source_ids = source_ids
 
       @proposal = OfflineAiDispatcher.new(
         actor: current_user, workspace: @workspace, intake: @intake
@@ -33,6 +25,40 @@ module Studio
       load_policies
       @error = "Offline proposal rejected. Check active policies and source selection."
       render :show, status: :unprocessable_entity
+    end
+
+    # Second explicit action after preview: persist a verified, unapproved
+    # synthetic snapshot. Cannot accept raw output or cost from HTTP params.
+    def record_run
+      run = OfflineRunRecorder.new(
+        actor: current_user, workspace: @workspace, intake: @intake
+      ).record!(purpose: params[:purpose], source_ids: parsed_source_ids!)
+      redirect_to workspace_ai_settings_path(@workspace, @intake),
+                  notice: "Synthetic run version #{run.version} recorded for human review."
+    rescue ArgumentError, OfflineRunRecorder::Denied, OfflineAiDispatcher::Denied,
+           OfflineSourceSelector::Denied, AiBudgetAdmission::Denied,
+           ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
+      load_policies
+      @error = "Synthetic run rejected. Policies, output and metadata must be valid."
+      render :show, status: :unprocessable_entity
+    rescue SecurityError
+      head :not_found
+    end
+
+    # One explicit immutable owner decision; never approval of client scope.
+    def review_run
+      OfflineRunReviewer.new(
+        actor: current_user, workspace: @workspace, intake: @intake
+      ).review!(run_id: params[:run_id], decision: params[:decision])
+      redirect_to workspace_ai_settings_path(@workspace, @intake),
+                  notice: "Synthetic-only review decision recorded. No client artifact was approved."
+    rescue OfflineRunReviewer::Denied, ActiveRecord::RecordInvalid,
+           ActiveRecord::RecordNotUnique
+      load_policies
+      @error = "Synthetic review rejected. Decision must be new and authorized."
+      render :show, status: :unprocessable_entity
+    rescue ActiveRecord::RecordNotFound, SecurityError
+      head :not_found
     end
 
     def update
@@ -78,6 +104,33 @@ module Studio
         client_id: @intake.client_id, project_intake_id: @intake.id,
         state: "metadata_only"
       ).order(:id).limit(OfflineSourceSelector::MAX_SELECTED)
+
+      @run_entries = @workspace.studio_offline_runs.where(
+        client_id: @intake.client_id, project_intake_id: @intake.id
+      ).includes(:review).order(version: :desc).limit(10).map do |run|
+        begin
+          payload = run.verified_payload!
+          existing = run.review
+          existing.verify! if existing
+          { run: run, payload: payload, review: existing, verified: true }
+        rescue SecurityError
+          { run: run, verified: false }
+        end
+      end
+    end
+
+    def parsed_source_ids!
+      raw = params[:source_ids]
+      unless raw.nil? || raw.is_a?(Array)
+        raise ArgumentError, "Invalid source selection"
+      end
+      values = Array(raw)
+      unless values.length <= OfflineSourceSelector::MAX_SELECTED &&
+             values.all? { |id| id.is_a?(String) &&
+               id.match?(/\A[1-9][0-9]{0,17}\z/) }
+        raise ArgumentError, "Invalid source selection"
+      end
+      values.map(&:to_i)
     end
 
     def synthetic_only!

@@ -100,7 +100,51 @@
           0 external calls · $0 cost</p>
         <pre class="rc-studio-line"><%= @proposal.fetch(:text) %></pre>
         <p class="rc-hint">UNVERIFIED SYNTHETIC ONLY. No customer agreement, generated specification or approval.</p>
+        <%= form_with url: workspace_offline_runs_path(@workspace, @intake), method: :post, local: true do %>
+          <%= hidden_field_tag :purpose, @proposal.fetch(:purpose) %>
+          <% Array(@selected_source_ids).each do |source_id| %>
+            <%= hidden_field_tag "source_ids[]", source_id %>
+          <% end %>
+          <%= button_tag "Record this synthetic run for review", type: :submit,
+                         class: "rc-action rc-action--soft" %>
+        <% end %>
+
       </section>
+    <% end %>
+  </section>
+
+  <section class="surface-panel p-3 p-sm-4 mb-3" aria-label="Synthetic run history">
+    <h2 class="h4">Recorded offline runs</h2>
+    <p class="rc-hint">Stored synthetic templates only. Review confirms human inspection, not client approval. The latest 10 versions are shown; history is append-only.</p>
+    <% if @run_entries.empty? %>
+      <p class="rc-hint">No recorded synthetic runs.</p>
+    <% else %>
+      <ol class="rc-record-list">
+        <% @run_entries.each do |entry| %>
+          <li class="rc-record">
+            <% run = entry.fetch(:run) %>
+            <strong>Version <%= run.version %></strong> · <%= run.purpose.humanize %> ·
+            <%= run.recorded_at.utc.iso8601 %>
+            <% if entry.fetch(:verified) %>
+              <% payload = entry.fetch(:payload) %>
+              <p class="rc-hint">Verified synthetic version · <%= payload.fetch(:source_metadata_count) %> metadata sources · $0 · needs human review</p>
+              <pre class="rc-studio-line"><%= payload.fetch(:text) %></pre>
+              <% if entry[:review] %>
+                <p class="rc-hint">Owner decision: <%= entry.fetch(:review).decision.humanize %>. No client artifact approved.</p>
+              <% else %>
+                <%= form_with url: workspace_offline_run_review_path(@workspace, @intake, run.id), method: :post, local: true do %>
+                  <%= button_tag "Mark reviewed (synthetic only)", name: "decision",
+                        value: "reviewed_synthetic", type: :submit, class: "rc-action rc-action--soft rc-action--small" %>
+                  <%= button_tag "Discard synthetic run", name: "decision",
+                        value: "discarded_synthetic", type: :submit, class: "rc-action rc-action--soft rc-action--small" %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <p class="rc-notice rc-notice--error" role="alert">Integrity check failed. Output hidden; review disabled.</p>
+            <% end %>
+          </li>
+        <% end %>
+      </ol>
     <% end %>
   </section>
 

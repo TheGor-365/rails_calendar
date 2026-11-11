@@ -29,6 +29,12 @@ Rails.application.routes.draw do
   post "/workspaces/:workspace_id/project_intakes/:id/offline_proposal",
        to: "studio/ai_settings#preview", as: :workspace_offline_proposal
 
+  # RC-037 Slice H: explicit signed synthetic run + one owner review; nonproduction.
+  post "/workspaces/:workspace_id/project_intakes/:id/offline_runs",
+       to: "studio/ai_settings#record_run", as: :workspace_offline_runs
+  post "/workspaces/:workspace_id/project_intakes/:id/offline_runs/:run_id/review",
+       to: "studio/ai_settings#review_run", as: :workspace_offline_run_review
+
   # Owner-only Studio preview. No client access, persistence or AI calls.
   get "/workspaces/:workspace_id/project_intakes/:id/source_preview",
       to: "studio/source_previews#new", as: :workspace_source_preview
