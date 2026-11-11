@@ -10,7 +10,7 @@ module Studio
     }.freeze
 
     def initialize(actor:, workspace:, intake:)
-      @workspace, @intake = workspace, intake
+      @workspace, @intake, @actor = workspace, intake, actor
       @access = WorkspaceMemory::Access.new(actor: actor, workspace: workspace)
       @access.assert_owner!
       unless (Rails.env.test? ||
@@ -25,7 +25,7 @@ module Studio
       end
     end
 
-    def call(purpose:, data_class: "synthetic")
+    def call(purpose:, data_class: "synthetic", source_ids: [])
       @access.assert_owner!
       raise Denied, "Unsupported purpose" unless AiPolicy::PURPOSES.include?(purpose)
       raise Denied, "Sensitive or unidentified content denied" unless data_class == "synthetic"
@@ -38,6 +38,10 @@ module Studio
       if override && (override.mode == "off" || !override.purposes.include?(purpose))
         raise Denied, "Project policy restricts AI assistance"
       end
+
+      selected = OfflineSourceSelector.new(
+        actor: @actor, workspace: @workspace, intake: @intake
+      ).select!(source_ids: source_ids)
 
       requested = if defaults.mode == "reviewed_provider" &&
                      (override.nil? || override.mode == "reviewed_provider")
@@ -54,8 +58,7 @@ module Studio
         provider_requested: requested,
         provider_executed: "offline_template",
         input_classification: "UNVERIFIED_SYNTHETIC_ONLY",
-        source_metadata_count: @workspace.project_sources.where(
-          project_intake_id: @intake.id).count,
+        source_metadata_count: selected.size,
         text: OfflineTemplateRegistry.render!(purpose: purpose),
         external_calls: 0,
         tokens_billed: 0,

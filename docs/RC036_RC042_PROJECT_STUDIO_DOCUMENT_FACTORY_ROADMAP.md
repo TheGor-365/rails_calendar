@@ -218,3 +218,8 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-037 Slice C — typed offline output contract (2026-11-11)
 - Added immutable `Studio::OfflineTemplateRegistry` and strict `Studio::OfflineOutputContract`; dispatcher now validates all locally generated responses. Must remain synthetic/unverified/offline with zero network calls, billing or auto-approval. Reject unknown keys, injected provider output, unreviewed templates and faked provenance. No external model was invoked.
 - [Slice C runbook](RC037_SLICE_C_OFFLINE_OUTPUT_CONTRACT.md). This is deterministic template validation, **not** a complete approved paid-model response pipeline.
+
+
+## RC-037 Slice D — explicit source selection without private retrieval (2026-11-11)
+- Added `Studio::OfflineSourceSelector`: owner scoped, <=10 explicit unique integer IDs, matching workspace+client+intake and metadata_only state, denied foreign/missing/duplicate/revoked. Offline dispatcher now counts only selected synthetic source metadata. No body/URL/object key is read or supplied to a provider.
+- [Slice D runbook](RC037_SLICE_D_SOURCE_SELECTION.md); not RAG/content retrieval or client-data authorization. Encrypted durable storage, consent and approved provider policy remain unimplemented.
