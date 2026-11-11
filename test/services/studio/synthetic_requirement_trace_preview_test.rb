@@ -76,7 +76,7 @@ class StudioSyntheticRequirementTracePreviewTest < ActiveSupport::TestCase
     refute_includes result.to_json, '"search"'
   end
 
-  test "clarification and exclusion block outline readiness and omit excluded trace" do
+  test "explicit exclusion removes one trace without blocking the safe retained subset" do
     comparison = reconcile
     items = comparison.fetch("comparisons")
     review(comparison, items.first, "retain_for_review")
@@ -84,6 +84,20 @@ class StudioSyntheticRequirementTracePreviewTest < ActiveSupport::TestCase
 
     result = trace(comparison)
     assert_equal 1, result.fetch("retained_trace_count")
+    assert_equal 1, result.dig("resolution_counts", "exclude_from_draft")
+    assert_equal true, result.fetch("eligible_for_unapproved_synthetic_outline_review")
+    assert_equal false, result.fetch("document_generation_allowed")
+  end
+
+  test "needs information blocks even an otherwise retained synthetic candidate" do
+    comparison = reconcile
+    items = comparison.fetch("comparisons")
+    review(comparison, items.first, "retain_for_review")
+    review(comparison, items.last, "needs_information")
+
+    result = trace(comparison)
+    assert_equal 1, result.fetch("retained_trace_count")
+    assert_equal 1, result.dig("resolution_counts", "needs_information")
     assert_equal false, result.fetch("eligible_for_unapproved_synthetic_outline_review")
     assert_equal false, result.fetch("document_generation_allowed")
   end
