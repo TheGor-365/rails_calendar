@@ -254,6 +254,6 @@ input[type="checkbox"],input[type="radio"] { accent-color: var(--rc-accent); }
 .rc-studio-dropzone input[type="file"] { display: block; max-width: 100%; margin-top: .6rem; }
 .rc-studio-progress { display: flex; gap: .5rem; flex-wrap: wrap; margin: .7rem 0; }
 .rc-studio-chip { padding: .35rem .65rem; border-radius: 999px; background: #e7f7f4; color: #0a766d; font-size: .8rem; }
-.rc-studio-line { overflow-wrap: anywhere; }
+.rc-studio-line { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
 @media (max-width: 575.98px) { .rc-studio-dropzone { padding: 1rem; } }
 @media (prefers-reduced-motion: reduce) { .rc-studio-dropzone { transition: none; } }

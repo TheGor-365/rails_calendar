@@ -249,3 +249,9 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-037 Slice H — immutable synthetic offline run ledger and owner review (2026-11-11)
 - Added two PostgreSQL tenant-scoped append-only entities: versioned `Studio::OfflineRun` (limit 25/intake, project row lock, unique version) and signed one-per-run `Studio::OfflineRunReview` with `reviewed_synthetic` / `discarded_synthetic` decisions. Strictly fixed synthetic output contract, input metadata SHA256, HMAC integrity verification and composite workspace/client/intake foreign keys. No customer data, real provider, billable tokens, approvals or auto-execution.
 - Added separate owner-only POST to record the existing ephemeral Slice G preview, and POST for an explicit review decision. Settings page displays last 10 verified synthetic versions; tampered data is hidden and cannot be reviewed. Synthetic-only production 404 unchanged. [Slice H runbook](RC037_SLICE_H_OFFLINE_RUN_LEDGER.md). Manual browser and full production readiness are NOT established by automated tests.
+
+
+## RC-037 security and mobile acceptance (2026-11-11)
+- Added targeted Selenium owner path at 320/390/430px, with no horizontal overflow, preview→versioned run→synthetic-only review, denied-policy and corrupted-signature checks; updated fixed-template `<pre>` wrapping for narrow screens.
+- Added `bin/rc037-local-acceptance` (localhost `ruby_calendar_test` only, reject production/remote and unknown args) with `--check-only` and negative guard tests. It runs synthetic Rails and Chrome system tests; does not certify owner's actual Linux Mint run until user executes it.
+- [RC-037 release gates/owner acceptance runbook](RC037_OWNER_ACCEPTANCE_RELEASE_GATES_2026-11-11.md) records infrastructure blockers and evidence requirements, including official antivirus signatures, encrypted durable store, DB+blob backup AND restore, legal consent and separate deploy approval. **Production blocked.**

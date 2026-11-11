@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+# RC-037 local acceptance: only a dedicated localhost PostgreSQL test database.
+# No production changes, customer files, external AI providers or billable calls.
+require "json"
+require "open3"
+require "rbconfig"
+require "uri"
+
+root = File.expand_path("..", __dir__)
+url = ENV["RC_LOCAL_TEST_DATABASE_URL"].to_s
+host = ENV.fetch("PGHOST", "localhost")
+uri = begin
+  URI.parse(url)
+rescue URI::InvalidURIError
+  nil
+end
+
+local_hosts = %w[localhost 127.0.0.1 ::1]
+safe = uri &&
+  %w[postgres postgresql].include?(uri.scheme) &&
+  local_hosts.include?(uri.host) &&
+  uri.path == "/ruby_calendar_test" &&
+  uri.user && !uri.user.empty? &&
+  uri.query.nil? && uri.fragment.nil? &&
+  local_hosts.include?(host) &&
+  ENV["DATABASE_URL"].to_s.empty? &&
+  ENV["RAILS_ENV"] != "production" &&
+  ENV["RACK_ENV"] != "production"
+
+unless safe
+  warn "REFUSED: use only RC_LOCAL_TEST_DATABASE_URL on localhost/ruby_calendar_test; remove DATABASE_URL and production environment flags"
+  puts JSON.generate(status: "REFUSED", test_database_only: true,
+                     production_ready: false, external_ai_permitted: false)
+  exit 2
+end
+
+if ARGV == ["--check-only"]
+  puts JSON.generate(status: "READY", test_database_only: true,
+                     production_ready: false, external_ai_permitted: false)
+  exit 0
+elsif !ARGV.empty?
+  warn "REFUSED: unsupported arguments; only --check-only is permitted"
+  exit 2
+end
+
+environment = {
+  "RAILS_ENV" => "test",
+  "RACK_ENV" => "test",
+  "RC_STUDIO_AI_OFFLINE" => "true",
+  "RC_STUDIO_QUARANTINE_BACKEND" => "disk",
+  "RC_STUDIO_S3_INTEGRATION_TEST" => "false"
+}
+steps = [
+  ["prepare_disposable_test_db", ["bin/rails", "db:prepare"]],
+  ["rc037_model_and_http", [
+    "bin/rails", "test",
+    "test/models/studio/offline_run_ledger_test.rb",
+    "test/models/studio/ai_policy_revision_test.rb",
+    "test/services/studio/ai_budget_admission_test.rb",
+    "test/services/studio/offline_golden_evaluation_test.rb",
+    "test/controllers/studio/ai_settings_http_test.rb",
+    "test/controllers/studio/offline_proposal_http_test.rb",
+    "test/controllers/studio/offline_run_http_test.rb"
+  ]],
+  ["rc037_chrome_mobile_320_390_430", [
+    "bin/rails", "test:system", "test/system/studio_offline_review_flow_test.rb"
+  ]]
+]
+
+steps.each do |name, argv|
+  stdout, stderr, result = Open3.capture3(
+    environment, RbConfig.ruby, *argv, chdir: root
+  )
+  warn stdout unless stdout.empty?
+  warn stderr unless stderr.empty?
+  unless result.success?
+    puts JSON.generate(status: "FAIL", failed_step: name,
+                       test_database_only: true, production_ready: false)
+    exit 1
+  end
+end
+
+puts JSON.generate(status: "PASS", mode: "rc037-test-db-offline",
+                   chromium_system_test: true, tested_viewports_px: [320, 390, 430],
+                   local_host_only: true, external_ai_permitted: false,
+                   real_client_files_permitted: false, production_ready: false)
