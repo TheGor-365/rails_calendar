@@ -51,7 +51,9 @@ module Studio
       # Row lock serializes duplicate/conflicting attempts. One immutable
       # decision per source-pair fingerprint and candidate ID; revised content
       # creates a new digest and a separate review event.
-      @workspace.project_intakes.where(client_id: client.id).lock.find(intake.id).with_lock do
+      @workspace.project_intakes.where(client_id: client.id).find(intake.id).with_lock do
+        @access.assert_owner! # recheck after acquiring transaction lock
+        @access.assert_client!(client)
         scope = @workspace.studio_synthetic_review_decisions.where(
           project_intake_id: intake.id, comparison_digest: expected_digest,
           incoming_fact_id: incoming_fact_id
@@ -63,16 +65,16 @@ module Studio
                  existing.incoming_source_id == comparison.fetch("incoming_source_id")
             raise Conflict, "Immutable triage decision already exists"
           end
-          return receipt(existing)
+          receipt(existing)
+        else
+          row = scope.create!(
+            client: client, baseline_source_id: comparison.fetch("baseline_source_id"),
+            incoming_source_id: comparison.fetch("incoming_source_id"),
+            reviewed_by: @actor, candidate_state: state,
+            resolution: resolution, reviewed_at: Time.current
+          )
+          receipt(row)
         end
-
-        row = scope.create!(
-          client: client, baseline_source_id: comparison.fetch("baseline_source_id"),
-          incoming_source_id: comparison.fetch("incoming_source_id"),
-          reviewed_by: @actor, candidate_state: state,
-          resolution: resolution, reviewed_at: Time.current
-        )
-        receipt(row)
       end
     rescue ActiveRecord::RecordNotFound
       raise Denied, "Scoped project not found"
