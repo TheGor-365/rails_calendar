@@ -19,6 +19,12 @@ Rails.application.routes.draw do
   patch "/project_intakes/:project_intake_id/quiz/adaptive/:question_key",
         to: "adaptive_intake_quizzes#update", as: :adaptive_project_intake_quiz_answer
 
+  # RC-037: explicit owner-only offline preference controls (nonproduction).
+  get "/workspaces/:workspace_id/project_intakes/:id/ai_settings",
+      to: "studio/ai_settings#show", as: :workspace_ai_settings
+  patch "/workspaces/:workspace_id/project_intakes/:id/ai_settings",
+        to: "studio/ai_settings#update"
+
   # Owner-only Studio preview. No client access, persistence or AI calls.
   get "/workspaces/:workspace_id/project_intakes/:id/source_preview",
       to: "studio/source_previews#new", as: :workspace_source_preview

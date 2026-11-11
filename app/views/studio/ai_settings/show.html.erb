@@ -1,0 +1,52 @@
+<div class="container my-4 my-sm-5">
+  <header class="rc-page-hero mb-3">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow">PROJECT STUDIO / RC-037 · PROJECT CONTROLS</p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-shield-lock"></i></span>
+        <h1 class="page-title">Offline AI settings</h1>
+      </div>
+      <p class="rc-muted"><%= @intake.title %> · <%= @workspace.name %></p>
+      <p class="rc-hint">Synthetic test / explicitly enabled local development only. External AI, real client content and paid providers stay disabled. Nothing runs automatically.</p>
+    </div>
+  </header>
+
+  <% if @error.present? %>
+    <p class="rc-notice rc-notice--error" role="alert"><%= @error %></p>
+  <% end %>
+
+  <% [["workspace", @workspace_policy, "Workspace policy", "Workspace off cannot be overridden by a project."],
+      ["project", @project_policy, "Project restriction", "A project may only narrow what the workspace permits."]].each do |scope, policy, heading, hint| %>
+    <section class="surface-panel p-3 p-sm-4 mb-3" aria-label="<%= heading %>">
+      <h2 class="h4"><%= heading %></h2>
+      <p class="rc-hint"><%= hint %></p>
+      <%= form_with url: workspace_ai_settings_path(@workspace, @intake), method: :patch, local: true do %>
+        <%= hidden_field_tag :target, scope %>
+        <div class="rc-field mb-3">
+          <%= label_tag "#{scope}_mode", "AI mode", class: "rc-field-label" %>
+          <%= select_tag :mode,
+                options_for_select([["Disabled", "off"], ["Local deterministic templates only", "offline"]], policy&.mode.in?(%w[off offline]) ? policy.mode : "off"),
+                id: "#{scope}_mode", class: "rc-input" %>
+        </div>
+        <fieldset class="mb-3">
+          <legend class="h6">Allowlisted offline purposes</legend>
+          <% Studio::AiPolicy::PURPOSES.each do |purpose| %>
+            <div class="form-check mb-2">
+              <%= check_box_tag "purposes[]", purpose, policy&.purposes&.include?(purpose),
+                    id: "#{scope}_purpose_#{purpose}", class: "form-check-input" %>
+              <%= label_tag "#{scope}_purpose_#{purpose}", purpose.humanize, class: "form-check-label" %>
+            </div>
+          <% end %>
+        </fieldset>
+        <%= button_tag "Save offline preference", type: :submit, class: "rc-action rc-action--primary" %>
+      <% end %>
+    </section>
+  <% end %>
+
+  <section class="surface-panel p-3 p-sm-4" aria-label="AI security limits">
+    <h2 class="h5">Security and cost limits</h2>
+    <p class="rc-hint">Production AI: disabled. External AI: disabled. Automatic approval: disabled. Actual provider calls: 0. Spending: $0. These preferences do not constitute client consent or approval to process customer files.</p>
+    <%= link_to "Return to source preview", workspace_source_preview_path(@workspace, @intake),
+                class: "rc-action rc-action--soft rc-action--small", data: { turbo_frame: "_top" } %>
+  </section>
+</div>

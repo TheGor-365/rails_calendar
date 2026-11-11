@@ -208,3 +208,8 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-037 Slice A — scoped offline AI policy foundation (2026-11-11)
 - Stacked Draft PR on RC-036: synthetic-only `studio_ai_policies` with project override, workspace hard-deny and PG composite tenant FK; `Studio::OfflineAiDispatcher` returns unapproved static offline proposal with zero external provider calls and zero billing. Project cannot escalate workspace restrictions; reviewed provider stays unavailable.
 - Test suite for foreign/revoked owner, invalid classes and purposes, duplicate defaults and forged tenant SQL. [Slice A runbook](RC037_SLICE_A_OFFLINE_AI_POLICY.md). Full RC-037 dispatch/structured outputs/budget enforcement and UI remain future work.
+
+
+## RC-037 Slice B — White Atlas offline AI Settings (2026-11-11)
+- Added local/test-only owner-scoped Project Controls UI (two forms: workspace default and restrictive project override), GET/PATCH routes with production 404 and no-store headers, allowlisted offline purposes. No provider, consent or spending mass assignment, no auto-execution. Existing source preview has a navigational link.
+- New HTTP tests verify form settings, hostile parameters, tenant IDOR, revoked owner, hard production-deny, zero-dollar dispatcher. [Slice B runbook](RC037_SLICE_B_OFFLINE_SETTINGS_UI.md). Actual visual/a11y acceptance on owner device pending.
