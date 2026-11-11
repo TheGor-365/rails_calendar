@@ -62,7 +62,7 @@ class StudioOfflineAiDispatcherTest < ActiveSupport::TestCase
     assert_raises(SecurityError) do
       Studio::OfflineAiDispatcher.new(actor: @outsider, workspace: @workspace, intake: @intake)
     end
-    assert_raises(Studio::OfflineAiDispatcher::Denied) do
+    assert_raises(SecurityError) do
       Studio::OfflineAiDispatcher.new(actor: @owner, workspace: @foreign, intake: @intake)
     end
     active = dispatcher
