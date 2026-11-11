@@ -213,3 +213,8 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-037 Slice B — White Atlas offline AI Settings (2026-11-11)
 - Added local/test-only owner-scoped Project Controls UI (two forms: workspace default and restrictive project override), GET/PATCH routes with production 404 and no-store headers, allowlisted offline purposes. No provider, consent or spending mass assignment, no auto-execution. Existing source preview has a navigational link.
 - New HTTP tests verify form settings, hostile parameters, tenant IDOR, revoked owner, hard production-deny, zero-dollar dispatcher. [Slice B runbook](RC037_SLICE_B_OFFLINE_SETTINGS_UI.md). Actual visual/a11y acceptance on owner device pending.
+
+
+## RC-037 Slice C — typed offline output contract (2026-11-11)
+- Added immutable `Studio::OfflineTemplateRegistry` and strict `Studio::OfflineOutputContract`; dispatcher now validates all locally generated responses. Must remain synthetic/unverified/offline with zero network calls, billing or auto-approval. Reject unknown keys, injected provider output, unreviewed templates and faked provenance. No external model was invoked.
+- [Slice C runbook](RC037_SLICE_C_OFFLINE_OUTPUT_CONTRACT.md). This is deterministic template validation, **not** a complete approved paid-model response pipeline.

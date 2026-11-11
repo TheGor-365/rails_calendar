@@ -45,8 +45,9 @@ module Studio
                   else
                     "offline"
                   end
-      {
+      result = {
         schema_version: VERSION,
+        template_version: OfflineTemplateRegistry::VERSION,
         status: "needs_human_review",
         purpose: purpose,
         mode_executed: "offline",
@@ -55,12 +56,13 @@ module Studio
         input_classification: "UNVERIFIED_SYNTHETIC_ONLY",
         source_metadata_count: @workspace.project_sources.where(
           project_intake_id: @intake.id).count,
-        text: "Synthetic internal outline. Sources and requirements remain unverified. A human must review and approve.",
+        text: OfflineTemplateRegistry.render!(purpose: purpose),
         external_calls: 0,
         tokens_billed: 0,
         billable_usd: 0,
         auto_approved: false
       }
+      OfflineOutputContract.validate!(result)
     end
   end
 end
