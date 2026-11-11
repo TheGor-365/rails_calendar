@@ -61,8 +61,10 @@ class StudioSyntheticSourceNormalizerTest < ActiveSupport::TestCase
 
   test "duplicate JSON keys and stale source bytes do not yield facts" do
     bad = '{"role":"reader","role":"admin"}'
-    src = register(@registry, @client, @intake, "test.json", bad)
-    assert_raises(ArgumentError) { normalize(src, bad, filename: "test.json") }
+    # The existing SourceInspector already rejects duplicates before registration.
+    assert_raises(ArgumentError) do
+      register(@registry, @client, @intake, "test.json", bad)
+    end
     assert_raises(Studio::SyntheticSourceNormalizer::Denied) do
       normalize(@source, "# Replaced fixture\n")
     end
