@@ -189,7 +189,7 @@ class Rc036LocalSmokeTest < ActionDispatch::IntegrationTest
   test "archive signature cannot be smuggled as markdown into quarantine" do
     sign_in(@owner)
     before_count = ProjectSourceBlob.count
-    post_source("PK\\x03\\x04test".b, ".md")
+    post_source([0x50, 0x4b, 0x03, 0x04].pack("C*") + "test", ".md")
     assert_response :unprocessable_entity
     assert_equal before_count, ProjectSourceBlob.count
   end
