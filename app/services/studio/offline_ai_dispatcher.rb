@@ -30,25 +30,17 @@ module Studio
       raise Denied, "Unsupported purpose" unless AiPolicy::PURPOSES.include?(purpose)
       raise Denied, "Sensitive or unidentified content denied" unless data_class == "synthetic"
 
-      defaults = @workspace.studio_ai_policies.find_by(project_intake_id: nil)
-      override = @workspace.studio_ai_policies.find_by(project_intake_id: @intake.id)
-      unless defaults && defaults.mode != "off" && defaults.purposes.include?(purpose)
-        raise Denied, "Workspace policy disallows AI assistance"
-      end
-      if override && (override.mode == "off" || !override.purposes.include?(purpose))
-        raise Denied, "Project policy restricts AI assistance"
-      end
-
+      admission = AiBudgetAdmission.new(
+        actor: @actor, workspace: @workspace, intake: @intake
+      ).admit!(
+        purpose: purpose, data_class: data_class, provider: "offline_template",
+        estimated_tokens: 0, estimated_usd: 0
+      )
       selected = OfflineSourceSelector.new(
         actor: @actor, workspace: @workspace, intake: @intake
       ).select!(source_ids: source_ids)
+      requested = admission.fetch(:requested_mode)
 
-      requested = if defaults.mode == "reviewed_provider" &&
-                     (override.nil? || override.mode == "reviewed_provider")
-                    "reviewed_provider_unavailable"
-                  else
-                    "offline"
-                  end
       result = {
         schema_version: VERSION,
         template_version: OfflineTemplateRegistry::VERSION,
@@ -66,6 +58,8 @@ module Studio
         auto_approved: false
       }
       OfflineOutputContract.validate!(result)
+    rescue AiBudgetAdmission::Denied
+      raise Denied, "Offline AI budget admission denied"
     end
   end
 end

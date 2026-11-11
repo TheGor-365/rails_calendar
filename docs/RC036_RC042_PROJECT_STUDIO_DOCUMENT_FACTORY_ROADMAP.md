@@ -227,3 +227,7 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-037 Slice E / phase 1 — append-only policy audit (2026-11-11)
 - Added model-level immutable `Studio::AiPolicyRevision` rows with sequential HMAC-linked versions and a tenant-composite policy FK, scoped intake FK, actor attribution for owner UI, and explicit `internal_unattributed` marker for model writes without an actor. No email, prompts or source bytes in snapshots.
 - `Studio::AiPolicy` now appends policy revisions transactionally for meaningful create/change; unchanged saves are not audited as changes. Direct SQL and DB administrators can bypass Rails callbacks, so independent backup/role hardening remain mandatory; do not claim this is tamper-proof storage.
+
+## RC-037 Slice E / phase 2 — zero-paid AI admission + golden tests (2026-11-11)
+- `Studio::AiBudgetAdmission` guards owner/tenant/purpose/data-class/production status and permits only `offline_template` with **zero estimated tokens and USD**. Persisted positive spending ceilings or external consent cannot permit a billable provider. Dispatcher calls gate before source selection. No API integration, token or budget reservation with real providers.
+- Added independent static golden YAML expected outputs for 3 purposes and adversarial synthetic intake prompt injection fixture. [Slice E runbook](RC037_SLICE_E_AUDIT_BUDGET_GOLDEN.md); nonprod only and no customer/production claims.

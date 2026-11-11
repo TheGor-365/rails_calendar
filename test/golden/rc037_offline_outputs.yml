@@ -1,0 +1,9 @@
+schema_version: rc037-offline-deterministic-v1
+template_version: rc037-static-templates-v1
+cases:
+  - purpose: clarify
+    expected_text: "Synthetic clarification checklist: confirm stakeholders, intended outcomes, scope exclusions and acceptance evidence. Unverified until a human reviews."
+  - purpose: source_outline
+    expected_text: "Synthetic source inventory outline: cross-check each source format, checksum, attribution, review status and missing evidence. No source text was retrieved."
+  - purpose: document_proposal
+    expected_text: "Synthetic document proposal: draft brief, requirements, architecture, QA and release plan only after source verification and explicit approval."
