@@ -42,6 +42,8 @@ class StudioOfflineAiDispatcherTest < ActiveSupport::TestCase
     assert_equal "0.000000", first.fetch(:usd)
     assert_equal 0, first.fetch(:tokens)
     assert_equal 0, first.fetch(:external_calls)
+    assert_equal 1, @ws.studio_ai_execution_receipts.count
+    assert_equal first.fetch(:receipt_id), @ws.studio_ai_execution_receipts.first.id
   end
 
   test "project override may deny but cannot enable a disabled workspace" do
@@ -134,6 +136,41 @@ class StudioOfflineAiDispatcherTest < ActiveSupport::TestCase
     }])
     assert_equal "invalid_policy",
       dispatcher.call(purpose: "document_plan", data_class: "synthetic").fetch(:reason)
+  end
+
+  test "only the nonbillable registry model is available" do
+    entry = Studio::AiModelRegistry.lookup(purpose: "document_plan", data_class: "synthetic")
+    assert_equal "none", entry.fetch(:provider)
+    assert_equal false, entry.fetch(:external)
+    assert_equal false, entry.fetch(:billable)
+    assert_nil Studio::AiModelRegistry.lookup(purpose: "document_plan", data_class: "client_private")
+    assert_equal ["offline_document_plan_v1"], Studio::AiModelRegistry.list.map { |model| model.fetch(:key) }
+  end
+
+  test "offline zero reservations are append-only, scoped and idempotent" do
+    allow_workspace!
+    one = dispatcher.call(purpose: "document_plan", data_class: "synthetic",
+                          evidence: { "source_inspected" => true })
+    two = dispatcher.call(purpose: "document_plan", data_class: "synthetic",
+                          evidence: { "source_inspected" => true })
+    assert_equal one.fetch(:receipt_id), two.fetch(:receipt_id)
+    assert_equal 1, @ws.studio_ai_execution_receipts.count
+    receipt = @ws.studio_ai_execution_receipts.first
+    assert_equal 0, receipt.tokens_reserved
+    assert_equal 0, receipt.tokens_used
+    assert_equal 0, receipt.usd_reserved
+    assert_equal 0, receipt.usd_used
+    assert_not receipt.update(state: "running")
+    assert_not receipt.destroy
+    assert_raises(ActiveRecord::InvalidForeignKey) do
+      Studio::AiExecutionReceipt.insert_all!([{
+        workspace_id: @ws.id, project_intake_id: @other_intake.id,
+        requested_by_id: @owner.id, request_fingerprint: "b" * 64,
+        purpose: "document_plan", registry_key: "offline_document_plan_v1",
+        state: "completed_offline", completed_at: Time.current,
+        created_at: Time.current, updated_at: Time.current
+      }])
+    end
   end
 
   private

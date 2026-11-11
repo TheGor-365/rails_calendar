@@ -39,10 +39,16 @@ module Studio
 
       # A caller may supply only boolean evidence claims. This output is a
       # PROPOSAL, not validation, consent, source-derived fact or approval.
+      model = AiModelRegistry.lookup(purpose: purpose, data_class: data_class)
+      return denied("model_unavailable") unless model
       plan = DocumentGenerationPlan.new.call(evidence: evidence)
+      receipt = AiExecutionReceipt.record_offline!(
+        actor: @actor, workspace: @workspace, intake: @intake,
+        purpose: purpose, evidence: evidence, registry_key: model.fetch(:key)
+      )
       {
         schema_version: VERSION, status: "offline_proposal", reason: nil,
-        provider: "none", model: "deterministic_document_plan_v1",
+        provider: "none", model: model.fetch(:key), receipt_id: receipt.id,
         external_calls: 0, tokens: 0, usd: "0.000000",
         source_bytes_accessed: false, human_review_required: true,
         production_ready: false, output: plan
