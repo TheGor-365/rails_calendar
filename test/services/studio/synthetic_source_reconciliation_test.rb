@@ -111,6 +111,19 @@ class StudioSyntheticSourceReconciliationTest < ActiveSupport::TestCase
     end
   end
 
+  test "identical text at another JSON pointer never corroborates an unrelated fact" do
+    old_body = '{"project":"same text"}'
+    new_body = '{"budget":"same text"}'
+    a = source(@registry, @client, @intake, "old.json", old_body)
+    b = source(@registry, @client, @intake, "new.json", new_body)
+    result = reconcile(a, b)
+    assert_equal "unknown", result.fetch("comparisons").first.fetch("state")
+    assert_equal "same_text_different_locator",
+                 result.fetch("comparisons").first.fetch("reason_code")
+    assert_equal 0, result.dig("counts", "corroborates")
+    assert_equal 0, result.fetch("automatic_supersedes")
+  end
+
   private
 
   def reconcile(a, b)

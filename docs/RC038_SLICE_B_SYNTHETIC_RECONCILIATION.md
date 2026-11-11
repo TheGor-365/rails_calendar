@@ -8,12 +8,12 @@ The owner-only service \`Studio::SyntheticSourceReconciliation\` accepts two exa
 
 For each incoming unverified fact candidate it returns one of:
 
-- \`corroborates\`: exact normalized value and type matched a previous claim; **not verified**, approved or a substitute for client confirmation.
+- \`corroborates\`: exact normalized value, type and source locator matched a previous claim; **not verified**, approved or a substitute for client confirmation.
 - \`conflicts\`: differing claim of the same type at the same source locator with complete available coverage; human investigation required.
 - \`new\`: not observed in a complete baseline; not a verified new requirement.
 - \`unknown\`: null, previous unknown, changed type or incomplete evidence. Incomplete baseline never licenses an absence claim.
 
-The comparison uses exact claim identity (only whitespace normalized) and consumes baseline matches to avoid reusing one claim for multiple incoming duplicates. Locator changes are not silently treated as supersession. The report includes deterministic fingerprint, source IDs, aggregate counts and references to candidate IDs/line locators; it **does not copy source text** into the comparison output. Missing baseline claims are counted only, never deleted or automatically superseded. All statuses are proposals with mandatory human review; costs and external calls are zero.
+The comparison uses exact claim identity (only whitespace normalized) and consumes baseline matches to avoid reusing one claim for multiple incoming duplicates. Locator changes, even with identical text (for example a different JSON key), are classified as unknown rather than corroboration or supersession. The report includes deterministic fingerprint, source IDs, aggregate counts and references to candidate IDs/line locators; it **does not copy source text** into the comparison output. Missing baseline claims are counted only, never deleted or automatically superseded. All statuses are proposals with mandatory human review; costs and external calls are zero.
 
 ## Proof and exclusions
 

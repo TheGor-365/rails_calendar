@@ -38,9 +38,17 @@ module Studio
       complete = older.fetch("coverage") == "complete" && newer.fetch("coverage") == "complete"
       comparisons = new_facts.map do |fact|
         segment = new_segments.fetch(fact.fetch("source_segment_id"))
-        identical = Array(matches_by_value[key(fact.fetch("type"), fact.fetch("value"))])
-                    .find { |candidate| !consumed.include?(candidate.fetch("id")) &&
-                      candidate.fetch("status") != "unknown" }
+        same_value = Array(matches_by_value[key(fact.fetch("type"), fact.fetch("value"))])
+                     .reject { |candidate| consumed.include?(candidate.fetch("id")) }
+        identical = same_value.find { |candidate|
+          candidate.fetch("status") != "unknown" &&
+            old_segments.fetch(candidate.fetch("source_segment_id")).fetch("locator") ==
+              segment.fetch("locator")
+        }
+        relocated = same_value.any? { |candidate|
+          old_segments.fetch(candidate.fetch("source_segment_id")).fetch("locator") !=
+            segment.fetch("locator")
+        }
         at_locator = Array(matches_by_locator[segment.fetch("locator")])
                      .find { |candidate| !consumed.include?(candidate.fetch("id")) }
 
@@ -51,6 +59,8 @@ module Studio
             ["corroborates", "exact_claim_match_not_verification", identical]
           elsif !complete
             ["unknown", "partial_evidence_no_absence_claim", at_locator]
+          elsif relocated
+            ["unknown", "same_text_different_locator", at_locator]
           elsif at_locator && at_locator.fetch("status") == "unknown"
             ["unknown", "previous_value_unknown", at_locator]
           elsif at_locator && at_locator.fetch("type") == fact.fetch("type")
