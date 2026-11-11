@@ -106,14 +106,18 @@ class StudioSyntheticReviewTriageTest < ActiveSupport::TestCase
     report = preview
     candidate = report.fetch("comparisons").first
     assert_raises(ActiveRecord::InvalidForeignKey) do
-      Studio::SyntheticReviewDecision.insert_all!([{
-        workspace_id: @foreign.id, client_id: @client.id, project_intake_id: @intake.id,
-        baseline_source_id: @a.fetch(:source_id), incoming_source_id: @b.fetch(:source_id),
-        reviewed_by_id: @owner.id, comparison_digest: report.fetch("comparison_digest"),
-        incoming_fact_id: candidate.fetch("incoming_fact_id"), candidate_state: "unknown",
-        resolution: "needs_information", reviewed_at: Time.current,
-        created_at: Time.current, updated_at: Time.current
-      }])
+      # A rejected PostgreSQL statement poisons the surrounding transaction.
+      # Roll back the expected violation to a savepoint before further SQL.
+      Studio::SyntheticReviewDecision.transaction(requires_new: true) do
+        Studio::SyntheticReviewDecision.insert_all!([{
+          workspace_id: @foreign.id, client_id: @client.id, project_intake_id: @intake.id,
+          baseline_source_id: @a.fetch(:source_id), incoming_source_id: @b.fetch(:source_id),
+          reviewed_by_id: @owner.id, comparison_digest: report.fetch("comparison_digest"),
+          incoming_fact_id: candidate.fetch("incoming_fact_id"), candidate_state: "unknown",
+          resolution: "needs_information", reviewed_at: Time.current,
+          created_at: Time.current, updated_at: Time.current
+        }])
+      end
     end
     assert_equal 0, Studio::SyntheticReviewDecision.count
   end
