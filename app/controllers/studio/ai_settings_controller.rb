@@ -19,7 +19,7 @@ module Studio
       source_ids = Array(raw_ids)
       unless source_ids.length <= OfflineSourceSelector::MAX_SELECTED &&
              source_ids.all? { |id| id.is_a?(String) &&
-               id.match?(/\\A[1-9][0-9]{0,17}\\z/) }
+               id.match?(/\A[1-9][0-9]{0,17}\z/) }
         raise ArgumentError, "Invalid source selection"
       end
 
