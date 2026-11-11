@@ -26,7 +26,8 @@ class StudioAiSettingsHttpTest < ActionDispatch::IntegrationTest
     get path
     assert_response :success
     assert_select "h1", "Offline AI settings"
-    assert_select "form", 2
+    assert_select "section[aria-label='Workspace policy'] form", 1
+    assert_select "section[aria-label='Project restriction'] form", 1
     assert_match(/no-store/, response.headers.fetch("Cache-Control"))
     assert_equal "no-referrer", response.headers.fetch("Referrer-Policy")
     assert_equal "nosniff", response.headers.fetch("X-Content-Type-Options")
