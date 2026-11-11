@@ -129,8 +129,6 @@
         <p class="eyebrow">SECURE WORKFLOW</p>
         <h2 class="h5">Source → Review → Documents</h2>
         <p class="rc-hint">The full private storage, invitation and document export pipeline is scheduled for RC-036–040. Do not upload genuine client secrets or personal documents to this preview.</p>
-        <%= link_to "Configure offline AI policy", workspace_ai_settings_path(@workspace, @intake),
-                    class: "rc-action rc-action--soft rc-action--small mt-2", data: { turbo_frame: "_top" } %>
         <%= link_to "Return to project draft", project_intake_path(@intake),
                     class: "rc-action rc-action--soft rc-action--small mt-2", data: { turbo_frame: "_top" } %>
       </section>

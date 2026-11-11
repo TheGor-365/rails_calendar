@@ -1,8 +1,6 @@
 class Workspace < ApplicationRecord
   belongs_to :owner_user, class_name: "User"
   has_many :workspace_memberships, dependent: :restrict_with_exception
-  has_many :studio_ai_policies, class_name: "Studio::AiPolicy", dependent: :restrict_with_exception
-  has_many :studio_ai_execution_receipts, class_name: "Studio::AiExecutionReceipt", dependent: :restrict_with_exception
   has_many :clients, dependent: :restrict_with_exception
   has_many :project_intakes, dependent: :restrict_with_exception
   has_many :project_sources, dependent: :restrict_with_exception
