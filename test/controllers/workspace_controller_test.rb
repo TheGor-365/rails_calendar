@@ -14,7 +14,7 @@ class WorkspaceControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to workspace_url
     get workspace_url
     assert_response :success
-    assert_select "h1", text: "Рабочее пространство"
+    assert_select "h1", text: "Workspace"
     assert_select ".ws-hub-metric", count: 3
     assert_select ".ws-hub-tool[href=?]", root_path
     assert_select ".ws-hub-tool[href=?]", consultations_path
