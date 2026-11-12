@@ -1,0 +1,10 @@
+en:
+  ai:
+    interface:
+      draft: "Draft"
+      human_review: "Requires human review"
+      not_configured: "AI is not enabled"
+      unknowns: "Unknowns"
+      sources: "Sources"
+      request: "AI request"
+      no_automatic_approval: "AI suggestions are never automatically approved"

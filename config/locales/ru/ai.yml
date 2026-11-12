@@ -1,0 +1,10 @@
+ru:
+  ai:
+    interface:
+      draft: "Черновик"
+      human_review: "Требует проверки человеком"
+      not_configured: "ИИ не включён"
+      unknowns: "Неизвестные условия"
+      sources: "Источники"
+      request: "AI-запрос"
+      no_automatic_approval: "Предложения ИИ никогда не утверждаются автоматически"

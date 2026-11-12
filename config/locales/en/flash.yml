@@ -1,0 +1,13 @@
+en:
+  flash:
+    signed_in: "Signed in"
+    signed_out: "Signed out"
+    invalid_login: "Invalid email or password"
+    owner_created: "Owner account created"
+    admin_signed_in: "Administrator signed in"
+    admin_signed_out: "Administrator signed out"
+    invalid_admin: "Invalid administrator credentials"
+    signup_generic: "If this email can be registered, a verification code will be sent."
+    signup_invalid: "Check your email address, matching passwords (12–72 bytes) and data consent."
+    code_invalid: "The code is invalid, expired or has too many attempts."
+    email_verified: "Email verified. Account created."

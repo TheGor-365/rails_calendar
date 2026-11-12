@@ -1,0 +1,13 @@
+es:
+  flash:
+    signed_in: "Sesión iniciada"
+    signed_out: "Sesión cerrada"
+    invalid_login: "Correo o contraseña incorrectos"
+    owner_created: "Cuenta de propietario creada"
+    admin_signed_in: "Sesión de administrador iniciada"
+    admin_signed_out: "Sesión de administrador cerrada"
+    invalid_admin: "Credenciales de administrador incorrectas"
+    signup_generic: "Si la dirección permite registrarse, se enviará un código de verificación."
+    signup_invalid: "Comprueba el correo, las contraseñas iguales (12–72 bytes) y el consentimiento."
+    code_invalid: "Código inválido, caducado o límite de intentos agotado."
+    email_verified: "Correo verificado. Cuenta creada."

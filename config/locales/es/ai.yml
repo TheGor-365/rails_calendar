@@ -1,0 +1,10 @@
+es:
+  ai:
+    interface:
+      draft: "Borrador"
+      human_review: "Requiere revisión humana"
+      not_configured: "La IA está desactivada"
+      unknowns: "Datos pendientes"
+      sources: "Fuentes"
+      request: "Solicitud de IA"
+      no_automatic_approval: "Las sugerencias de IA nunca se aprueban automáticamente"

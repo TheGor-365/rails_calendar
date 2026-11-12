@@ -1,0 +1,4 @@
+en:
+  mail:
+    subject: "Rails Calendar — email verification code"
+    body: "Your Rails Calendar verification code: %{code}\n\nEnter this code on the registration page. It expires in 10 minutes.\nThe code is single-use. Never share it.\nIf you did not request an account, ignore this message."
