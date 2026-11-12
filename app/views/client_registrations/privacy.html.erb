@@ -9,9 +9,9 @@
     <h2><%= t("auth.privacy.email_title") %></h2>
     <p><%= t("auth.privacy.email_body") %></p>
     <h2><%= t("auth.privacy.security_title") %></h2>
-    <p>Код действителен 10 минут и ограничен по числу попыток. Очистка временных данных выполняется отдельной сервисной задачей.</p>
+    <p><%= t("auth.privacy.security_body") %></p>
     <h2><%= t("auth.privacy.release_title") %></h2>
-    <p>Внешняя регистрация остаётся закрытой в production до проверки доставки, восстановления доступа, удаления данных и юридических условий.</p>
+    <p><%= t("auth.privacy.release_body") %></p>
     <%= link_to rc_icon_label("arrow-left", t("auth.privacy.back")),
                 client_registration_path, class: "rc-account-option" %>
   </section>

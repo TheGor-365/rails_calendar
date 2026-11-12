@@ -4,7 +4,7 @@ class SignupMailer < ApplicationMailer
     mail(
       to: email,
       from: ENV.fetch("RC_SIGNUP_FROM", "no-reply@rails-calendar.invalid"),
-      subject: "Rails Calendar — код подтверждения email"
+      subject: I18n.t("mail.subject")
     )
   end
 end
