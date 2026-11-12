@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+# Explicitly run by a developer after inspecting their isolated local DB.
+# This script is never part of production boot, migration, or CI.
+require "uri"
+
+name = "rails_calendar_mvp_preview_20261112"
+abort "STOP: RAILS_ENV must be development" unless ENV["RAILS_ENV"] == "development"
+abort "STOP: DATABASE_URL must be unset" unless ENV["DATABASE_URL"].to_s.empty?
+raw_url = ENV["RC_LOCAL_DEV_DATABASE_URL"].to_s
+abort "STOP: RC_LOCAL_DEV_DATABASE_URL is missing" if raw_url.empty?
+
+begin
+  uri = URI.parse(raw_url)
+rescue URI::InvalidURIError
+  abort "STOP: invalid local database URL"
+end
+
+unless %w[postgres postgresql].include?(uri.scheme) &&
+       %w[localhost 127.0.0.1 ::1].include?(uri.host) &&
+       uri.path == "/#{name}"
+  abort "STOP: only loopback PostgreSQL /#{name} is allowed"
+end
+
+require_relative "../config/environment"
+abort "STOP: Rails environment mismatch" unless Rails.env.development?
+
+conn = ActiveRecord::Base.connection
+abort "STOP: connection database mismatch" unless conn.select_value("SELECT current_database()") == name
+
+# The default Rails db:schema:load command also considers a disabled
+# test configuration in this repo. Instead load the committed Ruby schema
+# directly on a verified EMPTY dev database only.
+relations = conn.select_value(<<~SQL).to_i
+  SELECT COUNT(*)
+  FROM pg_class c
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
+    AND n.nspname NOT LIKE 'pg_toast%'
+    AND n.nspname NOT LIKE 'pg_temp_%'
+    AND c.relkind IN ('r','p','v','m','S','f')
+SQL
+abort "STOP: preview database contains #{relations} relations; nothing changed" unless relations.zero?
+
+path = Rails.root.join("db/schema.rb")
+abort "STOP: committed db/schema.rb missing" unless File.file?(path)
+
+puts "LOCAL_PREVIEW_SCHEMA_BEGIN: #{name} (verified empty)"
+load path.to_s
+puts "LOCAL_PREVIEW_SCHEMA_OK: #{name}"

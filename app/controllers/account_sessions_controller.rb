@@ -2,7 +2,7 @@ class AccountSessionsController < ApplicationController
   before_action :limit_login_attempts!, only: :create
 
   def new
-    redirect_to consultations_path if owner_signed_in?
+    redirect_to workspace_path if owner_signed_in?
   end
 
   def create
@@ -16,7 +16,7 @@ class AccountSessionsController < ApplicationController
 
     if user&.role == "owner"
       start_owner_session!(user)
-      redirect_to consultations_path, notice: "Signed in"
+      redirect_to workspace_path, notice: "Signed in"
     else
       reset_session
       flash.now[:alert] = "Invalid email or password"

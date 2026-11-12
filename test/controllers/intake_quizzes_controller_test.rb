@@ -176,7 +176,7 @@ class IntakeQuizzesControllerTest < ActionDispatch::IntegrationTest
     )
     post account_session_path,
          params: { email: user.email, password: password }
-    assert_redirected_to consultations_path
+    assert_redirected_to workspace_path
   end
 
   def sign_in_as_legacy_admin

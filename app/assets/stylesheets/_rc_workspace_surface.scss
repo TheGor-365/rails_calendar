@@ -208,3 +208,50 @@ body.app-shell {
     transform: none!important;
   }
 }
+
+// Owner hub: real linked cards, read-only live counts, restrained semantic surfaces.
+.ws-hub-header {display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.ws-hub-header h1 {font-weight:800;font-size:clamp(1.65rem,2.7vw,2.4rem);letter-spacing:-.05em;margin:0 0 .35rem}
+.ws-hub-metrics,.ws-hub-tools {display:grid;gap:.75rem}
+.ws-hub-metrics {grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:1.7rem}
+.ws-hub-metric,.ws-hub-tool,.ws-hub-panel {background:white;border:1px solid var(--ws-border);border-radius:15px;box-shadow:var(--ws-shadow)}
+.ws-hub-metric {padding:1rem;display:flex;flex-direction:column;gap:.25rem;min-width:0;transition:transform .18s,box-shadow .18s}
+.ws-hub-metric:hover,.ws-hub-tool:hover {transform:translateY(-2px);box-shadow:var(--ws-shadow-up)}
+.ws-hub-metric>.bi {font-size:1.2rem;color:var(--ws-teal)}
+.ws-hub-metric span {font-size:.76rem;font-weight:740;color:var(--ws-muted)}
+.ws-hub-metric strong {font-size:1.68rem;letter-spacing:-.05em;line-height:1.2}
+.ws-hub-metric small {font-size:.67rem;color:#85979e}
+.ws-hub-section {margin-bottom:1.7rem}
+.ws-hub-section-head {display:flex;gap:.7rem;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+.ws-hub-section-head h2 {font-size:1.14rem;letter-spacing:-.035em;margin:0}
+.ws-hub-section-head span {font-size:.7rem;color:var(--ws-muted)}
+.ws-hub-tools {grid-template-columns:repeat(4,minmax(0,1fr))}
+.ws-hub-tool {min-height:165px;min-width:0;padding:1rem;display:flex;flex-direction:column;gap:.45rem;text-decoration:none;color:var(--ws-ink);transition:transform .18s,box-shadow .18s,border-color .18s}
+.ws-hub-tool:hover {color:var(--ws-teal-deep);border-color:#b7ddd5}
+.ws-hub-tool:active {transform:translateY(1px)}
+.ws-hub-tool-icon {display:grid;place-items:center;background:var(--ws-teal-wash);color:var(--ws-teal);width:36px;height:36px;border-radius:10px;font-size:1.12rem}
+.ws-hub-tool strong {font-size:.88rem}
+.ws-hub-tool small {font-size:.73rem;line-height:1.5;color:var(--ws-muted)}
+.ws-hub-tool-action {display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:.6rem;border-top:1px solid var(--ws-border);color:var(--ws-teal-deep);font-size:.73rem;font-weight:780}
+.ws-hub-panels {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;margin-bottom:1.5rem}
+.ws-hub-panel {padding:1rem;min-width:0}
+.ws-hub-panel-head {display:flex;gap:.6rem;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.ws-hub-panel-head h2 {font-size:.9rem;margin:0}
+.ws-hub-panel-head a {font-size:.72rem;font-weight:770}
+.ws-hub-list {list-style:none;margin:0;padding:0;display:grid;gap:.35rem}
+.ws-hub-list li a {display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:.18rem .6rem;padding:.7rem;background:#f7fafb;border-radius:10px;text-decoration:none;transition:background .16s}
+.ws-hub-list li a:hover {background:var(--ws-teal-wash)}
+.ws-hub-list strong {grid-column:1;font-size:.78rem;color:var(--ws-ink);overflow-wrap:anywhere}
+.ws-hub-list small {grid-column:1;font-size:.69rem;color:var(--ws-muted)}
+.ws-hub-list .bi {grid-column:2;grid-row:1/3;align-self:center;color:var(--ws-teal);font-size:.72rem}
+.ws-hub-empty {font-size:.76rem;color:var(--ws-muted);padding:1rem;background:#f7fafb;border-radius:10px}
+.ws-hub-boundary {display:flex;align-items:flex-start;gap:.9rem;flex-wrap:wrap;background:var(--ws-teal-wash);border:1px solid #c7e9df;border-radius:15px;padding:1rem}
+.ws-hub-boundary>.bi {font-size:1.2rem;color:var(--ws-teal)}
+.ws-hub-boundary>div {flex:1 1 275px}
+.ws-hub-boundary strong {font-size:.81rem;color:var(--ws-teal-deep)}
+.ws-hub-boundary p {font-size:.74rem;color:#537770;margin:.3rem 0 0}
+.ws-hub-boundary>a {align-self:center;font-size:.73rem;font-weight:770}
+@media(max-width:991.98px){.ws-hub-tools {grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:767.98px){.ws-hub-metrics {grid-template-columns:repeat(2,minmax(0,1fr))}.ws-hub-metric:last-child {grid-column:1/-1}.ws-hub-panels {grid-template-columns:1fr}}
+@media(max-width:450px){.ws-hub-metrics {grid-template-columns:1fr}.ws-hub-metric:last-child {grid-column:auto}.ws-hub-tool {padding:.8rem;min-height:160px}}
+@media(prefers-reduced-motion:reduce){.ws-hub :is(.ws-hub-metric,.ws-hub-tool) {transition:none!important;transform:none!important}}
