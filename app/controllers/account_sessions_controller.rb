@@ -1,4 +1,5 @@
 class AccountSessionsController < ApplicationController
+  layout "account"
   before_action :limit_login_attempts!, only: :create
 
   def new

@@ -1744,3 +1744,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
 // Workspace Surface: compact cards, semantic states, original product chrome.
 @import 'rc_workspace_surface';
+
+// Shared identity experience; uses the same White Atlas components as workspace.
+@import 'rc_account';
+@import 'rc_ui_consistency';

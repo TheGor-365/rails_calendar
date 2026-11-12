@@ -1,15 +1,36 @@
-<div class="mk-auth-shell">
-  <div class="mk-auth-heading"><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#lock"></use></svg> ПОДТВЕРЖДЕНИЕ ПОЧТЫ</span>
-    <h1>Введите код</h1><p>Если адрес доступен для регистрации, сообщение с шестизначным кодом отправлено на <strong><%= @masked_email %></strong>. Код действует 10 минут.</p></div>
-  <% if notice.present? %><p class="mk-auth-notice" role="status"><%= notice %></p><% end %>
-  <% if alert.present? %><p class="mk-auth-alert" role="alert"><%= alert %></p><% end %>
-  <section class="mk-auth-panel">
-    <%= form_with url: verify_client_registration_path, method: :post, local: true, html: { class: "mk-auth-form" } do |f| %>
-      <div><%= f.label :code, "Код подтверждения" %><%= f.text_field :code, required: true, maxlength: 6, minlength: 6, pattern: "[0-9]{6}", inputmode: "numeric", autocomplete: "one-time-code", placeholder: "000000", class: "mk-auth-code" %></div>
-      <%= f.button type: :submit, class: "mk-action mk-action-primary" do %><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#check"></use></svg> Подтвердить email<% end %>
+<div class="rc-account-content">
+  <%= render "shared/account_heading",
+             icon: "envelope-check", eyebrow: "АККАУНТ / ПОДТВЕРЖДЕНИЕ",
+             title: "Подтвердите почту",
+             description: "Введите шестизначный код для #{@masked_email}. Код действителен 10 минут." %>
+  <section class="rc-account-panel" aria-label="Подтверждение электронной почты">
+    <% if Rails.env.development? && Rails.application.config.action_mailer.delivery_method == :file %>
+      <p class="rc-account-dev-mail" role="note">
+        <i class="bi bi-laptop" aria-hidden="true"></i>
+        <span><strong>Локальный режим:</strong> письмо сохранено на этом компьютере в <code>tmp/signup_emails</code>. Оно не отправлялось в Gmail. Код не публикуйте.</span>
+      </p>
     <% end %>
-    <div class="mk-auth-resend"><span>Не получили письмо?</span>
-      <%= button_to "Отправить снова", resend_client_registration_path, method: :post, class: "mk-auth-secondary" %></div>
+    <%= form_with url: verify_client_registration_path, method: :post, local: true,
+                  html: { class: "rc-account-form rc-form" } do |form| %>
+      <div class="rc-field">
+        <%= form.label :code, "Код из письма", class: "rc-field-label" %>
+        <%= form.text_field :code, required: true, maxlength: 6, minlength: 6,
+                            pattern: "[0-9]{6}", inputmode: "numeric", autocomplete: "one-time-code",
+                            placeholder: "000000", class: "rc-input rc-account-code" %>
+      </div>
+      <div class="rc-account-form-actions">
+        <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
+          <%= rc_icon_label("check-circle", "Подтвердить email") %>
+        <% end %>
+      </div>
+    <% end %>
+    <div class="rc-account-alternatives">
+      <span>Нужен новый код?</span>
+      <%= button_to rc_icon_label("arrow-clockwise", "Отправить снова"), resend_client_registration_path,
+                    method: :post, class: "rc-account-option rc-account-option--button" %>
+    </div>
   </section>
-  <p class="mk-auth-foot"><%= link_to "Указать другой email", client_registration_path %></p>
+  <nav class="rc-account-return" aria-label="Регистрация">
+    <%= link_to rc_icon_label("arrow-left", "Другой email"), client_registration_path, class: "rc-account-option" %>
+  </nav>
 </div>

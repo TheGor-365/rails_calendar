@@ -323,7 +323,7 @@ class ConsultationsTest < ApplicationSystemTestCase
   test "anonymous visitor cannot open administrative forms" do
     visit new_consultation_url
     assert_current_path admin_login_path
-    assert_selector "h1", text: "Administrator sign-in"
+    assert_selector "h1", text: "Вход администратора"
 
     visit edit_consultation_url(@consultation)
     assert_current_path admin_login_path
@@ -458,9 +458,9 @@ class ConsultationsTest < ApplicationSystemTestCase
 
   def sign_in_as_admin
     visit admin_login_url
-    fill_in "Username", with: ENV.fetch("RAILS_CALENDAR_ADMIN_USERNAME")
-    fill_in "Password", with: ENV.fetch("RAILS_CALENDAR_ADMIN_PASSWORD")
-    click_button "Sign in"
+    fill_in "Логин", with: ENV.fetch("RAILS_CALENDAR_ADMIN_USERNAME")
+    fill_in "Пароль", with: ENV.fetch("RAILS_CALENDAR_ADMIN_PASSWORD")
+    click_button "Войти как администратор"
     assert_text "Administrator signed in"
   end
 end

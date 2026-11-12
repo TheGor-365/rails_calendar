@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Аккаунт · Rails Calendar AI Workspace</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="theme-color" content="#ffffff">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+  </head>
+  <body class="app-shell rc-account-shell" data-controller="ui-feedback"
+        data-action="turbo:submit-start->ui-feedback#start turbo:submit-end->ui-feedback#finish turbo:load@document->ui-feedback#reset">
+    <a class="skip-link" href="#main-content">К содержимому</a>
+    <header class="app-header rc-account-header">
+      <div class="container">
+        <nav class="rc-account-nav" aria-label="Навигация аккаунта">
+          <%= link_to services_path, class: "app-brand rc-account-brand", aria: { label: "Rails Calendar AI Workspace — обзор" } do %>
+            <span class="rc-brand-symbol" aria-hidden="true"><i class="bi bi-grid-1x2"></i></span>
+            <span class="ws-brand-name">Rails Calendar<small>AI Workspace</small></span>
+          <% end %>
+          <div class="rc-account-nav-actions">
+            <%= link_to rc_icon_label("grid", "Обзор"), services_path, class: "rc-account-nav-link" %>
+            <%= link_to rc_icon_label("box-arrow-in-right", "Вход"), sign_in_path,
+                        class: "rc-account-nav-link #{'is-active' if controller_path == 'account_sessions'}",
+                        aria: { current: ("page" if controller_path == "account_sessions") } %>
+            <% if ClientSignupAvailability.enabled? %>
+              <%= link_to rc_icon_label("person-plus", "Регистрация"), client_registration_path,
+                          class: "rc-account-nav-link #{'is-active' if controller_path == 'client_registrations'}",
+                          aria: { current: ("page" if controller_path == "client_registrations") } %>
+            <% end %>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main id="main-content" class="rc-account-main" tabindex="-1">
+      <div class="container">
+        <% if notice.present? %><p class="rc-notice rc-notice--success rc-account-flash" role="status"><%= notice %></p><% end %>
+        <% if alert.present? %><p class="rc-notice rc-notice--error rc-account-flash" role="alert"><%= alert %></p><% end %>
+        <%= yield %>
+      </div>
+    </main>
+    <footer class="rc-account-footer">
+      <div class="container rc-account-footer-inner">
+        <span><i class="bi bi-grid-1x2" aria-hidden="true"></i> Rails Calendar · AI Workspace</span>
+        <span><i class="bi bi-shield-check" aria-hidden="true"></i> Защищённый доступ к аккаунту</span>
+      </div>
+    </footer>
+  </body>
+</html>

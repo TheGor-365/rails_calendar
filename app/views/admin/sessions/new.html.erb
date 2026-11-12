@@ -1,25 +1,24 @@
-<div class="container my-4 my-sm-5">
-  <div class="form-page">
-    <header class="mb-4">
-      <p class="eyebrow mb-2">SECURE / ACCESS</p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-shield-lock"></i></span><h1 class="page-title mb-2">Administrator sign-in</h1></div>
-      <p class="rc-muted mb-0">Consultation management is restricted to the administrator.</p>
-    </header>
-
-    <section class="surface-panel" aria-label="Administrator credentials">
-      <%= form_with url: admin_session_path, method: :post, local: true, html: { class: "rc-form" } do |form| %>
-        <div class="rc-field">
-          <%= form.label :username, "Username", class: "rc-field-label" %>
-          <%= form.text_field :username, required: true, autocomplete: "username", class: "rc-input" %>
-        </div>
-        <div class="rc-field">
-          <%= form.label :password, "Password", class: "rc-field-label" %>
-          <%= form.password_field :password, required: true, autocomplete: "current-password", class: "rc-input" %>
-        </div>
+<div class="rc-account-content">
+  <%= render "shared/account_heading",
+             icon: "shield-lock", eyebrow: "ADMIN / LEGACY ACCESS",
+             title: "Вход администратора",
+             description: "Отдельный служебный вход для прежнего календаря. Клиентские аккаунты не дают административных прав." %>
+  <section class="rc-account-panel" aria-label="Административный вход">
+    <%= form_with url: admin_session_path, method: :post, local: true,
+                  html: { class: "rc-account-form rc-form" } do |form| %>
+      <div class="rc-field"><%= form.label :username, "Логин", class: "rc-field-label" %>
+        <%= form.text_field :username, required: true, autocomplete: "username", class: "rc-input" %></div>
+      <div class="rc-field"><%= form.label :password, "Пароль", class: "rc-field-label" %>
+        <%= form.password_field :password, required: true, autocomplete: "current-password", class: "rc-input" %></div>
+      <div class="rc-account-form-actions">
         <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
-          <%= rc_icon_label("box-arrow-in-right", "Sign in") %>
+          <%= rc_icon_label("shield-lock", "Войти как администратор") %>
         <% end %>
-      <% end %>
-    </section>
-  </div>
+      </div>
+    <% end %>
+    <div class="rc-account-alternatives">
+      <span>Аккаунт владельца или клиента?</span>
+      <%= link_to rc_icon_label("person", "Обычный вход"), sign_in_path, class: "rc-account-option" %>
+    </div>
+  </section>
 </div>
