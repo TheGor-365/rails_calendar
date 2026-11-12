@@ -1,0 +1,210 @@
+// Workspace Surface / RC-035-based visual layer.
+// Trello-like information architecture, not a clone of Atlassian styling.
+// All changes are additive presentation rules; business logic and calendar geometry stay intact.
+:root {
+  --ws-canvas: #f7fafb;
+  --ws-paper: #fff;
+  --ws-ink: #172d37;
+  --ws-muted: #596f79;
+  --ws-border: #e2eaed;
+  --ws-teal: #0a766d;
+  --ws-teal-deep: #07574f;
+  --ws-teal-wash: #e7f6f2;
+  --ws-soft: #f1f5f6;
+  --ws-shadow: 0 2px 5px rgba(30,65,75,.025), 0 13px 27px -23px rgba(20,67,76,.31);
+  --ws-shadow-up: 0 8px 27px -20px rgba(16,69,78,.43), 0 18px 34px -25px rgba(21,64,71,.25);
+  --ws-easing: cubic-bezier(.19,.67,.25,1);
+}
+body.app-shell {
+  background: radial-gradient(ellipse at 70% -8%, rgba(225,245,240,.63), transparent 43%), var(--ws-canvas);
+  color: var(--ws-ink);
+}
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(255,255,255,.96);
+  border-bottom: 1px solid var(--ws-border);
+  box-shadow: 0 3px 18px rgba(29,70,81,.025);
+}
+@supports(backdrop-filter:blur(10px)) {
+  .app-header { backdrop-filter: blur(12px); background: rgba(255,255,255,.93); }
+}
+.app-nav { min-height: 67px; padding-top: .52rem!important; padding-bottom: .52rem!important; column-gap: .7rem; }
+.app-brand { border-right: 0; margin-right: .55rem; padding-right: 0; gap: .55rem; font-size: .93rem; }
+.app-brand:hover .rc-brand-symbol { transform: translateY(-1px); }
+.rc-brand-symbol { width: 37px; height: 37px; border-radius: 11px; box-shadow: 0 6px 16px -12px rgba(5,97,89,.7); transition: transform .18s var(--ws-easing); }
+.ws-brand-name { display: grid; gap: 0; line-height: 1.2; }
+.ws-brand-name small { color: var(--ws-teal); font-size: .62rem; letter-spacing: .1em; font-weight: 850; text-transform: uppercase; margin-top: 2px; }
+.rc-nav-group { gap: .15rem; }
+.rc-nav-link {
+  min-height: 37px;
+  display: inline-flex;
+  align-items: center;
+  gap: .48rem;
+  border-radius: 10px;
+  padding: .54rem .65rem;
+  font-size: .78rem;
+  font-weight: 740;
+  color: #5b707a;
+  background: transparent;
+  transition: color .18s, background .18s, transform .18s var(--ws-easing);
+}
+.rc-nav-link:hover, .rc-nav-link.active { background: var(--ws-teal-wash); color: var(--ws-teal-deep); }
+.rc-nav-link:hover { transform: translateY(-1px); }
+.rc-nav-link .bi { font-size: 1rem; }
+.ws-header-services {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 37px;
+  border-radius: 10px;
+  padding: .45rem .7rem;
+  background: #f1f5f6;
+  color: #59717a;
+  text-decoration: none;
+  font-size: .76rem;
+  font-weight: 760;
+  transition: background .18s, color .18s, transform .18s var(--ws-easing);
+}
+.ws-header-services:hover { color: var(--ws-teal-deep); background: var(--ws-teal-wash); transform: translateY(-1px); }
+.ws-header-services .bi { font-size: .98rem; }
+.rc-nav-admin { font-size: .64rem; font-weight: 770; }
+#main-content > .container { max-width: 1350px; }
+.rc-page-hero { padding-top: .25rem; align-items: center; }
+.rc-page-hero__heading { gap: .7rem; }
+.rc-page-hero__symbol { width: 41px; height: 41px; flex: 0 0 41px; border-radius: 12px; background: var(--ws-teal-wash); box-shadow: none; font-size: 1.13rem; }
+.rc-page-hero__heading > .rc-page-hero__symbol { flex-basis: 41px; }
+.page-title { font-size: clamp(1.55rem,2.3vw,2.17rem); font-weight: 800; letter-spacing: -.047em; }
+.eyebrow { font-size: .63rem; letter-spacing: .11em; }
+.eyebrow::before { display: none; }
+.rc-muted { color: var(--ws-muted); font-size: .85rem; }
+.rc-hint { color: #6b8089; }
+.surface-panel, .simple-calendar, .rc-consultation-filters, .rc-agenda, .rc-quiz-progress, .rc-flow {
+  border: 1px solid var(--ws-border);
+  border-radius: 17px;
+  box-shadow: var(--ws-shadow);
+}
+.surface-panel { padding: clamp(1rem,2vw,1.65rem); }
+.rc-consultation-filters { padding: clamp(1rem,2vw,1.5rem); }
+.rc-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .47rem;
+  padding: .55rem .78rem;
+  min-height: 40px;
+  border-radius: 11px;
+  font-size: .78rem;
+  font-weight: 750;
+  box-shadow: none;
+  line-height: 1.25;
+  transition: transform .18s var(--ws-easing),background .18s,box-shadow .18s,color .18s;
+}
+// The mobile-only calendar shortcut must remain hidden at desktop widths.
+// This selector outranks the generic .rc-action display style above.
+.rc-action.calendar-mobile-agenda-trigger { display: none; }
+@media (max-width: 767.98px) { .rc-action.calendar-mobile-agenda-trigger { display: inline-flex; } }
+.rc-action--primary { background: var(--ws-teal); color: white; box-shadow: 0 9px 20px -13px rgba(10,118,109,.68); }
+.rc-action--primary:hover { background: var(--ws-teal-deep); color: white; transform: translateY(-2px); box-shadow: 0 14px 23px -15px rgba(10,118,109,.71); }
+.rc-action--quiet { background: white; color: var(--ws-ink); box-shadow: inset 0 0 0 1px var(--ws-border),var(--ws-shadow); }
+.rc-action--quiet:hover { background: #f6fcfa; color: var(--ws-teal-deep); transform: translateY(-2px); box-shadow: inset 0 0 0 1px #a4d6cb,var(--ws-shadow-up); }
+.rc-action--danger { background: #fff0f3; color: #a63f50; }
+.rc-action--danger:hover { background: #fee5e9; color: #8c263a; }
+.rc-action:active, .rc-nav-link:active, .ws-header-services:active { transform: translateY(1px); }
+.rc-action:disabled,.rc-action[aria-disabled="true"] { cursor: not-allowed; transform: none; box-shadow: none; }
+.rc-action--iconlabel { min-width: auto; padding: .7rem; }
+.rc-action--small { min-height: 35px; padding: .5rem .68rem; font-size: .74rem; }
+.rc-action .bi { font-size: .95rem; }
+.rc-text-link { color: var(--ws-teal); font-weight: 760; }
+.rc-text-link:hover { color: var(--ws-teal-deep); }
+.rc-record {
+  position: relative;
+  padding: 1.08rem 1.18rem;
+  border: 1px solid var(--ws-border);
+  border-radius: 13px;
+  box-shadow: var(--ws-shadow);
+  transition: box-shadow .18s var(--ws-easing),border-color .18s,transform .18s var(--ws-easing);
+}
+.rc-record:hover { transform: translateY(-2px); box-shadow: var(--ws-shadow-up); border-color: #a8d9cf; }
+.surface-panel .rc-record { background: white; border: 1px solid var(--ws-border); }
+.rc-record-list { gap: .72rem; }
+.rc-record-title { font-size: .98rem; }
+.rc-record-meta { font-size: .75rem; }
+.rc-record-actions { margin-top: .55rem; }
+.rc-filter-grid { gap: .75rem; }
+.rc-input { border-radius: 10px; background: #fbfcfd; border: 1px solid var(--ws-border); min-height: 43px; font-size: .89rem; padding: .62rem .76rem; }
+.rc-input:focus,.rc-input:focus-visible { border-color: #63baa9; box-shadow: 0 0 0 3px rgba(10,118,109,.13); background: white; }
+.rc-field-label { color: #526b74; }
+.rc-status-pill { background: var(--ws-teal-wash); border-radius: 8px; }
+.rc-empty-state { border: 1px solid var(--ws-border); border-radius: 16px; box-shadow: var(--ws-shadow); }
+.rc-quiz-choice { border: 1px solid #edf2f4; border-radius: 11px; background: #f7fafb; }
+.rc-quiz-choice:hover { background: var(--ws-teal-wash); transform: translateY(-1px); border-color: #d7ebe6; }
+.rc-quiz-choice:has(input:checked) { border-color: #66bbae; }
+.simple-calendar { padding: .75rem; }
+.calendar-grid { border-radius: 11px; }
+.calendar-grid tbody td { transition: background .17s,box-shadow .17s; }
+.calendar-grid tbody td:hover { background: #f2faf8; box-shadow: inset 0 0 0 1px #d4eae4; }
+.calendar-grid tbody td.today:hover { background: #e3f6f0; }
+.calendar-event-link,.calendar-day-link { transition: color .18s,background .18s,box-shadow .18s; }
+.calendar-event-link:hover { box-shadow: 0 4px 12px -9px rgba(6,91,83,.6); }
+.rc-mobile-dock { border-top: 1px solid var(--ws-border); }
+.rc-mobile-dock-item { transition: transform .15s var(--ws-easing),background .15s,color .15s; }
+.rc-mobile-dock-item:active { transform: scale(.97); }
+.rc-notice { border-left-width: 3px; }
+// Dashboard cards read from the already-loaded calendar records; no new queries.
+.ws-overview { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .75rem; margin-bottom: 1.15rem; }
+.ws-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: .75rem;
+  background: white;
+  border: 1px solid var(--ws-border);
+  border-radius: 13px;
+  box-shadow: var(--ws-shadow);
+  padding: .95rem 1.05rem;
+  min-width: 0;
+  transition: transform .18s var(--ws-easing),box-shadow .18s,border-color .18s;
+}
+.ws-metric:hover { transform: translateY(-2px); box-shadow: var(--ws-shadow-up); border-color: #cee6e2; }
+.ws-metric__eyebrow { display: block; color: #71858f; font-size: .69rem; font-weight: 720; line-height: 1.4; }
+.ws-metric__number { display: block; margin-top: 5px; font-size: 1.5rem; letter-spacing: -.045em; line-height: 1.2; color: var(--ws-ink); }
+.ws-metric__foot { display: block; color: #8597a0; font-size: .67rem; margin-top: 5px; }
+.ws-metric__icon { display: grid; place-items: center; flex: 0 0 34px; height: 34px; width: 34px; border-radius: 10px; background: var(--ws-teal-wash); color: var(--ws-teal); }
+.ws-metric__icon .bi { font-size: 1.02rem; }
+@media(max-width:1199.98px) {
+  .rc-nav-link { padding: .5rem; font-size: .75rem; }
+  .rc-nav-admin { max-width: 135px; }
+}
+@media(max-width:991.98px) {
+  .app-header { position: relative; }
+  .app-brand { margin-right: 0; }
+}
+@media(max-width:767.98px) {
+  .app-nav { min-height: 62px; }
+  .ws-header-services { margin-left: auto; font-size: .72rem; }
+  .rc-page-hero { padding-top: .3rem; }
+  .rc-page-hero__heading > .rc-page-hero__symbol { flex-basis: 38px; }
+  .rc-page-hero__symbol { width: 38px; height: 38px; font-size: 1.05rem; }
+  .ws-overview { grid-template-columns: repeat(3,minmax(0,1fr)); gap: .46rem; }
+  .ws-metric { padding: .75rem; border-radius: 11px; flex-direction: column-reverse; gap: .3rem; }
+  .ws-metric__icon { height: 28px; width: 28px; flex-basis: 28px; border-radius: 8px; }
+  .ws-metric__eyebrow { font-size: .64rem; }
+  .ws-metric__number { font-size: 1.28rem; }
+  .ws-metric__foot { font-size: .6rem; }
+  .rc-quiz-review-footer .rc-action { width: auto; flex: 1 1 auto; }
+  .rc-quiz-actions .rc-action:first-child { flex: 1 1 auto; }
+}
+@media(max-width:480px) {
+  .ws-overview { grid-template-columns: 1fr 1fr; }
+  .ws-metric:last-child { grid-column: 1 / -1; flex-direction: row; }
+  .rc-action { min-height: 39px; font-size: .76rem; }
+  .rc-record { padding: .95rem; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .app-shell :is(.rc-action,.rc-nav-link,.ws-header-services,.rc-record,.ws-metric,.rc-brand-symbol,.rc-mobile-dock-item,.calendar-grid tbody td,.rc-quiz-choice) {
+    transition: none!important;
+    transform: none!important;
+  }
+}

@@ -15,6 +15,21 @@
     </div>
   </header>
 
+  <section class="ws-overview" aria-label="Calendar overview metrics">
+    <article class="ws-metric">
+      <div><span class="ws-metric__eyebrow">Records in visible range</span><strong class="ws-metric__number"><%= @consultations.size %></strong><span class="ws-metric__foot">Loaded calendar window</span></div>
+      <span class="ws-metric__icon" aria-hidden="true"><i class="bi bi-calendar2-check"></i></span>
+    </article>
+    <article class="ws-metric">
+      <div><span class="ws-metric__eyebrow">Days with events</span><strong class="ws-metric__number"><%= @month_days_with_events.size %></strong><span class="ws-metric__foot">Selected month</span></div>
+      <span class="ws-metric__icon" aria-hidden="true"><i class="bi bi-grid-3x3-gap"></i></span>
+    </article>
+    <article class="ws-metric">
+      <div><span class="ws-metric__eyebrow">In progress / upcoming</span><strong class="ws-metric__number"><%= @consultations.count { |item| item.end_time > Time.current } %></strong><span class="ws-metric__foot">Within loaded window</span></div>
+      <span class="ws-metric__icon" aria-hidden="true"><i class="bi bi-clock-history"></i></span>
+    </article>
+  </section>
+
   <%= month_calendar(events: @consultations) do |date, _calendar_events| %>
     <% day_events = @consultations_by_day.fetch(date, []) %>
     <div class="calendar-date-heading">

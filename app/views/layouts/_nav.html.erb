@@ -2,7 +2,7 @@
   <nav aria-label="Main navigation" class="app-nav d-flex flex-wrap align-items-center gap-2 py-3">
     <%= link_to root_path, class: "app-brand", aria: { label: "Rails Calendar — calendar overview" } do %>
       <span class="rc-brand-symbol" aria-hidden="true"><i class="bi bi-calendar2-check"></i></span>
-      <span>Rails Calendar</span>
+      <span class="ws-brand-name">Rails Calendar<small>AI Workspace</small></span>
     <% end %>
 
     <div class="rc-nav-group" aria-label="Workspace sections">
@@ -32,6 +32,9 @@
     </div>
 
     <div class="ms-auto d-flex align-items-center gap-2">
+      <%= link_to services_path, class: "ws-header-services", aria: { label: "Open public services" } do %>
+        <%= rc_icon_label("grid-1x2", "Services") %>
+      <% end %>
       <% if owner_signed_in? %>
         <span class="rc-nav-admin d-none d-sm-inline" title="Owner session">Owner: <%= current_user.email %></span>
         <%= button_to rc_icon_label("box-arrow-right", "Sign out"), sign_out_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
