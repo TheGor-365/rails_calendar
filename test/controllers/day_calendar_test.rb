@@ -129,8 +129,8 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     get admin_login_url
     assert_response :success
     assert_select "button.rc-action.rc-action--primary[type='submit']" do
-      assert_select "i.bi.bi-box-arrow-in-right[aria-hidden='true']", count: 1
-      assert_select "span.rc-action-label", text: "Sign in"
+      assert_select "i.bi.bi-shield-lock[aria-hidden='true']", count: 1
+      assert_select "span.rc-action-label", text: "Войти как администратор"
     end
   end
 
