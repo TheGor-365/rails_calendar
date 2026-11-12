@@ -69,7 +69,7 @@ class IntakeQuizzesController < ApplicationController
                   else
                     next_question ? project_intake_quiz_path(@intake, step: next_question.fetch(:key)) : review_project_intake_quiz_path(@intake)
                   end
-    redirect_to destination, notice: "Quiz draft saved"
+    redirect_to destination, notice: I18n.t("quiz.flash_saved")
   end
 
   def review
@@ -82,7 +82,7 @@ class IntakeQuizzesController < ApplicationController
   def require_quiz_owner!
     return if owner_signed_in?
 
-    redirect_to sign_in_path, alert: "Owner sign-in required for quiz"
+    redirect_to sign_in_path, alert: I18n.t("quiz.owner_required")
   end
 
   def set_intake

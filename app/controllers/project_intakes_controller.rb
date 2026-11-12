@@ -12,16 +12,16 @@ class ProjectIntakesController < ApplicationController
     if params[:demo_consent] == "1"
       @intake.demo_consent_at = Time.current
     else
-      @intake.errors.add(:base, "Consent to the fictional-data demo is required")
+      @intake.errors.add(:base, I18n.t("intake.flash_consent"))
     end
 
     if @intake.errors.empty? && @intake.save
       session[:project_intake_id] = @intake.id
       @intake.intake_messages.create!(
         role: "assistant",
-        body: "Describe your audience, the site's purpose, and the main action visitors should take."
+        body: I18n.t("intake.flash_intro")
       )
-      redirect_to project_intake_path(@intake), notice: "Demo request started"
+      redirect_to project_intake_path(@intake), notice: I18n.t("intake.flash_created")
     else
       render :new, status: :unprocessable_entity
     end
@@ -33,7 +33,7 @@ class ProjectIntakesController < ApplicationController
 
   def reply
     unless @intake.status == "interviewing" && @intake.client_message_count < ProjectIntake::MAX_CLIENT_MESSAGES
-      return redirect_to project_intake_path(@intake), alert: "Interview is closed or has reached its limit"
+      return redirect_to project_intake_path(@intake), alert: I18n.t("intake.flash_interview_limit")
     end
 
     message = @intake.intake_messages.new(role: "client", body: params[:answer].to_s.strip)
@@ -50,7 +50,7 @@ class ProjectIntakesController < ApplicationController
         role: "assistant",
         body: "Interview complete. An administrator can now generate and review the proposed specification."
       )
-      return redirect_to project_intake_path(@intake), notice: "Demo interview complete"
+      return redirect_to project_intake_path(@intake), notice: I18n.t("intake.flash_interview_done")
     end
 
     # All API calls require explicitly configured server-side credentials.
@@ -58,7 +58,7 @@ class ProjectIntakesController < ApplicationController
     answer, source = Intake::Grok.new(@intake).interview_question
     @intake.intake_messages.create!(role: "assistant", body: answer)
     redirect_to project_intake_path(@intake),
-                notice: (source == "grok" ? "Grok question generated" : "Demo question generated without API charge")
+                notice: I18n.t(source == "grok" ? "intake.flash_generated_ai" : "intake.flash_generated_template")
   end
 
   def acknowledge
@@ -69,7 +69,7 @@ class ProjectIntakesController < ApplicationController
     # A client reviewing the previous published version must not discard the
     # pending newer draft/version review state.
     @intake.update!(status: "client_reviewed") if @intake.status == "owner_approved"
-    redirect_to project_intake_path(@intake), notice: "Demo review recorded (not a contract or final acceptance)"
+    redirect_to project_intake_path(@intake), notice: I18n.t("intake.flash_review_recorded")
   end
 
   private

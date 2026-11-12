@@ -4,6 +4,7 @@ import { Controller } from "@hotwired/stimulus"
 // always controlled by IntakeQuizzesController and revisioned server-side.
 export default class extends Controller {
   static targets = ["state", "count", "unsure", "other"]
+  static values = { one: String, many: String, none: String, dirty: String, clean: String, leave: String }
 
   connect() {
     this.submitting = false
@@ -45,11 +46,11 @@ export default class extends Controller {
     const count = this.element.querySelectorAll('input[name="quiz[selected_options][]"]:checked').length
     const dirty = this.snapshot() !== this.original
     if (this.hasCountTarget) {
-      this.countTarget.textContent = count > 0 ? `${count} option${count === 1 ? "" : "s"} selected` : "Choose an option or enter your own answer"
+      this.countTarget.textContent = count > 0 ? `${count} ${count === 1 ? this.oneValue : this.manyValue}` : this.noneValue
     }
     if (this.hasStateTarget) {
       this.stateTarget.dataset.dirty = String(dirty)
-      this.stateTarget.textContent = dirty ? "Unsaved changes — choose Save to keep them" : "No unsaved edits on this card"
+      this.stateTarget.textContent = dirty ? this.dirtyValue : this.cleanValue
     }
   }
 
@@ -61,7 +62,7 @@ export default class extends Controller {
 
   beforeVisit(event) {
     if (this.submitting || this.snapshot() === this.original) return
-    if (!window.confirm("This quiz card has unsaved changes. Leave without saving?")) event.preventDefault()
+    if (!window.confirm(this.leaveValue)) event.preventDefault()
   }
 
   beforeUnload(event) {

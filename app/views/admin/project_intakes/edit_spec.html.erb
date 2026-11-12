@@ -1,8 +1,8 @@
 <div class="container my-4 my-sm-5">
   <header class="mb-4">
-    <p class="eyebrow">ADMIN / SPECIFICATION REVIEW</p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span><h1 class="page-title">Review proposal #<%= @intake.id %></h1></div>
-    <p class="rc-muted">Editing creates a new immutable draft version. Nothing is sent to the client until you approve that version.</p>
+    <p class="eyebrow"><%= t("intake.admin_spec_eyebrow") %></p>
+    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span><h1 class="page-title"><%= t("intake.admin_spec_title", id: @intake.id) %></h1></div>
+    <p class="rc-muted"><%= t("intake.admin_spec_hint") %></p>
   </header>
   <section class="surface-panel p-3 p-sm-4">
     <% if @review_errors.present? %>
@@ -11,22 +11,22 @@
     <%= form_with url: revise_spec_admin_project_intake_path(@intake), method: :patch, html: { class: "rc-form" } do |f| %>
       <%= hidden_field_tag :expected_version, @spec.version %>
       <div class="rc-field mb-3">
-        <%= f.label :summary, "Project summary", class: "rc-field-label" %>
+        <%= f.label :summary, t("intake.field_summary"), class: "rc-field-label" %>
         <%= f.text_area :summary, value: @spec.document["summary"], maxlength: 1200,
               required: true, rows: 4, class: "rc-input" %>
       </div>
-      <% { "goals" => "Goals", "deliverables" => "Deliverables",
-           "acceptance_criteria" => "Acceptance criteria",
-           "unknowns" => "Unknowns", "exclusions" => "Exclusions" }.each do |key, label| %>
+      <% { "goals" => t("intake.sections.goals"), "deliverables" => t("intake.sections.deliverables"),
+           "acceptance_criteria" => t("intake.sections.acceptance_criteria"),
+           "unknowns" => t("intake.sections.unknowns"), "exclusions" => t("intake.sections.exclusions") }.each do |key, label| %>
         <div class="rc-field mb-3">
-          <%= f.label key, "#{label} — one entry per line", class: "rc-field-label" %>
+          <%= f.label key, t("intake.field_lines", label: label), class: "rc-field-label" %>
           <%= f.text_area key, value: Array(@spec.document[key]).join("\n"),
                 rows: 4, class: "rc-input" %>
         </div>
       <% end %>
-      <p class="rc-hint">AI-proposed milestone durations remain unchanged here. Dates, scope, fees and client acceptance are not automatically confirmed.</p>
-      <%= f.button type: :submit, class: "rc-action rc-action--primary" do %><%= rc_icon_label("check2-circle", "Save a new reviewed draft") %><% end %>
-      <%= link_to rc_icon_label("x-circle", "Cancel without changes"), project_intake_path(@intake),
+      <p class="rc-hint"><%= t("intake.spec_edit_hint") %></p>
+      <%= f.button type: :submit, class: "rc-action rc-action--primary" do %><%= rc_icon_label("check2-circle", t("intake.spec_save")) %><% end %>
+      <%= link_to rc_icon_label("x-circle", t("intake.spec_cancel")), project_intake_path(@intake),
           class: "rc-action rc-action--quiet" %>
     <% end %>
   </section>
