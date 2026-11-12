@@ -68,7 +68,7 @@ class OwnerQuizI18nTest < ActionDispatch::IntegrationTest
       get review_project_intake_quiz_path(@intake)
       assert_response :success
       assert_select "html[lang=?]", code
-      assert_select ".rc-quiz-review-item", text: I18n.t("quiz.options.website.outcome.leads", locale: code)
+      assert_select ".rc-quiz-review-choices li", text: I18n.t("quiz.options.website.outcome.leads", locale: code)
       assert_equal ["leads"], first.reload.selected_options
       assert_equal 1, first.revision
       assert_equal 1, first.intake_answer_revisions.count
