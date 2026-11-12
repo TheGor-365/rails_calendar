@@ -204,3 +204,31 @@ body.marketing-page { min-width: 320px; margin: 0; background: var(--mk-canvas);
   .marketing-page * { transition: none!important; animation: none!important; }
   .marketing-page :is(a,button):active, .mk-action:hover, .mk-service-card:hover, .mk-evidence-links a:hover, .mk-board-card:hover { transform: none!important; }
 }
+
+/* Registration uses compact workspace primitives; no Bootstrap form defaults. */
+.mk-auth-main { padding: clamp(26px,5vw,62px) 16px 80px; }
+.mk-auth-shell { width:min(100%,500px); margin-inline:auto; }
+.mk-auth-heading h1 {font-size:clamp(1.65rem,4vw,2.2rem);letter-spacing:-.045em;margin:12px 0 7px;line-height:1.2}
+.mk-auth-heading p {font-size:.86rem;color:var(--mk-subtle);margin:0 0 22px}
+.mk-auth-panel {border:1px solid var(--mk-line);border-radius:17px;background:white;padding:clamp(19px,3vw,28px);box-shadow:var(--mk-shadow)}
+.mk-auth-form {display:grid;gap:17px}
+.mk-auth-form>div {display:grid;gap:6px}
+.mk-auth-form label:not(.mk-auth-consent) {font-size:.77rem;color:#536b75;font-weight:750}
+.mk-auth-form input:not([type=checkbox]) {width:100%;min-height:46px;border:1px solid #dce7eb;background:#f9fbfc;padding:10px 12px;border-radius:10px;font:inherit;font-size:.89rem;transition:background .2s,border-color .2s,box-shadow .2s}
+.mk-auth-form input:not([type=checkbox]):focus {border-color:#5db5a5;background:white;outline:0;box-shadow:0 0 0 3px #0a766d1c}
+.mk-auth-code {font-variant-numeric:tabular-nums;letter-spacing:.23em!important;font-size:1.3rem!important;font-weight:750}
+.mk-auth-consent {display:flex;align-items:flex-start;gap:9px;font-size:.77rem;color:var(--mk-subtle);line-height:1.55}
+.mk-auth-consent input {flex:0 0 17px;width:17px;height:17px;margin-top:3px;accent-color:var(--mk-teal)}
+.mk-auth-consent a,.mk-auth-foot a,.mk-auth-back {color:var(--mk-teal);font-weight:770}
+.mk-auth-form .mk-action {border:0;cursor:pointer;font:inherit;font-size:.83rem;font-weight:760;min-height:44px}
+.mk-auth-alert,.mk-auth-notice {padding:12px 15px;border-radius:11px;font-size:.82rem;margin-bottom:14px}
+.mk-auth-alert {background:#fff0f2;border-left:3px solid #b33b51;color:#852a3b}
+.mk-auth-notice {background:#e7f5f2;border-left:3px solid var(--mk-teal);color:#086559}
+.mk-auth-resend {display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:20px;font-size:.78rem;color:var(--mk-subtle)}
+.mk-auth-secondary {border:0;border-radius:9px;background:var(--mk-teal-soft);color:var(--mk-teal-dark);padding:8px 12px;font:inherit;font-weight:780;cursor:pointer;transition:background .18s}
+.mk-auth-secondary:hover {background:#d4eee7}
+.mk-auth-foot {font-size:.78rem;text-align:center;color:var(--mk-subtle);margin-top:17px}
+.mk-auth-policy {width:min(100%,650px)}
+.mk-auth-policy h2 {font-size:1rem;margin:20px 0 5px}
+.mk-auth-policy p {color:var(--mk-subtle);font-size:.84rem}
+.mk-auth-back {display:inline-block;margin-top:18px}

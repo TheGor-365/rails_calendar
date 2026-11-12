@@ -7,6 +7,9 @@
     <% end %>
 
     <div class="rc-nav-group" aria-label="Workspace sections">
+      <% if client_signed_in? %>
+        <%= link_to rc_icon_label("grid-1x2", "Мой кабинет"), client_home_path, class: "rc-nav-link active" %>
+      <% else %>
       <% if owner_signed_in? %>
         <%= link_to rc_icon_label("grid-1x2", "Workspace"), workspace_path, class: "rc-nav-link" %>
       <% end %>
@@ -33,6 +36,7 @@
                       class: "rc-nav-link #{'active' if controller_path == 'admin/project_intakes' && action_name == 'index'}" %>
         <% end %>
       <% end %>
+      <% end %>
     </div>
 
     <div class="ms-auto d-flex align-items-center gap-2">
@@ -42,6 +46,9 @@
       <% if owner_signed_in? %>
         <span class="rc-nav-admin d-none d-sm-inline" title="Owner session">Owner: <%= current_user.email %></span>
         <%= button_to rc_icon_label("box-arrow-right", "Sign out"), sign_out_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
+      <% elsif client_signed_in? %>
+        <%= button_to rc_icon_label("box-arrow-right", "Выход"), sign_out_path,
+                      method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
       <% elsif admin_signed_in? %>
         <span class="rc-nav-admin d-none d-sm-inline">Administrator</span>
         <%= button_to rc_icon_label("box-arrow-right", "Sign out"), admin_logout_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
