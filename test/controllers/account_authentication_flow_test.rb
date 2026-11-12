@@ -22,7 +22,7 @@ class AccountAuthenticationFlowTest < ActionDispatch::IntegrationTest
                 password_confirmation: "long-test-password-123" }
       }
     end
-    assert_redirected_to consultations_path
+    assert_redirected_to workspace_path
     assert_equal "owner@example.test", User.last.email
     assert_not_equal "long-test-password-123", User.last.password_digest
 
@@ -41,7 +41,7 @@ class AccountAuthenticationFlowTest < ActionDispatch::IntegrationTest
       user: { email: "owner@example.test", password: "long-test-password-123",
               password_confirmation: "long-test-password-123" }
     }
-    assert_redirected_to consultations_path
+    assert_redirected_to workspace_path
     get sign_up_path
     assert_response :not_found
     delete sign_out_path
@@ -52,7 +52,7 @@ class AccountAuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_login_path
 
     post account_session_path, params: { email: "OWNER@EXAMPLE.TEST", password: "long-test-password-123" }
-    assert_redirected_to consultations_path
+    assert_redirected_to workspace_path
     get new_consultation_path
     assert_response :success
   end
@@ -75,7 +75,7 @@ class AccountAuthenticationFlowTest < ActionDispatch::IntegrationTest
       user: { email: "owner@example.test", password: "long-test-password-123",
               password_confirmation: "long-test-password-123" }
     }
-    assert_redirected_to consultations_path
+    assert_redirected_to workspace_path
 
     travel 8.hours + 1.second do
       get new_consultation_path

@@ -27,7 +27,7 @@ class RegistrationsController < ApplicationController
 
     if saved
       start_owner_session!(@user)
-      redirect_to consultations_path, notice: "Owner account created"
+      redirect_to workspace_path, notice: "Owner account created"
     else
       render :new, status: :unprocessable_entity
     end

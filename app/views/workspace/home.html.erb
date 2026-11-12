@@ -1,0 +1,44 @@
+<div class="container ws-hub my-4 my-sm-5">
+  <header class="ws-hub-header">
+    <div><p class="eyebrow mb-2"><i class="bi bi-grid-1x2" aria-hidden="true"></i> OWNER WORKSPACE</p>
+      <h1>Рабочее пространство</h1><p class="rc-muted mb-0">Календарь, консультации и внутренние запросы.</p></div>
+    <%= link_to rc_icon_label("plus-lg", "Новая консультация"), new_consultation_path, class: "rc-action rc-action--primary" %>
+  </header>
+  <section class="ws-hub-metrics" aria-label="Сводка">
+    <div class="ws-hub-metric"><i class="bi bi-calendar2-check" aria-hidden="true"></i><span>Предстоящие консультации</span><strong><%= @upcoming_count %></strong><small>Текущие и будущие записи</small></div>
+    <div class="ws-hub-metric"><i class="bi bi-inboxes" aria-hidden="true"></i><span>Внутренние демо-запросы</span><strong><%= @intake_count %></strong><small>Не оплаченные клиентские заказы</small></div>
+    <div class="ws-hub-metric"><i class="bi bi-clipboard-check" aria-hidden="true"></i><span>Черновики на проверке</span><strong><%= @review_count %></strong><small>Ревью владельца</small></div>
+  </section>
+  <section class="ws-hub-section" aria-labelledby="ws-tools">
+    <div class="ws-hub-section-head"><h2 id="ws-tools">Инструменты</h2><span><i class="bi bi-shield-lock" aria-hidden="true"></i> Только владелец</span></div>
+    <div class="ws-hub-tools">
+      <%= link_to root_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-calendar3" aria-hidden="true"></i></span><strong>Календарь</strong><small>Месяц, день, часы и записи</small><span class="ws-hub-tool-action">Открыть <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
+      <%= link_to consultations_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></span><strong>Консультации</strong><small>Поиск, детали и переносы</small><span class="ws-hub-tool-action">Открыть <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
+      <%= link_to admin_project_intakes_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-inboxes" aria-hidden="true"></i></span><strong>Запросы</strong><small>Синтетические заявки и ревью ТЗ</small><span class="ws-hub-tool-action">Открыть <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
+      <%= link_to new_project_intake_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-clipboard2-plus" aria-hidden="true"></i></span><strong>Пробный запрос</strong><small>Только учебные данные</small><span class="ws-hub-tool-action">Начать <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
+    </div>
+  </section>
+  <div class="ws-hub-panels">
+    <section class="ws-hub-panel" aria-labelledby="ws-upcoming">
+      <div class="ws-hub-panel-head"><h2 id="ws-upcoming">Ближайшие консультации</h2><%= link_to "Все записи", consultations_path %></div>
+      <% if @upcoming.any? %>
+        <ul class="ws-hub-list"><% @upcoming.each do |item| %>
+          <li><%= link_to consultation_path(item) do %><strong><%= item.title %></strong><small><%= item.start_time.in_time_zone.strftime("%d.%m.%Y · %H:%M UTC") %></small><i class="bi bi-chevron-right" aria-hidden="true"></i><% end %></li>
+        <% end %></ul>
+      <% else %><p class="ws-hub-empty">Предстоящих консультаций нет.</p><% end %>
+    </section>
+    <section class="ws-hub-panel" aria-labelledby="ws-intakes">
+      <div class="ws-hub-panel-head"><h2 id="ws-intakes">Последние демо-запросы</h2><%= link_to "Внутренний список", admin_project_intakes_path %></div>
+      <% if @recent_intakes.any? %>
+        <ul class="ws-hub-list"><% @recent_intakes.each do |item| %>
+          <li><%= link_to project_intake_path(item) do %><strong><%= item.title %></strong><small><%= item.project_type %> · <%= item.status %></small><i class="bi bi-chevron-right" aria-hidden="true"></i><% end %></li>
+        <% end %></ul>
+      <% else %><p class="ws-hub-empty">Демо-запросов пока нет.</p><% end %>
+    </section>
+  </div>
+  <aside class="ws-hub-boundary"><i class="bi bi-shield-check" aria-hidden="true"></i>
+    <div><strong>Клиентский кабинет и внешний AI пока закрыты</strong>
+      <p>Текущий экран — только для владельца. Многопользовательский доступ потребует отдельной изоляции данных; AI не используется на этой странице.</p></div>
+    <%= link_to rc_icon_label("globe", "Публичная витрина"), services_path %>
+  </aside>
+</div>
