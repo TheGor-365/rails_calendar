@@ -1,0 +1,286 @@
+// Rails Calendar Identity / White Atlas shared authentication shell v1.
+// All four entry flows: owner login, legacy admin, local owner bootstrap, client signup/OTP.
+// No Bootstrap form-control/card/btn components; responsive native CSS and semantic actions.
+body.rc-account-shell {
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(ellipse 58% 28% at 50% 3%, #e8f7f3 0, transparent 95%), #f7fafb;
+  min-height: 100dvh;
+}
+.rc-account-header {
+  position: sticky;
+  top: 0;
+  z-index: 70;
+  background: rgba(255,255,255,.96);
+  border-bottom: 1px solid var(--ws-border);
+  box-shadow: 0 6px 28px -23px rgba(17,66,73,.18);
+}
+@supports (backdrop-filter: blur(12px)) {
+  .rc-account-header { background: rgba(255,255,255,.91); backdrop-filter: blur(12px); }
+}
+.rc-account-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .75rem 1.1rem;
+  min-height: 72px;
+  padding: .65rem 0;
+}
+.rc-account-brand {
+  margin: 0 auto 0 0;
+  border: 0;
+  padding: 0;
+  gap: .68rem;
+}
+.rc-account-brand .rc-brand-symbol { width: 39px; height: 39px; border-radius: 11px; }
+.rc-account-nav-actions {
+  display: flex;
+  gap: .2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.rc-account-nav-link {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: .47rem;
+  padding: .54rem .8rem;
+  min-height: 39px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #526d77;
+  font-size: .78rem;
+  font-weight: 760;
+  transition: transform .17s var(--ws-easing),background .17s,color .17s;
+}
+.rc-account-nav-link:hover, .rc-account-nav-link.is-active {
+  background: var(--ws-teal-wash);
+  color: var(--ws-teal-deep);
+}
+.rc-account-nav-link:hover { transform: translateY(-1px); }
+.rc-account-nav-link .bi { color: var(--ws-teal); font-size: .96rem; }
+.rc-account-nav-link:active { transform: translateY(1px); }
+.rc-account-main {
+  flex: 1 0 auto;
+  padding: clamp(31px,5vw,63px) 0 clamp(46px,7vw,86px);
+}
+.rc-account-main > .container { max-width: 1110px; }
+.rc-account-content {
+  width: min(100%, 540px);
+  margin: 0 auto;
+}
+.rc-account-content--wide { width: min(100%, 720px); }
+.rc-account-intro { margin-bottom: 21px; }
+.rc-account-intro h1 {
+  margin: .68rem 0 .52rem;
+  font-size: clamp(1.8rem, 3.4vw, 2.3rem);
+  letter-spacing: -.055em;
+  line-height: 1.19;
+  font-weight: 820;
+}
+.rc-account-intro > p {
+  color: var(--ws-muted);
+  font-size: .88rem;
+  line-height: 1.64;
+  margin: 0;
+  max-width: 500px;
+}
+.rc-account-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  color: var(--ws-teal);
+  font-size: .65rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: .13em;
+}
+.rc-account-kicker .bi { font-size: .96rem; }
+.rc-account-panel {
+  border: 1px solid var(--ws-border);
+  background: white;
+  box-shadow: var(--ws-shadow);
+  border-radius: 17px;
+  padding: clamp(19px,3.1vw,28px);
+}
+.rc-account-form { display: grid; gap: 17px; }
+.rc-account-form .rc-field { margin: 0; }
+.rc-account-form .rc-field-label {
+  margin-bottom: 7px;
+  color: #4f6773;
+  font-size: .76rem;
+  font-weight: 770;
+  letter-spacing: 0;
+}
+.rc-account-form .rc-input {
+  width: 100%;
+  min-height: 45px;
+  background: #f8fafb;
+  border: 1px solid #dce7eb;
+  border-radius: 10px;
+  padding: .68rem .76rem;
+  font-size: .88rem;
+  font-weight: 560;
+  outline: 0;
+  box-shadow: none;
+  transition: background .17s,border-color .17s,box-shadow .17s;
+}
+.rc-account-form .rc-input:focus,
+.rc-account-form .rc-input:focus-visible {
+  background: white;
+  border: 1px solid #5eb9ac;
+  box-shadow: 0 0 0 3px rgba(10,118,109,.14);
+  outline: 0;
+}
+.rc-account-code {
+  font-size: 1.31rem!important;
+  letter-spacing: .27em;
+  font-variant-numeric: tabular-nums;
+}
+.rc-account-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: .7rem;
+  color: var(--ws-muted);
+  font-size: .77rem;
+  line-height: 1.55;
+}
+.rc-account-checkbox {
+  margin-top: .22rem;
+  flex: 0 0 17px;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--ws-teal);
+  cursor: pointer;
+}
+.rc-account-consent label { cursor: pointer; }
+.rc-account-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  color: var(--ws-teal);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  font-weight: 780;
+}
+.rc-account-inline-link .bi { font-size: .83rem; }
+.rc-account-form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 4px; }
+.rc-account-form-actions .rc-action {
+  min-height: 41px;
+  border: 0;
+  border-radius: 10px;
+  padding: .65rem .95rem;
+  font-weight: 790;
+  font-size: .8rem;
+  width: auto;
+  max-width: 100%;
+}
+.rc-account-form-actions .rc-action .rc-icon { font-size: .98rem; }
+.rc-account-alternatives {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .4rem .75rem;
+  margin-top: 20px;
+  padding-top: 17px;
+  border-top: 1px solid var(--ws-border);
+  font-size: .75rem;
+  color: var(--ws-muted);
+}
+.rc-account-option {
+  display: inline-flex;
+  align-items: center;
+  gap: .42rem;
+  min-height: 33px;
+  padding: .36rem .58rem;
+  border-radius: 9px;
+  color: var(--ws-teal-deep);
+  background: var(--ws-teal-wash);
+  text-decoration: none;
+  font-size: .75rem;
+  font-weight: 780;
+  line-height: 1.3;
+  border: 1px solid transparent;
+  transition: transform .16s var(--ws-easing),background .16s,border-color .16s,color .16s;
+}
+.rc-account-option .bi { font-size: .92rem; }
+.rc-account-option:hover {
+  background: #d4ede6;
+  color: #064e46;
+  border-color: #c5e2d9;
+  transform: translateY(-1px);
+}
+.rc-account-option:active { transform: translateY(1px); }
+.rc-account-option--button { font: inherit; font-size: .75rem; cursor: pointer; }
+.rc-account-alternatives form { margin: 0; }
+.rc-account-local-setup {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .65rem;
+  margin-top: 17px;
+  border: 1px dashed #c9e2db;
+  background: #f5faf8;
+  border-radius: 12px;
+  padding: .8rem;
+  color: #53746e;
+  font-size: .74rem;
+}
+.rc-account-local-setup > .bi { font-size: 1rem; color: var(--ws-teal); }
+.rc-account-local-setup .rc-account-option { margin-left: auto; }
+.rc-account-return { margin-top: 15px; }
+.rc-account-flash { max-width: 540px; margin: 0 auto 17px; border-radius: 11px; }
+.rc-account-dev-mail {
+  display: flex;
+  align-items: flex-start;
+  gap: .7rem;
+  background: #eef7f9;
+  color: #4e6f79;
+  border: 1px solid #d7eaef;
+  border-radius: 11px;
+  padding: .86rem 1rem;
+  font-size: .77rem;
+  margin: 0 0 21px;
+  line-height: 1.6;
+}
+.rc-account-dev-mail > .bi { font-size: 1.08rem; color: #247e83; }
+.rc-account-dev-mail code {
+  display: inline-block;
+  color: #175e63;
+  font-size: .76rem;
+  background: white;
+  padding: .1rem .32rem;
+  border-radius: 5px;
+  word-break: break-word;
+}
+.rc-account-policy h2 { margin: 19px 0 5px; font-weight: 790; font-size: 1rem; }
+.rc-account-policy h2:first-child { margin-top: 0; }
+.rc-account-policy p { font-size: .83rem; color: var(--ws-muted); line-height: 1.66; margin-bottom: 12px; }
+.rc-account-policy > .rc-account-option { margin-top: 15px; }
+.rc-account-footer { border-top: 1px solid var(--ws-border); background: #fff; padding: 17px 0; }
+.rc-account-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+  font-size: .69rem;
+  color: #71858d;
+}
+.rc-account-footer .bi { margin-right: .32rem; color: var(--ws-teal); }
+@media (max-width: 575.98px) {
+  .rc-account-main { padding: 26px 0 51px; }
+  .rc-account-header .rc-account-nav { min-height: 60px; gap: .55rem; }
+  .rc-account-nav-actions { width: 100%; padding-top: .1rem; gap: .15rem; }
+  .rc-account-nav-link { flex: 0 0 auto; padding: .46rem .65rem; font-size: .72rem; min-height: 35px; }
+  .rc-account-brand .rc-brand-symbol { width: 34px; height: 34px; }
+  .rc-account-brand { font-size: .85rem; }
+  .rc-account-intro h1 { font-size: clamp(1.7rem, 7.4vw, 2.05rem); }
+  .rc-account-panel { padding: 18px; }
+  .rc-account-footer-inner { font-size: .65rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rc-account-shell :is(.rc-account-nav-link,.rc-account-option,.rc-account-form .rc-input) { transition: none!important; }
+  .rc-account-shell :is(.rc-account-nav-link,.rc-account-option):hover,
+  .rc-account-shell :is(.rc-account-nav-link,.rc-account-option):active { transform: none!important; }
+}

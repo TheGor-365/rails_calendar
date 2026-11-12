@@ -1,0 +1,59 @@
+// Workspace UI polish / shared application surfaces.
+// Keep Bootstrap for grid utilities, not buttons/cards/alerts. No behavioral changes.
+:root {
+  --ui-focus-ring: 0 0 0 3px rgba(10,118,109,.16);
+  --ui-soft-shadow: 0 4px 12px -10px rgba(20,62,70,.24);
+}
+.app-shell :is(.rc-action,.rc-account-option,.rc-nav-link,.rc-text-link,.rc-navigation-link):focus-visible {
+  outline: 3px solid #168d82;
+  outline-offset: 3px;
+}
+.app-shell button:not(:disabled),
+.app-shell a[href] { -webkit-tap-highlight-color: rgba(10,118,109,.12); }
+.app-shell :is(.rc-action,.rc-record,.surface-panel,.rc-quiz-choice) {
+  -webkit-font-smoothing: antialiased;
+}
+.app-shell .surface-panel {
+  background: #fff;
+  border-color: var(--ws-border);
+  box-shadow: var(--ws-shadow);
+  border-radius: 17px;
+}
+.app-shell .rc-action {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  text-wrap: pretty;
+}
+.app-shell .rc-action:disabled,
+.app-shell .rc-action[aria-disabled="true"] {
+  opacity: .48;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+.app-shell .rc-record:focus-within,
+.app-shell .ws-hub-tool:focus-visible,
+.app-shell .ws-tool:focus-visible {
+  border-color: #7dc6b8;
+  box-shadow: var(--ws-shadow-up),var(--ui-focus-ring);
+}
+.app-shell .rc-input:hover:not(:disabled):not(:focus) { border-color: #9fcfc6; }
+.app-shell .rc-input:disabled { background: #eff3f4; color: #8a9b9f; cursor: not-allowed; }
+.app-shell .rc-status-pill { border-radius: 8px; }
+.app-shell .rc-notice { border-radius: 12px; border-color: var(--ws-border); box-shadow: var(--ui-soft-shadow); }
+.app-shell .rc-notice--success { border-left: 3px solid var(--ws-teal); background: #f1faf7; }
+.app-shell .rc-notice--error { border-left: 3px solid #aa4253; background: #fff5f6; }
+.app-shell .rc-quiz-choice:focus-within { border-color: #55baa8; box-shadow: var(--ui-focus-ring); }
+.app-shell .rc-quiz-choice:active { transform: translateY(1px); }
+.app-shell .rc-record-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+@media(max-width:575.98px) {
+  .app-shell .rc-page-hero__actions .rc-action,
+  .app-shell .rc-filter-actions .rc-action { flex: 0 1 auto; }
+  .app-shell .rc-action { font-size: .76rem; }
+}
+@media(prefers-reduced-motion: reduce) {
+  .app-shell :is(.rc-action,.rc-quiz-choice,.rc-record,.ws-hub-tool) { transition: none!important; }
+  .app-shell .rc-quiz-choice:active { transform: none; }
+}
