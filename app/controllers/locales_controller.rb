@@ -12,7 +12,7 @@ class LocalesController < ApplicationController
     destination = params[:return_to].to_s
     path = begin
       uri = URI.parse(destination)
-      uri.path.start_with?("/") && !destination.start_with?("//") &&
+      uri.path.to_s.start_with?("/") && !destination.start_with?("//") &&
         uri.scheme.nil? && uri.host.nil? && !destination.match?(/[\r\n]/) &&
         destination.bytesize <= 2048 && uri.path != language_path ? destination : services_path
     rescue URI::InvalidURIError
