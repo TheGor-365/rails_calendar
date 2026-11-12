@@ -1,9 +1,9 @@
 <div class="rc-account-content">
   <%= render "shared/account_heading",
-             icon: "person-gear", eyebrow: "WORKSPACE / LOCAL BOOTSTRAP",
-             title: "Создать владельца",
-             description: "Доступно только в изолированной локальной среде. Клиентская регистрация — отдельный сценарий." %>
-  <section class="rc-account-panel" aria-label="Создание первого владельца">
+             icon: "person-gear", eyebrow: t("auth.owner.eyebrow"),
+             title: t("auth.owner.title"),
+             description: t("auth.owner.description") %>
+  <section class="rc-account-panel" aria-label="<%= t('auth.owner.panel') %>">
     <% if @user.errors.any? %>
       <div role="alert" class="rc-notice rc-notice--error mb-3">
         <ul><% @user.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul>
@@ -11,21 +11,21 @@
     <% end %>
     <%= form_with model: @user, url: sign_up_path, local: true,
                   html: { class: "rc-account-form rc-form" } do |form| %>
-      <div class="rc-field"><%= form.label :email, "Электронная почта", class: "rc-field-label" %>
+      <div class="rc-field"><%= form.label :email, t("auth.owner.email"), class: "rc-field-label" %>
         <%= form.email_field :email, required: true, maxlength: 254, autocomplete: "email", class: "rc-input" %></div>
-      <div class="rc-field"><%= form.label :password, "Пароль (минимум 12 символов)", class: "rc-field-label" %>
+      <div class="rc-field"><%= form.label :password, t("auth.owner.password"), class: "rc-field-label" %>
         <%= form.password_field :password, required: true, minlength: 12, autocomplete: "new-password", class: "rc-input" %></div>
-      <div class="rc-field"><%= form.label :password_confirmation, "Повторите пароль", class: "rc-field-label" %>
+      <div class="rc-field"><%= form.label :password_confirmation, t("auth.owner.confirm"), class: "rc-field-label" %>
         <%= form.password_field :password_confirmation, required: true, minlength: 12, autocomplete: "new-password", class: "rc-input" %></div>
       <div class="rc-account-form-actions">
         <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
-          <%= rc_icon_label("person-check", "Создать владельца") %>
+          <%= rc_icon_label("person-check", t("auth.owner.submit")) %>
         <% end %>
       </div>
     <% end %>
     <div class="rc-account-alternatives">
-      <span>Уже есть владелец?</span>
-      <%= link_to rc_icon_label("box-arrow-in-right", "Войти"), sign_in_path, class: "rc-account-option" %>
+      <span><%= t("auth.owner.existing") %></span>
+      <%= link_to rc_icon_label("box-arrow-in-right", t("auth.owner.login")), sign_in_path, class: "rc-account-option" %>
     </div>
   </section>
 </div>

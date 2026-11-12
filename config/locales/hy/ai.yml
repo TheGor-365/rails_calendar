@@ -1,0 +1,10 @@
+hy:
+  ai:
+    interface:
+      draft: "Սևագիր"
+      human_review: "Պահանջում է մարդու ստուգում"
+      not_configured: "ԱԲ-ն միացված չէ"
+      unknowns: "Անհայտ տվյալներ"
+      sources: "Աղբյուրներ"
+      request: "ԱԲ հարցում"
+      no_automatic_approval: "ԱԲ-ի առաջարկներն ինքնաբերաբար չեն հաստատվում"

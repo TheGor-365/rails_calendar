@@ -6,12 +6,12 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     get services_url
 
     assert_response :success
-    assert_select "html[lang='ru']", count: 1
+    assert_select "html[lang='en']", count: 1
     assert_select "body.marketing-page", count: 1
-    assert_select "h1", text: /Веб-задачи/
+    assert_select "h1", text: /Web tasks/
     assert_select "section#services article.marketing-service", count: 4
     assert_select ".mk-board-lane", count: 3
-    assert_select ".mk-workflow-disclaimer", text: /не интерактивная доска/
+    assert_select ".mk-workflow-disclaimer", text: /not an interactive board/
     assert_select "a.mk-service-card", count: 0
     assert_select "article.marketing-service > a[href='#contact']", count: 4
     assert_select "a[href='/sign_in']", minimum: 1
@@ -19,7 +19,7 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='https://kwork.com/user/thegor-365']", minimum: 1
     assert_select "meta[name='robots'][content='index,follow']", count: 1
     assert_select "link[rel='stylesheet'][href='/marketing.css']", count: 1
-    assert_select "form", count: 0
+    assert_select "form:not([action='/language'])", count: 0
     assert_select "a[href*='project_intakes']", count: 0
   end
 

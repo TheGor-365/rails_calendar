@@ -1,0 +1,8 @@
+es:
+  client:
+    eyebrow: "ESPACIO DEL CLIENTE"
+    title: "Mi espacio de trabajo"
+    description: "Correo verificado. La cuenta está lista. Los proyectos y solicitudes se mostrarán al habilitar el flujo seguro independiente."
+    panel_title: "Estamos preparando tu espacio"
+    panel_body: "Aún no tienes proyectos. No presentamos datos de otros usuarios ni solicitudes ficticias como tuyas."
+    overview: "Resumen de servicios"

@@ -9,9 +9,9 @@ class ConsultationStaleFormTest < ApplicationSystemTestCase
 
   test "stale browser tab displays a conflict without overwriting saved data" do
     visit admin_login_url
-    fill_in "Логин", with: ENV.fetch("RAILS_CALENDAR_ADMIN_USERNAME")
-    fill_in "Пароль", with: ENV.fetch("RAILS_CALENDAR_ADMIN_PASSWORD")
-    click_button "Войти как администратор"
+    fill_in "Username", with: ENV.fetch("RAILS_CALENDAR_ADMIN_USERNAME")
+    fill_in "Password", with: ENV.fetch("RAILS_CALENDAR_ADMIN_PASSWORD")
+    click_button "Sign in as administrator"
     assert_text "Administrator signed in"
 
     visit edit_consultation_url(@consultation)

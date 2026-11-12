@@ -1,0 +1,8 @@
+en:
+  client:
+    eyebrow: "CLIENT SPACE"
+    title: "My workspace"
+    description: "Email verified. Your account is ready. Client projects and requests will appear when a separate secure workflow is enabled."
+    panel_title: "Workspace is being prepared"
+    panel_body: "You have no client projects yet. We do not show other people's data or fictional demo requests as yours."
+    overview: "Service overview"

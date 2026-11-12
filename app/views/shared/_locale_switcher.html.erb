@@ -1,0 +1,22 @@
+<details class="rc-locale-switcher">
+  <summary aria-label="<%= t('i18n.language') %>" title="<%= t('i18n.language') %>">
+    <i class="bi bi-translate" aria-hidden="true"></i>
+    <span><%= I18n.locale.to_s.upcase %></span>
+    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+  </summary>
+  <div class="rc-locale-options" role="group" aria-label="<%= t('i18n.choose') %>">
+    <% { en: "English", ru: "Русский", hy: "Հայերեն", es: "Español" }.each do |code, label| %>
+      <% if I18n.locale == code %>
+        <span class="rc-locale-option is-selected" aria-current="true">
+          <i class="bi bi-check2" aria-hidden="true"></i><%= label %>
+        </span>
+      <% else %>
+        <%= button_to language_path, method: :post,
+                      params: { locale: code, return_to: request.fullpath },
+                      form: { class: "rc-locale-form" }, class: "rc-locale-option" do %>
+          <i class="bi bi-globe2" aria-hidden="true"></i><%= label %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</details>

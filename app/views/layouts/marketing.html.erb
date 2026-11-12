@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="<%= I18n.locale %>">
   <head>
     <meta charset="utf-8">
-    <title>Rails Calendar · AI Workspace — заявки и разработка веб-сервисов</title>
+    <title><%= t("marketing.title") %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Rails Calendar · AI Workspace: услуги Ruby on Rails, формы, API/PostgreSQL и автоматизация. Прозрачный процесс постановки и согласования веб-задач.">
+    <meta name="description" content="<%= t("marketing.description") %>">
     <meta name="robots" content="index,follow">
     <link rel="canonical" href="https://rails-calendar-ai-web-production.up.railway.app/">
     <meta name="theme-color" content="#ffffff">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Rails Calendar · AI Workspace">
-    <meta property="og:description" content="Четыре направления веб-разработки и понятный маршрут от запроса до согласованной задачи.">
+    <meta property="og:description" content="<%= t("marketing.og_description") %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -19,21 +19,22 @@
     <link rel="stylesheet" href="/marketing.css">
   </head>
   <body class="marketing-page">
-    <a class="mk-skip" href="#main-content">Перейти к содержимому</a>
+    <a class="mk-skip" href="#main-content"><%= t("nav.skip") %></a>
     <header class="mk-header">
       <div class="mk-container mk-header-inner">
-        <%= link_to services_path, class: "mk-brand", aria: { label: "Rails Calendar AI Workspace — обзор" } do %>
+        <%= link_to services_path, class: "mk-brand", aria: { label: t("nav.home") } do %>
           <span class="mk-brand-icon" aria-hidden="true"><svg class="mk-icon"><use href="/workspace-icons.svg#layers"></use></svg></span>
           <span class="mk-brand-name">Rails Calendar <small>AI Workspace</small></span>
         <% end %>
-        <nav class="mk-header-nav" aria-label="Главная навигация">
-          <%= link_to "Услуги", services_path(anchor: "services") %>
-          <%= link_to "Как работаем", services_path(anchor: "process"), class: "mk-header-secondary" %>
-          <%= link_to "Контакты", services_path(anchor: "contact"), class: "mk-header-secondary" %>
+        <nav class="mk-header-nav" aria-label="<%= t("nav.main_navigation") %>">
+          <%= link_to t("nav.services"), services_path(anchor: "services") %>
+          <%= link_to t("marketing.nav_process"), services_path(anchor: "process"), class: "mk-header-secondary" %>
+          <%= link_to t("marketing.nav_contact"), services_path(anchor: "contact"), class: "mk-header-secondary" %>
         </nav>
+        <%= render "shared/locale_switcher" %>
         <%= link_to(owner_signed_in? ? workspace_path : (client_signed_in? ? client_home_path : (admin_signed_in? ? root_path : sign_in_path)), class: "mk-header-access") do %>
           <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#lock"></use></svg>
-          <span><%= owner_signed_in? ? "Рабочая область" : (client_signed_in? ? "Мой кабинет" : (admin_signed_in? ? "Администратор" : "Вход")) %></span>
+          <span><%= owner_signed_in? ? t("nav.workspace") : (client_signed_in? ? t("nav.client_home") : (admin_signed_in? ? t("nav.administrator") : t("nav.sign_in"))) %></span>
         <% end %>
       </div>
     </header>
@@ -41,7 +42,7 @@
     <footer class="mk-footer">
       <div class="mk-container mk-footer-inner">
         <span class="mk-footer-brand"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg>Rails Calendar · AI Workspace</span>
-        <span>Публичная витрина · Клиентские данные на сайте не принимаются</span>
+        <span><%= t("marketing.footer") %></span>
       </div>
     </footer>
   </body>

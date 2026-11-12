@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="<%= I18n.locale %>">
   <head>
     <meta charset="utf-8">
-    <title>Аккаунт · Rails Calendar AI Workspace</title>
+    <title><%= t("auth.brand") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
     <meta name="theme-color" content="#ffffff">
@@ -15,24 +15,25 @@
   </head>
   <body class="app-shell rc-account-shell" data-controller="ui-feedback"
         data-action="turbo:submit-start->ui-feedback#start turbo:submit-end->ui-feedback#finish turbo:load@document->ui-feedback#reset">
-    <a class="skip-link" href="#main-content">К содержимому</a>
+    <a class="skip-link" href="#main-content"><%= t("nav.skip") %></a>
     <header class="app-header rc-account-header">
       <div class="container">
-        <nav class="rc-account-nav" aria-label="Навигация аккаунта">
-          <%= link_to services_path, class: "app-brand rc-account-brand", aria: { label: "Rails Calendar AI Workspace — обзор" } do %>
+        <nav class="rc-account-nav" aria-label="<%= t("nav.account_navigation") %>">
+          <%= link_to services_path, class: "app-brand rc-account-brand", aria: { label: t("nav.home") } do %>
             <span class="rc-brand-symbol" aria-hidden="true"><i class="bi bi-grid-1x2"></i></span>
             <span class="ws-brand-name">Rails Calendar<small>AI Workspace</small></span>
           <% end %>
           <div class="rc-account-nav-actions">
-            <%= link_to rc_icon_label("grid", "Обзор"), services_path, class: "rc-account-nav-link" %>
-            <%= link_to rc_icon_label("box-arrow-in-right", "Вход"), sign_in_path,
+            <%= link_to rc_icon_label("grid", t("nav.overview")), services_path, class: "rc-account-nav-link" %>
+            <%= link_to rc_icon_label("box-arrow-in-right", t("nav.sign_in")), sign_in_path,
                         class: "rc-account-nav-link #{'is-active' if controller_path == 'account_sessions'}",
                         aria: { current: ("page" if controller_path == "account_sessions") } %>
             <% if ClientSignupAvailability.enabled? %>
-              <%= link_to rc_icon_label("person-plus", "Регистрация"), client_registration_path,
+              <%= link_to rc_icon_label("person-plus", t("nav.register")), client_registration_path,
                           class: "rc-account-nav-link #{'is-active' if controller_path == 'client_registrations'}",
                           aria: { current: ("page" if controller_path == "client_registrations") } %>
             <% end %>
+            <%= render "shared/locale_switcher" %>
           </div>
         </nav>
       </div>
@@ -47,7 +48,7 @@
     <footer class="rc-account-footer">
       <div class="container rc-account-footer-inner">
         <span><i class="bi bi-grid-1x2" aria-hidden="true"></i> Rails Calendar · AI Workspace</span>
-        <span><i class="bi bi-shield-check" aria-hidden="true"></i> Защищённый доступ к аккаунту</span>
+        <span><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("auth.footer_secure") %></span>
       </div>
     </footer>
   </body>

@@ -1,41 +1,41 @@
 <div class="rc-account-content">
   <%= render "shared/account_heading",
-             icon: "person-plus", eyebrow: "АККАУНТ / РЕГИСТРАЦИЯ",
-             title: "Создать аккаунт",
-             description: "Подтвердите адрес одноразовым кодом, чтобы войти в собственную рабочую область." %>
-  <section class="rc-account-panel" aria-label="Регистрация клиента">
+             icon: "person-plus", eyebrow: t("auth.register.eyebrow"),
+             title: t("auth.register.title"),
+             description: t("auth.register.description") %>
+  <section class="rc-account-panel" aria-label="<%= t('auth.register.panel') %>">
     <%= form_with url: client_registration_path, scope: :signup, local: true,
                   html: { class: "rc-account-form rc-form" } do |form| %>
       <div class="rc-field">
-        <%= form.label :email, "Электронная почта", class: "rc-field-label" %>
+        <%= form.label :email, t("auth.register.email"), class: "rc-field-label" %>
         <%= form.email_field :email, required: true, maxlength: 254, autocomplete: "email",
                              placeholder: "you@example.com", class: "rc-input" %>
       </div>
       <div class="rc-field">
-        <%= form.label :password, "Пароль (минимум 12 символов)", class: "rc-field-label" %>
+        <%= form.label :password, t("auth.register.password"), class: "rc-field-label" %>
         <%= form.password_field :password, required: true, minlength: 12, maxlength: 72,
                                  autocomplete: "new-password", class: "rc-input" %>
       </div>
       <div class="rc-field">
-        <%= form.label :password_confirmation, "Повторите пароль", class: "rc-field-label" %>
+        <%= form.label :password_confirmation, t("auth.register.confirm"), class: "rc-field-label" %>
         <%= form.password_field :password_confirmation, required: true, minlength: 12, maxlength: 72,
                                  autocomplete: "new-password", class: "rc-input" %>
       </div>
       <div class="rc-account-consent">
         <%= form.check_box :consent, { required: true, class: "rc-account-checkbox" }, "1", "0" %>
         <%= form.label :consent do %>
-          Согласен на обработку email и данных аккаунта. <%= link_to rc_icon_label("shield-check", "Условия обработки"), ClientSignupAvailability.privacy_url, class: "rc-account-inline-link" %>
+          <%= t("auth.register.consent") %> <%= link_to rc_icon_label("shield-check", t("auth.register.privacy_link")), ClientSignupAvailability.privacy_url, class: "rc-account-inline-link" %>
         <% end %>
       </div>
       <div class="rc-account-form-actions">
         <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
-          <%= rc_icon_label("envelope-arrow-up", "Получить код") %>
+          <%= rc_icon_label("envelope-arrow-up", t("auth.register.submit")) %>
         <% end %>
       </div>
     <% end %>
     <div class="rc-account-alternatives">
-      <span>Уже зарегистрированы?</span>
-      <%= link_to rc_icon_label("box-arrow-in-right", "Войти"), sign_in_path, class: "rc-account-option" %>
+      <span><%= t("auth.register.existing") %></span>
+      <%= link_to rc_icon_label("box-arrow-in-right", t("auth.register.sign_in")), sign_in_path, class: "rc-account-option" %>
     </div>
   </section>
 </div>

@@ -1,24 +1,24 @@
 <div class="rc-account-content">
   <%= render "shared/account_heading",
-             icon: "shield-lock", eyebrow: "ADMIN / LEGACY ACCESS",
-             title: "Вход администратора",
-             description: "Отдельный служебный вход для прежнего календаря. Клиентские аккаунты не дают административных прав." %>
-  <section class="rc-account-panel" aria-label="Административный вход">
+             icon: "shield-lock", eyebrow: t("auth.admin.eyebrow"),
+             title: t("auth.admin.title"),
+             description: t("auth.admin.description") %>
+  <section class="rc-account-panel" aria-label="<%= t('auth.admin.panel') %>">
     <%= form_with url: admin_session_path, method: :post, local: true,
                   html: { class: "rc-account-form rc-form" } do |form| %>
-      <div class="rc-field"><%= form.label :username, "Логин", class: "rc-field-label" %>
+      <div class="rc-field"><%= form.label :username, t("auth.admin.username"), class: "rc-field-label" %>
         <%= form.text_field :username, required: true, autocomplete: "username", class: "rc-input" %></div>
-      <div class="rc-field"><%= form.label :password, "Пароль", class: "rc-field-label" %>
+      <div class="rc-field"><%= form.label :password, t("auth.admin.password"), class: "rc-field-label" %>
         <%= form.password_field :password, required: true, autocomplete: "current-password", class: "rc-input" %></div>
       <div class="rc-account-form-actions">
         <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
-          <%= rc_icon_label("shield-lock", "Войти как администратор") %>
+          <%= rc_icon_label("shield-lock", t("auth.admin.submit")) %>
         <% end %>
       </div>
     <% end %>
     <div class="rc-account-alternatives">
-      <span>Аккаунт владельца или клиента?</span>
-      <%= link_to rc_icon_label("person", "Обычный вход"), sign_in_path, class: "rc-account-option" %>
+      <span><%= t("auth.admin.regular_prompt") %></span>
+      <%= link_to rc_icon_label("person", t("auth.admin.regular")), sign_in_path, class: "rc-account-option" %>
     </div>
   </section>
 </div>

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  post "/language", to: "locales#update", as: :language
   # RC-032: local owner bootstrap and DB-backed account sessions.
   get "/sign_up", to: "registrations#new", as: :sign_up
   post "/sign_up", to: "registrations#create"

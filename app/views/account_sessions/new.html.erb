@@ -1,35 +1,35 @@
 <div class="rc-account-content">
   <%= render "shared/account_heading",
-             icon: "shield-lock", eyebrow: "WORKSPACE / ДОСТУП",
-             title: "Вход в рабочую область",
-             description: "Один аккаунт для доступа к вашему рабочему пространству. Права владельца и клиента разделены." %>
-  <section class="rc-account-panel" aria-label="Вход в аккаунт">
+             icon: "shield-lock", eyebrow: t("auth.login.eyebrow"),
+             title: t("auth.login.title"),
+             description: t("auth.login.description") %>
+  <section class="rc-account-panel" aria-label="<%= t('auth.login.panel') %>">
     <%= form_with url: account_session_path, method: :post, local: true, html: { class: "rc-account-form rc-form" } do |form| %>
       <div class="rc-field">
-        <%= form.label :email, "Электронная почта", class: "rc-field-label" %>
+        <%= form.label :email, t("auth.login.email"), class: "rc-field-label" %>
         <%= form.email_field :email, required: true, maxlength: 254, autocomplete: "email", placeholder: "you@example.com", class: "rc-input" %>
       </div>
       <div class="rc-field">
-        <%= form.label :password, "Пароль", class: "rc-field-label" %>
+        <%= form.label :password, t("auth.login.password"), class: "rc-field-label" %>
         <%= form.password_field :password, required: true, autocomplete: "current-password", class: "rc-input" %>
       </div>
       <div class="rc-account-form-actions">
         <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
-          <%= rc_icon_label("box-arrow-in-right", "Войти") %>
+          <%= rc_icon_label("box-arrow-in-right", t("auth.login.action")) %>
         <% end %>
       </div>
     <% end %>
     <% if ClientSignupAvailability.enabled? %>
       <div class="rc-account-alternatives">
-        <span>Ещё нет аккаунта?</span>
-        <%= link_to rc_icon_label("person-plus", "Создать аккаунт"), client_registration_path, class: "rc-account-option" %>
+        <span><%= t("auth.login.no_account") %></span>
+        <%= link_to rc_icon_label("person-plus", t("auth.login.create")), client_registration_path, class: "rc-account-option" %>
       </div>
     <% end %>
     <% if (Rails.env.development? || Rails.env.test?) && ENV["RC_LOCAL_OWNER_SIGNUP"] == "true" && !User.where(role: "owner").exists? %>
       <div class="rc-account-local-setup">
         <i class="bi bi-terminal" aria-hidden="true"></i>
-        <span>Локальная настройка</span>
-        <%= link_to rc_icon_label("person-gear", "Первый владелец"), sign_up_path, class: "rc-account-option" %>
+        <span><%= t("auth.login.local_setup") %></span>
+        <%= link_to rc_icon_label("person-gear", t("auth.login.first_owner")), sign_up_path, class: "rc-account-option" %>
       </div>
     <% end %>
   </section>

@@ -1,18 +1,18 @@
 <div class="rc-account-content rc-account-content--wide">
   <%= render "shared/account_heading",
-             icon: "shield-check", eyebrow: "АККАУНТ / ДАННЫЕ",
-             title: "Обработка данных",
-             description: "Техническое уведомление текущей QA-версии. Перед публичным запуском требуется утверждённая юридическая политика." %>
-  <section class="rc-account-panel rc-account-policy" aria-label="Уведомление о данных">
-    <h2>Какие данные нужны</h2>
-    <p>Email, хэш пароля, хэш кода, время подтверждения и согласия. Для защиты от перебора используются HMAC-отпечатки.</p>
-    <h2>Как используется email</h2>
-    <p>Для подтверждения адреса и доступа к аккаунту. До подтверждения клиентский аккаунт не создаётся.</p>
-    <h2>Безопасность и сроки</h2>
-    <p>Код действителен 10 минут и ограничен по числу попыток. Очистка временных данных выполняется отдельной сервисной задачей.</p>
-    <h2>Статус запуска</h2>
-    <p>Внешняя регистрация остаётся закрытой в production до проверки доставки, восстановления доступа, удаления данных и юридических условий.</p>
-    <%= link_to rc_icon_label("arrow-left", "Вернуться к регистрации"),
+             icon: "shield-check", eyebrow: t("auth.privacy.eyebrow"),
+             title: t("auth.privacy.title"),
+             description: t("auth.privacy.description") %>
+  <section class="rc-account-panel rc-account-policy" aria-label="<%= t('auth.privacy.panel') %>">
+    <h2><%= t("auth.privacy.data_title") %></h2>
+    <p><%= t("auth.privacy.data_body") %></p>
+    <h2><%= t("auth.privacy.email_title") %></h2>
+    <p><%= t("auth.privacy.email_body") %></p>
+    <h2><%= t("auth.privacy.security_title") %></h2>
+    <p><%= t("auth.privacy.security_body") %></p>
+    <h2><%= t("auth.privacy.release_title") %></h2>
+    <p><%= t("auth.privacy.release_body") %></p>
+    <%= link_to rc_icon_label("arrow-left", t("auth.privacy.back")),
                 client_registration_path, class: "rc-account-option" %>
   </section>
 </div>

@@ -18,20 +18,20 @@ class AccountSessionsController < ApplicationController
 
     if user&.role == "owner"
       start_owner_session!(user)
-      redirect_to workspace_path, notice: "Signed in"
+      redirect_to workspace_path, notice: I18n.t("flash.signed_in")
     elsif user&.verified_client?
       start_account_session!(user)
       redirect_to client_home_path, notice: "Signed in"
     else
       reset_session
-      flash.now[:alert] = "Invalid email or password"
+      flash.now[:alert] = I18n.t("flash.invalid_login")
       render :new, status: :unauthorized
     end
   end
 
   def destroy
     end_owner_session!
-    redirect_to root_path, notice: "Signed out"
+    redirect_to root_path, notice: I18n.t("flash.signed_out")
   end
 
   private

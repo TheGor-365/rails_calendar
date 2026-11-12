@@ -20,17 +20,17 @@ module Admin
         reset_session
         session[:admin_signed_in_at] = Time.current.to_i
         session[:admin_session_signature] = admin_session_signature
-        redirect_to consultations_path, notice: "Administrator signed in"
+        redirect_to consultations_path, notice: I18n.t("flash.admin_signed_in")
       else
         reset_session
-        flash.now[:alert] = "Invalid administrator credentials"
+        flash.now[:alert] = I18n.t("flash.invalid_admin")
         render :new, status: :unauthorized
       end
     end
 
     def destroy
       reset_session
-      redirect_to root_path, notice: "Administrator signed out"
+      redirect_to root_path, notice: I18n.t("flash.admin_signed_out")
     end
 
     private

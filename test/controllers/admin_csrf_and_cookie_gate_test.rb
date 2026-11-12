@@ -65,7 +65,7 @@ class AdminCsrfAndCookieGateTest < ActionDispatch::IntegrationTest
     old_title = record.title
     get edit_consultation_url(record)
     assert_response :success
-    token = response.parsed_body.at_css("form input[name='authenticity_token']")&.[]("value")
+    token = response.parsed_body.at_css("form[action='#{consultation_path(record)}'] input[name='authenticity_token']")&.[]("value")
     assert token.present?, "edit form must include a CSRF token"
 
     assert_raises(ActionController::InvalidAuthenticityToken) do
@@ -120,7 +120,7 @@ class AdminCsrfAndCookieGateTest < ActionDispatch::IntegrationTest
   end
 
   def login_form_token
-    token = response.parsed_body.at_css("form input[name='authenticity_token']")&.[]("value")
+    token = response.parsed_body.at_css("form[action='#{admin_session_path}'] input[name='authenticity_token']")&.[]("value")
     assert token.present?, "login form must include a CSRF token"
     token
   end

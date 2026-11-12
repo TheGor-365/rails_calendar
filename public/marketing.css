@@ -232,3 +232,20 @@ body.marketing-page { min-width: 320px; margin: 0; background: var(--mk-canvas);
 .mk-auth-policy h2 {font-size:1rem;margin:20px 0 5px}
 .mk-auth-policy p {color:var(--mk-subtle);font-size:.84rem}
 .mk-auth-back {display:inline-block;margin-top:18px}
+
+/* Shared language control across app, account and public layouts. No JS. */
+.rc-locale-switcher{position:relative;flex:0 0 auto;font-size:.78rem;line-height:1.2;z-index:100}
+.rc-locale-switcher>summary{list-style:none;display:inline-flex;align-items:center;gap:.4rem;min-height:37px;padding:.4rem .65rem;border:1px solid #e2eaed;border-radius:10px;background:#fff;color:#43636a;font-weight:800;cursor:pointer;user-select:none;transition:background .16s,border-color .16s,color .16s,transform .16s}
+.rc-locale-switcher>summary::-webkit-details-marker{display:none}
+.rc-locale-switcher>summary:hover,.rc-locale-switcher[open]>summary{color:#07574f;background:#e7f6f2;border-color:#bce2d7}
+.rc-locale-switcher>summary:active{transform:translateY(1px)}
+.rc-locale-switcher>summary:focus-visible,.rc-locale-option:focus-visible{outline:3px solid #168d82;outline-offset:2px}
+.rc-locale-switcher>summary .bi:first-child{color:#0a766d;font-size:.98rem}
+.rc-locale-switcher>summary .bi:last-child{font-size:.61rem}
+.rc-locale-options{position:absolute;right:0;top:calc(100% + 7px);display:grid;gap:3px;min-width:155px;max-width:min(90vw,230px);padding:6px;border:1px solid #e2eaed;border-radius:12px;background:white;box-shadow:0 18px 34px -18px rgba(10,48,59,.25);z-index:105}
+.rc-locale-form{display:block;margin:0}
+.rc-locale-option{display:flex;width:100%;align-items:center;gap:9px;border:0;border-radius:8px;background:transparent;text-align:left;text-decoration:none;padding:9px 10px;min-height:36px;font:inherit;font-size:.78rem;font-weight:730;color:#526c75;cursor:pointer;transition:background .16s,color .16s}
+.rc-locale-option:hover,.rc-locale-option.is-selected{background:#e7f6f2;color:#07574f}
+.rc-locale-option .bi{color:#0a766d;flex:0 0 15px}
+@media(max-width:575.98px){.rc-locale-switcher>summary{padding:.4rem .55rem}.rc-locale-options{right:0}}
+@media(prefers-reduced-motion:reduce){.rc-locale-switcher>summary,.rc-locale-option{transition:none}}

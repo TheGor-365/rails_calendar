@@ -28,7 +28,7 @@ class RegistrationsController < ApplicationController
 
     if saved
       start_owner_session!(@user)
-      redirect_to workspace_path, notice: "Owner account created"
+      redirect_to workspace_path, notice: I18n.t("flash.owner_created")
     else
       render :new, status: :unprocessable_entity
     end

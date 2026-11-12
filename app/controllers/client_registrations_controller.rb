@@ -5,8 +5,8 @@ class ClientRegistrationsController < ApplicationController
   before_action :require_available!, except: :privacy
   before_action :redirect_authenticated!, except: :privacy
 
-  GENERIC_NOTICE = "Если адрес доступен для регистрации, письмо с кодом будет отправлено.".freeze
-  VERIFY_ERROR = "Код неверен, просрочен или число попыток исчерпано.".freeze
+  GENERIC_NOTICE = "flash.signup_generic".freeze
+  VERIFY_ERROR = "flash.code_invalid".freeze
 
   def new
   end
@@ -18,7 +18,7 @@ class ClientRegistrationsController < ApplicationController
     consent = params.dig(:signup, :consent).to_s
 
     unless valid_identity_input?(email, password, confirmation, consent)
-      flash.now[:alert] = "Проверьте email, совпадение паролей от 12 до 72 байт и согласие на обработку данных."
+      flash.now[:alert] = I18n.t("flash.signup_invalid")
       return render :new, status: :unprocessable_entity
     end
 
@@ -27,16 +27,16 @@ class ClientRegistrationsController < ApplicationController
     session[:pending_client_signup_email] = email
 
     if User.where("lower(email) = ?", email).exists?
-      return redirect_to verify_client_registration_path, notice: GENERIC_NOTICE
+      return redirect_to verify_client_registration_path, notice: I18n.t(GENERIC_NOTICE)
     end
 
     result = issue_code(email: email, password: password, consent_at: Time.current)
     return head :service_unavailable if result == :delivery_failed
 
-    redirect_to verify_client_registration_path, notice: GENERIC_NOTICE
+    redirect_to verify_client_registration_path, notice: I18n.t(GENERIC_NOTICE)
   rescue ActiveRecord::RecordNotUnique
     # Same response under concurrent requests; a uniqueness race cannot grant an account.
-    redirect_to verify_client_registration_path, notice: GENERIC_NOTICE
+    redirect_to verify_client_registration_path, notice: I18n.t(GENERIC_NOTICE)
   end
 
   def verify_form
@@ -73,14 +73,14 @@ class ClientRegistrationsController < ApplicationController
     if user
       session.delete(:pending_client_signup_email)
       start_account_session!(user)
-      redirect_to client_home_path, notice: "Email подтверждён. Аккаунт создан."
+      redirect_to client_home_path, notice: I18n.t("flash.email_verified")
     else
-      flash.now[:alert] = VERIFY_ERROR
+      flash.now[:alert] = I18n.t(VERIFY_ERROR)
       verify_form
       render :verify_form, status: :unprocessable_entity unless performed?
     end
   rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
-    flash.now[:alert] = VERIFY_ERROR
+    flash.now[:alert] = I18n.t(VERIFY_ERROR)
     verify_form
     render :verify_form, status: :unprocessable_entity unless performed?
   end
@@ -93,7 +93,7 @@ class ClientRegistrationsController < ApplicationController
     result = issue_code(email: email, password: nil, consent_at: nil, resend: true)
     return head :service_unavailable if result == :delivery_failed
 
-    redirect_to verify_client_registration_path, notice: GENERIC_NOTICE
+    redirect_to verify_client_registration_path, notice: I18n.t(GENERIC_NOTICE)
   end
 
   def privacy
