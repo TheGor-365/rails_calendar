@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+# Explicit local-only upgrade for this isolated preview DB. Never run in Railway.
+# Applies only the additive client signup migration, no global db:migrate tasks.
+require "uri"
+
+db_name = "rails_calendar_mvp_preview_20261112"
+abort "STOP: expected development" unless ENV["RAILS_ENV"] == "development"
+abort "STOP: DATABASE_URL must be unset" if ENV["DATABASE_URL"].to_s != ""
+
+begin
+  uri = URI.parse(ENV.fetch("RC_LOCAL_DEV_DATABASE_URL"))
+rescue KeyError, URI::InvalidURIError
+  abort "STOP: local DB URL missing or invalid"
+end
+
+unless %w[postgres postgresql].include?(uri.scheme) &&
+       %w[localhost 127.0.0.1 ::1].include?(uri.host) &&
+       uri.path == "/#{db_name}"
+  abort "STOP: wrong connection target"
+end
+
+require_relative "../config/environment"
+abort "STOP: Rails environment mismatch" unless Rails.env.development?
+
+conn = ActiveRecord::Base.connection
+abort "STOP: physical database mismatch" unless conn.select_value("SELECT current_database()") == db_name
+%w[users consultations project_intakes schema_migrations].each do |relation|
+  abort "STOP: expected base relation missing" unless conn.data_source_exists?(relation)
+end
+%w[client_signup_challenges signup_rate_windows].each do |relation|
+  abort "STOP: new registration table already exists; no action" if conn.data_source_exists?(relation)
+end
+%w[email_verified_at signup_consent_at].each do |column|
+  abort "STOP: users already includes #{column}; no action" if conn.column_exists?(:users, column)
+end
+
+migration_path = Rails.root.join("db/migrate/20261112230000_create_client_email_signups.rb")
+abort "STOP: migration missing" unless File.file?(migration_path)
+abort "STOP: migration version already present" if conn.select_value(
+  "SELECT 1 FROM schema_migrations WHERE version = '20261112230000'"
+)
+
+require migration_path
+puts "PREVIEW_CLIENT_MIGRATION_BEGIN: #{db_name}"
+CreateClientEmailSignups.migrate(:up)
+conn.execute("INSERT INTO schema_migrations (version) VALUES ('20261112230000')")
+puts "PREVIEW_CLIENT_MIGRATION_OK: #{db_name}"
