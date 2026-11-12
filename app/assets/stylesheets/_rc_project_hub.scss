@@ -1,0 +1,185 @@
+// RC-039 Slice D · White Atlas-aligned, test-only synthetic Project Hub preview.
+// Grid collapses to a single lane column on narrow screens; no scroll rail.
+// No drag/drop, hover-only interactions or visual-only approval indicators.
+.rc-project-hub {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.rc-hub-guardrails { background: #f4faf8; }
+.rc-hub-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .9rem;
+  align-items: start;
+  min-width: 0;
+}
+.rc-hub-lane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: .85rem;
+  background: #eef3f4;
+  border: 1px solid #e2eaf0;
+  border-radius: 19px;
+}
+.rc-hub-lane__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .35rem;
+  padding: .25rem .1rem 1rem;
+}
+.rc-hub-lane__header h2 { font-size: .98rem; }
+.rc-hub-card-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: .75rem;
+}
+.rc-hub-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px -20px rgba(19, 56, 71, .36);
+}
+.rc-hub-card__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .35rem .6rem;
+}
+.rc-hub-card__top h3 { flex: 1 1 125px; min-width: 0; }
+.rc-hub-card .rc-status-pill { font-size: .68rem; }
+.rc-hub-details { font-size: .78rem; color: var(--rc-muted); margin-bottom: .9rem; }
+.rc-hub-details summary {
+  cursor: pointer;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: .2rem;
+}
+.rc-hub-details summary:focus-visible { outline: 2px solid var(--rc-accent); outline-offset: 3px; }
+.rc-hub-details ul { margin: .35rem 0 .75rem; padding-left: 1.3rem; }
+.rc-hub-details li { margin: .3rem 0; }
+.rc-hub-card form { min-width: 0; margin: 0; }
+.rc-hub-card .rc-action { width: 100%; min-width: 0; }
+.rc-hub-transition-form { display: flex; flex-direction: column; gap: .5rem; }
+.rc-hub-transition-form .rc-input { width: 100%; min-width: 0; }
+.rc-hub-version { margin-top: .65rem; font-size: .72rem; color: var(--rc-muted); }
+.rc-hub-footer { margin: 1.4rem 0; max-width: 750px; }
+
+@media (max-width: 1199.98px) {
+  .rc-hub-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767.98px) {
+  .rc-hub-board { grid-template-columns: minmax(0, 1fr); }
+  .rc-hub-card-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 575.98px) {
+  .rc-hub-lane { padding: .7rem; }
+  .rc-hub-card-list { grid-template-columns: minmax(0, 1fr); }
+  .rc-hub-card { padding: .9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rc-hub-card .rc-action { transition: none; }
+}
+
+
+// Slice E: visible recovery on a stale or rejected owner-only form.
+.rc-hub-problem {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.rc-hub-reload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  max-width: 100%;
+  text-decoration: none;
+}
+.rc-hub-reload:focus-visible {
+  outline: 2px solid var(--rc-accent);
+  outline-offset: 3px;
+}
+
+
+// RC-039 Slice H: project-engineering task simulation, distinct from artifact cards.
+.rc-hub-task-section {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.rc-hub-task-section__intro {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+.rc-hub-task-section__intro > * { min-width: 0; }
+.rc-hub-task-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .85rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.rc-hub-task {
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #e0e9eb;
+  border-radius: 16px;
+}
+.rc-hub-task__heading {
+  display: flex;
+  gap: .55rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.rc-hub-task__heading > div { min-width: 0; flex: 1 1 120px; }
+.rc-hub-task__deps ul {
+  font-size: .81rem;
+  margin: .3rem 0 .6rem;
+  padding-left: 1.2rem;
+}
+.rc-hub-task__deps li { margin-bottom: .25rem; }
+.rc-hub-task-form {
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  min-width: 0;
+  padding-top: .6rem;
+  border-top: 1px solid #e8edf0;
+}
+.rc-hub-task-form .rc-input,
+.rc-hub-task .rc-action {
+  width: 100%;
+  min-width: 0;
+}
+.rc-hub-task .rc-action { min-height: 44px; }
+.rc-hub-task :is(button, select):focus-visible {
+  outline: 2px solid var(--rc-accent);
+  outline-offset: 3px;
+}
+@media (max-width: 991.98px) {
+  .rc-hub-task-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 575.98px) {
+  .rc-hub-task-grid { grid-template-columns: minmax(0, 1fr); }
+  .rc-hub-task { padding: .85rem; }
+}

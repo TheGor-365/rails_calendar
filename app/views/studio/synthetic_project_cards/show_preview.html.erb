@@ -1,0 +1,204 @@
+<div class="container rc-project-hub my-4 my-sm-5">
+  <header class="rc-page-hero mb-3">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow">PROJECT STUDIO / RC-039 · TEST-ONLY BOARD</p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-kanban"></i></span>
+        <h1 class="page-title">Project Hub preview</h1>
+      </div>
+      <p class="rc-muted">Four workflow lanes · Nine fictional artifact types</p>
+      <p class="rc-hint">Fictional owner-only test screen. No client confirmation, generated document, delivery task, deadline or paid AI call.</p>
+    </div>
+  </header>
+
+  <section class="surface-panel rc-hub-guardrails mb-3" aria-label="Project Hub safety limits">
+    <h2 class="h5 mb-2">Review-only prototype</h2>
+    <p class="rc-hint mb-0">All document-generation gates remain blocked. Moving a card records only a synthetic owner action; it never approves requirements or updates the consultation calendar.</p>
+  </section>
+
+  <% if @error.present? %>
+    <section class="rc-notice rc-notice--error rc-hub-problem mb-3" role="alert" aria-live="assertive" aria-label="Project Hub action failed">
+      <h2 class="h5 mb-2">Action not applied</h2>
+      <p class="mb-2"><%= @error %></p>
+      <%= link_to "Reload current board", rc039_synthetic_project_hub_preview_path(@workspace, @client, @intake),
+                  class: "rc-action rc-action--soft rc-action--small rc-hub-reload" %>
+    </section>
+  <% end %>
+
+  <section class="rc-hub-board" aria-label="Project Hub workflow lanes">
+    <% @board.fetch("lanes").each do |lane| %>
+      <% preview_cards = @board.fetch("cards").select { |item| item.fetch("lane_key") == lane.fetch("key") } %>
+      <section class="rc-hub-lane" aria-labelledby="hub_lane_<%= lane.fetch('key') %>">
+        <header class="rc-hub-lane__header">
+          <h2 class="h5 mb-0" id="hub_lane_<%= lane.fetch('key') %>"><%= lane.fetch("label") %></h2>
+          <span class="rc-status-pill rc-status-pill--muted"><%= preview_cards.length %> types</span>
+        </header>
+        <ol class="rc-hub-card-list">
+          <% preview_cards.each do |candidate| %>
+            <% key = candidate.fetch("key") %>
+            <% saved = @saved_cards_by_key[key] %>
+            <li class="rc-hub-card" data-artifact-key="<%= key %>">
+              <div class="rc-hub-card__top">
+                <h3 class="h6 mb-0" id="hub_artifact_<%= key %>"><%= key.humanize %></h3>
+                <span class="rc-status-pill rc-status-pill--muted"><%= saved ? saved.fetch("state").humanize : "Untracked" %></span>
+              </div>
+              <p class="rc-hint mt-2 mb-2">Unverified synthetic proposal — no document generated.</p>
+              <details class="rc-hub-details">
+                <summary aria-describedby="hub_artifact_<%= key %>">Missing prerequisites (<%= candidate.fetch("prerequisites").size %>)</summary>
+                <ul>
+                  <% candidate.fetch("prerequisites").each do |item| %>
+                    <li><%= item.humanize %></li>
+                  <% end %>
+                </ul>
+              </details>
+
+              <% if saved %>
+                <% options = Studio::SyntheticProjectCardWorkflow::ALLOWED.fetch(saved.fetch("state")) %>
+                <%= form_with url: rc039_synthetic_project_hub_preview_card_path(
+                               @workspace, @client, @intake, saved.fetch("card_id")),
+                              method: :patch, local: true, data: { turbo: false },
+                              html: { class: "rc-hub-transition-form" } do %>
+                  <%= hidden_field_tag :expected_state, saved.fetch("state") %>
+                  <%= hidden_field_tag :expected_version, saved.fetch("version") %>
+                  <%= label_tag "hub_next_state_#{saved.fetch('card_id')}", "Move to", class: "rc-field-label" %>
+                  <%= select_tag :to_state,
+                        options_for_select(options.map { |value| [value.humanize, value] }),
+                        id: "hub_next_state_#{saved.fetch('card_id')}", class: "rc-input",
+                        aria: { describedby: "hub_artifact_#{key}" } %>
+                  <%= button_tag "Move synthetic card", type: :submit,
+                                 class: "rc-action rc-action--soft rc-action--small",
+                                 aria: { describedby: "hub_artifact_#{key}" } %>
+                <% end %>
+                <p class="rc-hub-version mb-0">Revision <%= saved.fetch("version") %> · no client approval</p>
+              <% else %>
+                <%= button_to "Create synthetic card",
+                              rc039_synthetic_project_hub_preview_cards_path(
+                                @workspace, @client, @intake),
+                              method: :post, params: { artifact_key: key },
+                              form: { data: { turbo: false } },
+                              class: "rc-action rc-action--soft rc-action--small rc-hub-create",
+                              aria: { describedby: "hub_artifact_#{key}" } %>
+              <% end %>
+            </li>
+          <% end %>
+        </ol>
+      </section>
+    <% end %>
+  </section>
+
+  <%# RC-039 Slice H: tasks are distinct from document artifacts, never approved client work. %>
+  <% tracked_by_key = @task_preview.fetch("tasks").index_by { |task| task.fetch("task_key") } %>
+  <% task_order = @task_preview.fetch("topological_task_keys") +
+                  (Studio::SyntheticProjectTaskGraph::PHASE_BY_TASK.keys - @task_preview.fetch("topological_task_keys")) %>
+  <section id="rc_hub_tasks" class="rc-hub-task-section surface-panel mt-4" aria-labelledby="rc_hub_tasks_title">
+    <div class="rc-hub-task-section__intro">
+      <div>
+        <p class="eyebrow">RC-039 / ENGINEERING WORKFLOW / TEST ONLY</p>
+        <h2 id="rc_hub_tasks_title" class="h4">Engineering task simulation</h2>
+        <p class="rc-hint">Separate from the nine document cards above. Fixed fictional steps only; no assignments, estimates, deadlines, client approvals or actual completed work.</p>
+      </div>
+      <p class="rc-hint mb-0"><%= @task_preview.fetch("task_count") %> / 6 steps · <%= @task_preview.fetch("dependency_count") %> dependencies</p>
+    </div>
+    <ol class="rc-hub-task-grid">
+      <% task_order.each do |key| %>
+        <% task = tracked_by_key[key] %>
+        <% phase = Studio::SyntheticProjectTaskGraph::PHASE_BY_TASK.fetch(key) %>
+        <% requirements = @task_preview.fetch("dependencies").select { |edge| edge.fetch("dependent_task_key") == key }.map { |edge| edge.fetch("prerequisite_task_key") } %>
+        <% unfinished = requirements.reject { |name| tracked_by_key.fetch(name).fetch("workflow_state") == "completed" } %>
+        <li class="rc-hub-task" data-task-key="<%= key %>">
+          <div class="rc-hub-task__heading">
+            <div>
+              <p class="rc-hub-version mb-1"><%= phase.humanize %></p>
+              <h3 class="h6 mb-0" id="rc_hub_task_<%= key %>"><%= key.humanize %></h3>
+            </div>
+            <span class="rc-status-pill rc-status-pill--muted"><%= task ? task.fetch("workflow_state").humanize : "Untracked" %></span>
+          </div>
+          <% if task %>
+            <p class="rc-hub-version mb-2">
+              Priority <%= task.fetch("priority") %> / 5 · Revision <%= task.fetch("version") %> · never client-approved
+            </p>
+            <div class="rc-hub-task__deps">
+              <p class="rc-field-label mb-1">Prerequisites</p>
+              <% if requirements.any? %>
+                <ul>
+                  <% requirements.each do |name| %>
+                    <li><%= name.humanize %> — <%= tracked_by_key.fetch(name).fetch("workflow_state").humanize %></li>
+                  <% end %>
+                </ul>
+                <% if unfinished.any? %>
+                  <p class="rc-hint mb-2">Waiting for <%= unfinished.length %> fictional prerequisite(s); readiness and completion are blocked.</p>
+                <% end %>
+              <% else %>
+                <p class="rc-hint mb-2">No prerequisites recorded.</p>
+              <% end %>
+            </div>
+            <% transitions = Studio::SyntheticProjectTaskLifecycle::TRANSITIONS.fetch(task.fetch("workflow_state")).reject { |next_state|
+                 unfinished.any? && %w[ready in_progress completed].include?(next_state)
+               } %>
+            <% if transitions.any? %>
+              <%= form_with url: rc039_synthetic_project_hub_preview_task_state_path(
+                             @workspace, @client, @intake, task.fetch("task_id")),
+                            method: :patch, local: true, data: { turbo: false },
+                            html: { class: "rc-hub-task-form" } do %>
+                <%= hidden_field_tag :expected_state, task.fetch("workflow_state") %>
+                <%= hidden_field_tag :expected_version, task.fetch("version") %>
+                <%= label_tag "hub_task_state_#{key}", "Move fictional task", class: "rc-field-label" %>
+                <%= select_tag :to_state,
+                      options_for_select(transitions.map { |state| [state.humanize, state] }),
+                      id: "hub_task_state_#{key}", class: "rc-input",
+                      aria: { describedby: "rc_hub_task_#{key}" } %>
+                <%= button_tag "Change task state", type: :submit, class: "rc-action rc-action--soft rc-action--small" %>
+              <% end %>
+            <% end %>
+            <% unless task.fetch("workflow_state") == "completed" %>
+              <%= form_with url: rc039_synthetic_project_hub_preview_task_priority_path(
+                             @workspace, @client, @intake, task.fetch("task_id")),
+                            method: :patch, local: true, data: { turbo: false },
+                            html: { class: "rc-hub-task-form" } do %>
+                <%= hidden_field_tag :expected_state, task.fetch("workflow_state") %>
+                <%= hidden_field_tag :expected_version, task.fetch("version") %>
+                <%= label_tag "hub_task_priority_#{key}", "Set fictional priority", class: "rc-field-label" %>
+                <%= select_tag :priority,
+                      options_for_select((1..5).reject { |n| n == task.fetch("priority") }.map { |n| ["Priority #{n}", n] }),
+                      id: "hub_task_priority_#{key}", class: "rc-input",
+                      aria: { describedby: "rc_hub_task_#{key}" } %>
+                <%= button_tag "Change task priority", type: :submit, class: "rc-action rc-action--soft rc-action--small" %>
+              <% end %>
+            <% end %>
+            <% candidates = @task_preview.fetch("tasks").reject { |other|
+                 other.fetch("task_id") == task.fetch("task_id") ||
+                   requirements.include?(other.fetch("task_key"))
+               } %>
+            <% if task.fetch("workflow_state") == "proposed" && candidates.any? %>
+              <%= form_with url: rc039_synthetic_project_hub_preview_task_dependencies_path(
+                             @workspace, @client, @intake),
+                            method: :post, local: true, data: { turbo: false },
+                            html: { class: "rc-hub-task-form" } do %>
+                <%= hidden_field_tag :dependent_task_id, task.fetch("task_id") %>
+                <%= label_tag "hub_task_dependency_#{key}", "Add fictional prerequisite", class: "rc-field-label" %>
+                <%= select_tag :prerequisite_task_id,
+                      options_for_select(candidates.map { |other| [other.fetch("task_key").humanize, other.fetch("task_id")] }),
+                      id: "hub_task_dependency_#{key}", class: "rc-input",
+                      aria: { describedby: "rc_hub_task_#{key}" } %>
+                <%= button_tag "Add prerequisite", type: :submit, class: "rc-action rc-action--soft rc-action--small" %>
+              <% end %>
+            <% end %>
+          <% else %>
+            <p class="rc-hint mt-2">Fictional task not recorded. No work is authorized.</p>
+            <%= button_to "Create fictional task",
+                  rc039_synthetic_project_hub_preview_tasks_path(@workspace, @client, @intake),
+                  method: :post, params: { task_key: key },
+                  form: { data: { turbo: false } },
+                  class: "rc-action rc-action--soft rc-action--small",
+                  aria: { describedby: "rc_hub_task_#{key}" } %>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+    <p class="rc-hint mt-3 mb-0">Tasks here are synthetic simulations. Project schedules, client review and confirmed deliverables require separate authorization.</p>
+  </section>
+
+  <footer class="rc-hub-footer rc-hint">
+    No drag and drop, auto-scheduling, real client access or document production. Keyboard forms are intentionally the only state-changing interface.
+  </footer>
+</div>

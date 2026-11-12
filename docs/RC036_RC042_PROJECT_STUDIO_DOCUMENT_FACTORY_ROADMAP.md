@@ -294,3 +294,58 @@ A separate append-only metadata-only \`Studio::SyntheticReviewDecision\` stores 
 - \`Studio::SyntheticDocumentRevisionImpact\` composes Slice F's exact-source checked in-memory diffs with the existing \`Studio::DocumentGenerationPlan\`. Changed/new/no-longer-retained synthetic candidates become human **assessment questions only**; unchanged claims do not create a revision request, and missing coordinates never authorize deletions.
 - All future document artifact types and missing prerequisites are taken from the deterministic planner with \`evidence: {}\` — no fictional triage becomes a client-verified fact, document approval or permission to generate.
 - No HTTP, database migration, document bytes, artifact revisions, real client data, provider billing or production access. [Slice G runbook](RC038_SLICE_G_SYNTHETIC_DOCUMENT_REVISION_IMPACT.md). Acceptance requires exact-HEAD CI/security and isolated Linux Mint Rails tests. RC-039 Project Hub and RC-040 actual Document Factory remain subsequent gated releases.
+
+
+## RC-039 Slice A — test-only Project Hub board contract (2026-11-12)
+- First independent **stacked Draft PR** above accepted RC-038, without changes to RC-038 itself. Read-only \`Studio::SyntheticProjectHubBoardPreview\` exposes four fictional lanes and nine future document-planning cards with unmet prerequisite edges derived from \`Studio::DocumentGenerationPlan\`, using only test environment and explicit synthetic opt-in.
+- Owner/client/intake ACL checked again on every call; project and customer free text are never returned. All cards remain blocked for generation, no clients, tasks, milestones, schedules, approval, money, AI, HTTP, or persistence.
+- [Slice A contract and acceptance runbook](RC039_SLICE_A_SYNTHETIC_PROJECT_HUB_BOARD.md); exact-head CI/Security and owner's Linux Mint tests required. **Not an actual Project Hub UI or persistent kanban**; further slices will require reviewed tenant-scoped models, E2E permissions, Turbo/Stimulus operations, keyboard a11y, and a project-only calendar.
+
+
+## RC-039 Slice B — synthetic-only persisted card transitions (2026-11-12)
+- \`Studio::SyntheticProjectCardWorkflow\` now supports strictly test-only creation, listing and serialized state transitions of scoped **fictional metadata cards**. DB composite client/intake foreign keys, fixed artifact catalog and nonapproval states are enforced by additive tables and checks. Append-only transition receipts and expected-version checks reject stale/invalid operations.
+- No client-facing or owner HTTP endpoints, UI, real project data, due dates, board drag/drop, document approval or calendar coupling. [Slice B runbook](RC039_SLICE_B_SYNTHETIC_PROJECT_CARDS.md).
+- Gate remains exact-head GitHub CI/Security and isolated Linux Mint tests. Production deployments, full private storage/consent and future real-role ACL need separate review.
+
+
+## RC-039 Slice C — test-only owner HTTP board operations (2026-11-12)
+- A strictly test-environment registered JSON HTTP contract (GET closed board+cards, POST fixed fictional catalog card, PATCH state with exact optimistic version) reuses RC-039 Slice A/B and existing DB-backed owner session. No routes in development or production, and runtime hard-denial independently verifies production/test predicates.
+- Private no-store/nosniff/referrer response headers, per-request workspace/client/intake scoping, denied revoked/foreign owners, opaque fixed metadata, blocked document generation, no arbitrary card fields or real content. Request tests exercise read/write/ACL/CSRF/version conflict/forged approvals.
+- No HTML/Turbo/Stimulus UI, project scheduling, real user tasks, comments, client access, storage/AI/provider use. [Slice C test-only HTTP runbook](RC039_SLICE_C_SYNTHETIC_PROJECT_HUB_HTTP.md). Exact-HEAD CI and Linux Mint owner regression are mandatory.
+
+
+## RC-039 Slice D — mobile-friendly synthetic owner HTML board (2026-11-12)
+- Added **test-environment-only** HTML preview routes and a keyboard-form board rendered from Slice A's four lanes/nine future document types; Slice B's existing scoped card transitions provide the only state-changing effects. JSON endpoints from Slice C retain their original semantics.
+- \`White Atlas\` CSS grid collapses without horizontal scroll, and all actions are explicit form POST/PATCH with standard CSRF and optimistic version checks. The screen never displays customer names, project titles, raw sources, tasks, unapproved client decisions or production capabilities.
+- New HTTP and Chrome tests cover owner admission, foreign/revoked denial, stale version and mobile 320/390/430px clipping. [Slice D runbook](RC039_SLICE_D_SYNTHETIC_PROJECT_HUB_UI.md). Full keyboard/screen-reader and manual UI checks are not yet complete; release remains test-only/no deploy.
+
+
+## RC-039 Slice E — accessible conflict recovery, synthetic UI only (2026-11-12)
+- Owner HTML 409 (stale optimistic version) and 422 (invalid synthetic request) now rerender the **current owner-scoped board**, with a live accessible error notice and explicit refresh link; no automatic retry, source text echo, new audit receipt, state change or approval on failure. The existing JSON and success redirects remain unchanged.
+- Named four-lane landmarks, stable card-heading context for repeated controls, focus-visible 44px recovery action and Chrome keyboard disclosure coverage; responsive 320/390/430px flow stays under test. [Slice E runbook](RC039_SLICE_E_ACCESSIBLE_CONFLICT_RECOVERY.md).
+- Test-only, no new migration/route/production access. Exact-head CI/Security and owner's full local Rails+Chrome verification required; real tasks and production delivery remain separate phases.
+
+
+## RC-039 Slice F — test-only engineering task DAG foundation (2026-11-12)
+- Introduce a **separate** \`Studio::SyntheticProjectTask\` model and \`Studio::SyntheticProjectTaskDependency\` edges. Their fixed six-step fictional catalog is distinct from the nine document-artifact cards; an additive migration applies composite scope foreign keys and SQL catalog/self-link checks.
+- Owner-only \`Studio::SyntheticProjectTaskGraph\` serializes writes under the project-intake lock, rejects missing/nonlocal tasks and cycles, idempotently records nodes/edges, and returns deterministic prerequisite-first task keys. Explicit synthetic opt-in and Rails test/nonproduction gate are mandatory for every operation. No client-facing UI/HTTP, free-text tasks, dates, assignments, cost, raw sources or external AI.
+- The graph is **not a project plan approval**: output has no verified critical path, due dates or task execution permission. [Slice F verification and security gates](RC039_SLICE_F_SYNTHETIC_PROJECT_TASK_DAG.md). Exact-head CI/Security and owner's isolated Linux Mint migration/targeted/full tests remain pending until evidence is collected.
+
+
+## RC-039 Slice G — fictional task lifecycle / priorities / append-only audit (2026-11-12)
+- New additive task state/priority/lock_version fields and immutable scoped lifecycle event table. \`Studio::SyntheticProjectTaskLifecycle\` enforces active owner permissions and test-only explicit opt-in, serialized project locks, legal synthetic state transitions, optimistic version and dependency completion checks; state plus audit receipt written atomically.
+- No new dependency after task leaves \`proposed\`, no work marked complete with uncompleted prerequisites (even if an edge was inserted directly), \`completed\` terminal; priorities 1–5 order independent ready nodes but never override DAG precedence. Original proposed_unverified receipt remains backward compatible, while workflow_state/priority/version expose the simulation separately.
+- No HTTP, production access, real client tasks, deadlines, assignment or client approval. [Slice G acceptance and security runbook](RC039_SLICE_G_SYNTHETIC_TASK_LIFECYCLE.md). Exact-head CI and isolated Linux Mint acceptance mandatory before any further scope.
+
+
+## RC-039 Slice H — synthetic engineering-task UI on existing Project Hub (2026-11-12)
+- Adds a **second** HTML panel to the test-only owner Project Hub: six fixed fictional development steps from Slice F, their G lifecycle states, priorities 1–5, versions and prerequisite status. Never conflate these with the nine future document artifact cards.
+- Adds four test-only HTML POST/PATCH endpoints wrapping **existing** F/G owner+tenant-scoped services, with CSRF, exact optimistic versions, 409/422 refreshed-board recovery and 404 for revoked/foreign owners. Priority never overrides DAG edges. No migration, no client data, no AI calls, no production routes, no real assignments, no deadlines.
+- HTTP and mobile Chrome QA includes 320/390/430px, safe forms, no overflow, unauthorized users, stale/illegal actions, attempted cycles and independent consultation calendar. [Slice H architecture, evidence and conceptual alignment](RC039_SLICE_H_SYNTHETIC_TASK_UI.md).
+- **Master-plan alignment:** RC-039 acceptance is a *working client cabinet*. A–H are still synthetic owner-development infrastructure. Open gates: real Project/Task and permissions, spec/client acceptance provenance, actual client comments/progress, independent project calendar and manual security review. No claim of production readiness.
+
+
+## RC-039 Slice I1 — project scope acceptance and Project admission foundation (2026-11-12)
+- Distinguish an owner-approved \`IntakeSpecVersion\` and existing reviewer-only client grant from explicit **client acceptance of an exact specification revision**. New test-only \`Studio::ProjectScopeAdmission\` gate requires the active accepting client account/grant, previously verified invitation, explicit exact SHA-256 document fingerprint and acknowledgment. The subsequent owner action can create one immutable \`Studio::Project\` in \`internal_scope_locked\` only while that version and grant remain valid.
+- Additive composite FK constraints bind \`studio_project_scope_acceptances\` and \`studio_projects\` to the same workspace/client/intake/spec/grant/fingerprint; no raw sources or real project tasks, URLs or calendars copied. Client session binding and real consent are **not demonstrated** by the test-only service.
+- [Slice I1 admission gate/runbook](RC039_SLICE_I1_PROJECT_SCOPE_ADMISSION.md). RC-039 exit remains a **working client cabinet**: secure HTTP client acceptance, real RBAC/tasks/progress and independent calendar are future, independently tested steps. No production opening/merge/deploy.

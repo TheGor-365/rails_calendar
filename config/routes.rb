@@ -70,6 +70,41 @@ Rails.application.routes.draw do
     delete "/invitations/:id", to: "studio/project_invitations#destroy", as: :studio_project_invitation
   end
 
+
+  # RC-039 Slice C: fictional metadata HTTP contract is registered ONLY in
+  # Rails test mode. Never expose card writes via development or production.
+  if Rails.env.test?
+    scope "/workspaces/:workspace_id/clients/:client_id/project_intakes/:project_intake_id" do
+      get "/project_hub", to: "studio/synthetic_project_cards#index",
+          as: :rc039_synthetic_project_hub
+      post "/project_hub/cards", to: "studio/synthetic_project_cards#create",
+           as: :rc039_synthetic_project_cards
+      patch "/project_hub/cards/:card_id", to: "studio/synthetic_project_cards#update",
+            as: :rc039_synthetic_project_card
+      # RC-039 Slice D: HTML UI available ONLY under the test-only parent scope.
+      get "/project_hub/preview", to: "studio/synthetic_project_cards#show_preview",
+          as: :rc039_synthetic_project_hub_preview
+      post "/project_hub/preview/cards", to: "studio/synthetic_project_cards#create_preview_card",
+           as: :rc039_synthetic_project_hub_preview_cards
+      patch "/project_hub/preview/cards/:card_id",
+            to: "studio/synthetic_project_cards#transition_preview_card",
+            as: :rc039_synthetic_project_hub_preview_card
+      # RC-039 H: fixed synthetic engineering tasks; only inside Rails test scope.
+      post "/project_hub/preview/tasks",
+           to: "studio/synthetic_project_cards#create_preview_task",
+           as: :rc039_synthetic_project_hub_preview_tasks
+      patch "/project_hub/preview/tasks/:task_id/state",
+            to: "studio/synthetic_project_cards#transition_preview_task",
+            as: :rc039_synthetic_project_hub_preview_task_state
+      patch "/project_hub/preview/tasks/:task_id/priority",
+            to: "studio/synthetic_project_cards#reprioritize_preview_task",
+            as: :rc039_synthetic_project_hub_preview_task_priority
+      post "/project_hub/preview/task_dependencies",
+           to: "studio/synthetic_project_cards#add_preview_dependency",
+           as: :rc039_synthetic_project_hub_preview_task_dependencies
+    end
+  end
+
   root "pages#home"
   get "calendar/day", to: "pages#day", as: :calendar_day
   get "calendar/hour", to: "pages#hour", as: :calendar_hour
