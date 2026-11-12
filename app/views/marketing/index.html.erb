@@ -1,97 +1,141 @@
-<section class="marketing-hero" aria-labelledby="marketing-title">
-  <div class="marketing-container marketing-hero-grid">
-    <div>
-      <p class="marketing-eyebrow"><span class="marketing-status-dot"></span> WEB ENGINEERING / RAILS</p>
-      <h1 id="marketing-title">Ruby on Rails <span>и веб-разработка</span> для конкретных бизнес-задач.</h1>
-      <p class="marketing-lead">Исправляю небольшие ошибки, дорабатываю формы и кабинеты, подключаю API и PostgreSQL. Начинаем с воспроизводимой проблемы, требований и критериев приёмки — без выдуманных сроков и цены до оценки.</p>
-      <div class="marketing-actions">
-        <%= link_to "Обсудить задачу в Facebook", "https://www.facebook.com/gor.webdevelopment/",
-                    class: "marketing-button marketing-button-primary", rel: "noopener noreferrer" %>
-        <%= link_to "Посмотреть Rails-услугу на Kwork", "https://kwork.com/website-revision/55217959/i-will-fix-a-bug-in-your-ruby-on-rails-application",
-                    class: "marketing-button marketing-button-secondary", rel: "noopener noreferrer" %>
+<div class="mk-container mk-workspace">
+  <aside class="mk-sidebar" aria-label="Разделы сайта">
+    <p class="mk-sidebar-label">РАБОЧЕЕ ПРОСТРАНСТВО</p>
+    <nav class="mk-sidebar-nav" aria-label="Навигация по разделам">
+      <a href="#overview" class="is-current"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg>Обзор</a>
+      <a href="#services"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg>Направления услуг</a>
+      <a href="#process"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg>Процесс</a>
+      <a href="#evidence"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg>Код и практика</a>
+      <a href="#contact"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg>Связаться</a>
+    </nav>
+    <div class="mk-sidebar-note">
+      <span class="mk-state-dot" aria-hidden="true"></span>
+      <p><strong>Публичная витрина</strong><br>Рабочие инструменты владельца закрыты для гостей.</p>
+    </div>
+  </aside>
+
+  <div class="mk-content">
+    <section class="mk-overview" id="overview" aria-labelledby="mk-main-title">
+      <div class="mk-intro">
+        <div class="mk-intro-top">
+          <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg> WEB SERVICE WORKSPACE</span>
+          <span class="mk-status"><span class="mk-state-dot" aria-hidden="true"></span> Открыт приём запросов</span>
+        </div>
+        <h1 id="mk-main-title">Веб-задачи.<br><span>Понятный процесс.</span></h1>
+        <p class="mk-lead">От исправления ошибки Rails до API-интеграции: выберите направление, опишите результат и согласуйте объём работы до старта.</p>
+        <div class="mk-intro-actions">
+          <a class="mk-action mk-action-primary" href="#services"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg> Выбрать услугу <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-right"></use></svg></a>
+          <a class="mk-action mk-action-quiet" href="#process"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg> Как это устроено</a>
+        </div>
+        <p class="mk-intro-footnote"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#shield"></use></svg> Заявки сейчас принимаются через внешние рабочие каналы. Регистрация клиента и загрузка файлов здесь не открыты.</p>
       </div>
-      <p class="marketing-caption">Оба перехода ведут на внешние рабочие профили. На этом сайте формы и загрузки клиентских данных пока отключены.</p>
-    </div>
-    <aside class="marketing-hero-panel" aria-label="Рабочий подход">
-      <p class="marketing-panel-kicker">HOW I WORK</p>
-      <ol class="marketing-steps">
-        <li><span>01</span><div><strong>Короткий запрос</strong><p>Симптом, цель, стек и ожидаемый результат.</p></div></li>
-        <li><span>02</span><div><strong>Согласование объёма</strong><p>Что входит в работу, что не входит и как принимаем результат.</p></div></li>
-        <li><span>03</span><div><strong>Разработка и проверка</strong><p>Изменения в коде, тесты и подтверждённая передача результата.</p></div></li>
+
+      <div class="mk-workflow" aria-label="Схема обработки запроса">
+        <div class="mk-workflow-head">
+          <div><span class="mk-workflow-overline">WORKFLOW</span><h2>От запроса к результату</h2></div>
+          <span class="mk-demo-label"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#eye"></use></svg> Схема</span>
+        </div>
+        <div class="mk-board">
+          <div class="mk-board-lane">
+            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-new"></span>01 · Запрос</div>
+            <div class="mk-board-card"><span class="mk-tag mk-tag-neutral">Контекст</span><strong>Проблема или задача</strong><small>Что требуется изменить?</small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#clipboard"></use></svg> Описание</span></div>
+          </div>
+          <div class="mk-board-lane">
+            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-review"></span>02 · Уточнение</div>
+            <div class="mk-board-card"><span class="mk-tag mk-tag-amber">Согласование</span><strong>Границы работы</strong><small>Объём, критерии приёмки</small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#checklist"></use></svg> Проверка</span></div>
+          </div>
+          <div class="mk-board-lane">
+            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-done"></span>03 · Выполнение</div>
+            <div class="mk-board-card"><span class="mk-tag mk-tag-green">Результат</span><strong>Изменение и тесты</strong><small>Демонстрация выполненного</small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#check"></use></svg> Приёмка</span></div>
+          </div>
+        </div>
+        <p class="mk-workflow-disclaimer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#info"></use></svg> Иллюстрация процесса, не интерактивная доска и не реальные клиентские данные.</p>
+      </div>
+    </section>
+
+    <section class="mk-section" id="services" aria-labelledby="services-title">
+      <header class="mk-section-head">
+        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg> УСЛУГИ</span><h2 id="services-title">Четыре направления работы</h2></div>
+        <p>Небольшие и проверяемые задачи, разбитые на понятные итерации.</p>
+      </header>
+      <div class="mk-service-grid">
+        <article class="marketing-service mk-service-card">
+          <a href="#contact" aria-label="Обсудить исправление ошибки Ruby on Rails">
+            <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#bug"></use></svg></span><span class="mk-service-index">01</span></span>
+            <h3>Rails: исправление ошибок</h3>
+            <p>Воспроизводимый дефект, диагностика, точечный фикс и тест.</p>
+            <span class="mk-service-tags"><span>Ruby</span><span>Debug</span><span>Tests</span></span>
+            <span class="mk-service-footer">Обсудить задачу <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
+          </a>
+        </article>
+        <article class="marketing-service mk-service-card">
+          <a href="#contact" aria-label="Обсудить формы CRUD и административный интерфейс">
+            <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layout"></use></svg></span><span class="mk-service-index">02</span></span>
+            <h3>Формы, CRUD, админка</h3>
+            <p>Поля, проверки, сценарии создания и редактирования данных.</p>
+            <span class="mk-service-tags"><span>Rails</span><span>Forms</span><span>UI</span></span>
+            <span class="mk-service-footer">Обсудить задачу <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
+          </a>
+        </article>
+        <article class="marketing-service mk-service-card">
+          <a href="#contact" aria-label="Обсудить REST API и PostgreSQL">
+            <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#database"></use></svg></span><span class="mk-service-index">03</span></span>
+            <h3>API и PostgreSQL</h3>
+            <p>Интеграции, запросы, endpoints и исправление ошибок данных.</p>
+            <span class="mk-service-tags"><span>API</span><span>SQL</span><span>Data</span></span>
+            <span class="mk-service-footer">Обсудить задачу <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
+          </a>
+        </article>
+        <article class="marketing-service mk-service-card">
+          <a href="#contact" aria-label="Обсудить веб-страницу или автоматизацию">
+            <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#bolt"></use></svg></span><span class="mk-service-index">04</span></span>
+            <h3>Веб и автоматизация</h3>
+            <p>Адаптивные страницы и небольшие улучшения рабочих процессов.</p>
+            <span class="mk-service-tags"><span>Web</span><span>UX</span><span>Automation</span></span>
+            <span class="mk-service-footer">Обсудить задачу <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <section class="mk-section mk-section-tight" id="process" aria-labelledby="process-title">
+      <header class="mk-section-head">
+        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg> ПРОЦЕСС</span><h2 id="process-title">Каждый этап имеет результат</h2></div>
+      </header>
+      <ol class="mk-process">
+        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg></span><div><strong>Запрос</strong><p>Описание проблемы, контекст и цель.</p></div><span class="mk-process-order">01</span></li>
+        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#checklist"></use></svg></span><div><strong>Согласование</strong><p>Границы задачи, входные данные и критерии приёмки.</p></div><span class="mk-process-order">02</span></li>
+        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg></span><div><strong>Разработка</strong><p>Изменения, проверка и передача результата.</p></div><span class="mk-process-order">03</span></li>
       </ol>
-      <div class="marketing-panel-foot">Ясная постановка задачи → контролируемые изменения → проверяемый результат</div>
-    </aside>
-  </div>
-</section>
+    </section>
 
-<section id="services" class="marketing-section" aria-labelledby="services-title">
-  <div class="marketing-container">
-    <div class="marketing-section-heading">
-      <div><p class="marketing-eyebrow">WHAT I CAN DELIVER</p><h2 id="services-title">Четыре направления услуг</h2></div>
-      <p>Под небольшие задачи и ограниченные итерации. Окончательный scope согласуется индивидуально.</p>
-    </div>
-    <div class="marketing-service-grid">
-      <article class="marketing-service">
-        <span class="marketing-service-id">01 / DEBUG</span>
-        <h3>Rails bug fixing</h3>
-        <p>Диагностика одного воспроизводимого дефекта Ruby on Rails, исправление и проверка результата.</p>
-        <span class="marketing-service-outcome">Результат: конкретный фикс + проверка</span>
-        <a href="#contact">Обсудить ошибку <span aria-hidden="true">↗</span></a>
-      </article>
-      <article class="marketing-service">
-        <span class="marketing-service-id">02 / FEATURES</span>
-        <h3>CRUD, формы и админка</h3>
-        <p>Небольшие доработки форм, валидаций, таблиц, пользовательских и административных экранов.</p>
-        <span class="marketing-service-outcome">Результат: согласованная функция в приложении</span>
-        <a href="#contact">Обсудить функцию <span aria-hidden="true">↗</span></a>
-      </article>
-      <article class="marketing-service">
-        <span class="marketing-service-id">03 / BACKEND</span>
-        <h3>API и PostgreSQL</h3>
-        <p>REST API, SQL-запросы, интеграционные точки и исправление прикладных ошибок данных.</p>
-        <span class="marketing-service-outcome">Результат: проверяемый endpoint или запрос</span>
-        <a href="#contact">Обсудить интеграцию <span aria-hidden="true">↗</span></a>
-      </article>
-      <article class="marketing-service">
-        <span class="marketing-service-id">04 / WEB</span>
-        <h3>Лендинги и автоматизация</h3>
-        <p>Адаптивные веб-страницы, небольшие автоматизации и улучшение рабочих сценариев сайта.</p>
-        <span class="marketing-service-outcome">Результат: работающий согласованный сценарий</span>
-        <a href="#contact">Обсудить задачу <span aria-hidden="true">↗</span></a>
-      </article>
-    </div>
-  </div>
-</section>
+    <section class="mk-section mk-evidence" id="evidence" aria-labelledby="evidence-title">
+      <div class="mk-evidence-intro">
+        <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg> ИНЖЕНЕРНАЯ ОСНОВА</span>
+        <h2 id="evidence-title">Код, тесты и понятные ограничения</h2>
+        <p>Rails Calendar содержит рабочий приватный календарь. Инструменты постановки задач и AI-поддержка развиваются отдельно; они не выдаются за уже открытый клиентский кабинет.</p>
+      </div>
+      <div class="mk-evidence-links">
+        <a href="https://github.com/TheGor-365/rails_calendar" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg><span>Исходный код Rails Calendar<small>Публичный репозиторий</small></span><svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
+        <a href="https://github.com/TheGor-365" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg><span>Другие проекты<small>GitHub · открытый код</small></span><svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
+        <a href="https://kwork.com/user/thegor-365" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#briefcase"></use></svg><span>Услуги на Kwork<small>Внешняя платформа</small></span><svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
+      </div>
+    </section>
 
-<section id="evidence" class="marketing-section marketing-section-muted" aria-labelledby="evidence-title">
-  <div class="marketing-container marketing-evidence">
-    <div>
-      <p class="marketing-eyebrow">CODE / DEMONSTRATION</p>
-      <h2 id="evidence-title">Проверяемый код вместо обещаний</h2>
-      <p>В открытых репозиториях — учебные и личные инженерные проекты. Этот Rails Calendar содержит календарь консультаций и закрытые сценарии подготовки запросов. Доступ к данным владельца не является публичным демо.</p>
-    </div>
-    <div class="marketing-proof-links">
-      <%= link_to "Исходный код Rails Calendar", "https://github.com/TheGor-365/rails_calendar", rel: "noopener noreferrer" %>
-      <%= link_to "Другие репозитории на GitHub", "https://github.com/TheGor-365", rel: "noopener noreferrer" %>
-      <%= link_to "Профессиональный профиль Kwork", "https://kwork.com/user/thegor-365", rel: "noopener noreferrer" %>
-      <p>Ruby on Rails · PostgreSQL · ERB / Turbo · тестирование · GitHub Actions</p>
-    </div>
+    <section class="mk-section mk-contact-section" id="contact" aria-labelledby="contact-title">
+      <div class="mk-contact-card">
+        <div class="mk-contact-copy">
+          <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg> СВЯЗЬ</span>
+          <h2 id="contact-title">Начать с описания задачи</h2>
+          <p>Укажите, что не работает или что требуется добавить, используемый стек и ожидаемый результат. Объём, срок и стоимость согласуются после оценки.</p>
+          <small><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#shield"></use></svg> Не отправляйте токены, пароли, закрытые базы и документы в первом сообщении.</small>
+        </div>
+        <div class="mk-contact-links">
+          <a class="mk-action mk-action-primary" href="https://www.facebook.com/gor.webdevelopment/" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg> Facebook Page <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
+          <a class="mk-action mk-action-quiet" href="https://kwork.com/user/thegor-365" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#briefcase"></use></svg> Написать через Kwork <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
+          <p>Обращение обрабатывается на внешней площадке по её правилам. Внутренний приём клиентских данных пока отключён.</p>
+        </div>
+      </div>
+    </section>
   </div>
-</section>
-
-<section id="contact" class="marketing-section" aria-labelledby="contact-title">
-  <div class="marketing-container marketing-contact">
-    <div>
-      <p class="marketing-eyebrow">NEXT STEP</p>
-      <h2 id="contact-title">Есть задача для Rails-разработчика?</h2>
-      <p>Напишите, что работает неправильно или что нужно добавить, на какой версии Rails и какой результат ожидаете. Не отправляйте пароли, токены, паспортные данные или приватные базы в первом обращении.</p>
-    </div>
-    <div class="marketing-contact-actions">
-      <%= link_to "Перейти на Facebook Page", "https://www.facebook.com/gor.webdevelopment/",
-                  class: "marketing-button marketing-button-primary", rel: "noopener noreferrer" %>
-      <%= link_to "Написать через Kwork", "https://kwork.com/user/thegor-365",
-                  class: "marketing-button marketing-button-secondary", rel: "noopener noreferrer" %>
-      <p class="marketing-caption">Обращение и ответ обрабатываются во внешнем сервисе по его правилам. Внутренний приём заявок и AI-обработка посетителей не запущены.</p>
-    </div>
-  </div>
-</section>
+</div>
