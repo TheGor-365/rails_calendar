@@ -62,7 +62,8 @@ class OwnerOfflineWorkflowE2eTest < ActionDispatch::IntegrationTest
            params: {answer: "Synthetic visitors should ask questions about menu items"}
       assert_redirected_to project_intake_path(intake)
     end
-    assert_equal "template", intake.intake_messages.order(:id).last.role == "assistant" ? "template" : "unexpected"
+    assert_equal "assistant", intake.intake_messages.order(:id).last.role
+    assert_equal Intake::Grok::QUESTIONS[1], intake.intake_messages.order(:id).last.body
 
     assert_no_difference "IntakeAiQuota.count" do
       post draft_spec_admin_project_intake_path(intake)
@@ -109,6 +110,13 @@ class OwnerOfflineWorkflowE2eTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to project_intake_path(intake)
     assert intake.project_milestones.order(:position).all? { |m| m.status == "proposed" }
+
+    assert_no_difference "ProjectMilestone.count" do
+      post plan_admin_project_intake_path(intake), params: {
+        start_date: "2026-11-19", confirm_plan: "1"
+      }
+    end
+    assert_response :conflict
     get project_intake_path(intake)
     assert_response :success
     assert_select "#private-project-calendar"
