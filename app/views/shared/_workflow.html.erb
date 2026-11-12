@@ -2,7 +2,7 @@
 <nav class="rc-flow mb-4" aria-label="<%= title %>">
   <div class="rc-flow__heading">
     <span><i class="bi bi-diagram-3 me-2" aria-hidden="true"></i><%= title %></span>
-    <span class="rc-status-pill rc-status-pill--muted">Demo workflow</span>
+    <span class="rc-status-pill rc-status-pill--muted"><%= t("intake.workflow_demo") %></span>
   </div>
   <ol class="rc-flow__steps">
     <% steps.each do |key, icon, name, detail| %>

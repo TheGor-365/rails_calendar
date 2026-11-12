@@ -1,39 +1,39 @@
 <div class="container my-4 my-sm-5">
   <header class="rc-page-hero mb-4">
     <div class="rc-page-hero__content">
-    <p class="eyebrow">AI SERVICE WORKSPACE / DEMO</p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-plus"></i></span><h1 class="page-title">Describe a website request</h1></div>
-    <p class="rc-muted">A protected, synthetic-data demonstration: interview → reviewable specification → proposed milestones. No quote, timeline or contract is committed automatically.</p>
+    <p class="eyebrow"><%= t("intake.new_eyebrow") %></p>
+    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-plus"></i></span><h1 class="page-title"><%= t("intake.new_title") %></h1></div>
+    <p class="rc-muted"><%= t("intake.new_hint") %></p>
     </div>
   </header>
-  <%= render "shared/workflow", title: "How a draft becomes a plan", current: "request", steps: [ ["request", "clipboard2-plus", "Request", "Describe scope"], ["interview", "chat-left-text", "Interview", "Clarify requirements"], ["review", "clipboard2-check", "Review", "Approve a draft"], ["plan", "calendar-range", "Plan", "Proposed phases"] ] %>
+  <%= render "shared/workflow", title: t("intake.workflow_new"), current: "request", steps: [ ["request", "clipboard2-plus", t("intake.step_request"), t("intake.step_request_desc")], ["interview", "chat-left-text", t("intake.step_interview"), t("intake.step_interview_desc")], ["review", "clipboard2-check", t("intake.step_review"), t("intake.step_review_desc")], ["plan", "calendar-range", t("intake.step_plan"), t("intake.step_plan_desc")] ] %>
   <div class="surface-panel p-4">
     <% if @intake.errors.any? %>
       <div class="rc-notice rc-notice--error" role="alert"><%= @intake.errors.full_messages.to_sentence %></div>
     <% end %>
     <%= form_with model: @intake, html: { class: "rc-form" } do |f| %>
       <div class="rc-field mb-3">
-        <%= f.label :title, "Project title", class: "rc-field-label" %>
-        <%= f.text_field :title, class: "rc-input", required: true, maxlength: 120, placeholder: "Example: Bakery landing page" %>
+        <%= f.label :title, t("intake.field_title"), class: "rc-field-label" %>
+        <%= f.text_field :title, class: "rc-input", required: true, maxlength: 120, placeholder: t("intake.example_title") %>
       </div>
       <div class="rc-field mb-3">
-        <%= f.label :project_type, "Work type", class: "rc-field-label" %>
+        <%= f.label :project_type, t("intake.field_type"), class: "rc-field-label" %>
         <%= f.select :project_type,
-            [["New website", "website"], ["Website redesign", "redesign"],
-             ["Rails bug fix", "rails_bugfix"], ["API/integration", "api_integration"]],
-            { include_blank: "Choose a work type" }, class: "rc-input", required: true %>
+            [[rc_intake_type("website"), "website"], [rc_intake_type("redesign"), "redesign"],
+             [rc_intake_type("rails_bugfix"), "rails_bugfix"], [rc_intake_type("api_integration"), "api_integration"]],
+            { include_blank: t("intake.type_blank") }, class: "rc-input", required: true %>
       </div>
       <div class="rc-field mb-3">
-        <%= f.label :goal, "What should this project achieve?", class: "rc-field-label" %>
+        <%= f.label :goal, t("intake.field_goal"), class: "rc-field-label" %>
         <%= f.text_area :goal, class: "rc-input", rows: 5, required: true, minlength: 10, maxlength: 3000,
-            placeholder: "A fictional scenario: who the visitors are and what they need" %>
+            placeholder: t("intake.example_goal") %>
       </div>
       <div class="rc-field mb-3">
         <%= check_box_tag :demo_consent, "1", false, required: true %>
-        <%= label_tag :demo_consent, "I will use fictional data only. I understand that, when enabled, the interview may be sent to the xAI Grok API." %>
+        <%= label_tag :demo_consent, t("intake.demo_consent") %>
       </div>
-      <p class="rc-hint">Do not enter real names, contacts, client content, credentials, tokens or confidential details. Demo records are not paid orders.</p>
-      <%= f.button type: :submit, class: "rc-action rc-action--primary" do %><%= rc_icon_label("arrow-right-circle", "Start fictional intake") %><% end %>
+      <p class="rc-hint"><%= t("intake.demo_warning") %></p>
+      <%= f.button type: :submit, class: "rc-action rc-action--primary" do %><%= rc_icon_label("arrow-right-circle", t("intake.start_intake")) %><% end %>
     <% end %>
   </div>
 </div>

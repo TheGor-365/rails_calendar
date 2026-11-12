@@ -1,26 +1,26 @@
 <div class="container my-4 my-sm-5">
   <header class="rc-page-hero mb-4">
     <div class="rc-page-hero__content">
-    <p class="eyebrow">ADMIN / INTAKE REVIEW</p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-inboxes"></i></span><h1 class="page-title">Incoming project briefs (demo)</h1></div>
-    <p class="rc-muted">Only the signed-in administrator can see the intake inbox. Public access is disabled by default.</p>
-    <%= link_to rc_icon_label("clipboard2-plus", "Start a fictional intake"), new_project_intake_path, class: "rc-action rc-action--primary" %>
+    <p class="eyebrow"><%= t("intake.admin_index_eyebrow") %></p>
+    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-inboxes"></i></span><h1 class="page-title"><%= t("intake.admin_index_title") %></h1></div>
+    <p class="rc-muted"><%= t("intake.admin_index_hint") %></p>
+    <%= link_to rc_icon_label("clipboard2-plus", t("intake.start_intake")), new_project_intake_path, class: "rc-action rc-action--primary" %>
     </div>
   </header>
   <ul class="rc-record-list">
     <% @intakes.each do |intake| %>
       <li class="rc-record">
         <h2 class="h5"><%= link_to rc_icon_label("arrow-up-right", intake.title), project_intake_path(intake), class: "rc-text-link" %></h2>
-        <p class="rc-muted"><%= intake.project_type.humanize %> · <%= intake.status.humanize %> · <%= intake.created_at.utc.strftime("%d %b %Y %H:%M UTC") %></p>
+        <p class="rc-muted"><%= rc_intake_type(intake.project_type) %> · <%= rc_intake_status(intake.status) %> · <%= rc_local_datetime(intake.created_at, format: :rc_date_time) + " UTC" %></p>
       </li>
     <% end %>
   </ul>
   <% if @intakes.empty? %>
     <div class="rc-empty-state" role="status">
       <span class="rc-empty-state__icon" aria-hidden="true"><i class="bi bi-inbox"></i></span>
-      <h2>No fictional project briefs yet</h2>
-      <p>This private inbox will list saved demonstration requests. No data is missing from other environments.</p>
-      <%= link_to rc_icon_label("clipboard2-plus", "Create a fictional request"), new_project_intake_path, class: "rc-action rc-action--soft" %>
+      <h2><%= t("intake.admin_index_empty") %></h2>
+      <p><%= t("intake.admin_index_empty_hint") %></p>
+      <%= link_to rc_icon_label("clipboard2-plus", t("intake.admin_index_create")), new_project_intake_path, class: "rc-action rc-action--soft" %>
     </div>
   <% end %>
 </div>
