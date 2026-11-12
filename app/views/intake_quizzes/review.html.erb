@@ -1,66 +1,66 @@
 <div class="container my-4 my-sm-5">
   <header class="rc-page-hero mb-3">
     <div class="rc-page-hero__content">
-    <p class="eyebrow">AI SERVICE WORKSPACE / QUIZ DRAFT REVIEW</p>
+    <p class="eyebrow"><%= t("quiz.review_eyebrow") %></p>
     <div class="rc-page-hero__heading">
       <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span>
-      <h1 class="page-title">Review your selections</h1>
+      <h1 class="page-title"><%= t("quiz.review_title") %></h1>
     </div>
-    <p class="rc-muted"><%= @intake.title %> · <%= @intake.project_type.humanize %> · Synthetic owner-only demo</p>
-    <p class="rc-hint">This is a saved draft, not a submitted client order or an AI-generated specification.</p>
+    <p class="rc-muted"><%= t("quiz.review_sub", title: @intake.title, type: @intake.project_type.humanize) %></p>
+    <p class="rc-hint"><%= t("quiz.review_hint") %></p>
     </div>
-    <span class="rc-status-pill"><i class="bi bi-database-check" aria-hidden="true"></i>Saved locally</span>
+    <span class="rc-status-pill"><i class="bi bi-database-check" aria-hidden="true"></i><%= t("quiz.saved_locally") %></span>
   </header>
 
   <%= render "progress", questions: @questions, saved_answers: @saved_answers, current_key: "review" %>
 
   <div class="rc-quiz-layout mt-3">
-    <section class="surface-panel p-3 p-sm-4" aria-label="Review of saved selections">
+    <section class="surface-panel p-3 p-sm-4" aria-label="<%= t("quiz.review_aria") %>">
       <% if @unfinished_question %>
         <div class="rc-quiz-review-alert mb-4" role="status">
-          <h2 class="h5">Your brief is not finished yet</h2>
-          <p class="mb-3">An answer is still missing. Complete the unfinished card before considering this draft ready for further review.</p>
-          <%= link_to rc_icon_label("arrow-right-circle", "Continue unfinished quiz"), project_intake_quiz_path(@intake, step: @unfinished_question.fetch(:key)), class: "rc-action rc-action--primary" %>
+          <h2 class="h5"><%= t("quiz.unfinished") %></h2>
+          <p class="mb-3"><%= t("quiz.unfinished_hint") %></p>
+          <%= link_to rc_icon_label("arrow-right-circle", t("quiz.continue_unfinished")), project_intake_quiz_path(@intake, step: @unfinished_question.fetch(:key)), class: "rc-action rc-action--primary" %>
         </div>
       <% else %>
         <div class="rc-quiz-review-ready mb-4" role="status">
-          <h2 class="h5">All <%= @questions.size %> questions are saved</h2>
-          <p class="mb-0">You can edit any answer below. This remains a private draft; no client submission or AI action has taken place.</p>
+          <h2 class="h5"><%= t("quiz.all_saved", count: @questions.size) %></h2>
+          <p class="mb-0"><%= t("quiz.all_saved_hint") %></p>
         </div>
       <% end %>
 
       <% @questions.each_with_index do |question, index| %>
         <% answer = @saved_answers[question.fetch(:key)] %>
-        <section class="rc-quiz-review-item" aria-label="<%= question.fetch(:title) %>">
+        <section class="rc-quiz-review-item" aria-label="<%= rc_quiz_question_title(question) %>">
           <div class="rc-quiz-review-item__heading">
-            <h2 class="h5 mb-0"><%= index + 1 %>. <%= question.fetch(:title) %></h2>
-            <span class="rc-quiz-status <%= answer ? 'rc-quiz-status--saved' : 'rc-quiz-status--empty' %>"><%= answer ? 'Saved' : 'Missing' %></span>
+            <h2 class="h5 mb-0"><%= index + 1 %>. <%= rc_quiz_question_title(question) %></h2>
+            <span class="rc-quiz-status <%= answer ? 'rc-quiz-status--saved' : 'rc-quiz-status--empty' %>"><%= answer ? t("quiz.saved") : t("quiz.missing") %></span>
           </div>
           <% if answer %>
             <% if answer.unsure? %>
-              <p>Not sure — recommendation needed</p>
+              <p><%= t("quiz.unsure_review") %></p>
             <% else %>
               <% if answer.selected_options.any? %>
                 <ul class="rc-quiz-review-choices">
                   <% answer.selected_options.each do |option| %>
-                    <li><%= question.fetch(:options).fetch(option, option) %></li>
+                    <li><%= rc_quiz_option_label(@intake.project_type, question, option) %></li>
                   <% end %>
                 </ul>
               <% end %>
-              <% if answer.other_text.present? %><p>Own answer: <%= answer.other_text %></p><% end %>
+              <% if answer.other_text.present? %><p><%= t("quiz.own_answer_review") %> <%= answer.other_text %></p><% end %>
             <% end %>
-            <% if answer.comment.present? %><p class="rc-muted">Comment: <%= answer.comment %></p><% end %>
-            <p class="rc-hint">Saved revision <%= answer.revision %> · <%= answer.intake_answer_revisions.size %> recorded snapshot(s)</p>
+            <% if answer.comment.present? %><p class="rc-muted"><%= t("quiz.comment_review") %> <%= answer.comment %></p><% end %>
+            <p class="rc-hint"><%= t("quiz.saved_revision", revision: answer.revision, count: answer.intake_answer_revisions.size) %></p>
           <% else %>
-            <p class="rc-muted">Not answered yet</p>
+            <p class="rc-muted"><%= t("quiz.not_answered") %></p>
           <% end %>
-          <%= link_to rc_icon_label(answer ? "pencil-square" : "arrow-right-circle", answer ? "Edit saved answer" : "Answer this question"), project_intake_quiz_path(@intake, step: question.fetch(:key)), class: "rc-action rc-action--soft rc-action--small" %>
+          <%= link_to rc_icon_label(answer ? "pencil-square" : "arrow-right-circle", answer ? t("quiz.edit_saved") : t("quiz.answer_question")), project_intake_quiz_path(@intake, step: question.fetch(:key)), class: "rc-action rc-action--soft rc-action--small" %>
         </section>
       <% end %>
 
       <div class="rc-quiz-review-footer">
-        <%= link_to rc_icon_label("arrow-counterclockwise", "Edit from first question"), project_intake_quiz_path(@intake, step: @questions.first.fetch(:key)), class: "rc-action rc-action--quiet" %>
-        <%= link_to rc_icon_label("house-door", "Return to intake (draft saved)"), project_intake_path(@intake), class: "rc-action rc-action--quiet" %>
+        <%= link_to rc_icon_label("arrow-counterclockwise", t("quiz.edit_first")), project_intake_quiz_path(@intake, step: @questions.first.fetch(:key)), class: "rc-action rc-action--quiet" %>
+        <%= link_to rc_icon_label("house-door", t("quiz.return_intake")), project_intake_path(@intake), class: "rc-action rc-action--quiet" %>
       </div>
     </section>
 
