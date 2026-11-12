@@ -1,4 +1,5 @@
 class RegistrationsController < ApplicationController
+  layout "account"
   before_action :require_local_owner_bootstrap!
   before_action :limit_bootstrap_attempts!, only: :create
 

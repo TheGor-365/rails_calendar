@@ -1,16 +1,41 @@
-<div class="mk-auth-shell">
-  <div class="mk-auth-heading"><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#shield"></use></svg> НОВЫЙ АККАУНТ</span>
-    <h1>Регистрация клиента</h1>
-    <p>Адрес почты будет подтверждён одноразовым кодом. После регистрации откроется личный кабинет без доступа к чужим проектам.</p></div>
-  <% if alert.present? %><p class="mk-auth-alert" role="alert"><%= alert %></p><% end %>
-  <section class="mk-auth-panel" aria-label="Создать клиентский аккаунт">
-    <%= form_with url: client_registration_path, scope: :signup, local: true, html: { class: "mk-auth-form" } do |f| %>
-      <div><%= f.label :email, "Электронная почта" %><%= f.email_field :email, required: true, maxlength: 254, autocomplete: "email", placeholder: "you@example.com" %></div>
-      <div><%= f.label :password, "Пароль (от 12 символов)" %><%= f.password_field :password, required: true, minlength: 12, maxlength: 72, autocomplete: "new-password" %></div>
-      <div><%= f.label :password_confirmation, "Повторите пароль" %><%= f.password_field :password_confirmation, required: true, minlength: 12, maxlength: 72, autocomplete: "new-password" %></div>
-      <label class="mk-auth-consent"><%= f.check_box :consent, { required: true }, "1", "0" %><span>Я ознакомился с <%= link_to "уведомлением об обработке данных", ClientSignupAvailability.privacy_url %> и согласен на обработку email и сведений об аккаунте для регистрации.</span></label>
-      <%= f.button type: :submit, class: "mk-action mk-action-primary" do %><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-right"></use></svg> Получить код<% end %>
+<div class="rc-account-content">
+  <%= render "shared/account_heading",
+             icon: "person-plus", eyebrow: "АККАУНТ / РЕГИСТРАЦИЯ",
+             title: "Создать аккаунт",
+             description: "Подтвердите адрес одноразовым кодом, чтобы войти в собственную рабочую область." %>
+  <section class="rc-account-panel" aria-label="Регистрация клиента">
+    <%= form_with url: client_registration_path, scope: :signup, local: true,
+                  html: { class: "rc-account-form rc-form" } do |form| %>
+      <div class="rc-field">
+        <%= form.label :email, "Электронная почта", class: "rc-field-label" %>
+        <%= form.email_field :email, required: true, maxlength: 254, autocomplete: "email",
+                             placeholder: "you@example.com", class: "rc-input" %>
+      </div>
+      <div class="rc-field">
+        <%= form.label :password, "Пароль (минимум 12 символов)", class: "rc-field-label" %>
+        <%= form.password_field :password, required: true, minlength: 12, maxlength: 72,
+                                 autocomplete: "new-password", class: "rc-input" %>
+      </div>
+      <div class="rc-field">
+        <%= form.label :password_confirmation, "Повторите пароль", class: "rc-field-label" %>
+        <%= form.password_field :password_confirmation, required: true, minlength: 12, maxlength: 72,
+                                 autocomplete: "new-password", class: "rc-input" %>
+      </div>
+      <div class="rc-account-consent">
+        <%= form.check_box :consent, { required: true, class: "rc-account-checkbox" }, "1", "0" %>
+        <%= form.label :consent do %>
+          Согласен на обработку email и данных аккаунта. <%= link_to rc_icon_label("shield-check", "Условия обработки"), ClientSignupAvailability.privacy_url, class: "rc-account-inline-link" %>
+        <% end %>
+      </div>
+      <div class="rc-account-form-actions">
+        <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
+          <%= rc_icon_label("envelope-arrow-up", "Получить код") %>
+        <% end %>
+      </div>
     <% end %>
+    <div class="rc-account-alternatives">
+      <span>Уже зарегистрированы?</span>
+      <%= link_to rc_icon_label("box-arrow-in-right", "Войти"), sign_in_path, class: "rc-account-option" %>
+    </div>
   </section>
-  <p class="mk-auth-foot">Есть аккаунт? <%= link_to "Войти", sign_in_path %></p>
 </div>

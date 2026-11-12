@@ -1,6 +1,6 @@
 # Gated public client identity. Never creates an owner or grants workspace membership.
 class ClientRegistrationsController < ApplicationController
-  layout "signup"
+  layout "account"
 
   before_action :require_available!, except: :privacy
   before_action :redirect_authenticated!, except: :privacy

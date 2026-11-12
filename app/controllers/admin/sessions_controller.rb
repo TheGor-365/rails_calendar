@@ -1,5 +1,6 @@
 module Admin
   class SessionsController < ApplicationController
+  layout "account"
     # Shared PostgreSQL counter counts all authentication attempts, including
     # successful ones, before reading any credentials. A database outage fails
     # closed rather than silently disabling throttling.

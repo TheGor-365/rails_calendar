@@ -1,28 +1,36 @@
-<div class="container my-4 my-sm-5">
-  <div class="form-page">
-    <header class="mb-4">
-      <p class="eyebrow mb-2">WORKSPACE / SECURE ACCESS</p>
-      <h1 class="page-title mb-2">Sign in to your workspace</h1>
-      <p class="rc-muted">Вход владельца или клиента с подтверждённой почтой.</p>
-    </header>
-    <section class="surface-panel" aria-label="Workspace sign in">
-      <%= form_with url: account_session_path, method: :post, local: true, html: { class: "rc-form" } do |form| %>
-        <div class="rc-field">
-          <%= form.label :email, "Email", class: "rc-field-label" %>
-          <%= form.email_field :email, required: true, autocomplete: "email", class: "rc-input" %>
-        </div>
-        <div class="rc-field">
-          <%= form.label :password, "Password", class: "rc-field-label" %>
-          <%= form.password_field :password, required: true, autocomplete: "current-password", class: "rc-input" %>
-        </div>
-        <%= form.submit "Sign in", class: "rc-action rc-action--primary" %>
-      <% end %>
-      <% if ClientSignupAvailability.enabled? %>
-        <p class="rc-muted mt-3 mb-0"><%= link_to "Создать аккаунт клиента", client_registration_path %></p>
-      <% end %>
-      <% if (Rails.env.development? || Rails.env.test?) && ENV["RC_LOCAL_OWNER_SIGNUP"] == "true" && !User.where(role: "owner").exists? %>
-        <p class="rc-muted mt-3 mb-0"><%= link_to "Create local owner account", sign_up_path %></p>
-      <% end %>
-    </section>
-  </div>
+<div class="rc-account-content">
+  <%= render "shared/account_heading",
+             icon: "shield-lock", eyebrow: "WORKSPACE / ДОСТУП",
+             title: "Вход в рабочую область",
+             description: "Один аккаунт для доступа к вашему рабочему пространству. Права владельца и клиента разделены." %>
+  <section class="rc-account-panel" aria-label="Вход в аккаунт">
+    <%= form_with url: account_session_path, method: :post, local: true, html: { class: "rc-account-form rc-form" } do |form| %>
+      <div class="rc-field">
+        <%= form.label :email, "Электронная почта", class: "rc-field-label" %>
+        <%= form.email_field :email, required: true, maxlength: 254, autocomplete: "email", placeholder: "you@example.com", class: "rc-input" %>
+      </div>
+      <div class="rc-field">
+        <%= form.label :password, "Пароль", class: "rc-field-label" %>
+        <%= form.password_field :password, required: true, autocomplete: "current-password", class: "rc-input" %>
+      </div>
+      <div class="rc-account-form-actions">
+        <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
+          <%= rc_icon_label("box-arrow-in-right", "Войти") %>
+        <% end %>
+      </div>
+    <% end %>
+    <% if ClientSignupAvailability.enabled? %>
+      <div class="rc-account-alternatives">
+        <span>Ещё нет аккаунта?</span>
+        <%= link_to rc_icon_label("person-plus", "Создать аккаунт"), client_registration_path, class: "rc-account-option" %>
+      </div>
+    <% end %>
+    <% if (Rails.env.development? || Rails.env.test?) && ENV["RC_LOCAL_OWNER_SIGNUP"] == "true" && !User.where(role: "owner").exists? %>
+      <div class="rc-account-local-setup">
+        <i class="bi bi-terminal" aria-hidden="true"></i>
+        <span>Локальная настройка</span>
+        <%= link_to rc_icon_label("person-gear", "Первый владелец"), sign_up_path, class: "rc-account-option" %>
+      </div>
+    <% end %>
+  </section>
 </div>
