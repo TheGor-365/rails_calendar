@@ -6,56 +6,56 @@
 <% access_active = controller_path == "admin/sessions" %>
 
 <% if client_signed_in? %>
-<nav class="rc-mobile-dock" aria-label="Навигация клиента">
+<nav class="rc-mobile-dock" aria-label="<%= t("nav.client_navigation") %>">
   <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-mobile-dock-item is-active" %>
   <%= link_to rc_icon_label("globe", t("nav.overview")), services_path, class: "rc-mobile-dock-item" %>
   <%= button_to sign_out_path, method: :delete, class: "rc-mobile-dock-item" do %>
-    <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Выход</span>
+    <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span><%= t("nav.sign_out") %></span>
   <% end %>
 </nav>
 <% else %>
-<nav class="rc-mobile-dock" aria-label="Mobile primary navigation">
+<nav class="rc-mobile-dock" aria-label="<%= t("nav.mobile_navigation") %>">
   <%= link_to root_path, class: "rc-mobile-dock-item #{'is-active' if calendar_active}",
               aria: { current: ("page" if calendar_active) } do %>
     <i class="bi bi-calendar3 rc-mobile-dock-icon" aria-hidden="true"></i>
-    <span class="rc-mobile-dock-label">Month</span>
+    <span class="rc-mobile-dock-label"><%= t("nav.month") %></span>
   <% end %>
 
   <%= link_to calendar_day_path(date: Time.zone.today.iso8601),
               class: "rc-mobile-dock-item #{'is-active' if today_active}",
               aria: { current: ("page" if today_active) } do %>
     <i class="bi bi-calendar-day rc-mobile-dock-icon" aria-hidden="true"></i>
-    <span class="rc-mobile-dock-label">Today</span>
+    <span class="rc-mobile-dock-label"><%= t("nav.day") %></span>
   <% end %>
 
   <%# Guests are sent to the existing login screen, never to a write action. %>
   <%= link_to(admin_signed_in? ? new_consultation_path : admin_login_path,
               class: "rc-mobile-dock-item rc-mobile-dock-item--create #{'is-active' if creation_active}",
-              aria: { label: (admin_signed_in? ? "New consultation" : "Sign in to add a consultation"),
+              aria: { label: (admin_signed_in? ? t("nav.new_consultation") : t("nav.sign_in_to_create")),
                       current: ("page" if creation_active) }) do %>
     <span class="rc-mobile-dock-create-icon"><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
-    <span class="rc-mobile-dock-label">New</span>
+    <span class="rc-mobile-dock-label"><%= t("nav.new") %></span>
   <% end %>
 
   <%= link_to consultations_path, class: "rc-mobile-dock-item #{'is-active' if consultations_active}",
               aria: { current: ("page" if consultations_active) } do %>
     <i class="bi bi-list-ul rc-mobile-dock-icon" aria-hidden="true"></i>
-    <span class="rc-mobile-dock-label">Records</span>
+    <span class="rc-mobile-dock-label"><%= t("nav.records") %></span>
   <% end %>
 
   <% if admin_signed_in? %>
     <%= button_to(owner_signed_in? ? sign_out_path : admin_logout_path, method: :delete,
                   form: { class: "rc-mobile-dock-form" },
                   class: "rc-mobile-dock-item",
-                  aria: { label: "Sign out of administrator session" }) do %>
+                  aria: { label: t("nav.admin_sign_out") }) do %>
       <i class="bi bi-box-arrow-right rc-mobile-dock-icon" aria-hidden="true"></i>
-      <span class="rc-mobile-dock-label">Sign out</span>
+      <span class="rc-mobile-dock-label"><%= t("nav.sign_out") %></span>
     <% end %>
   <% else %>
     <%= link_to sign_in_path, class: "rc-mobile-dock-item #{'is-active' if access_active}",
                 aria: { current: ("page" if access_active) } do %>
       <i class="bi bi-person-circle rc-mobile-dock-icon" aria-hidden="true"></i>
-      <span class="rc-mobile-dock-label">Admin</span>
+      <span class="rc-mobile-dock-label"><%= t("nav.admin") %></span>
     <% end %>
   <% end %>
 </nav>

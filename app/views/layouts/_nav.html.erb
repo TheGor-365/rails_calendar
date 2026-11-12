@@ -6,7 +6,7 @@
       <span class="ws-brand-name">Rails Calendar<small>AI Workspace</small></span>
     <% end %>
 
-    <div class="rc-nav-group" aria-label="Workspace sections">
+    <div class="rc-nav-group" aria-label="<%= t("nav.workspace_sections") %>">
       <% if client_signed_in? %>
         <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-nav-link active" %>
       <% else %>
