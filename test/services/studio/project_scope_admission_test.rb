@@ -180,7 +180,7 @@ class StudioProjectScopeAdmissionTest < ActiveSupport::TestCase
     receipt = Studio::ProjectScopeAcceptance.sole
     project = Studio::Project.sole
     assert_not receipt.update(document_sha256: "a" * 64)
-    assert_not receipt.destroy
+    assert_raises(ActiveRecord::DeleteRestrictionError) { receipt.destroy }
     assert_not project.update(status: "active")
     assert_not project.destroy
     assert_equal "internal_scope_locked", project.reload.status
