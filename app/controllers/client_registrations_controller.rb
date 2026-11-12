@@ -59,7 +59,8 @@ class ClientRegistrationsController < ApplicationController
           unless User.where("lower(email) = ?", email).exists?
             user = User.create!(
               email: challenge.email, password_digest: challenge.password_digest,
-              role: "client", email_verified_at: Time.current, signup_consent_at: challenge.consent_at
+              role: "client", email_verified_at: Time.current, signup_consent_at: challenge.consent_at,
+              signup_policy_version: challenge.policy_version
             )
             challenge.destroy!
           end
@@ -165,6 +166,7 @@ class ClientRegistrationsController < ApplicationController
         ClientSignupChallenge.create!(
           email: email, password: password, consent_at: consent_at,
           code_digest: issued_digest, sent_at: now,
+          policy_version: ClientSignupAvailability.policy_version,
           expires_at: now + ClientSignupChallenge::CODE_TTL,
           window_started_at: now
         )

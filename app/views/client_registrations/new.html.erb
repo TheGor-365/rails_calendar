@@ -8,7 +8,7 @@
       <div><%= f.label :email, "Электронная почта" %><%= f.email_field :email, required: true, maxlength: 254, autocomplete: "email", placeholder: "you@example.com" %></div>
       <div><%= f.label :password, "Пароль (от 12 символов)" %><%= f.password_field :password, required: true, minlength: 12, maxlength: 72, autocomplete: "new-password" %></div>
       <div><%= f.label :password_confirmation, "Повторите пароль" %><%= f.password_field :password_confirmation, required: true, minlength: 12, maxlength: 72, autocomplete: "new-password" %></div>
-      <label class="mk-auth-consent"><%= f.check_box :consent, { required: true }, "1", "0" %><span>Я ознакомился с <%= link_to "уведомлением об обработке данных", client_registration_privacy_path %> и согласен на обработку email и сведений об аккаунте для регистрации.</span></label>
+      <label class="mk-auth-consent"><%= f.check_box :consent, { required: true }, "1", "0" %><span>Я ознакомился с <%= link_to "уведомлением об обработке данных", ClientSignupAvailability.privacy_url %> и согласен на обработку email и сведений об аккаунте для регистрации.</span></label>
       <%= f.button type: :submit, class: "mk-action mk-action-primary" do %><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-right"></use></svg> Получить код<% end %>
     <% end %>
   </section>

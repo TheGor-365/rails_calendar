@@ -2,6 +2,7 @@ class CreateClientEmailSignups < ActiveRecord::Migration[8.1]
   def change
     add_column :users, :email_verified_at, :datetime
     add_column :users, :signup_consent_at, :datetime
+    add_column :users, :signup_policy_version, :string, limit: 80
     create_table :client_signup_challenges do |t|
       t.string :email, limit: 254, null: false
       t.string :password_digest, null: false
@@ -9,6 +10,7 @@ class CreateClientEmailSignups < ActiveRecord::Migration[8.1]
       t.datetime :expires_at, null: false
       t.datetime :sent_at, null: false
       t.datetime :consent_at, null: false
+      t.string :policy_version, limit: 80, null: false
       t.integer :failed_attempts, default: 0, null: false
       t.integer :send_count, default: 1, null: false
       t.datetime :window_started_at, null: false

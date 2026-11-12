@@ -43,6 +43,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_230000) do
     t.datetime "expires_at", null: false
     t.datetime "sent_at", null: false
     t.datetime "consent_at", null: false
+    t.string "policy_version", limit: 80, null: false
     t.integer "failed_attempts", default: 0, null: false
     t.integer "send_count", default: 1, null: false
     t.datetime "window_started_at", null: false
@@ -175,6 +176,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_230000) do
     t.datetime "updated_at", null: false
     t.datetime "email_verified_at"
     t.datetime "signup_consent_at"
+    t.string "signup_policy_version", limit: 80
     t.index "lower((email)::text)", name: "idx_users_email_case_insensitive", unique: true
   end
 

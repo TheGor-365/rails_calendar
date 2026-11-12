@@ -27,3 +27,7 @@ Public customer accounts with one-time email verification. No existing `/sign_up
 Use only `~/rails_calendar_mvp_release_20261112` with verified local `RC_LOCAL_DEV_DATABASE_URL` ending in `/rails_calendar_mvp_preview_20261112`; the preview schema was created earlier on local 127.0.0.1:5432. Do NOT run `db:reset`, `db:prepare` or `db:schema:load` on shared QA DBs or Railway. This branch's migration must be applied only to isolated preview, after explicit identity check and a migration-diff review. Owner QA worktree RC-039 must remain unmodified.
 
 To enable local test of the form on a fresh server process, export `RC_CLIENT_SIGNUP_ENABLED=true`; Ruby 3.4.12 is required. Local verification codes are stored in `tmp/signup_emails`; treat them as secrets and do not paste/send screenshots of them.
+
+### Auditable privacy version
+
+A client and its pending challenge now record a policy version together with consent timestamp. Production registration additionally requires protected `RC_SIGNUP_POLICY_VERSION` and an approved absolute HTTPS `RC_SIGNUP_PRIVACY_URL`; the public form links to the reviewed version. Development uses explicit `qa-2026-11-12`, not a legally approved document. Env flag alone cannot bypass these requirements.

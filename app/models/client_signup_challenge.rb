@@ -9,7 +9,7 @@ class ClientSignupChallenge < ApplicationRecord
 
   normalizes :email, with: ->(value) { value.strip.downcase }
   validates :email, presence: true, length: { maximum: 254 }, format: { with: URI::MailTo::EMAIL_REGEXP }, uniqueness: { case_sensitive: false }
-  validates :password_digest, :code_digest, :expires_at, :sent_at, :consent_at, :window_started_at, presence: true
+  validates :password_digest, :code_digest, :expires_at, :sent_at, :consent_at, :policy_version, :window_started_at, presence: true
   validates :code_digest, format: { with: /\A[0-9a-f]{64}\z/ }
 
   def self.digest_for(email, code)

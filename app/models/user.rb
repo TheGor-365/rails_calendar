@@ -12,6 +12,6 @@ class User < ApplicationRecord
                     format: { with: URI::MailTo::EMAIL_REGEXP },
                     uniqueness: { case_sensitive: false }
   validates :role, inclusion: { in: %w[owner client] }
-  validates :email_verified_at, :signup_consent_at, presence: true, if: -> { role == "client" }
+  validates :email_verified_at, :signup_consent_at, :signup_policy_version, presence: true, if: -> { role == "client" }
   validates :password, length: { minimum: 12 }, if: -> { password.present? }
 end
