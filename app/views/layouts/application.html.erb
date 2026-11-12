@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="<%= I18n.locale %>">
   <head>
     <title>Rails Calendar</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -17,7 +17,7 @@
 
   <body class="app-shell" data-controller="ui-feedback"
         data-action="turbo:submit-start->ui-feedback#start turbo:submit-end->ui-feedback#finish turbo:load@document->ui-feedback#reset">
-    <a class="skip-link" href="#main-content">Skip to content</a>
+    <a class="skip-link" href="#main-content"><%= t("nav.skip") %></a>
     <header class="app-header">
       <%= render "layouts/nav" %>
     </header>

@@ -7,8 +7,8 @@
 
 <% if client_signed_in? %>
 <nav class="rc-mobile-dock" aria-label="Навигация клиента">
-  <%= link_to rc_icon_label("grid-1x2", "Мой кабинет"), client_home_path, class: "rc-mobile-dock-item is-active" %>
-  <%= link_to rc_icon_label("globe", "Обзор"), services_path, class: "rc-mobile-dock-item" %>
+  <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-mobile-dock-item is-active" %>
+  <%= link_to rc_icon_label("globe", t("nav.overview")), services_path, class: "rc-mobile-dock-item" %>
   <%= button_to sign_out_path, method: :delete, class: "rc-mobile-dock-item" do %>
     <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Выход</span>
   <% end %>

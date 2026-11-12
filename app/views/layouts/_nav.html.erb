@@ -1,38 +1,38 @@
 <div class="container">
-  <nav aria-label="Main navigation" class="app-nav d-flex flex-wrap align-items-center gap-2 py-3">
+  <nav aria-label=t("nav.main_navigation") class="app-nav d-flex flex-wrap align-items-center gap-2 py-3">
     <% brand_destination = owner_signed_in? ? workspace_path : (client_signed_in? ? client_home_path : root_path) %>
-    <%= link_to brand_destination, class: "app-brand", aria: { label: "Rails Calendar — application home" } do %>
+    <%= link_to brand_destination, class: "app-brand", aria: { label: t("nav.home") } do %>
       <span class="rc-brand-symbol" aria-hidden="true"><i class="bi bi-calendar2-check"></i></span>
       <span class="ws-brand-name">Rails Calendar<small>AI Workspace</small></span>
     <% end %>
 
     <div class="rc-nav-group" aria-label="Workspace sections">
       <% if client_signed_in? %>
-        <%= link_to rc_icon_label("grid-1x2", "Мой кабинет"), client_home_path, class: "rc-nav-link active" %>
+        <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-nav-link active" %>
       <% else %>
       <% if owner_signed_in? %>
-        <%= link_to rc_icon_label("grid-1x2", "Workspace"), workspace_path, class: "rc-nav-link" %>
+        <%= link_to rc_icon_label("grid-1x2", t("nav.workspace")), workspace_path, class: "rc-nav-link" %>
       <% end %>
       <%= link_to root_path,
                   class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",
                   aria: { current: ("page" if controller_name == 'pages' && action_name == 'home') } do %>
-        <%= rc_icon_label("calendar3", "Calendar") %>
+        <%= rc_icon_label("calendar3", t("nav.calendar")) %>
       <% end %>
       <%= link_to calendar_day_path(date: Time.zone.today.iso8601),
                   class: "rc-nav-link #{'active' if controller_name == 'pages' && %w[day hour].include?(action_name)}",
                   aria: { current: ("page" if controller_name == 'pages' && %w[day hour].include?(action_name)) } do %>
-        <%= rc_icon_label("clock-history", "Today · 24h") %>
+        <%= rc_icon_label("clock-history", t("nav.today")) %>
       <% end %>
       <%= link_to consultations_path,
                   class: "rc-nav-link #{'active' if controller_name == 'consultations'}",
                   aria: { current: ("page" if controller_name == 'consultations') } do %>
-        <%= rc_icon_label("journal-text", "Consultations") %>
+        <%= rc_icon_label("journal-text", t("nav.consultations")) %>
       <% end %>
       <% if admin_signed_in? || ENV["RC_INTAKE_PUBLIC_DEMO"] == "true" %>
-        <%= link_to rc_icon_label("clipboard2-plus", "AI request"), new_project_intake_path,
+        <%= link_to rc_icon_label("clipboard2-plus", t("nav.ai_request")), new_project_intake_path,
                     class: "rc-nav-link #{'active' if controller_path == 'project_intakes' && action_name == 'new'}" %>
         <% if admin_signed_in? %>
-          <%= link_to rc_icon_label("inboxes", "Intake inbox"), admin_project_intakes_path,
+          <%= link_to rc_icon_label("inboxes", t("nav.intake_inbox")), admin_project_intakes_path,
                       class: "rc-nav-link #{'active' if controller_path == 'admin/project_intakes' && action_name == 'index'}" %>
         <% end %>
       <% end %>
@@ -40,20 +40,21 @@
     </div>
 
     <div class="ms-auto d-flex align-items-center gap-2">
-      <%= link_to services_path, class: "ws-header-services", aria: { label: "Open public services" } do %>
-        <%= rc_icon_label("grid-1x2", "Services") %>
+      <%= render "shared/locale_switcher" %>
+      <%= link_to services_path, class: "ws-header-services", aria: { label: t("nav.open_services") } do %>
+        <%= rc_icon_label("grid-1x2", t("nav.services")) %>
       <% end %>
       <% if owner_signed_in? %>
-        <span class="rc-nav-admin d-none d-sm-inline" title="Owner session">Owner: <%= current_user.email %></span>
-        <%= button_to rc_icon_label("box-arrow-right", "Sign out"), sign_out_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
+        <span class="rc-nav-admin d-none d-sm-inline" title="Owner session"><%= t("nav.owner") %>: <%= current_user.email %></span>
+        <%= button_to rc_icon_label("box-arrow-right", t("nav.sign_out")), sign_out_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
       <% elsif client_signed_in? %>
-        <%= button_to rc_icon_label("box-arrow-right", "Выход"), sign_out_path,
+        <%= button_to rc_icon_label("box-arrow-right", t("nav.sign_out")), sign_out_path,
                       method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
       <% elsif admin_signed_in? %>
-        <span class="rc-nav-admin d-none d-sm-inline">Administrator</span>
-        <%= button_to rc_icon_label("box-arrow-right", "Sign out"), admin_logout_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
+        <span class="rc-nav-admin d-none d-sm-inline"><%= t("nav.administrator") %></span>
+        <%= button_to rc_icon_label("box-arrow-right", t("nav.sign_out")), admin_logout_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
       <% else %>
-        <%= link_to rc_icon_label("box-arrow-in-right", "Sign in"), sign_in_path, class: "rc-action rc-action--quiet rc-action--small" %>
+        <%= link_to rc_icon_label("box-arrow-in-right", t("nav.sign_in")), sign_in_path, class: "rc-action rc-action--quiet rc-action--small" %>
       <% end %>
     </div>
   </nav>
