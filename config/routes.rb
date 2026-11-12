@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   get "/project_intakes/:project_intake_id/quiz/review", to: "intake_quizzes#review", as: :review_project_intake_quiz
   patch "/project_intakes/:project_intake_id/quiz/:question_key", to: "intake_quizzes#update", as: :project_intake_quiz_answer
 
+  # Public commercial showcase; never accepts or stores visitor contact data.
+  get "/services", to: "marketing#index", as: :services
   root "pages#home"
   get "calendar/day", to: "pages#day", as: :calendar_day
   get "calendar/hour", to: "pages#hour", as: :calendar_hour

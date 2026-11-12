@@ -1,0 +1,97 @@
+<section class="marketing-hero" aria-labelledby="marketing-title">
+  <div class="marketing-container marketing-hero-grid">
+    <div>
+      <p class="marketing-eyebrow"><span class="marketing-status-dot"></span> WEB ENGINEERING / RAILS</p>
+      <h1 id="marketing-title">Ruby on Rails <span>и веб-разработка</span> для конкретных бизнес-задач.</h1>
+      <p class="marketing-lead">Исправляю небольшие ошибки, дорабатываю формы и кабинеты, подключаю API и PostgreSQL. Начинаем с воспроизводимой проблемы, требований и критериев приёмки — без выдуманных сроков и цены до оценки.</p>
+      <div class="marketing-actions">
+        <%= link_to "Обсудить задачу в Facebook", "https://www.facebook.com/gor.webdevelopment/",
+                    class: "marketing-button marketing-button-primary", rel: "noopener noreferrer" %>
+        <%= link_to "Посмотреть Rails-услугу на Kwork", "https://kwork.com/website-revision/55217959/i-will-fix-a-bug-in-your-ruby-on-rails-application",
+                    class: "marketing-button marketing-button-secondary", rel: "noopener noreferrer" %>
+      </div>
+      <p class="marketing-caption">Оба перехода ведут на внешние рабочие профили. На этом сайте формы и загрузки клиентских данных пока отключены.</p>
+    </div>
+    <aside class="marketing-hero-panel" aria-label="Рабочий подход">
+      <p class="marketing-panel-kicker">HOW I WORK</p>
+      <ol class="marketing-steps">
+        <li><span>01</span><div><strong>Короткий запрос</strong><p>Симптом, цель, стек и ожидаемый результат.</p></div></li>
+        <li><span>02</span><div><strong>Согласование объёма</strong><p>Что входит в работу, что не входит и как принимаем результат.</p></div></li>
+        <li><span>03</span><div><strong>Разработка и проверка</strong><p>Изменения в коде, тесты и подтверждённая передача результата.</p></div></li>
+      </ol>
+      <div class="marketing-panel-foot">Ясная постановка задачи → контролируемые изменения → проверяемый результат</div>
+    </aside>
+  </div>
+</section>
+
+<section id="services" class="marketing-section" aria-labelledby="services-title">
+  <div class="marketing-container">
+    <div class="marketing-section-heading">
+      <div><p class="marketing-eyebrow">WHAT I CAN DELIVER</p><h2 id="services-title">Четыре направления услуг</h2></div>
+      <p>Под небольшие задачи и ограниченные итерации. Окончательный scope согласуется индивидуально.</p>
+    </div>
+    <div class="marketing-service-grid">
+      <article class="marketing-service">
+        <span class="marketing-service-id">01 / DEBUG</span>
+        <h3>Rails bug fixing</h3>
+        <p>Диагностика одного воспроизводимого дефекта Ruby on Rails, исправление и проверка результата.</p>
+        <span class="marketing-service-outcome">Результат: конкретный фикс + проверка</span>
+        <a href="#contact">Обсудить ошибку <span aria-hidden="true">↗</span></a>
+      </article>
+      <article class="marketing-service">
+        <span class="marketing-service-id">02 / FEATURES</span>
+        <h3>CRUD, формы и админка</h3>
+        <p>Небольшие доработки форм, валидаций, таблиц, пользовательских и административных экранов.</p>
+        <span class="marketing-service-outcome">Результат: согласованная функция в приложении</span>
+        <a href="#contact">Обсудить функцию <span aria-hidden="true">↗</span></a>
+      </article>
+      <article class="marketing-service">
+        <span class="marketing-service-id">03 / BACKEND</span>
+        <h3>API и PostgreSQL</h3>
+        <p>REST API, SQL-запросы, интеграционные точки и исправление прикладных ошибок данных.</p>
+        <span class="marketing-service-outcome">Результат: проверяемый endpoint или запрос</span>
+        <a href="#contact">Обсудить интеграцию <span aria-hidden="true">↗</span></a>
+      </article>
+      <article class="marketing-service">
+        <span class="marketing-service-id">04 / WEB</span>
+        <h3>Лендинги и автоматизация</h3>
+        <p>Адаптивные веб-страницы, небольшие автоматизации и улучшение рабочих сценариев сайта.</p>
+        <span class="marketing-service-outcome">Результат: работающий согласованный сценарий</span>
+        <a href="#contact">Обсудить задачу <span aria-hidden="true">↗</span></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="evidence" class="marketing-section marketing-section-muted" aria-labelledby="evidence-title">
+  <div class="marketing-container marketing-evidence">
+    <div>
+      <p class="marketing-eyebrow">CODE / DEMONSTRATION</p>
+      <h2 id="evidence-title">Проверяемый код вместо обещаний</h2>
+      <p>В открытых репозиториях — учебные и личные инженерные проекты. Этот Rails Calendar содержит календарь консультаций и закрытые сценарии подготовки запросов. Доступ к данным владельца не является публичным демо.</p>
+    </div>
+    <div class="marketing-proof-links">
+      <%= link_to "Исходный код Rails Calendar", "https://github.com/TheGor-365/rails_calendar", rel: "noopener noreferrer" %>
+      <%= link_to "Другие репозитории на GitHub", "https://github.com/TheGor-365", rel: "noopener noreferrer" %>
+      <%= link_to "Профессиональный профиль Kwork", "https://kwork.com/user/thegor-365", rel: "noopener noreferrer" %>
+      <p>Ruby on Rails · PostgreSQL · ERB / Turbo · тестирование · GitHub Actions</p>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="marketing-section" aria-labelledby="contact-title">
+  <div class="marketing-container marketing-contact">
+    <div>
+      <p class="marketing-eyebrow">NEXT STEP</p>
+      <h2 id="contact-title">Есть задача для Rails-разработчика?</h2>
+      <p>Напишите, что работает неправильно или что нужно добавить, на какой версии Rails и какой результат ожидаете. Не отправляйте пароли, токены, паспортные данные или приватные базы в первом обращении.</p>
+    </div>
+    <div class="marketing-contact-actions">
+      <%= link_to "Перейти на Facebook Page", "https://www.facebook.com/gor.webdevelopment/",
+                  class: "marketing-button marketing-button-primary", rel: "noopener noreferrer" %>
+      <%= link_to "Написать через Kwork", "https://kwork.com/user/thegor-365",
+                  class: "marketing-button marketing-button-secondary", rel: "noopener noreferrer" %>
+      <p class="marketing-caption">Обращение и ответ обрабатываются во внешнем сервисе по его правилам. Внутренний приём заявок и AI-обработка посетителей не запущены.</p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Ruby on Rails разработчик — исправления, API и веб-сервисы | Gor Web Development</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Ruby on Rails и веб-разработка: исправление ошибок, формы, CRUD, PostgreSQL, API-интеграции и автоматизация. Обсудите задачу с разработчиком.">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://rails-calendar-ai-web-production.up.railway.app/">
+    <meta name="theme-color" content="#f7f9fc">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Gor Web Development | Ruby on Rails и веб-разработка">
+    <meta property="og:description" content="Багфиксы Rails, формы и CRUD, API/PostgreSQL и автоматизация. Прямой контакт через действующие профессиональные профили.">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="stylesheet" href="/marketing.css">
+  </head>
+  <body class="marketing-page">
+    <a class="marketing-skip" href="#main-content">К содержимому</a>
+    <header class="marketing-header">
+      <div class="marketing-container marketing-header-inner">
+        <%= link_to services_path, class: "marketing-brand", aria: { label: "Gor Web Development — главная" } do %>
+          <span class="marketing-brand-mark" aria-hidden="true">G<span>.</span></span>
+          <span>Gor <strong>Web Development</strong></span>
+        <% end %>
+        <nav class="marketing-nav" aria-label="Основная навигация">
+          <%= link_to "Услуги", "#services" %>
+          <%= link_to "Проекты", "#evidence" %>
+          <% if admin_signed_in? %>
+            <%= link_to "Календарь владельца", root_path, class: "marketing-nav-private" %>
+          <% else %>
+            <%= link_to "Вход владельца", sign_in_path, class: "marketing-nav-private" %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+    <main id="main-content" tabindex="-1"><%= yield %></main>
+    <footer class="marketing-footer">
+      <div class="marketing-container marketing-footer-inner">
+        <span>Gor Web Development · Ruby on Rails / Web</span>
+        <span>Коммерческие услуги · Проектный showcase без публичного клиентского кабинета</span>
+      </div>
+    </footer>
+  </body>
+</html>
