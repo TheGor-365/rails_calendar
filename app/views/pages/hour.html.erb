@@ -2,43 +2,43 @@
   <div class="content-page">
     <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
       <div>
-        <p class="eyebrow mb-2">TIME / INTERVAL</p>
+        <p class="eyebrow mb-2"><%= t("calendar.hour_eyebrow") %></p>
         <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clock-history"></i></span><h1 class="page-title mb-2">
           <time datetime="<%= @hour_start.iso8601 %>"><%= @hour_start.strftime("%H:%M") %></time>
           <span aria-hidden="true">–</span>
           <time datetime="<%= @hour_end.iso8601 %>"><%= @hour_end.strftime("%H:%M") %></time>
         </h1></div>
         <p class="rc-muted mb-0">
-          <time datetime="<%= @selected_date.iso8601 %>"><%= @selected_date.strftime("%A, %d %B %Y") %></time>
+          <time datetime="<%= @selected_date.iso8601 %>"><%= rc_local_date(@selected_date, format: :rc_full) %></time>
           <span aria-hidden="true">·</span>
           <%= Time.zone.name %> <span aria-hidden="true">·</span>
-          <%= pluralize(@consultations.size, "overlapping consultation") %>
+          <%= rc_count(@consultations.size, "calendar", "overlap") %>
         </p>
         <% if @hour_end.to_date > @selected_date %>
-          <p class="rc-hint mt-1 mb-0">The interval ends at midnight on the following day.</p>
+          <p class="rc-hint mt-1 mb-0"><%= t("calendar.hour_cross_midnight") %></p>
         <% end %>
       </div>
       <div class="d-flex flex-wrap gap-2">
         <% if admin_signed_in? %>
-          <%= link_to rc_icon_label("plus-lg", "Add consultation"), new_consultation_path(start_at: @hour_start.iso8601),
+          <%= link_to rc_icon_label("plus-lg", t("calendar.add_consultation")), new_consultation_path(start_at: @hour_start.iso8601),
                       class: "rc-action rc-action--primary" %>
         <% end %>
-        <%= link_to rc_icon_label("arrow-left", "Back to day"), calendar_day_path(date: @selected_date.iso8601,
+        <%= link_to rc_icon_label("arrow-left", t("calendar.back_to_day")), calendar_day_path(date: @selected_date.iso8601,
                           anchor: format("hour-%02d", @selected_hour)), class: "rc-action rc-action--quiet" %>
       </div>
     </header>
 
-    <section class="surface-panel" aria-label="Consultations overlapping selected interval">
+    <section class="surface-panel" aria-label="<%= t("calendar.hour_section_aria") %>">
       <% if @consultations.any? %>
         <ul class="rc-record-list">
           <% @consultations.each do |event| %>
             <li class="rc-record">
-              <p class="eyebrow mb-2">CONSULTATION</p>
+              <p class="eyebrow mb-2"><%= t("calendar.consultation_eyebrow") %></p>
               <h2 class="h5 mb-2"><%= link_to event.title, consultation_path(event), class: "rc-text-link" %></h2>
               <p class="rc-muted mb-1">
-                <time datetime="<%= event.start_time.iso8601 %>"><%= event.start_time.in_time_zone.strftime("%d %b %Y %H:%M") %></time>
+                <time datetime="<%= event.start_time.iso8601 %>"><%= rc_local_datetime(event.start_time, format: :rc_date_time) %></time>
                 <span aria-hidden="true">–</span>
-                <time datetime="<%= event.end_time.iso8601 %>"><%= event.end_time.in_time_zone.strftime("%d %b %Y %H:%M") %></time>
+                <time datetime="<%= event.end_time.iso8601 %>"><%= rc_local_datetime(event.end_time, format: :rc_date_time) %></time>
               </p>
               <% if event.description.present? %>
                 <p class="mb-0"><%= event.description %></p>
@@ -48,7 +48,7 @@
         </ul>
       <% else %>
         <p class="rc-notice rc-notice--neutral" role="status">
-          No consultations overlap this interval.
+          <%= t("calendar.empty_hour") %>
         </p>
       <% end %>
     </section>

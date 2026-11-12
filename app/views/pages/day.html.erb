@@ -1,80 +1,80 @@
 <div class="container my-4 my-sm-5">
   <header class="rc-page-hero mb-4">
     <div>
-      <p class="eyebrow mb-2">DAY / <%= @selected_date.strftime("%j") %></p>
+      <p class="eyebrow mb-2"><%= t("calendar.day_eyebrow", day_number: @selected_date.strftime("%j")) %></p>
       <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-day"></i></span><h1 class="page-title mb-1">
-        <time datetime="<%= @selected_date.iso8601 %>"><%= @selected_date.strftime("%A, %d %B %Y") %></time>
+        <time datetime="<%= @selected_date.iso8601 %>"><%= rc_local_date(@selected_date, format: :rc_full) %></time>
       </h1></div>
       <p class="rc-muted mb-0">
-        <span class="rc-data-number"><%= pluralize(@consultations.size, "consultation") %></span>
+        <span class="rc-data-number"><%= rc_count(@consultations.size, "calendar", "consultation") %></span>
         <span aria-hidden="true">·</span> 00:00–24:00
         <span aria-hidden="true">·</span> <%= Time.zone.name %>
       </p>
     </div>
     <div class="d-flex flex-wrap gap-2">
       <% if admin_signed_in? %>
-        <%= link_to rc_icon_label("plus-lg", "New consultation"), new_consultation_path(start_at: @hour_slots.first[:start_time].iso8601),
+        <%= link_to rc_icon_label("plus-lg", t("calendar.new_consultation")), new_consultation_path(start_at: @hour_slots.first[:start_time].iso8601),
                     class: "rc-action rc-action--primary" %>
       <% end %>
-      <%= link_to rc_icon_label("calendar3", "Month"), root_path(start_date: @selected_date.iso8601),
+      <%= link_to rc_icon_label("calendar3", t("calendar.month")), root_path(start_date: @selected_date.iso8601),
                   class: "rc-action rc-action--quiet" %>
     </div>
   </header>
 
-  <nav aria-label="Calendar day navigation" class="rc-day-navigation mb-3">
+  <nav aria-label="<%= t("calendar.day_nav_aria") %>" class="rc-day-navigation mb-3">
     <% if @selected_date > Date.new(Consultation::MIN_SCHEDULE_YEAR, 1, 1) %>
-      <%= link_to rc_icon_label("chevron-left", "Previous day"), calendar_day_path(date: @selected_date.prev_day.iso8601),
+      <%= link_to rc_icon_label("chevron-left", t("calendar.previous_day")), calendar_day_path(date: @selected_date.prev_day.iso8601),
                   class: "rc-navigation-link" %>
     <% end %>
-    <%= link_to rc_icon_label("calendar-check", "Today"), calendar_day_path(date: Time.zone.today.iso8601),
+    <%= link_to rc_icon_label("calendar-check", t("calendar.today")), calendar_day_path(date: Time.zone.today.iso8601),
                 class: "rc-navigation-link" %>
     <% if @selected_date < Date.new(Consultation::MAX_SCHEDULE_YEAR, 12, 31) %>
-      <%= link_to rc_icon_label("chevron-right", "Next day"), calendar_day_path(date: @selected_date.next_day.iso8601),
+      <%= link_to rc_icon_label("chevron-right", t("calendar.next_day")), calendar_day_path(date: @selected_date.next_day.iso8601),
                   class: "rc-navigation-link" %>
     <% end %>
   </nav>
 
-  <section class="rc-agenda" aria-label="Continuous 24 hour consultation timeline">
+  <section class="rc-agenda" aria-label="<%= t("calendar.agenda_aria") %>">
     <div class="rc-agenda-legend" aria-hidden="true">
-      <span>TIME</span><span>EVENTS · CLICK AN HOUR FOR DETAILS</span>
+      <span><%= t("calendar.time_heading") %></span><span><%= t("calendar.event_heading") %></span>
     </div>
 
     <div class="rc-day-grid">
-      <div class="rc-time-axis" aria-label="Hour interval navigation">
+      <div class="rc-time-axis" aria-label="<%= t("calendar.hour_axis_aria") %>">
         <% @hour_slots.each do |slot| %>
           <div class="rc-time-axis-hour" id="hour-<%= format('%02d', slot[:hour]) %>">
             <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
                         class: "rc-time-axis-link",
-                        aria: { label: "Inspect #{slot[:start_time].strftime('%H:%M')}–#{slot[:end_time].strftime('%H:%M')}" } do %>
+                        aria: { label: t("calendar.inspect_interval", range: "#{slot[:start_time].strftime('%H:%M')}–#{slot[:end_time].strftime('%H:%M')}") } do %>
               <time datetime="<%= slot[:start_time].iso8601 %>"><%= slot[:start_time].strftime("%H:%M") %></time>
             <% end %>
             <% if slot[:count].positive? %>
-              <span class="rc-time-axis-count" aria-label="<%= pluralize(slot[:count], 'event') %>"><%= slot[:count] %></span>
+              <span class="rc-time-axis-count" aria-label="<%= rc_count(slot[:count], "calendar", "event") %>"><%= slot[:count] %></span>
             <% end %>
           </div>
         <% end %>
       </div>
 
       <div class="rc-day-scroll" role="region" tabindex="0"
-           aria-label="Continuous daily schedule; scroll horizontally when events overlap">
+           aria-label="<%= t("calendar.scroll_aria") %>">
         <div class="rc-day-canvas" style="--rc-max-lanes: <%= @timeline.max_lanes %>">
-          <div class="rc-hour-bands" role="list" aria-label="24 selectable one-hour intervals">
+          <div class="rc-hour-bands" role="list" aria-label="<%= t("calendar.bands_aria") %>">
             <% @hour_slots.each do |slot| %>
               <% from_label = slot[:start_time].strftime("%H:%M") %>
               <% to_label = slot[:end_time].strftime("%H:%M") %>
               <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
                           class: "rc-hour-band #{'rc-hour-band--busy' if slot[:count].positive?}",
                           role: "listitem",
-                          aria: { label: "Inspect #{from_label}–#{to_label}, #{pluralize(slot[:count], 'event')}" },
-                          title: "Inspect #{from_label}–#{to_label}" do %>
+                          aria: { label: "Inspect #{from_label}–#{to_label}, #{rc_count(slot[:count], "calendar", "event")}" },
+                          title: t("calendar.inspect_interval", range: "#{from_label}–#{to_label}") do %>
                 <span class="visually-hidden">
-                  <%= from_label %>–<%= to_label %>, <%= pluralize(slot[:count], "event") %>
+                  <%= from_label %>–<%= to_label %>, <%= rc_count(slot[:count], "calendar", "event") %>
                 </span>
               <% end %>
             <% end %>
           </div>
 
-          <div class="rc-event-layer" aria-label="Consultations drawn once per day">
+          <div class="rc-event-layer" aria-label="<%= t("calendar.event_layer_aria") %>">
             <% @timeline.items.each do |item| %>
               <% event = item.consultation %>
               <% left = (item.lane * 100.0 / item.lanes).round(4) %>
@@ -86,7 +86,7 @@
                        data-lanes="<%= item.lanes %>">
                 <%= link_to consultation_path(event),
                             class: "rc-range-event-link",
-                            aria: { label: "#{event.title}, #{time_span}. Open consultation" },
+                            aria: { label: "#{event.title}, #{time_span}. #{t("calendar.open_consultation")}" },
                             title: "#{event.title} — #{time_span}" do %>
                   <span class="rc-range-event-heading"><%= event.title %></span>
                   <span class="rc-range-event-clock">
@@ -99,7 +99,7 @@
                   <% end %>
                   <% if item.height_px >= 82 && (item.continues_from_previous_day || item.continues_into_next_day) %>
                     <span class="rc-range-event-continuation">
-                      <%= item.continues_from_previous_day ? "Continues from previous day" : "Continues next day" %>
+                      <%= item.continues_from_previous_day ? t("calendar.continues_from") : t("calendar.continues_into") %>
                     </span>
                   <% end %>
                 <% end %>
@@ -114,9 +114,6 @@
   </section>
 
   <p class="rc-hint mt-3">
-    One continuous block represents each consultation, even when it lasts several hours.
-    Select a time row to inspect its exact interval; select an event to open its details.
-    On crowded days, scroll horizontally to see overlapping event lanes.
-    Times are displayed in <%= Time.zone.name %>.
+    <%= t("calendar.day_help", zone: Time.zone.name) %>
   </p>
 </div>
