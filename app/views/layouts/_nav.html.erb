@@ -5,7 +5,10 @@
       <span class="ws-brand-name">Rails Calendar<small>AI Workspace</small></span>
     <% end %>
 
-    <div class="rc-nav-group" aria-label="Workspace sections">\n      <% if owner_signed_in? %>\n        <%= link_to rc_icon_label("grid-1x2", "Workspace"), workspace_path, class: "rc-nav-link" %>\n      <% end %>
+    <div class="rc-nav-group" aria-label="Workspace sections">
+      <% if owner_signed_in? %>
+        <%= link_to rc_icon_label("grid-1x2", "Workspace"), workspace_path, class: "rc-nav-link" %>
+      <% end %>
       <%= link_to root_path,
                   class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",
                   aria: { current: ("page" if controller_name == 'pages' && action_name == 'home') } do %>
