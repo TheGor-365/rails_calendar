@@ -84,6 +84,53 @@ class StudioProjectHubBrowserTest < ApplicationSystemTestCase
     page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
   end
 
+  test "320 390 430px owner uses fictional task forms without horizontal overflow or real approvals" do
+    visit sign_in_url
+    fill_in "Email", with: @owner.email
+    fill_in "Password", with: @password
+    click_button "Sign in"
+    assert_current_path consultations_path
+
+    [320, 390, 430].zip(%w[scope_review rails_implementation quality_verification]).each do |width, key|
+      emulate_viewport!(width)
+      visit @url
+      assert_selector "li.rc-hub-card", count: 9
+      assert_selector "li.rc-hub-task", count: 6
+      assert_selector "#rc_hub_tasks[aria-labelledby='rc_hub_tasks_title']"
+      refute_text @intake.title
+      assert_safe_width(width)
+
+      within "[data-task-key='#{key}']" do
+        click_button "Create fictional task"
+      end
+      assert_text "Fictional engineering task created. No work approved."
+      within "[data-task-key='#{key}']" do
+        assert_text "Proposed"
+        select "Ready", from: "Move fictional task"
+        click_button "Change task state"
+      end
+      assert_text "Fictional task state recorded. Client acceptance is still absent."
+      within "[data-task-key='#{key}']" do
+        assert_text "Ready"
+        select "Priority 1", from: "Set fictional priority"
+        click_button "Change task priority"
+      end
+      assert_text "Fictional task priority recorded; dependencies still take precedence."
+      within "[data-task-key='#{key}']" do
+        assert_text "Priority 1 / 5"
+        assert_text "Revision 2"
+        assert_text "Ready"
+      end
+      assert_no_button "Approve client project"
+      assert_safe_width(width)
+    end
+    assert_equal 3, Studio::SyntheticProjectTask.count
+    assert_equal 6, Studio::SyntheticProjectTaskEvent.count
+    assert_equal 0, Studio::SyntheticProjectTaskDependency.count
+  ensure
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+  end
+
   private
 
   def emulate_viewport!(width)

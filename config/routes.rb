@@ -89,6 +89,19 @@ Rails.application.routes.draw do
       patch "/project_hub/preview/cards/:card_id",
             to: "studio/synthetic_project_cards#transition_preview_card",
             as: :rc039_synthetic_project_hub_preview_card
+      # RC-039 H: fixed synthetic engineering tasks; only inside Rails test scope.
+      post "/project_hub/preview/tasks",
+           to: "studio/synthetic_project_cards#create_preview_task",
+           as: :rc039_synthetic_project_hub_preview_tasks
+      patch "/project_hub/preview/tasks/:task_id/state",
+            to: "studio/synthetic_project_cards#transition_preview_task",
+            as: :rc039_synthetic_project_hub_preview_task_state
+      patch "/project_hub/preview/tasks/:task_id/priority",
+            to: "studio/synthetic_project_cards#reprioritize_preview_task",
+            as: :rc039_synthetic_project_hub_preview_task_priority
+      post "/project_hub/preview/task_dependencies",
+           to: "studio/synthetic_project_cards#add_preview_dependency",
+           as: :rc039_synthetic_project_hub_preview_task_dependencies
     end
   end
 

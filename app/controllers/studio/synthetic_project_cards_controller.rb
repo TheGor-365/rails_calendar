@@ -27,12 +27,74 @@ module Studio
     def show_preview
       load_preview_board!
     rescue SecurityError, SyntheticProjectHubBoardPreview::Denied,
-           SyntheticProjectCardWorkflow::Denied
+           SyntheticProjectCardWorkflow::Denied, SyntheticProjectTaskGraph::Denied
       head :not_found
     end
 
     # These two HTML-only actions reuse Slice B's locked workflow; never
     # mutate columns directly and never accept arbitrary task/approval text.
+    # RC-039 H: test-only engineering task operations. Document cards stay separate.
+    def create_preview_task
+      task_graph.create_task!(
+        client: @client, intake: @intake, task_key: params[:task_key], explicit_synthetic: true
+      )
+      redirect_to "#{preview_path}#rc_hub_tasks", notice: "Fictional engineering task created. No work approved."
+    rescue SyntheticProjectTaskGraph::Denied, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
+      render_preview_problem("Fictional task creation rejected. Review the current task board.", :unprocessable_entity)
+    rescue SecurityError, ActiveRecord::RecordNotFound
+      head :not_found
+    end
+
+    def transition_preview_task
+      task_lifecycle.transition!(
+        client: @client, intake: @intake,
+        task_id: positive_integer!(params[:task_id]),
+        expected_state: params[:expected_state], expected_version: exact_version!,
+        to_state: params[:to_state], explicit_synthetic: true
+      )
+      redirect_to "#{preview_path}#rc_hub_tasks",
+                  notice: "Fictional task state recorded. Client acceptance is still absent."
+    rescue SyntheticProjectTaskLifecycle::Conflict, ActiveRecord::StaleObjectError
+      render_preview_problem("Engineering task changed. Review its current state and version before retrying.", :conflict)
+    rescue ArgumentError, SyntheticProjectTaskLifecycle::Denied, ActiveRecord::RecordInvalid
+      render_preview_problem("Fictional task transition denied; prerequisites or permitted states need review.", :unprocessable_entity)
+    rescue SecurityError, ActiveRecord::RecordNotFound
+      head :not_found
+    end
+
+    def reprioritize_preview_task
+      task_lifecycle.reprioritize!(
+        client: @client, intake: @intake,
+        task_id: positive_integer!(params[:task_id]),
+        expected_state: params[:expected_state], expected_version: exact_version!,
+        priority: positive_integer!(params[:priority]), explicit_synthetic: true
+      )
+      redirect_to "#{preview_path}#rc_hub_tasks",
+                  notice: "Fictional task priority recorded; dependencies still take precedence."
+    rescue SyntheticProjectTaskLifecycle::Conflict, ActiveRecord::StaleObjectError
+      render_preview_problem("Engineering task changed. Review its current state and version before retrying.", :conflict)
+    rescue ArgumentError, SyntheticProjectTaskLifecycle::Denied, ActiveRecord::RecordInvalid
+      render_preview_problem("Fictional task priority rejected. No change recorded.", :unprocessable_entity)
+    rescue SecurityError, ActiveRecord::RecordNotFound
+      head :not_found
+    end
+
+    def add_preview_dependency
+      task_graph.add_dependency!(
+        client: @client, intake: @intake,
+        dependent_task_id: positive_integer!(params[:dependent_task_id]),
+        prerequisite_task_id: positive_integer!(params[:prerequisite_task_id]),
+        explicit_synthetic: true
+      )
+      redirect_to "#{preview_path}#rc_hub_tasks",
+                  notice: "Fictional prerequisite recorded. No schedule or task approved."
+    rescue ArgumentError, SyntheticProjectTaskGraph::Denied, ActiveRecord::RecordInvalid,
+           ActiveRecord::RecordNotUnique
+      render_preview_problem("Fictional dependency rejected. Cycles, late edges and cross-project links are forbidden.", :unprocessable_entity)
+    rescue SecurityError, ActiveRecord::RecordNotFound
+      head :not_found
+    end
+
     def create_preview_card
       workflow.create!(
         client: @client, intake: @intake, artifact_key: params[:artifact_key],
@@ -106,6 +168,9 @@ module Studio
       @saved_cards_by_key = workflow.list(
         client: @client, intake: @intake, explicit_synthetic: true
       ).index_by { |row| row.fetch("artifact_key") }
+      @task_preview = task_graph.snapshot(
+        client: @client, intake: @intake, explicit_synthetic: true
+      )
     end
 
     def render_preview_problem(message, status)
@@ -113,7 +178,8 @@ module Studio
       @error = message
       render :show_preview, status: status
     rescue SecurityError, SyntheticProjectHubBoardPreview::Denied,
-           SyntheticProjectCardWorkflow::Denied, ActiveRecord::RecordNotFound
+           SyntheticProjectCardWorkflow::Denied,
+           SyntheticProjectTaskGraph::Denied, ActiveRecord::RecordNotFound
       head :not_found
     end
 
@@ -125,6 +191,31 @@ module Studio
       @workflow ||= SyntheticProjectCardWorkflow.new(
         actor: current_user, workspace: @workspace
       )
+    end
+
+    def task_graph
+      @task_graph ||= SyntheticProjectTaskGraph.new(
+        actor: current_user, workspace: @workspace
+      )
+    end
+
+    def task_lifecycle
+      @task_lifecycle ||= SyntheticProjectTaskLifecycle.new(
+        actor: current_user, workspace: @workspace
+      )
+    end
+
+    def positive_integer!(value)
+      raw = value.to_s
+      raise ArgumentError, "Positive integer required" unless raw.match?(/\A[1-9][0-9]{0,8}\z/)
+      raw.to_i
+    end
+
+    def exact_version!
+      raw = params[:expected_version]
+      raise ArgumentError, "Exact version required" unless raw.is_a?(String) &&
+        raw.match?(/\A(?:0|[1-9][0-9]{0,8})\z/)
+      raw.to_i
     end
 
     def expected_version!

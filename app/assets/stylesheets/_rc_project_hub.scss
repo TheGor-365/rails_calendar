@@ -109,3 +109,77 @@
   outline: 2px solid var(--rc-accent);
   outline-offset: 3px;
 }
+
+
+// RC-039 Slice H: project-engineering task simulation, distinct from artifact cards.
+.rc-hub-task-section {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.rc-hub-task-section__intro {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+.rc-hub-task-section__intro > * { min-width: 0; }
+.rc-hub-task-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .85rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.rc-hub-task {
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #e0e9eb;
+  border-radius: 16px;
+}
+.rc-hub-task__heading {
+  display: flex;
+  gap: .55rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.rc-hub-task__heading > div { min-width: 0; flex: 1 1 120px; }
+.rc-hub-task__deps ul {
+  font-size: .81rem;
+  margin: .3rem 0 .6rem;
+  padding-left: 1.2rem;
+}
+.rc-hub-task__deps li { margin-bottom: .25rem; }
+.rc-hub-task-form {
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  min-width: 0;
+  padding-top: .6rem;
+  border-top: 1px solid #e8edf0;
+}
+.rc-hub-task-form .rc-input,
+.rc-hub-task .rc-action {
+  width: 100%;
+  min-width: 0;
+}
+.rc-hub-task .rc-action { min-height: 44px; }
+.rc-hub-task :is(button, select):focus-visible {
+  outline: 2px solid var(--rc-accent);
+  outline-offset: 3px;
+}
+@media (max-width: 991.98px) {
+  .rc-hub-task-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 575.98px) {
+  .rc-hub-task-grid { grid-template-columns: minmax(0, 1fr); }
+  .rc-hub-task { padding: .85rem; }
+}
