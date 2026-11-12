@@ -1,6 +1,7 @@
 <div class="container">
   <nav aria-label="Main navigation" class="app-nav d-flex flex-wrap align-items-center gap-2 py-3">
-    <%= link_to(owner_signed_in? ? workspace_path : root_path, class: "app-brand", aria: { label: "Rails Calendar — calendar overview" } do %>
+    <% brand_destination = owner_signed_in? ? workspace_path : root_path %>
+    <%= link_to brand_destination, class: "app-brand", aria: { label: "Rails Calendar — application home" } do %>
       <span class="rc-brand-symbol" aria-hidden="true"><i class="bi bi-calendar2-check"></i></span>
       <span class="ws-brand-name">Rails Calendar<small>AI Workspace</small></span>
     <% end %>
