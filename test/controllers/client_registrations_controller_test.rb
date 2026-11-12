@@ -73,6 +73,7 @@ class ClientRegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: /Личный кабинет/
     assert_select "a[href='/workspace']", count: 0
     assert_select "a[href='/consultations']", count: 0
+    assert_select "a.app-brand[href=?]", client_home_path, count: 1
     get workspace_path
     assert_redirected_to sign_in_path
     get admin_project_intakes_path
