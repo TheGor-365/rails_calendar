@@ -17,6 +17,6 @@ class WorkspaceDesignNavigationTest < ActionDispatch::IntegrationTest
     assert_select "nav.mk-sidebar-nav a[href='#services']", count: 1
     assert_select "section#contact a[href='https://www.facebook.com/gor.webdevelopment/']", count: 1
     assert_select "section#contact a[href='https://kwork.com/user/thegor-365']", count: 1
-    assert_select "form", count: 0
+    assert_select "form:not([action='/language'])", count: 0
   end
 end

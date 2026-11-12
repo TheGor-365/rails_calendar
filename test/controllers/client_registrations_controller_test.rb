@@ -70,7 +70,7 @@ class ClientRegistrationsControllerTest < ActionDispatch::IntegrationTest
 
     get client_home_path
     assert_response :success
-    assert_select "h1", text: /Личный кабинет/
+    assert_select "h1", text: /My workspace/
     assert_select "a[href='/workspace']", count: 0
     assert_select "a[href='/consultations']", count: 0
     assert_select "a.app-brand[href=?]", client_home_path, count: 1
