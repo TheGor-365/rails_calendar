@@ -3,6 +3,7 @@ class AccountSessionsController < ApplicationController
 
   def new
     redirect_to workspace_path if owner_signed_in?
+    redirect_to client_home_path if client_signed_in?
   end
 
   def create
@@ -17,6 +18,9 @@ class AccountSessionsController < ApplicationController
     if user&.role == "owner"
       start_owner_session!(user)
       redirect_to workspace_path, notice: "Signed in"
+    elsif user&.verified_client?
+      start_account_session!(user)
+      redirect_to client_home_path, notice: "Signed in"
     else
       reset_session
       flash.now[:alert] = "Invalid email or password"

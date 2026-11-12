@@ -255,3 +255,10 @@ body.app-shell {
 @media(max-width:767.98px){.ws-hub-metrics {grid-template-columns:repeat(2,minmax(0,1fr))}.ws-hub-metric:last-child {grid-column:1/-1}.ws-hub-panels {grid-template-columns:1fr}}
 @media(max-width:450px){.ws-hub-metrics {grid-template-columns:1fr}.ws-hub-metric:last-child {grid-column:auto}.ws-hub-tool {padding:.8rem;min-height:160px}}
 @media(prefers-reduced-motion:reduce){.ws-hub :is(.ws-hub-metric,.ws-hub-tool) {transition:none!important;transform:none!important}}
+
+// Client placeholder — intentionally no owner data or project queries.
+.ws-client-heading {max-width:690px;margin-bottom:1.6rem}
+.ws-client-panel {border:1px solid var(--ws-border);border-radius:18px;box-shadow:var(--ws-shadow);background:#fff;padding:clamp(20px,3vw,32px);max-width:640px}
+.ws-client-panel h2 {font-size:1.17rem;font-weight:790;margin:15px 0 7px}
+.ws-client-panel p {color:var(--ws-muted);font-size:.88rem;line-height:1.65}
+.ws-client-icon {display:grid;place-items:center;background:var(--ws-teal-wash);color:var(--ws-teal);height:46px;width:46px;border-radius:13px;font-size:1.25rem}

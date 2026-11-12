@@ -27,13 +27,13 @@
           <span class="mk-brand-name">Rails Calendar <small>AI Workspace</small></span>
         <% end %>
         <nav class="mk-header-nav" aria-label="Главная навигация">
-          <%= link_to "Услуги", "#services" %>
-          <%= link_to "Как работаем", "#process", class: "mk-header-secondary" %>
-          <%= link_to "Контакты", "#contact", class: "mk-header-secondary" %>
+          <%= link_to "Услуги", services_path(anchor: "services") %>
+          <%= link_to "Как работаем", services_path(anchor: "process"), class: "mk-header-secondary" %>
+          <%= link_to "Контакты", services_path(anchor: "contact"), class: "mk-header-secondary" %>
         </nav>
-        <%= link_to(admin_signed_in? ? root_path : sign_in_path, class: "mk-header-access") do %>
+        <%= link_to(owner_signed_in? ? workspace_path : (client_signed_in? ? client_home_path : (admin_signed_in? ? root_path : sign_in_path)), class: "mk-header-access") do %>
           <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#lock"></use></svg>
-          <span><%= admin_signed_in? ? "В рабочую область" : "Вход владельца" %></span>
+          <span><%= owner_signed_in? ? "Рабочая область" : (client_signed_in? ? "Мой кабинет" : (admin_signed_in? ? "Администратор" : "Вход")) %></span>
         <% end %>
       </div>
     </header>

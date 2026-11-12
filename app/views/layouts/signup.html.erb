@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>Аккаунт · Rails Calendar AI Workspace</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="theme-color" content="#ffffff">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/marketing.css">
+  </head>
+  <body class="marketing-page mk-auth-page">
+    <a class="mk-skip" href="#content">К содержимому</a>
+    <header class="mk-header"><div class="mk-container mk-header-inner">
+      <%= link_to services_path, class: "mk-brand" do %>
+        <span class="mk-brand-icon" aria-hidden="true"><svg class="mk-icon"><use href="/workspace-icons.svg#layers"></use></svg></span>
+        <span class="mk-brand-name">Rails Calendar <small>AI Workspace</small></span>
+      <% end %>
+      <nav class="mk-header-nav" aria-label="Аккаунт">
+        <%= link_to "Обзор", services_path %>
+        <%= link_to "Вход", sign_in_path %>
+      </nav>
+    </div></header>
+    <main class="mk-auth-main" id="content" tabindex="-1"><%= yield %></main>
+  </body>
+</html>

@@ -3,7 +3,7 @@
     <header class="mb-4">
       <p class="eyebrow mb-2">WORKSPACE / SECURE ACCESS</p>
       <h1 class="page-title mb-2">Sign in to your workspace</h1>
-      <p class="rc-muted">Owner account. Client invitations and public registration are not yet enabled.</p>
+      <p class="rc-muted">Вход владельца или клиента с подтверждённой почтой.</p>
     </header>
     <section class="surface-panel" aria-label="Workspace sign in">
       <%= form_with url: account_session_path, method: :post, local: true, html: { class: "rc-form" } do |form| %>
@@ -17,7 +17,10 @@
         </div>
         <%= form.submit "Sign in", class: "rc-action rc-action--primary" %>
       <% end %>
-      <% if (Rails.env.development? || Rails.env.test?) && ENV["RC_LOCAL_OWNER_SIGNUP"] == "true" && !User.exists? %>
+      <% if ClientSignupAvailability.enabled? %>
+        <p class="rc-muted mt-3 mb-0"><%= link_to "Создать аккаунт клиента", client_registration_path %></p>
+      <% end %>
+      <% if (Rails.env.development? || Rails.env.test?) && ENV["RC_LOCAL_OWNER_SIGNUP"] == "true" && !User.where(role: "owner").exists? %>
         <p class="rc-muted mt-3 mb-0"><%= link_to "Create local owner account", sign_up_path %></p>
       <% end %>
     </section>

@@ -7,7 +7,7 @@ module AccountAuthentication
   OWNER_SESSION_LIFETIME = 8.hours
 
   included do
-    helper_method :current_user, :owner_signed_in?
+    helper_method :current_user, :owner_signed_in?, :client_signed_in?
   end
 
   private
@@ -26,7 +26,17 @@ module AccountAuthentication
     current_user&.role == "owner"
   end
 
+  def client_signed_in?
+    current_user&.verified_client?
+  end
+
   def start_owner_session!(user)
+    raise ArgumentError, "owner only" unless user.role == "owner"
+    start_account_session!(user)
+  end
+
+  def start_account_session!(user)
+    raise ArgumentError, "unverified client" unless user.role == "owner" || user.verified_client?
     reset_session
     token = SecureRandom.hex(32)
     user.user_sessions.create!(

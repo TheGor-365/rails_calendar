@@ -5,6 +5,15 @@
 <% creation_active = controller_name == "consultations" && %w[new create].include?(action_name) %>
 <% access_active = controller_path == "admin/sessions" %>
 
+<% if client_signed_in? %>
+<nav class="rc-mobile-dock" aria-label="Навигация клиента">
+  <%= link_to rc_icon_label("grid-1x2", "Мой кабинет"), client_home_path, class: "rc-mobile-dock-item is-active" %>
+  <%= link_to rc_icon_label("globe", "Обзор"), services_path, class: "rc-mobile-dock-item" %>
+  <%= button_to sign_out_path, method: :delete, class: "rc-mobile-dock-item" do %>
+    <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Выход</span>
+  <% end %>
+</nav>
+<% else %>
 <nav class="rc-mobile-dock" aria-label="Mobile primary navigation">
   <%= link_to root_path, class: "rc-mobile-dock-item #{'is-active' if calendar_active}",
               aria: { current: ("page" if calendar_active) } do %>
@@ -50,3 +59,5 @@
     <% end %>
   <% end %>
 </nav>
+
+<% end %>

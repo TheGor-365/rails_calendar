@@ -16,7 +16,7 @@ class RegistrationsController < ApplicationController
     already_taken = false
     User.transaction do
       User.connection.execute("SELECT pg_advisory_xact_lock(20261108, 32)")
-      if User.exists?
+      if User.where(role: "owner").exists?
         already_taken = true
       else
         saved = @user.save
@@ -44,7 +44,7 @@ class RegistrationsController < ApplicationController
   def require_local_owner_bootstrap!
     allowed_environment = Rails.env.development? || Rails.env.test?
     return if allowed_environment && request.local? &&
-              ENV["RC_LOCAL_OWNER_SIGNUP"] == "true" && !User.exists?
+              ENV["RC_LOCAL_OWNER_SIGNUP"] == "true" && !User.where(role: "owner").exists?
 
     head :not_found
   end
