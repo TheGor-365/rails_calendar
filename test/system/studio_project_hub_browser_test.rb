@@ -71,7 +71,7 @@ class StudioProjectHubBrowserTest < ApplicationSystemTestCase
     emulate_viewport!(320)
     visit @url
     details = find("[data-artifact-key='requirements_spec'] details.rc-hub-details")
-    assert_not details[:open]
+    assert_no_selector "[data-artifact-key='requirements_spec'] details[open]"
     details.find("summary").send_keys(:enter)
     assert_selector "[data-artifact-key='requirements_spec'] details[open]"
     assert_selector "[data-artifact-key='requirements_spec'] details li", minimum: 1
