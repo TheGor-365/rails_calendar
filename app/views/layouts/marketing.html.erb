@@ -2,15 +2,15 @@
 <html lang="<%= I18n.locale %>">
   <head>
     <meta charset="utf-8">
-    <title>Rails Calendar · AI Workspace — заявки и разработка веб-сервисов</title>
+    <title><%= t("marketing.title") %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Rails Calendar · AI Workspace: услуги Ruby on Rails, формы, API/PostgreSQL и автоматизация. Прозрачный процесс постановки и согласования веб-задач.">
+    <meta name="description" content="<%= t("marketing.description") %>">
     <meta name="robots" content="index,follow">
     <link rel="canonical" href="https://rails-calendar-ai-web-production.up.railway.app/">
     <meta name="theme-color" content="#ffffff">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Rails Calendar · AI Workspace">
-    <meta property="og:description" content="Четыре направления веб-разработки и понятный маршрут от запроса до согласованной задачи.">
+    <meta property="og:description" content="<%= t("marketing.og_description") %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">

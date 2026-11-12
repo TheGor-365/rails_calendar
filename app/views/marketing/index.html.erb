@@ -1,16 +1,16 @@
 <div class="mk-container mk-workspace">
-  <aside class="mk-sidebar" aria-label="Разделы сайта">
-    <p class="mk-sidebar-label">РАБОЧЕЕ ПРОСТРАНСТВО</p>
-    <nav class="mk-sidebar-nav" aria-label="Навигация по разделам">
-      <a href="#overview" class="is-current"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg>Обзор</a>
-      <a href="#services"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg>Направления услуг</a>
-      <a href="#process"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg>Процесс</a>
-      <a href="#evidence"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg>Код и практика</a>
-      <a href="#contact"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg>Связаться</a>
+  <aside class="mk-sidebar" aria-label="<%= t("marketing.sidebar_aria") %>">
+    <p class="mk-sidebar-label"><%= t("marketing.sidebar_heading") %></p>
+    <nav class="mk-sidebar-nav" aria-label="<%= t("marketing.sidebar_nav") %>">
+      <a href="#overview" class="is-current"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg><%= t("marketing.sidebar_overview") %></a>
+      <a href="#services"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg><%= t("marketing.sidebar_services") %></a>
+      <a href="#process"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg><%= t("marketing.sidebar_process") %></a>
+      <a href="#evidence"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg><%= t("marketing.sidebar_evidence") %></a>
+      <a href="#contact"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg><%= t("marketing.sidebar_contact") %></a>
     </nav>
     <div class="mk-sidebar-note">
       <span class="mk-state-dot" aria-hidden="true"></span>
-      <p><strong>Публичная витрина</strong><br>Рабочие инструменты владельца закрыты для гостей.</p>
+      <p><strong><%= t("marketing.sidebar_public") %></strong><br><%= t("marketing.sidebar_note") %></p>
     </div>
   </aside>
 
@@ -19,80 +19,80 @@
       <div class="mk-intro">
         <div class="mk-intro-top">
           <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg> WEB SERVICE WORKSPACE</span>
-          <span class="mk-status"><span class="mk-state-dot" aria-hidden="true"></span> Открыт приём запросов</span>
+          <span class="mk-status"><span class="mk-state-dot" aria-hidden="true"></span> <%= t("marketing.hero_status") %></span>
         </div>
-        <h1 id="mk-main-title">Веб-задачи.<br><span>Понятный процесс.</span></h1>
-        <p class="mk-lead">От исправления ошибки Rails до API-интеграции: выберите направление, опишите результат и согласуйте объём работы до старта.</p>
+        <h1 id="mk-main-title"><%= t("marketing.hero_title") %><br><span><%= t("marketing.hero_accent") %></span></h1>
+        <p class="mk-lead"><%= t("marketing.hero_lead") %></p>
         <div class="mk-intro-actions">
-          <a class="mk-action mk-action-primary" href="#services"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg> Выбрать услугу <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-right"></use></svg></a>
-          <a class="mk-action mk-action-quiet" href="#process"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg> Как это устроено</a>
+          <a class="mk-action mk-action-primary" href="#services"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg> <%= t("marketing.hero_pick") %> <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-right"></use></svg></a>
+          <a class="mk-action mk-action-quiet" href="#process"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg> <%= t("marketing.hero_how") %></a>
         </div>
-        <p class="mk-intro-footnote"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#shield"></use></svg> Заявки сейчас принимаются через внешние рабочие каналы. Регистрация клиента и загрузка файлов здесь не открыты.</p>
+        <p class="mk-intro-footnote"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#shield"></use></svg> <%= t("marketing.hero_note") %></p>
       </div>
 
-      <div class="mk-workflow" aria-label="Схема обработки запроса">
+      <div class="mk-workflow" aria-label="<%= t("marketing.workflow_aria") %>">
         <div class="mk-workflow-head">
-          <div><span class="mk-workflow-overline">WORKFLOW</span><h2>От запроса к результату</h2></div>
-          <span class="mk-demo-label"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#eye"></use></svg> Схема</span>
+          <div><span class="mk-workflow-overline">WORKFLOW</span><h2><%= t("marketing.workflow_title") %></h2></div>
+          <span class="mk-demo-label"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#eye"></use></svg> <%= t("marketing.workflow_scheme") %></span>
         </div>
         <div class="mk-board">
           <div class="mk-board-lane">
-            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-new"></span>01 · Запрос</div>
-            <div class="mk-board-card"><span class="mk-tag mk-tag-neutral">Контекст</span><strong>Проблема или задача</strong><small>Что требуется изменить?</small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#clipboard"></use></svg> Описание</span></div>
+            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-new"></span>01 · <%= t("marketing.lane_request") %></div>
+            <div class="mk-board-card"><span class="mk-tag mk-tag-neutral"><%= t("marketing.lane_context") %></span><strong><%= t("marketing.lane_problem") %></strong><small><%= t("marketing.lane_question") %></small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#clipboard"></use></svg> <%= t("marketing.lane_description") %></span></div>
           </div>
           <div class="mk-board-lane">
-            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-review"></span>02 · Уточнение</div>
-            <div class="mk-board-card"><span class="mk-tag mk-tag-amber">Согласование</span><strong>Границы работы</strong><small>Объём, критерии приёмки</small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#checklist"></use></svg> Проверка</span></div>
+            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-review"></span>02 · <%= t("marketing.lane_clarify") %></div>
+            <div class="mk-board-card"><span class="mk-tag mk-tag-amber"><%= t("marketing.lane_agreement") %></span><strong><%= t("marketing.lane_boundaries") %></strong><small><%= t("marketing.lane_scope") %></small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#checklist"></use></svg> <%= t("marketing.lane_check") %></span></div>
           </div>
           <div class="mk-board-lane">
-            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-done"></span>03 · Выполнение</div>
-            <div class="mk-board-card"><span class="mk-tag mk-tag-green">Результат</span><strong>Изменение и тесты</strong><small>Демонстрация выполненного</small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#check"></use></svg> Приёмка</span></div>
+            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-done"></span>03 · <%= t("marketing.lane_delivery") %></div>
+            <div class="mk-board-card"><span class="mk-tag mk-tag-green"><%= t("marketing.lane_result") %></span><strong><%= t("marketing.lane_changes") %></strong><small><%= t("marketing.lane_demo") %></small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#check"></use></svg> <%= t("marketing.lane_accept") %></span></div>
           </div>
         </div>
-        <p class="mk-workflow-disclaimer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#info"></use></svg> Иллюстрация процесса, не интерактивная доска и не реальные клиентские данные.</p>
+        <p class="mk-workflow-disclaimer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#info"></use></svg> <%= t("marketing.workflow_note") %></p>
       </div>
     </section>
 
     <section class="mk-section" id="services" aria-labelledby="services-title">
       <header class="mk-section-head">
-        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg> УСЛУГИ</span><h2 id="services-title">Четыре направления работы</h2></div>
-        <p>Небольшие и проверяемые задачи, разбитые на понятные итерации.</p>
+        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg> <%= t("marketing.services_label") %></span><h2 id="services-title"><%= t("marketing.services_title") %></h2></div>
+        <p><%= t("marketing.services_lead") %></p>
       </header>
       <div class="mk-service-grid">
         <article class="marketing-service mk-service-card">
-          <a href="#contact" aria-label="Обсудить исправление ошибки Ruby on Rails">
+          <a href="#contact" aria-label="<%= t("marketing.bug_aria") %>">
             <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#bug"></use></svg></span><span class="mk-service-index">01</span></span>
-            <h3>Rails: исправление ошибок</h3>
-            <p>Воспроизводимый дефект, диагностика, точечный фикс и тест.</p>
+            <h3><%= t("marketing.bug_title") %></h3>
+            <p><%= t("marketing.bug_desc") %></p>
             <span class="mk-service-tags"><span>Ruby</span><span>Debug</span><span>Tests</span></span>
-            <span class="mk-service-footer">Обсудить задачу <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
+            <span class="mk-service-footer"><%= t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
           </a>
         </article>
         <article class="marketing-service mk-service-card">
-          <a href="#contact" aria-label="Обсудить формы CRUD и административный интерфейс">
+          <a href="#contact" aria-label="<%= t("marketing.forms_aria") %>">
             <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layout"></use></svg></span><span class="mk-service-index">02</span></span>
-            <h3>Формы, CRUD, админка</h3>
-            <p>Поля, проверки, сценарии создания и редактирования данных.</p>
+            <h3><%= t("marketing.forms_title") %></h3>
+            <p><%= t("marketing.forms_desc") %></p>
             <span class="mk-service-tags"><span>Rails</span><span>Forms</span><span>UI</span></span>
-            <span class="mk-service-footer">Обсудить задачу <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
+            <span class="mk-service-footer"><%= t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
           </a>
         </article>
         <article class="marketing-service mk-service-card">
-          <a href="#contact" aria-label="Обсудить REST API и PostgreSQL">
+          <a href="#contact" aria-label="<%= t("marketing.api_aria") %>">
             <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#database"></use></svg></span><span class="mk-service-index">03</span></span>
-            <h3>API и PostgreSQL</h3>
-            <p>Интеграции, запросы, endpoints и исправление ошибок данных.</p>
+            <h3><%= t("marketing.api_title") %></h3>
+            <p><%= t("marketing.api_desc") %></p>
             <span class="mk-service-tags"><span>API</span><span>SQL</span><span>Data</span></span>
-            <span class="mk-service-footer">Обсудить задачу <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
+            <span class="mk-service-footer"><%= t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
           </a>
         </article>
         <article class="marketing-service mk-service-card">
-          <a href="#contact" aria-label="Обсудить веб-страницу или автоматизацию">
+          <a href="#contact" aria-label="<%= t("marketing.web_aria") %>">
             <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#bolt"></use></svg></span><span class="mk-service-index">04</span></span>
-            <h3>Веб и автоматизация</h3>
-            <p>Адаптивные страницы и небольшие улучшения рабочих процессов.</p>
+            <h3><%= t("marketing.web_title") %></h3>
+            <p><%= t("marketing.web_desc") %></p>
             <span class="mk-service-tags"><span>Web</span><span>UX</span><span>Automation</span></span>
-            <span class="mk-service-footer">Обсудить задачу <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
+            <span class="mk-service-footer"><%= t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
           </a>
         </article>
       </div>
@@ -100,40 +100,40 @@
 
     <section class="mk-section mk-section-tight" id="process" aria-labelledby="process-title">
       <header class="mk-section-head">
-        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg> ПРОЦЕСС</span><h2 id="process-title">Каждый этап имеет результат</h2></div>
+        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg> <%= t("marketing.process_label") %></span><h2 id="process-title"><%= t("marketing.process_title") %></h2></div>
       </header>
       <ol class="mk-process">
-        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg></span><div><strong>Запрос</strong><p>Описание проблемы, контекст и цель.</p></div><span class="mk-process-order">01</span></li>
-        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#checklist"></use></svg></span><div><strong>Согласование</strong><p>Границы задачи, входные данные и критерии приёмки.</p></div><span class="mk-process-order">02</span></li>
-        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg></span><div><strong>Разработка</strong><p>Изменения, проверка и передача результата.</p></div><span class="mk-process-order">03</span></li>
+        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg></span><div><strong><%= t("marketing.lane_request") %></strong><p><%= t("marketing.process_request_desc") %></p></div><span class="mk-process-order">01</span></li>
+        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#checklist"></use></svg></span><div><strong><%= t("marketing.lane_agreement") %></strong><p><%= t("marketing.process_agreement_desc") %></p></div><span class="mk-process-order">02</span></li>
+        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg></span><div><strong><%= t("marketing.process_build") %></strong><p><%= t("marketing.process_build_desc") %></p></div><span class="mk-process-order">03</span></li>
       </ol>
     </section>
 
     <section class="mk-section mk-evidence" id="evidence" aria-labelledby="evidence-title">
       <div class="mk-evidence-intro">
-        <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg> ИНЖЕНЕРНАЯ ОСНОВА</span>
-        <h2 id="evidence-title">Код, тесты и понятные ограничения</h2>
-        <p>Rails Calendar содержит рабочий приватный календарь. Инструменты постановки задач и AI-поддержка развиваются отдельно; они не выдаются за уже открытый клиентский кабинет.</p>
+        <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg> <%= t("marketing.evidence_label") %></span>
+        <h2 id="evidence-title"><%= t("marketing.evidence_title") %></h2>
+        <p><%= t("marketing.evidence_desc") %></p>
       </div>
       <div class="mk-evidence-links">
-        <a href="https://github.com/TheGor-365/rails_calendar" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg><span>Исходный код Rails Calendar<small>Публичный репозиторий</small></span><svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
-        <a href="https://github.com/TheGor-365" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg><span>Другие проекты<small>GitHub · открытый код</small></span><svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
-        <a href="https://kwork.com/user/thegor-365" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#briefcase"></use></svg><span>Услуги на Kwork<small>Внешняя платформа</small></span><svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
+        <a href="https://github.com/TheGor-365/rails_calendar" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg><span><%= t("marketing.evidence_repo") %><small><%= t("marketing.evidence_repo_sub") %></small></span><svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
+        <a href="https://github.com/TheGor-365" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg><span><%= t("marketing.evidence_other") %><small><%= t("marketing.evidence_other_sub") %></small></span><svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
+        <a href="https://kwork.com/user/thegor-365" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#briefcase"></use></svg><span><%= t("marketing.evidence_kwork") %><small><%= t("marketing.evidence_kwork_sub") %></small></span><svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
       </div>
     </section>
 
     <section class="mk-section mk-contact-section" id="contact" aria-labelledby="contact-title">
       <div class="mk-contact-card">
         <div class="mk-contact-copy">
-          <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg> СВЯЗЬ</span>
-          <h2 id="contact-title">Начать с описания задачи</h2>
-          <p>Укажите, что не работает или что требуется добавить, используемый стек и ожидаемый результат. Объём, срок и стоимость согласуются после оценки.</p>
-          <small><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#shield"></use></svg> Не отправляйте токены, пароли, закрытые базы и документы в первом сообщении.</small>
+          <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg> <%= t("marketing.contact_label") %></span>
+          <h2 id="contact-title"><%= t("marketing.contact_title") %></h2>
+          <p><%= t("marketing.contact_desc") %></p>
+          <small><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#shield"></use></svg> <%= t("marketing.contact_warning") %></small>
         </div>
         <div class="mk-contact-links">
           <a class="mk-action mk-action-primary" href="https://www.facebook.com/gor.webdevelopment/" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg> Facebook Page <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
-          <a class="mk-action mk-action-quiet" href="https://kwork.com/user/thegor-365" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#briefcase"></use></svg> Написать через Kwork <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
-          <p>Обращение обрабатывается на внешней площадке по её правилам. Внутренний приём клиентских данных пока отключён.</p>
+          <a class="mk-action mk-action-quiet" href="https://kwork.com/user/thegor-365" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#briefcase"></use></svg> <%= t("marketing.contact_kwork") %> <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
+          <p><%= t("marketing.contact_note") %></p>
         </div>
       </div>
     </section>
