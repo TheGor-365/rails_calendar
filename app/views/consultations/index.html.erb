@@ -1,55 +1,55 @@
 <div class="container my-4 my-sm-5">
   <header class="rc-page-hero mb-4">
     <div>
-      <p class="eyebrow mb-2">SCHEDULE / ALL RECORDS</p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-journal-text"></i></span><h1 class="page-title mb-1">Consultations</h1></div>
-      <p class="rc-muted mb-0">Chronological list of sessions. Open a record or jump directly to its calendar date.</p>
+      <p class="eyebrow mb-2"><%= t("consultations.all_eyebrow") %></p>
+      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-journal-text"></i></span><h1 class="page-title mb-1"><%= t("consultations.title") %></h1></div>
+      <p class="rc-muted mb-0"><%= t("consultations.list_hint") %></p>
     </div>
     <div class="d-flex flex-wrap gap-2">
-      <%= link_to rc_icon_label("calendar3", "Calendar"), root_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("calendar3", t("consultations.calendar")), root_path, class: "rc-action rc-action--quiet" %>
       <% if admin_signed_in? %>
-        <%= link_to rc_icon_label("plus-lg", "New consultation"), new_consultation_path, class: "rc-action rc-action--primary" %>
+        <%= link_to rc_icon_label("plus-lg", t("consultations.new")), new_consultation_path, class: "rc-action rc-action--primary" %>
       <% end %>
     </div>
   </header>
 
   <%= form_with url: consultations_path, method: :get, local: true,
                 html: { class: "rc-consultation-filters", role: "search",
-                        aria: { label: "Filter consultations" } } do %>
+                        aria: { label: t("consultations.filter_aria") } } do %>
     <div class="rc-filter-grid">
       <div class="rc-filter-field">
-        <%= label_tag :q, "Title contains", class: "rc-field-label" %>
+        <%= label_tag :q, t("consultations.title_contains"), class: "rc-field-label" %>
         <%= search_field_tag :q, @search.query,
                              class: "rc-input rc-filter-input",
                              maxlength: ConsultationSearch::MAX_QUERY_LENGTH,
-                             placeholder: "Search consultation titles" %>
+                             placeholder: t("consultations.search_placeholder") %>
       </div>
       <div class="rc-filter-field">
-        <%= label_tag :from, "From (UTC)", class: "rc-field-label" %>
+        <%= label_tag :from, t("consultations.from"), class: "rc-field-label" %>
         <%= date_field_tag :from, @search.from_value,
                            class: "rc-input rc-filter-input",
                            min: "2000-01-01", max: "2100-12-31" %>
       </div>
       <div class="rc-filter-field">
-        <%= label_tag :to, "To (UTC)", class: "rc-field-label" %>
+        <%= label_tag :to, t("consultations.to"), class: "rc-field-label" %>
         <%= date_field_tag :to, @search.to_value,
                            class: "rc-input rc-filter-input",
                            min: "2000-01-01", max: "2100-12-31" %>
       </div>
       <div class="rc-filter-field">
-        <%= label_tag :status, "Schedule status", class: "rc-field-label" %>
+        <%= label_tag :status, t("consultations.status"), class: "rc-field-label" %>
         <%= select_tag :status,
-                       options_for_select([["All", "all"], ["Upcoming", "upcoming"],
-                                           ["In progress", "ongoing"], ["Past", "past"]], @search.status),
+                       options_for_select([[t("consultations.all"), "all"], [t("consultations.upcoming"), "upcoming"],
+                                           [t("consultations.ongoing"), "ongoing"], [t("consultations.past"), "past"]], @search.status),
                        class: "rc-input rc-filter-input" %>
       </div>
     </div>
     <div class="rc-filter-actions">
-      <%= button_tag rc_icon_label("search", "Apply filters"),
+      <%= button_tag rc_icon_label("search", t("consultations.apply")),
                      type: :submit, class: "rc-action rc-action--primary" %>
-      <%= link_to rc_icon_label("arrow-counterclockwise", "Clear"), consultations_path,
+      <%= link_to rc_icon_label("arrow-counterclockwise", t("consultations.clear")), consultations_path,
                   class: "rc-action rc-action--quiet" %>
-      <p class="rc-hint mb-0">Dates include consultations that overlap the selected UTC day range.</p>
+      <p class="rc-hint mb-0"><%= t("consultations.range_hint") %></p>
     </div>
   <% end %>
 
@@ -61,11 +61,11 @@
 
   <p class="rc-results-summary" role="status" aria-live="polite">
     <% if @search.errors.any? %>
-      Filters need correction before results can be displayed.
+      <%= t("consultations.filter_invalid") %>
     <% elsif @search.total.zero? %>
-      <%= @search.filtered? ? "No matching consultations." : "No consultations scheduled." %>
+      <%= @search.filtered? ? t("consultations.no_matches") : t("consultations.none_scheduled") %>
     <% else %>
-      Showing <%= @search.first_result %>–<%= @search.last_result %> of <%= pluralize(@search.total, "consultation") %>.
+      <%= t("consultations.showing", first: @search.first_result, last: @search.last_result, total: rc_count(@search.total, "calendar", "consultation")) %>
     <% end %>
   </p>
 
@@ -76,22 +76,22 @@
           <div class="rc-record-head">
             <h2 class="h5 mb-0"><%= link_to consultation.title, consultation_path(consultation), class: "rc-record-title" %></h2>
             <span class="rc-record-meta">
-              <time datetime="<%= consultation.start_time.iso8601 %>"><%= consultation.start_time.in_time_zone.strftime("%d %b %Y, %H:%M") %></time>
+              <time datetime="<%= consultation.start_time.iso8601 %>"><%= rc_local_datetime(consultation.start_time) %></time>
               <span aria-hidden="true">—</span>
-              <time datetime="<%= consultation.end_time.iso8601 %>"><%= consultation.end_time.in_time_zone.strftime("%d %b %Y, %H:%M") %></time>
+              <time datetime="<%= consultation.end_time.iso8601 %>"><%= rc_local_datetime(consultation.end_time) %></time>
             </span>
           </div>
           <% if consultation.description.present? %>
             <p class="rc-muted mt-2 mb-0"><%= truncate(consultation.description, length: 140) %></p>
           <% end %>
           <div class="rc-record-actions">
-            <%= link_to rc_icon_label("eye", "View details"), consultation_path(consultation), class: "rc-text-link" %>
+            <%= link_to rc_icon_label("eye", t("consultations.view_details")), consultation_path(consultation), class: "rc-text-link" %>
             <% if admin_signed_in? %>
-              <%= link_to rc_icon_label("calendar2-week", "Reschedule"),
+              <%= link_to rc_icon_label("calendar2-week", t("consultations.reschedule")),
                           edit_consultation_path(consultation, anchor: "consultation_start_time"),
-                          class: "rc-text-link", aria: { label: "Reschedule #{consultation.title}" } %>
+                          class: "rc-text-link", aria: { label: t("consultations.reschedule_aria", title: consultation.title) } %>
             <% end %>
-            <%= link_to rc_icon_label("calendar-event", "View in calendar"),
+            <%= link_to rc_icon_label("calendar-event", t("consultations.view_calendar")),
                         calendar_day_path(date: consultation.start_time.in_time_zone.to_date.iso8601, anchor: "event-#{consultation.id}"),
                         class: "rc-text-link" %>
           </div>
@@ -102,27 +102,27 @@
     <div id="consultations" class="rc-empty-state rc-notice--neutral" role="status">
       <span class="rc-empty-state__icon" aria-hidden="true"><i class="bi bi-calendar-x"></i></span>
       <% if @search.errors.any? %>
-        Correct the filters above to view results.
+        <%= t("consultations.filters_correct") %>
       <% elsif @search.filtered? %>
-        No results for these filters. Try another title, date range or schedule status.
+        <%= t("consultations.filters_empty") %>
       <% else %>
-        No consultations have been scheduled.
+        <%= t("consultations.none_ever") %>
       <% end %>
     </div>
   <% end %>
 
   <% if @search.total_pages > 1 %>
-    <nav class="rc-pagination" aria-label="Consultation result pages">
+    <nav class="rc-pagination" aria-label="<%= t("consultations.pagination_aria") %>">
       <% if @search.page > 1 %>
-        <%= link_to rc_icon_label("chevron-left", "Previous"),
+        <%= link_to rc_icon_label("chevron-left", t("consultations.previous")),
                     consultations_path(@search.page_params(@search.page - 1)),
                     class: "rc-action rc-action--quiet", rel: "prev" %>
       <% end %>
       <span class="rc-pagination-current" aria-current="page">
-        Page <%= @search.page %> of <%= @search.total_pages %>
+        <%= t("consultations.page_of", page: @search.page, total: @search.total_pages) %>
       </span>
       <% if @search.page < @search.total_pages %>
-        <%= link_to rc_icon_label("chevron-right", "Next"),
+        <%= link_to rc_icon_label("chevron-right", t("consultations.next")),
                     consultations_path(@search.page_params(@search.page + 1)),
                     class: "rc-action rc-action--quiet", rel: "next" %>
       <% end %>
