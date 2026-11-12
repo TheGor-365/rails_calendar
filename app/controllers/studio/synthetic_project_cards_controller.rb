@@ -25,12 +25,7 @@ module Studio
     # Human-readable, keyboard-operable preview for fictitious internal cards.
     # Separate from Slice C JSON endpoints to preserve their original contract.
     def show_preview
-      @board = SyntheticProjectHubBoardPreview.new(
-        actor: current_user, workspace: @workspace
-      ).call(client: @client, intake: @intake, explicit_synthetic: true)
-      @saved_cards_by_key = workflow.list(
-        client: @client, intake: @intake, explicit_synthetic: true
-      ).index_by { |row| row.fetch("artifact_key") }
+      load_preview_board!
     rescue SecurityError, SyntheticProjectHubBoardPreview::Denied,
            SyntheticProjectCardWorkflow::Denied
       head :not_found
@@ -46,7 +41,7 @@ module Studio
       redirect_to preview_path, notice: "Fictional card recorded. No scope approved."
     rescue SyntheticProjectCardWorkflow::Denied, ActiveRecord::RecordInvalid,
            ActiveRecord::RecordNotUnique
-      render plain: "Synthetic card request rejected", status: :unprocessable_entity
+      render_preview_problem("That fictional card cannot be created. Review the current board.", :unprocessable_entity)
     rescue ActiveRecord::RecordNotFound, SecurityError
       head :not_found
     end
@@ -60,10 +55,10 @@ module Studio
       )
       redirect_to preview_path, notice: "Fictional card state recorded. No approval granted."
     rescue SyntheticProjectCardWorkflow::Conflict, ActiveRecord::StaleObjectError
-      render plain: "Card was changed; reload the board", status: :conflict
+      render_preview_problem("Card changed since this page was opened. Review its current state before trying again.", :conflict)
     rescue ArgumentError, SyntheticProjectCardWorkflow::Denied,
            ActiveRecord::RecordInvalid
-      render plain: "Synthetic transition rejected", status: :unprocessable_entity
+      render_preview_problem("That fictional state transition is not permitted. No change was saved.", :unprocessable_entity)
     rescue ActiveRecord::RecordNotFound, SecurityError
       head :not_found
     end
@@ -101,6 +96,26 @@ module Studio
     end
 
     private
+
+    # Read the same owner-scoped board on both successful GET and failed POST/
+    # PATCH; a 409 response must never echo stale form fields or raw inputs.
+    def load_preview_board!
+      @board = SyntheticProjectHubBoardPreview.new(
+        actor: current_user, workspace: @workspace
+      ).call(client: @client, intake: @intake, explicit_synthetic: true)
+      @saved_cards_by_key = workflow.list(
+        client: @client, intake: @intake, explicit_synthetic: true
+      ).index_by { |row| row.fetch("artifact_key") }
+    end
+
+    def render_preview_problem(message, status)
+      load_preview_board!
+      @error = message
+      render :show_preview, status: status
+    rescue SecurityError, SyntheticProjectHubBoardPreview::Denied,
+           SyntheticProjectCardWorkflow::Denied, ActiveRecord::RecordNotFound
+      head :not_found
+    end
 
     def preview_path
       rc039_synthetic_project_hub_preview_path(@workspace, @client, @intake)

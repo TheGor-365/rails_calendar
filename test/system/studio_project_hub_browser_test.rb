@@ -61,6 +61,29 @@ class StudioProjectHubBrowserTest < ApplicationSystemTestCase
     page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
   end
 
+  test "keyboard opens prerequisite disclosure without pointer and leaves no approval controls" do
+    visit sign_in_url
+    fill_in "Email", with: @owner.email
+    fill_in "Password", with: @password
+    click_button "Sign in"
+    assert_current_path consultations_path
+
+    emulate_viewport!(320)
+    visit @url
+    details = find("[data-artifact-key='requirements_spec'] details.rc-hub-details")
+    assert_not details[:open]
+    details.find("summary").send_keys(:enter)
+    assert_selector "[data-artifact-key='requirements_spec'] details[open]"
+    assert_selector "[data-artifact-key='requirements_spec'] details li", minimum: 1
+    assert_selector "[data-artifact-key='requirements_spec'] h3[id='hub_artifact_requirements_spec']"
+    assert_selector "[data-artifact-key='requirements_spec'] button[aria-describedby='hub_artifact_requirements_spec']"
+    assert_no_button "Approve scope"
+    assert_no_button "Upload client file"
+    assert_safe_width(320)
+  ensure
+    page.driver.browser.execute_cdp("Emulation.clearDeviceMetricsOverride")
+  end
+
   private
 
   def emulate_viewport!(width)

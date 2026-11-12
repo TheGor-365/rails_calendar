@@ -46,8 +46,11 @@ class StudioSyntheticProjectHubUiHttpTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: "Project Hub preview"
     assert_select "[aria-label='Project Hub workflow lanes']", 1
-    assert_select "section.rc-hub-lane", 4
+    assert_select "section.rc-hub-lane[aria-labelledby]", 4
+    assert_select "section.rc-hub-lane h2[id^='hub_lane_']", 4
     assert_select "li.rc-hub-card", 9
+    assert_select "li.rc-hub-card h3[id^='hub_artifact_']", 9
+    assert_select "li.rc-hub-card button[aria-describedby^='hub_artifact_']", 9
     assert_select "form[action='#{create_path}']", 9
     assert_select "form input[name=artifact_key]", 9
     assert_select "details summary", 9
@@ -137,6 +140,62 @@ class StudioSyntheticProjectHubUiHttpTest < ActionDispatch::IntegrationTest
       assert_response :not_found
     end
     assert_equal 0, Studio::SyntheticProjectCard.count
+  end
+
+  test "stale HTML transition restores current board and shows safe recovery link" do
+    sign_in(@owner)
+    post create_path, params: { artifact_key: "requirements_spec" }
+    assert_redirected_to preview_path
+    card = Studio::SyntheticProjectCard.sole
+
+    patch card_path(card.id), params: {
+      expected_state: "backlog", expected_version: "0", to_state: "in_review"
+    }
+    assert_redirected_to preview_path
+    assert_equal 1, Studio::SyntheticProjectCardTransition.count
+
+    assert_no_difference "Studio::SyntheticProjectCardTransition.count" do
+      patch card_path(card.id), params: {
+        expected_state: "backlog", expected_version: "0", to_state: "in_review",
+        raw_source: "STALE_FORGED_SECRET"
+      }
+    end
+    assert_response :conflict
+    assert_select "section[role='alert'][aria-label='Project Hub action failed']", text: /Card changed since/
+    assert_select "a[href='#{preview_path}']", text: "Reload current board"
+    assert_select "[data-artifact-key='requirements_spec']", text: /In review/
+    assert_select "[data-artifact-key='requirements_spec']", text: /Revision 1/
+    assert_select "[data-artifact-key='requirements_spec'] input[name='expected_version'][value='1']", 1
+    assert_not_includes response.body, "STALE_FORGED_SECRET"
+    assert_equal "in_review", card.reload.state
+    assert_equal 1, card.lock_version
+  end
+
+  test "invalid HTML transitions render scoped board with no approval or input reflection" do
+    sign_in(@owner)
+    post create_path, params: { artifact_key: "requirements_spec" }
+    card = Studio::SyntheticProjectCard.sole
+
+    assert_no_difference "Studio::SyntheticProjectCardTransition.count" do
+      patch card_path(card.id), params: {
+        expected_state: "backlog", expected_version: "0",
+        to_state: "approved", source_body: "FORGED_CLIENT_DOCUMENT"
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_select "section[role='alert']", text: /not permitted/
+    assert_select "a[href='#{preview_path}']", text: "Reload current board"
+    assert_select "section.rc-hub-lane", 4
+    assert_select "[data-artifact-key='requirements_spec']", text: /Backlog/
+    assert_not_includes response.body, "FORGED_CLIENT_DOCUMENT"
+    assert_equal "backlog", card.reload.state
+
+    assert_no_difference "Studio::SyntheticProjectCard.count" do
+      post create_path, params: { artifact_key: "invalid" }
+    end
+    assert_response :unprocessable_entity
+    assert_select "section[role='alert']", text: /cannot be created/
+    assert_select "li.rc-hub-card", 9
   end
 
   private

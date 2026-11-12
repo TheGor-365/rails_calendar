@@ -16,12 +16,21 @@
     <p class="rc-hint mb-0">All document-generation gates remain blocked. Moving a card records only a synthetic owner action; it never approves requirements or updates the consultation calendar.</p>
   </section>
 
-  <div class="rc-hub-board" aria-label="Project Hub workflow lanes">
+  <% if @error.present? %>
+    <section class="rc-notice rc-notice--error rc-hub-problem mb-3" role="alert" aria-live="assertive" aria-label="Project Hub action failed">
+      <h2 class="h5 mb-2">Action not applied</h2>
+      <p class="mb-2"><%= @error %></p>
+      <%= link_to "Reload current board", rc039_synthetic_project_hub_preview_path(@workspace, @client, @intake),
+                  class: "rc-action rc-action--soft rc-action--small rc-hub-reload" %>
+    </section>
+  <% end %>
+
+  <section class="rc-hub-board" aria-label="Project Hub workflow lanes">
     <% @board.fetch("lanes").each do |lane| %>
       <% preview_cards = @board.fetch("cards").select { |item| item.fetch("lane_key") == lane.fetch("key") } %>
-      <section class="rc-hub-lane" aria-label="<%= "#{lane.fetch('label')} lane" %>">
+      <section class="rc-hub-lane" aria-labelledby="hub_lane_<%= lane.fetch('key') %>">
         <header class="rc-hub-lane__header">
-          <h2 class="h5 mb-0"><%= lane.fetch("label") %></h2>
+          <h2 class="h5 mb-0" id="hub_lane_<%= lane.fetch('key') %>"><%= lane.fetch("label") %></h2>
           <span class="rc-status-pill rc-status-pill--muted"><%= preview_cards.length %> types</span>
         </header>
         <ol class="rc-hub-card-list">
@@ -30,12 +39,12 @@
             <% saved = @saved_cards_by_key[key] %>
             <li class="rc-hub-card" data-artifact-key="<%= key %>">
               <div class="rc-hub-card__top">
-                <h3 class="h6 mb-0"><%= key.humanize %></h3>
+                <h3 class="h6 mb-0" id="hub_artifact_<%= key %>"><%= key.humanize %></h3>
                 <span class="rc-status-pill rc-status-pill--muted"><%= saved ? saved.fetch("state").humanize : "Untracked" %></span>
               </div>
               <p class="rc-hint mt-2 mb-2">Unverified synthetic proposal — no document generated.</p>
               <details class="rc-hub-details">
-                <summary>Missing prerequisites (<%= candidate.fetch("prerequisites").size %>)</summary>
+                <summary aria-describedby="hub_artifact_<%= key %>">Missing prerequisites (<%= candidate.fetch("prerequisites").size %>)</summary>
                 <ul>
                   <% candidate.fetch("prerequisites").each do |item| %>
                     <li><%= item.humanize %></li>
@@ -54,9 +63,11 @@
                   <%= label_tag "hub_next_state_#{saved.fetch('card_id')}", "Move to", class: "rc-field-label" %>
                   <%= select_tag :to_state,
                         options_for_select(options.map { |value| [value.humanize, value] }),
-                        id: "hub_next_state_#{saved.fetch('card_id')}", class: "rc-input" %>
+                        id: "hub_next_state_#{saved.fetch('card_id')}", class: "rc-input",
+                        aria: { describedby: "hub_artifact_#{key}" } %>
                   <%= button_tag "Move synthetic card", type: :submit,
-                                 class: "rc-action rc-action--soft rc-action--small" %>
+                                 class: "rc-action rc-action--soft rc-action--small",
+                                 aria: { describedby: "hub_artifact_#{key}" } %>
                 <% end %>
                 <p class="rc-hub-version mb-0">Revision <%= saved.fetch("version") %> · no client approval</p>
               <% else %>
@@ -65,14 +76,15 @@
                                 @workspace, @client, @intake),
                               method: :post, params: { artifact_key: key },
                               form: { data: { turbo: false } },
-                              class: "rc-action rc-action--soft rc-action--small rc-hub-create" %>
+                              class: "rc-action rc-action--soft rc-action--small rc-hub-create",
+                              aria: { describedby: "hub_artifact_#{key}" } %>
               <% end %>
             </li>
           <% end %>
         </ol>
       </section>
     <% end %>
-  </div>
+  </section>
 
   <footer class="rc-hub-footer rc-hint">
     No drag and drop, auto-scheduling, real client access or document production. Keyboard forms are intentionally the only state-changing interface.

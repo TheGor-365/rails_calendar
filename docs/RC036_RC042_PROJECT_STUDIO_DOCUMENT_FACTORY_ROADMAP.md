@@ -318,3 +318,9 @@ A separate append-only metadata-only \`Studio::SyntheticReviewDecision\` stores 
 - Added **test-environment-only** HTML preview routes and a keyboard-form board rendered from Slice A's four lanes/nine future document types; Slice B's existing scoped card transitions provide the only state-changing effects. JSON endpoints from Slice C retain their original semantics.
 - \`White Atlas\` CSS grid collapses without horizontal scroll, and all actions are explicit form POST/PATCH with standard CSRF and optimistic version checks. The screen never displays customer names, project titles, raw sources, tasks, unapproved client decisions or production capabilities.
 - New HTTP and Chrome tests cover owner admission, foreign/revoked denial, stale version and mobile 320/390/430px clipping. [Slice D runbook](RC039_SLICE_D_SYNTHETIC_PROJECT_HUB_UI.md). Full keyboard/screen-reader and manual UI checks are not yet complete; release remains test-only/no deploy.
+
+
+## RC-039 Slice E — accessible conflict recovery, synthetic UI only (2026-11-12)
+- Owner HTML 409 (stale optimistic version) and 422 (invalid synthetic request) now rerender the **current owner-scoped board**, with a live accessible error notice and explicit refresh link; no automatic retry, source text echo, new audit receipt, state change or approval on failure. The existing JSON and success redirects remain unchanged.
+- Named four-lane landmarks, stable card-heading context for repeated controls, focus-visible 44px recovery action and Chrome keyboard disclosure coverage; responsive 320/390/430px flow stays under test. [Slice E runbook](RC039_SLICE_E_ACCESSIBLE_CONFLICT_RECOVERY.md).
+- Test-only, no new migration/route/production access. Exact-head CI/Security and owner's full local Rails+Chrome verification required; real tasks and production delivery remain separate phases.
