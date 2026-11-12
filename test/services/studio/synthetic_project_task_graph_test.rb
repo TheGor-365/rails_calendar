@@ -58,6 +58,7 @@ class StudioSyntheticProjectTaskGraphTest < ActiveSupport::TestCase
   end
 
   test "deterministic six-step DAG generates stable prerequisite-first roadmap" do
+    baseline = [ProjectMilestone.count, Consultation.count]
     scope = task("scope_review")
     design = task("solution_design")
     backend = task("rails_implementation")
@@ -85,8 +86,7 @@ class StudioSyntheticProjectTaskGraphTest < ActiveSupport::TestCase
         first.fetch("tasks").any? { |t| t.fetch("task_key") == link.fetch("dependent_task_key") } &&
         first.fetch("tasks").any? { |t| t.fetch("task_key") == link.fetch("prerequisite_task_key") }
     }
-    assert_equal 0, ProjectMilestone.count
-    assert_equal 0, Consultation.count
+    assert_equal baseline, [ProjectMilestone.count, Consultation.count]
   end
 
   test "self reference, cycle, missing task and duplicates cannot corrupt the graph" do
