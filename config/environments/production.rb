@@ -66,17 +66,20 @@ Rails.application.configure do
   # Real SMTP is configured only by protected deployment secrets.
   # Public signup additionally requires RC_CLIENT_SIGNUP_ENABLED and
   # RC_SIGNUP_LEGAL_APPROVED. No email is sent by a default/example provider.
-  if %w[RC_SMTP_ADDRESS RC_SMTP_USERNAME RC_SMTP_PASSWORD RC_SIGNUP_FROM].all? { |key| ENV[key].present? }
+  signup_smtp_port = Integer(ENV.fetch("RC_SMTP_PORT", "587"), exception: false)
+  if %w[RC_SMTP_ADDRESS RC_SMTP_USERNAME RC_SMTP_PASSWORD RC_SIGNUP_FROM].all? { |key| ENV[key].present? } &&
+     signup_smtp_port&.between?(1, 65_535)
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.perform_deliveries = true
     config.action_mailer.raise_delivery_errors = true
     config.action_mailer.smtp_settings = {
       address: ENV.fetch("RC_SMTP_ADDRESS"),
-      port: Integer(ENV.fetch("RC_SMTP_PORT", "587")),
+      port: signup_smtp_port,
       user_name: ENV.fetch("RC_SMTP_USERNAME"),
       password: ENV.fetch("RC_SMTP_PASSWORD"),
       authentication: :plain,
-      enable_starttls_auto: true,
+      enable_starttls: true,
+      openssl_verify_mode: "peer",
       open_timeout: 5,
       read_timeout: 5
     }
