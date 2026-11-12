@@ -1,6 +1,14 @@
 class PagesController < ApplicationController
-  before_action :require_calendar_read_access!
+  before_action :require_calendar_read_access!, only: %i[day hour]
   def home
+    # Keep legacy calendar links and owner workflow unchanged. Only in
+    # production do anonymous visitors get the PII-free service showcase.
+    # No Consultation or ProjectIntake query runs on this branch.
+    if Rails.env.production? && !admin_signed_in?
+      return render "marketing/index", layout: "marketing"
+    end
+
+    require_calendar_read_access!
     requested_date = params[:start_date].presence
     calendar_date = requested_date ? Date.iso8601(requested_date) : Time.zone.today
     @displayed_month = calendar_date
