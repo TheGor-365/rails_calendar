@@ -19,7 +19,7 @@ module Admin
         @intake.update!(status: "draft_spec")
       end
       redirect_to project_intake_path(@intake),
-                  notice: "#{source == 'grok' ? 'Grok' : 'Demo template'} specification drafted for administrator review"
+                  notice: I18n.t("intake.flash_spec_drafted", source: source == "grok" ? "Grok" : "Demo template")
     end
 
     def approve_spec
@@ -29,7 +29,7 @@ module Admin
       spec.update!(owner_approved_at: Time.current)
       @intake.update!(status: "owner_approved")
       redirect_to project_intake_path(@intake),
-                  notice: "Version #{spec.version} approved by administrator; commercial terms and dates remain unconfirmed"
+                  notice: I18n.t("intake.flash_spec_approved", version: spec.version)
     end
 
     def edit_spec
@@ -68,7 +68,7 @@ module Admin
 
       case outcome
       when :saved
-        redirect_to project_intake_path(@intake), notice: "New human-reviewed draft saved. Approval is still required."
+        redirect_to project_intake_path(@intake), notice: I18n.t("intake.flash_revised")
       when :conflict
         head :conflict
       else
@@ -118,7 +118,7 @@ module Admin
         end
       end
       redirect_to project_intake_path(@intake),
-                  notice: "Tentative project calendar created; dates and capacity are not client commitments"
+                  notice: I18n.t("intake.flash_plan_created")
     rescue Date::Error, TypeError
       head :unprocessable_entity
     end
@@ -162,7 +162,7 @@ module Admin
 
     def render_invalid_review(_revised)
       @spec = @intake.latest_spec
-      @review_errors = ["Review text is missing or exceeds permitted lengths. No changes were saved."]
+      @review_errors = [I18n.t("intake.flash_invalid_review")]
       render :edit_spec, status: :unprocessable_entity
     end
 

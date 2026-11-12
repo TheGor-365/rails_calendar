@@ -31,7 +31,7 @@
       <div class="ws-hub-panel-head"><h2 id="ws-intakes"><%= t("workspace.recent_intakes") %></h2><%= link_to t("workspace.internal_list"), admin_project_intakes_path %></div>
       <% if @recent_intakes.any? %>
         <ul class="ws-hub-list"><% @recent_intakes.each do |item| %>
-          <li><%= link_to project_intake_path(item) do %><strong><%= item.title %></strong><small><%= item.project_type %> · <%= item.status %></small><i class="bi bi-chevron-right" aria-hidden="true"></i><% end %></li>
+          <li><%= link_to project_intake_path(item) do %><strong><%= item.title %></strong><small><%= rc_intake_type(item.project_type) %> · <%= rc_intake_status(item.status) %></small><i class="bi bi-chevron-right" aria-hidden="true"></i><% end %></li>
         <% end %></ul>
       <% else %><p class="ws-hub-empty"><%= t("workspace.intakes_empty") %></p><% end %>
     </section>

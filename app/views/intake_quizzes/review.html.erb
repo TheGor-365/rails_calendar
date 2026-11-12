@@ -6,7 +6,7 @@
       <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span>
       <h1 class="page-title"><%= t("quiz.review_title") %></h1>
     </div>
-    <p class="rc-muted"><%= t("quiz.review_sub", title: @intake.title, type: @intake.project_type.humanize) %></p>
+    <p class="rc-muted"><%= t("quiz.review_sub", title: @intake.title, type: rc_intake_type(@intake.project_type)) %></p>
     <p class="rc-hint"><%= t("quiz.review_hint") %></p>
     </div>
     <span class="rc-status-pill"><i class="bi bi-database-check" aria-hidden="true"></i><%= t("quiz.saved_locally") %></span>
