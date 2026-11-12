@@ -1,36 +1,36 @@
 <div class="rc-account-content">
   <%= render "shared/account_heading",
-             icon: "envelope-check", eyebrow: "АККАУНТ / ПОДТВЕРЖДЕНИЕ",
-             title: "Подтвердите почту",
-             description: "Введите шестизначный код для #{@masked_email}. Код действителен 10 минут." %>
-  <section class="rc-account-panel" aria-label="Подтверждение электронной почты">
+             icon: "envelope-check", eyebrow: t("auth.verify.eyebrow"),
+             title: t("auth.verify.title"),
+             description: t("auth.verify.description", email: @masked_email) %>
+  <section class="rc-account-panel" aria-label="<%= t('auth.verify.panel') %>">
     <% if Rails.env.development? && Rails.application.config.action_mailer.delivery_method == :file %>
       <p class="rc-account-dev-mail" role="note">
         <i class="bi bi-laptop" aria-hidden="true"></i>
-        <span><strong>Локальный режим:</strong> письмо сохранено на этом компьютере в <code>tmp/signup_emails</code>. Оно не отправлялось в Gmail. Код не публикуйте.</span>
+        <span><strong><%= t('auth.verify.local_heading') %></strong> <%= t("auth.verify.local_body", path: "tmp/signup_emails") %></span>
       </p>
     <% end %>
     <%= form_with url: verify_client_registration_path, method: :post, local: true,
                   html: { class: "rc-account-form rc-form" } do |form| %>
       <div class="rc-field">
-        <%= form.label :code, "Код из письма", class: "rc-field-label" %>
+        <%= form.label :code, t("auth.verify.code_label"), class: "rc-field-label" %>
         <%= form.text_field :code, required: true, maxlength: 6, minlength: 6,
                             pattern: "[0-9]{6}", inputmode: "numeric", autocomplete: "one-time-code",
                             placeholder: "000000", class: "rc-input rc-account-code" %>
       </div>
       <div class="rc-account-form-actions">
         <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
-          <%= rc_icon_label("check-circle", "Подтвердить email") %>
+          <%= rc_icon_label("check-circle", t("auth.verify.submit")) %>
         <% end %>
       </div>
     <% end %>
     <div class="rc-account-alternatives">
-      <span>Нужен новый код?</span>
-      <%= button_to rc_icon_label("arrow-clockwise", "Отправить снова"), resend_client_registration_path,
+      <span><%= t("auth.verify.resend_prompt") %></span>
+      <%= button_to rc_icon_label("arrow-clockwise", t("auth.verify.resend")), resend_client_registration_path,
                     method: :post, class: "rc-account-option rc-account-option--button" %>
     </div>
   </section>
-  <nav class="rc-account-return" aria-label="Регистрация">
-    <%= link_to rc_icon_label("arrow-left", "Другой email"), client_registration_path, class: "rc-account-option" %>
+  <nav class="rc-account-return" aria-label="<%= t('auth.verify.nav') %>">
+    <%= link_to rc_icon_label("arrow-left", t("auth.verify.return")), client_registration_path, class: "rc-account-option" %>
   </nav>
 </div>

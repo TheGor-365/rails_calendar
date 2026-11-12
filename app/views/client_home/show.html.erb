@@ -1,11 +1,11 @@
 <div class="container ws-client-home my-4 my-sm-5">
-  <div class="ws-client-heading"><span class="eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> CLIENT SPACE</span>
-    <h1 class="page-title">Личный кабинет</h1>
-    <p class="rc-muted">Email подтверждён. Аккаунт создан; клиентские проекты и заявки станут доступны только после включения отдельного защищённого сценария.</p></div>
+  <div class="ws-client-heading"><span class="eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("client.eyebrow") %></span>
+    <h1 class="page-title"><%= t("client.title") %></h1>
+    <p class="rc-muted"><%= t("client.description") %></p></div>
   <section class="ws-client-panel" aria-labelledby="client-start-title">
     <div class="ws-client-icon" aria-hidden="true"><i class="bi bi-grid-1x2"></i></div>
-    <h2 id="client-start-title">Рабочее пространство готовится</h2>
-    <p>Сейчас здесь нет доступных клиентских проектов. Мы не показываем демонстрационные или чужие заявки как ваши.</p>
-    <%= link_to rc_icon_label("globe", "Обзор сервиса"), services_path, class: "rc-action rc-action--quiet" %>
+    <h2 id="client-start-title"><%= t("client.panel_title") %></h2>
+    <p><%= t("client.panel_body") %></p>
+    <%= link_to rc_icon_label("globe", t("client.overview")), services_path, class: "rc-action rc-action--quiet" %>
   </section>
 </div>
