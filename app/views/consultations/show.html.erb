@@ -1,17 +1,17 @@
 <div class="container my-4 my-sm-5">
   <div class="content-page">
     <header class="mb-4">
-      <p class="eyebrow mb-2">SCHEDULE / SESSION</p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-event"></i></span><h1 class="page-title mb-1">Consultation details</h1></div>
-      <p class="rc-muted mb-0">Session details, duration and direct calendar navigation.</p>
+      <p class="eyebrow mb-2"><%= t("consultations.details_eyebrow") %></p>
+      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-event"></i></span><h1 class="page-title mb-1"><%= t("consultations.details_title") %></h1></div>
+      <p class="rc-muted mb-0"><%= t("consultations.details_hint") %></p>
     </header>
     <div class="surface-panel">
       <%= render @consultation %>
       <div class="rc-detail-meta">
-        <strong>Duration:</strong>
+        <strong><%= t("consultations.duration") %></strong>
         <%= rc_consultation_duration(@consultation.start_time, @consultation.end_time) %>
         <span aria-hidden="true">·</span>
-        <%= @consultation.end_time <= Time.current ? "Past" : (@consultation.start_time <= Time.current ? "In progress by scheduled time" : "Upcoming") %>
+        <%= @consultation.end_time <= Time.current ? t("consultations.time_past") : (@consultation.start_time <= Time.current ? t("consultations.time_in_progress") : t("consultations.time_upcoming")) %>
       </div>
     </div>
 
@@ -23,35 +23,35 @@
       <section class="surface-panel mt-3" aria-labelledby="reschedule-history-title">
         <h2 id="reschedule-history-title" class="h5 mb-2">
           <i class="bi bi-clock-history" aria-hidden="true"></i>
-          Reschedule history
+          <%= t("consultations.history_title") %>
         </h2>
         <% if @reschedule_events.any? %>
-          <p class="rc-hint mb-3">Most recent 20 recorded time changes. Original times and reason are retained.</p>
+          <p class="rc-hint mb-3"><%= t("consultations.history_hint") %></p>
           <ol class="rc-reschedule-history">
             <% @reschedule_events.each do |entry| %>
               <li>
                 <div class="rc-reschedule-heading">
-                  <strong><%= entry.created_at.in_time_zone.strftime("%d %b %Y, %H:%M UTC") %></strong>
+                  <strong><%= rc_local_datetime(entry.created_at) + " UTC" %></strong>
                   <span><%= entry.actor_label %></span>
                 </div>
                 <p class="mb-1">
-                  <strong>From:</strong>
-                  <%= entry.old_start_time.in_time_zone.strftime("%d %b %Y, %H:%M") %>
+                  <strong><%= t("consultations.history_from") %></strong>
+                  <%= rc_local_datetime(entry.old_start_time) %>
                   –
-                  <%= entry.old_end_time.in_time_zone.strftime("%d %b %Y, %H:%M UTC") %>
+                  <%= rc_local_datetime(entry.old_end_time) + " UTC" %>
                 </p>
                 <p class="mb-1">
-                  <strong>To:</strong>
-                  <%= entry.new_start_time.in_time_zone.strftime("%d %b %Y, %H:%M") %>
+                  <strong><%= t("consultations.history_to") %></strong>
+                  <%= rc_local_datetime(entry.new_start_time) %>
                   –
-                  <%= entry.new_end_time.in_time_zone.strftime("%d %b %Y, %H:%M UTC") %>
+                  <%= rc_local_datetime(entry.new_end_time) + " UTC" %>
                 </p>
-                <p class="mb-0"><strong>Reason:</strong> <%= entry.reason %></p>
+                <p class="mb-0"><strong><%= t("consultations.history_reason") %></strong> <%= entry.reason %></p>
               </li>
             <% end %>
           </ol>
         <% else %>
-          <p class="rc-muted mb-0">No reschedules recorded for this consultation.</p>
+          <p class="rc-muted mb-0"><%= t("consultations.history_empty") %></p>
         <% end %>
       </section>
     <% end %>
@@ -59,33 +59,33 @@
     <% final_date = (@consultation.end_time - 1.second).in_time_zone.to_date %>
     <% spans_multiple_days = final_date > @consultation.start_time.in_time_zone.to_date %>
 
-    <nav class="rc-detail-actions mt-3" aria-label="Consultation actions">
+    <nav class="rc-detail-actions mt-3" aria-label="<%= t("consultations.actions_aria") %>">
       <div class="rc-detail-primary-actions <%= 'rc-detail-primary-actions--two' unless spans_multiple_days %>"
-           role="group" aria-label="Calendar navigation">
-        <%= link_to rc_responsive_icon_label("calendar-event", "View in calendar", "Calendar"),
+           role="group" aria-label="<%= t("consultations.calendar_nav_aria") %>">
+        <%= link_to rc_responsive_icon_label("calendar-event", t("consultations.view_calendar"), t("consultations.calendar_short")),
                     calendar_day_path(date: @consultation.start_time.in_time_zone.to_date.iso8601, anchor: "event-#{@consultation.id}"),
-                    class: "rc-action rc-action--primary", aria: { label: "View in calendar" } %>
+                    class: "rc-action rc-action--primary", aria: { label: t("consultations.view_calendar") } %>
         <% if spans_multiple_days %>
-          <%= link_to rc_responsive_icon_label("calendar-check", "See final day", "Final day"),
+          <%= link_to rc_responsive_icon_label("calendar-check", t("consultations.see_final_day"), t("consultations.final_day_short")),
                       calendar_day_path(date: final_date.iso8601, anchor: "event-#{@consultation.id}"),
-                      class: "rc-action rc-action--quiet", aria: { label: "See final day" } %>
+                      class: "rc-action rc-action--quiet", aria: { label: t("consultations.see_final_day") } %>
         <% end %>
-        <%= link_to rc_responsive_icon_label("list-ul", "All consultations", "All"),
+        <%= link_to rc_responsive_icon_label("list-ul", t("consultations.all_consultations"), t("consultations.all_short")),
                     consultations_path, class: "rc-action rc-action--quiet",
-                    aria: { label: "All consultations" } %>
+                    aria: { label: t("consultations.all_consultations") } %>
       </div>
 
       <% if admin_signed_in? %>
-        <div class="rc-detail-admin-actions" role="group" aria-label="Administrator consultation actions">
-          <%= link_to rc_responsive_icon_label("pencil-square", "Edit this consultation", "Edit"),
+        <div class="rc-detail-admin-actions" role="group" aria-label="<%= t("consultations.admin_actions_aria") %>">
+          <%= link_to rc_responsive_icon_label("pencil-square", t("consultations.edit"), t("consultations.edit_short")),
                       edit_consultation_path(@consultation),
                       class: "rc-action rc-action--quiet",
-                      aria: { label: "Edit this consultation" } %>
+                      aria: { label: t("consultations.edit") } %>
           <%= button_to @consultation, method: :delete,
                         class: "rc-action rc-action--danger",
-                        aria: { label: "Destroy this consultation" },
-                        data: { turbo_confirm: "Delete consultation ##{@consultation.id} — #{@consultation.title} (#{@consultation.start_time.in_time_zone.strftime('%d %b %Y, %H:%M %Z')})? This cannot be undone." } do %>
-            <%= rc_responsive_icon_label("trash3", "Destroy this consultation", "Delete") %>
+                        aria: { label: t("consultations.destroy") },
+                        data: { turbo_confirm: t("consultations.confirm_destroy", id: @consultation.id, title: @consultation.title, when: rc_local_datetime(@consultation.start_time, format: :rc_date_time_zone)) } do %>
+            <%= rc_responsive_icon_label("trash3", t("consultations.destroy"), t("consultations.destroy_short")) %>
           <% end %>
         </div>
       <% end %>

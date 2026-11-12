@@ -1,11 +1,11 @@
 <div class="container my-4 my-sm-5">
   <div class="form-page">
     <header class="mb-4">
-      <p class="eyebrow mb-2">Scheduling</p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-plus"></i></span><h1 class="page-title mb-2">New consultation</h1></div>
-      <p class="text-secondary mb-0">Create a consultation in the shared calendar.</p>
+      <p class="eyebrow mb-2"><%= t("consultations.scheduling") %></p>
+      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-plus"></i></span><h1 class="page-title mb-2"><%= t("consultations.new") %></h1></div>
+      <p class="text-secondary mb-0"><%= t("consultations.new_hint") %></p>
     </header>
-    <section class="surface-panel" aria-label="Consultation details">
+    <section class="surface-panel" aria-label="<%= t("consultations.details_title") %>">
       <%= render "form", consultation: @consultation %>
     </section>
   </div>
