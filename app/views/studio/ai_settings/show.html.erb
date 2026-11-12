@@ -1,0 +1,157 @@
+<div class="container my-4 my-sm-5">
+  <header class="rc-page-hero mb-3">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow">PROJECT STUDIO / RC-037 · PROJECT CONTROLS</p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-shield-lock"></i></span>
+        <h1 class="page-title">Offline AI settings</h1>
+      </div>
+      <p class="rc-muted"><%= @intake.title %> · <%= @workspace.name %></p>
+      <p class="rc-hint">Synthetic test / explicitly enabled local development only. External AI, real client content and paid providers stay disabled. Nothing runs automatically.</p>
+    </div>
+  </header>
+
+  <% if @error.present? %>
+    <p class="rc-notice rc-notice--error" role="alert"><%= @error %></p>
+  <% end %>
+
+  <% [["workspace", @workspace_policy, "Workspace policy", "Workspace off cannot be overridden by a project."],
+      ["project", @project_policy, "Project restriction", "A project may only narrow what the workspace permits."]].each do |scope, policy, heading, hint| %>
+    <section class="surface-panel p-3 p-sm-4 mb-3" aria-label="<%= heading %>">
+      <h2 class="h4"><%= heading %></h2>
+      <p class="rc-hint"><%= hint %></p>
+      <%= form_with url: workspace_ai_settings_path(@workspace, @intake), method: :patch, local: true do %>
+        <%= hidden_field_tag :target, scope %>
+        <div class="rc-field mb-3">
+          <%= label_tag "#{scope}_mode", "AI mode", class: "rc-field-label" %>
+          <%= select_tag :mode,
+                options_for_select([["Disabled", "off"], ["Local deterministic templates only", "offline"]], policy&.mode.in?(%w[off offline]) ? policy.mode : "off"),
+                id: "#{scope}_mode", class: "rc-input" %>
+        </div>
+        <fieldset class="mb-3">
+          <legend class="h6">Allowlisted offline purposes</legend>
+          <% Studio::AiPolicy::PURPOSES.each do |purpose| %>
+            <div class="form-check mb-2">
+              <%= check_box_tag "purposes[]", purpose, policy&.purposes&.include?(purpose),
+                    id: "#{scope}_purpose_#{purpose}", class: "form-check-input" %>
+              <%= label_tag "#{scope}_purpose_#{purpose}", purpose.humanize, class: "form-check-label" %>
+            </div>
+          <% end %>
+        </fieldset>
+        <%= button_tag "Save offline preference", type: :submit, class: "rc-action rc-action--primary" %>
+      <% end %>
+      <% versions = scope == "workspace" ? @workspace_history : @project_history %>
+      <div class="mt-3" aria-label="<%= "#{heading} revision history" %>">
+        <h3 class="h6">Recent policy changes</h3>
+        <% if versions.empty? %>
+          <p class="rc-hint">No revisions recorded yet.</p>
+        <% else %>
+          <ol class="rc-record-list">
+            <% versions.each do |entry| %>
+              <li class="rc-record">
+                Revision <%= entry.revision %> · <%= entry.action %> ·
+                <%= entry.settings.fetch("mode") %> ·
+                <%= entry.recorded_at.utc.iso8601 %> ·
+                <%= entry.origin == "owner_ui" ? "Owner UI" : "Internal change (actor not attributed)" %>
+              </li>
+            <% end %>
+          </ol>
+        <% end %>
+        <p class="rc-hint">History is read-only. Records do not authorize external AI or paid calls.</p>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="surface-panel p-3 p-sm-4 mb-3" aria-label="Synthetic offline proposal">
+    <h2 class="h4">Preview an offline proposal</h2>
+    <p class="rc-hint">Explicit action only. Deterministic, unapproved templates using synthetic source metadata, never source file contents. No external AI calls or charges.</p>
+    <%= form_with url: workspace_offline_proposal_path(@workspace, @intake), method: :post, local: true, data: { turbo: false } do %>
+      <div class="rc-field mb-3">
+        <%= label_tag :offline_purpose, "Proposal type", class: "rc-field-label" %>
+        <%= select_tag :purpose,
+              options_for_select(Studio::AiPolicy::PURPOSES.map { |purpose| [purpose.humanize, purpose] }),
+              id: "offline_purpose", class: "rc-input" %>
+      </div>
+      <fieldset class="mb-3">
+        <legend class="h6">Optional source metadata (maximum 10)</legend>
+        <% if @synthetic_sources.empty? %>
+          <p class="rc-hint">No synthetic metadata sources are registered for this project.</p>
+        <% else %>
+          <% @synthetic_sources.each do |source| %>
+            <div class="form-check mb-2">
+              <%= check_box_tag "source_ids[]", source.id, false,
+                    id: "offline_source_#{source.id}", class: "form-check-input" %>
+              <%= label_tag "offline_source_#{source.id}",
+                    "Source ##{source.id} · #{source.source_format} · #{source.byte_size} bytes",
+                    class: "form-check-label" %>
+            </div>
+          <% end %>
+        <% end %>
+      </fieldset>
+      <%= button_tag "Generate synthetic offline preview", type: :submit,
+                    class: "rc-action rc-action--primary" %>
+    <% end %>
+
+    <% if @proposal.present? %>
+      <section class="mt-3" aria-label="Unapproved offline proposal" role="status">
+        <h3 class="h5">Needs human review</h3>
+        <p class="rc-hint"><%= @proposal.fetch(:purpose).humanize %> ·
+          <%= @proposal.fetch(:source_metadata_count) %> metadata sources ·
+          0 external calls · $0 cost</p>
+        <pre class="rc-studio-line"><%= @proposal.fetch(:text) %></pre>
+        <p class="rc-hint">UNVERIFIED SYNTHETIC ONLY. No customer agreement, generated specification or approval.</p>
+        <%= form_with url: workspace_offline_runs_path(@workspace, @intake), method: :post, local: true do %>
+          <%= hidden_field_tag :purpose, @proposal.fetch(:purpose) %>
+          <% Array(@selected_source_ids).each do |source_id| %>
+            <%= hidden_field_tag "source_ids[]", source_id %>
+          <% end %>
+          <%= button_tag "Record this synthetic run for review", type: :submit,
+                         class: "rc-action rc-action--soft" %>
+        <% end %>
+
+      </section>
+    <% end %>
+  </section>
+
+  <section class="surface-panel p-3 p-sm-4 mb-3" aria-label="Synthetic run history">
+    <h2 class="h4">Recorded offline runs</h2>
+    <p class="rc-hint">Stored synthetic templates only. Review confirms human inspection, not client approval. The latest 10 versions are shown; history is append-only.</p>
+    <% if @run_entries.empty? %>
+      <p class="rc-hint">No recorded synthetic runs.</p>
+    <% else %>
+      <ol class="rc-record-list">
+        <% @run_entries.each do |entry| %>
+          <li class="rc-record">
+            <% run = entry.fetch(:run) %>
+            <strong>Version <%= run.version %></strong> · <%= run.purpose.humanize %> ·
+            <%= run.recorded_at.utc.iso8601 %>
+            <% if entry.fetch(:verified) %>
+              <% payload = entry.fetch(:payload) %>
+              <p class="rc-hint">Verified synthetic version · <%= payload.fetch(:source_metadata_count) %> metadata sources · $0 · needs human review</p>
+              <pre class="rc-studio-line"><%= payload.fetch(:text) %></pre>
+              <% if entry[:review] %>
+                <p class="rc-hint">Owner decision: <%= entry.fetch(:review).decision.humanize %>. No client artifact approved.</p>
+              <% else %>
+                <%= form_with url: workspace_offline_run_review_path(@workspace, @intake, run.id), method: :post, local: true do %>
+                  <%= button_tag "Mark reviewed (synthetic only)", name: "decision",
+                        value: "reviewed_synthetic", type: :submit, class: "rc-action rc-action--soft rc-action--small" %>
+                  <%= button_tag "Discard synthetic run", name: "decision",
+                        value: "discarded_synthetic", type: :submit, class: "rc-action rc-action--soft rc-action--small" %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <p class="rc-notice rc-notice--error" role="alert">Integrity check failed. Output hidden; review disabled.</p>
+            <% end %>
+          </li>
+        <% end %>
+      </ol>
+    <% end %>
+  </section>
+
+  <section class="surface-panel p-3 p-sm-4" aria-label="AI security limits">
+    <h2 class="h5">Security and cost limits</h2>
+    <p class="rc-hint">Production AI: disabled. External AI: disabled. Automatic approval: disabled. Actual provider calls: 0. Spending: $0. These preferences do not constitute client consent or approval to process customer files.</p>
+    <%= link_to "Return to source preview", workspace_source_preview_path(@workspace, @intake),
+                class: "rc-action rc-action--soft rc-action--small", data: { turbo_frame: "_top" } %>
+  </section>
+</div>

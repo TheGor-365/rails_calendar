@@ -203,3 +203,55 @@ Only owner-scoped synthetic/test data in Draft PR #36: add nullable workspace/cl
 ## RC-036 Stage 3 Slice N — preview hard-deny and untrusted HTML regression (2026-11-11)
 - Found that preexisting owner preview could parse unscanned bytes in production despite synthetic-only policy. Patched `Studio::SourcePreviewsController` to require nonproduction test/explicit synthetic development, return 404 in production even for owner, and emit no-store/nosniff/no-referrer on early denied responses.
 - Negative HTTP tests assert production 404 and safe escaping for raw Markdown HTML/JS with no persisted blob. [Stage N security boundary](RC036_STAGE3_SLICE_N_SECURITY_GATES.md). Other security/manual/legal/production gates remain explicitly pending until independent proof.
+
+
+## RC-037 Slice A — scoped offline AI policy foundation (2026-11-11)
+- Stacked Draft PR on RC-036: synthetic-only `studio_ai_policies` with project override, workspace hard-deny and PG composite tenant FK; `Studio::OfflineAiDispatcher` returns unapproved static offline proposal with zero external provider calls and zero billing. Project cannot escalate workspace restrictions; reviewed provider stays unavailable.
+- Test suite for foreign/revoked owner, invalid classes and purposes, duplicate defaults and forged tenant SQL. [Slice A runbook](RC037_SLICE_A_OFFLINE_AI_POLICY.md). Full RC-037 dispatch/structured outputs/budget enforcement and UI remain future work.
+
+
+## RC-037 Slice B — White Atlas offline AI Settings (2026-11-11)
+- Added local/test-only owner-scoped Project Controls UI (two forms: workspace default and restrictive project override), GET/PATCH routes with production 404 and no-store headers, allowlisted offline purposes. No provider, consent or spending mass assignment, no auto-execution. Existing source preview has a navigational link.
+- New HTTP tests verify form settings, hostile parameters, tenant IDOR, revoked owner, hard production-deny, zero-dollar dispatcher. [Slice B runbook](RC037_SLICE_B_OFFLINE_SETTINGS_UI.md). Actual visual/a11y acceptance on owner device pending.
+
+
+## RC-037 Slice C — typed offline output contract (2026-11-11)
+- Added immutable `Studio::OfflineTemplateRegistry` and strict `Studio::OfflineOutputContract`; dispatcher now validates all locally generated responses. Must remain synthetic/unverified/offline with zero network calls, billing or auto-approval. Reject unknown keys, injected provider output, unreviewed templates and faked provenance. No external model was invoked.
+- [Slice C runbook](RC037_SLICE_C_OFFLINE_OUTPUT_CONTRACT.md). This is deterministic template validation, **not** a complete approved paid-model response pipeline.
+
+
+## RC-037 Slice D — explicit source selection without private retrieval (2026-11-11)
+- Added `Studio::OfflineSourceSelector`: owner scoped, <=10 explicit unique integer IDs, matching workspace+client+intake and metadata_only state, denied foreign/missing/duplicate/revoked. Offline dispatcher now counts only selected synthetic source metadata. No body/URL/object key is read or supplied to a provider.
+- [Slice D runbook](RC037_SLICE_D_SOURCE_SELECTION.md); not RAG/content retrieval or client-data authorization. Encrypted durable storage, consent and approved provider policy remain unimplemented.
+
+## RC-037 Slice E / phase 1 — append-only policy audit (2026-11-11)
+- Added model-level immutable `Studio::AiPolicyRevision` rows with sequential HMAC-linked versions and a tenant-composite policy FK, scoped intake FK, actor attribution for owner UI, and explicit `internal_unattributed` marker for model writes without an actor. No email, prompts or source bytes in snapshots.
+- `Studio::AiPolicy` now appends policy revisions transactionally for meaningful create/change; unchanged saves are not audited as changes. Direct SQL and DB administrators can bypass Rails callbacks, so independent backup/role hardening remain mandatory; do not claim this is tamper-proof storage.
+
+## RC-037 Slice E / phase 2 — zero-paid AI admission + golden tests (2026-11-11)
+- `Studio::AiBudgetAdmission` guards owner/tenant/purpose/data-class/production status and permits only `offline_template` with **zero estimated tokens and USD**. Persisted positive spending ceilings or external consent cannot permit a billable provider. Dispatcher calls gate before source selection. No API integration, token or budget reservation with real providers.
+- Added independent static golden YAML expected outputs for 3 purposes and adversarial synthetic intake prompt injection fixture. [Slice E runbook](RC037_SLICE_E_AUDIT_BUDGET_GOLDEN.md); nonprod only and no customer/production claims.
+
+## RC-037 Slice E — read-only audit history on existing settings screen (2026-11-11)
+- Reused the existing owner-only project AI settings view to show the last 15 safe, scoped policy revision summaries (action, mode, event time, attribution) with no raw HMAC digests, email or source text; verified by HTTP tests. Does not change the zero-cost gate or production-deny boundary.
+
+
+## RC-037 Slice F — fail-closed audit verification at request-time admission (2026-11-11)
+- Hardened `Studio::AiBudgetAdmission`: verify HMAC-linked revision history and latest persisted snapshot of both workspace and project AI policies before any synthetic offline response. Direct SQL tampering, missing chain, changed scope and forged revision digest deny execution with no implicit repair. This is not independent WORM audit or permission for external billable AI.
+- Negative service/dispatcher tests demonstrate bypass denial. [Slice F runbook](RC037_SLICE_F_POLICY_INTEGRITY_ADMISSION.md). Exact HEAD CI evidence recorded separately.
+
+
+## RC-037 Slice G — explicit owner-only synthetic offline proposal (2026-11-11)
+- Added POST `offline_proposal` on the existing AI Settings screen, after exact owner/tenant/intake ACL and synthetic-only production hard deny. UI selects only bounded per-intake `metadata_only` source IDs; controller strictly validates IDs and executes existing audited zero-budget gate + safe deterministic output. Displays unapproved text without storage, raw bytes, API calls, spending or auto-approval.
+- HTTP negative tests for foreign/duplicate/oversized selection, owner revocation, production 404, forged provider/cost fields and audit SQL bypass. [Slice G runbook](RC037_SLICE_G_OFFLINE_PROPOSAL_UI.md). Human mobile/browser acceptance pending.
+
+
+## RC-037 Slice H — immutable synthetic offline run ledger and owner review (2026-11-11)
+- Added two PostgreSQL tenant-scoped append-only entities: versioned `Studio::OfflineRun` (limit 25/intake, project row lock, unique version) and signed one-per-run `Studio::OfflineRunReview` with `reviewed_synthetic` / `discarded_synthetic` decisions. Strictly fixed synthetic output contract, input metadata SHA256, HMAC integrity verification and composite workspace/client/intake foreign keys. No customer data, real provider, billable tokens, approvals or auto-execution.
+- Added separate owner-only POST to record the existing ephemeral Slice G preview, and POST for an explicit review decision. Settings page displays last 10 verified synthetic versions; tampered data is hidden and cannot be reviewed. Synthetic-only production 404 unchanged. [Slice H runbook](RC037_SLICE_H_OFFLINE_RUN_LEDGER.md). Manual browser and full production readiness are NOT established by automated tests.
+
+
+## RC-037 security and mobile acceptance (2026-11-11)
+- Added targeted Selenium owner path at 320/390/430px, with no horizontal overflow, preview→versioned run→synthetic-only review, denied-policy and corrupted-signature checks; updated fixed-template `<pre>` wrapping for narrow screens.
+- Added `bin/rc037-local-acceptance` (localhost `ruby_calendar_test` only, reject production/remote and unknown args) with `--check-only` and negative guard tests. It runs synthetic Rails and Chrome system tests; does not certify owner's actual Linux Mint run until user executes it.
+- [RC-037 release gates/owner acceptance runbook](RC037_OWNER_ACCEPTANCE_RELEASE_GATES_2026-11-11.md) records infrastructure blockers and evidence requirements, including official antivirus signatures, encrypted durable store, DB+blob backup AND restore, legal consent and separate deploy approval. **Production blocked.**

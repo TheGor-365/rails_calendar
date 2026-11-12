@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_004000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -160,6 +160,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_004000) do
     t.bigint "client_id"
     t.index ["workspace_id"], name: "index_project_intakes_on_workspace_id"
     t.index ["id", "workspace_id", "client_id"], name: "idx_project_intakes_scoped_source_reference", unique: true
+    t.index ["id", "workspace_id"], name: "idx_project_intakes_ai_tenant_reference", unique: true
     t.index ["client_id", "workspace_id"], name: "idx_project_intakes_client_workspace"
   end
 
@@ -247,6 +248,77 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_004000) do
     t.index ["intake_spec_version_id"], name: "index_project_milestones_on_intake_spec_version_id"
     t.index ["project_intake_id", "position"], name: "idx_project_milestone_position", unique: true
     t.index ["project_intake_id"], name: "index_project_milestones_on_project_intake_id"
+  end
+
+  create_table "studio_offline_runs", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "project_intake_id", null: false
+    t.bigint "actor_user_id", null: false
+    t.integer "version", null: false
+    t.string "purpose", limit: 32, null: false
+    t.string "input_fingerprint", limit: 64, null: false
+    t.jsonb "output_payload", default: {}, null: false
+    t.string "event_digest", limit: 64, null: false
+    t.datetime "recorded_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_intake_id", "version"], name: "idx_studio_offline_runs_version", unique: true
+    t.index ["workspace_id", "client_id", "project_intake_id", "id"], name: "idx_studio_offline_runs_scope"
+    t.index ["id", "workspace_id", "client_id", "project_intake_id"], name: "idx_studio_offline_runs_scoped_reference", unique: true
+  end
+
+  create_table "studio_offline_run_reviews", force: :cascade do |t|
+    t.bigint "studio_offline_run_id", null: false
+    t.bigint "workspace_id", null: false
+    t.bigint "client_id", null: false
+    t.bigint "project_intake_id", null: false
+    t.bigint "reviewer_user_id", null: false
+    t.string "decision", limit: 28, null: false
+    t.string "run_digest", limit: 64, null: false
+    t.string "event_digest", limit: 64, null: false
+    t.datetime "recorded_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["studio_offline_run_id"], name: "idx_studio_offline_one_review", unique: true
+    t.index ["workspace_id", "client_id", "project_intake_id"], name: "idx_studio_offline_review_scope"
+  end
+
+  create_table "studio_ai_policies", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "project_intake_id"
+    t.string "mode", limit: 24, default: "off", null: false
+    t.jsonb "purposes", default: [], null: false
+    t.integer "token_cap_per_call", default: 0, null: false
+    t.integer "token_cap_per_day", default: 0, null: false
+    t.decimal "usd_cap_per_call", precision: 12, scale: 4, default: "0.0", null: false
+    t.decimal "usd_cap_per_month", precision: 12, scale: 4, default: "0.0", null: false
+    t.boolean "external_consent", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_studio_ai_policies_on_workspace_id"
+    t.index ["workspace_id"], name: "idx_studio_ai_workspace_default", unique: true, where: "project_intake_id IS NULL"
+    t.index ["workspace_id", "project_intake_id"], name: "idx_studio_ai_project_override", unique: true, where: "project_intake_id IS NOT NULL"
+    t.index ["id", "workspace_id"], name: "idx_studio_ai_policy_scoped_reference", unique: true
+  end
+
+  create_table "studio_ai_policy_revisions", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.bigint "studio_ai_policy_id", null: false
+    t.bigint "project_intake_id"
+    t.bigint "actor_user_id"
+    t.integer "revision", null: false
+    t.string "action", limit: 16, null: false
+    t.string "origin", limit: 32, null: false
+    t.jsonb "settings", default: {}, null: false
+    t.string "previous_digest", limit: 64, null: false
+    t.string "event_digest", limit: 64, null: false
+    t.datetime "recorded_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_studio_ai_policy_revisions_on_workspace_id"
+    t.index ["studio_ai_policy_id", "revision"], name: "idx_studio_ai_policy_revisions_sequence", unique: true
+    t.index ["workspace_id", "project_intake_id", "id"], name: "idx_studio_ai_policy_revisions_scope"
   end
 
   create_table "studio_inventory_checkpoints", force: :cascade do |t|
@@ -422,6 +494,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_004000) do
   add_foreign_key "project_sources", "workspaces"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
+  add_foreign_key "studio_offline_runs", "workspaces"
+  add_foreign_key "studio_offline_runs", "clients", column: ["client_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_offline_runs_scoped_client"
+  add_foreign_key "studio_offline_runs", "project_intakes", column: ["project_intake_id", "workspace_id", "client_id"], primary_key: ["id", "workspace_id", "client_id"], name: "fk_studio_offline_runs_scoped_intake"
+  add_foreign_key "studio_offline_runs", "users", column: "actor_user_id"
+  add_foreign_key "studio_offline_run_reviews", "workspaces"
+  add_foreign_key "studio_offline_run_reviews", "studio_offline_runs", column: ["studio_offline_run_id", "workspace_id", "client_id", "project_intake_id"], primary_key: ["id", "workspace_id", "client_id", "project_intake_id"], name: "fk_studio_offline_review_run_scope"
+  add_foreign_key "studio_offline_run_reviews", "users", column: "reviewer_user_id"
+  add_foreign_key "studio_ai_policy_revisions", "workspaces"
+  add_foreign_key "studio_ai_policy_revisions", "studio_ai_policies", column: ["studio_ai_policy_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_ai_policy_revision_scoped_policy"
+  add_foreign_key "studio_ai_policy_revisions", "project_intakes", column: ["project_intake_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_ai_policy_revision_scoped_intake"
+  add_foreign_key "studio_ai_policy_revisions", "users", column: "actor_user_id", name: "fk_studio_ai_policy_revision_actor"
+  add_foreign_key "studio_ai_policies", "workspaces"
+  add_foreign_key "studio_ai_policies", "project_intakes", column: ["project_intake_id", "workspace_id"], primary_key: ["id", "workspace_id"], name: "fk_studio_ai_project_tenant"
   add_foreign_key "studio_inventory_checkpoints", "workspaces"
   add_foreign_key "studio_maintenance_runs", "workspaces"
   add_foreign_key "studio_operator_reviews", "workspaces"
@@ -438,6 +523,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_004000) do
   add_foreign_key "workspace_memberships", "users"
   add_foreign_key "workspace_memberships", "workspaces"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
+  add_check_constraint "studio_offline_runs", "version BETWEEN 1 AND 25", name: "chk_studio_offline_run_version"
+  add_check_constraint "studio_offline_runs", "purpose IN ('clarify', 'source_outline', 'document_proposal')", name: "chk_studio_offline_run_purpose"
+  add_check_constraint "studio_offline_runs", "jsonb_typeof(output_payload) = 'object'", name: "chk_studio_offline_run_payload"
+  add_check_constraint "studio_offline_runs", %q(input_fingerprint ~ '^[0-9a-f]{64}$' AND event_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_offline_run_digests"
+  add_check_constraint "studio_offline_run_reviews", "decision IN ('reviewed_synthetic','discarded_synthetic')", name: "chk_studio_offline_review_decision"
+  add_check_constraint "studio_offline_run_reviews", %q(run_digest ~ '^[0-9a-f]{64}$' AND event_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_offline_review_digests"
+  add_check_constraint "studio_ai_policy_revisions", "revision >= 1", name: "chk_studio_ai_policy_revision_positive"
+  add_check_constraint "studio_ai_policy_revisions", "action IN ('created', 'updated')", name: "chk_studio_ai_policy_revision_action"
+  add_check_constraint "studio_ai_policy_revisions", "origin IN ('owner_ui', 'internal_unattributed')", name: "chk_studio_ai_policy_revision_origin"
+  add_check_constraint "studio_ai_policy_revisions", "jsonb_typeof(settings) = 'object'", name: "chk_studio_ai_policy_revision_settings"
+  add_check_constraint "studio_ai_policy_revisions", %q(previous_digest ~ '^[0-9a-f]{64}$' AND event_digest ~ '^[0-9a-f]{64}$'), name: "chk_studio_ai_policy_revision_digest"
+  add_check_constraint "studio_ai_policies", "mode IN ('off','offline','reviewed_provider')", name: "chk_studio_ai_policy_mode"
+  add_check_constraint "studio_ai_policies", "jsonb_typeof(purposes) = 'array'", name: "chk_studio_ai_policy_purposes_array"
+  add_check_constraint "studio_ai_policies", "token_cap_per_call >= 0 AND token_cap_per_day >= 0 AND usd_cap_per_call >= 0 AND usd_cap_per_month >= 0", name: "chk_studio_ai_policy_caps"
   add_check_constraint "studio_inventory_checkpoints", "state IN ('listing','checking','completed','failed')", name: "chk_studio_inventory_checkpoint_state"
   add_check_constraint "studio_inventory_checkpoints", "(state IN ('listing','checking')) = (finished_at IS NULL)", name: "chk_studio_inventory_checkpoint_terminal"
   add_check_constraint "studio_inventory_checkpoints", "pages_scanned BETWEEN 0 AND 10000 AND last_db_blob_id >= 0 AND db_target_max_id >= 0", name: "chk_studio_inventory_checkpoint_progress"
