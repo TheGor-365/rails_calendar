@@ -101,6 +101,10 @@ body.app-shell {
   line-height: 1.25;
   transition: transform .18s var(--ws-easing),background .18s,box-shadow .18s,color .18s;
 }
+// The mobile-only calendar shortcut must remain hidden at desktop widths.
+// This selector outranks the generic .rc-action display style above.
+.rc-action.calendar-mobile-agenda-trigger { display: none; }
+@media (max-width: 767.98px) { .rc-action.calendar-mobile-agenda-trigger { display: inline-flex; } }
 .rc-action--primary { background: var(--ws-teal); color: white; box-shadow: 0 9px 20px -13px rgba(10,118,109,.68); }
 .rc-action--primary:hover { background: var(--ws-teal-deep); color: white; transform: translateY(-2px); box-shadow: 0 14px 23px -15px rgba(10,118,109,.71); }
 .rc-action--quiet { background: white; color: var(--ws-ink); box-shadow: inset 0 0 0 1px var(--ws-border),var(--ws-shadow); }
