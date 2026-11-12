@@ -1,10 +1,10 @@
 <% answered_count = questions.count { |question| saved_answers.key?(question.fetch(:key)) } %>
-<nav class="rc-quiz-progress" aria-label="Quiz progress">
+<nav class="rc-quiz-progress" aria-label="<%= t("quiz.progress_aria") %>">
   <div class="rc-quiz-progress__header">
-    <span><i class="bi bi-diagram-3 me-2" aria-hidden="true"></i>Project brief progress</span>
-    <strong><%= answered_count %> / <%= questions.size %> answers saved</strong>
+    <span><i class="bi bi-diagram-3 me-2" aria-hidden="true"></i><%= t("quiz.brief_progress") %></span>
+    <strong><%= t("quiz.answer_progress", saved: answered_count, total: questions.size) %></strong>
   </div>
-  <div class="rc-quiz-meter" role="progressbar" aria-valuenow="<%= answered_count %>" aria-valuemin="0" aria-valuemax="<%= questions.size %>" aria-label="Saved quiz answers">
+  <div class="rc-quiz-meter" role="progressbar" aria-valuenow="<%= answered_count %>" aria-valuemin="0" aria-valuemax="<%= questions.size %>" aria-label="<%= t("quiz.answers_aria") %>">
     <span class="rc-quiz-meter__fill" style="width: <%= (answered_count * 100.0 / questions.size).round %>%"></span>
   </div>
   <ol class="rc-quiz-steps">
@@ -13,12 +13,12 @@
       <% done = saved_answers.key?(question.fetch(:key)) %>
       <li class="rc-quiz-step <%= active ? 'rc-quiz-step--active' : (done ? 'rc-quiz-step--done' : 'rc-quiz-step--pending') %>" aria-current="<%= active ? 'step' : 'false' %>">
         <span class="rc-quiz-step__number" aria-hidden="true"><i class="bi bi-<%= done ? 'check-lg' : (index == 0 ? 'bullseye' : 'ui-checks-grid') %>"></i></span>
-        <span class="rc-quiz-step__label"><strong><%= index == 0 ? 'Outcome' : 'Features' %></strong><small><%= done ? 'Saved' : (active ? 'Editing now' : 'Not answered') %></small></span>
+        <span class="rc-quiz-step__label"><strong><%= index == 0 ? t('quiz.outcome') : t('quiz.features') %></strong><small><%= done ? t('quiz.saved') : (active ? t('quiz.editing_now') : t('quiz.not_answered_short')) %></small></span>
       </li>
     <% end %>
     <li class="rc-quiz-step <%= current_key == 'review' ? 'rc-quiz-step--active' : 'rc-quiz-step--pending' %>" aria-current="<%= current_key == 'review' ? 'step' : 'false' %>">
       <span class="rc-quiz-step__number" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span>
-      <span class="rc-quiz-step__label"><strong>Review</strong><small><%= current_key == 'review' ? 'Current page' : 'Draft summary' %></small></span>
+      <span class="rc-quiz-step__label"><strong><%= t("quiz.review") %></strong><small><%= current_key == 'review' ? t('quiz.current_page') : t('quiz.draft_summary') %></small></span>
     </li>
   </ol>
 </nav>
