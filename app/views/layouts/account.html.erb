@@ -19,7 +19,7 @@
     <header class="app-header rc-account-header">
       <div class="container">
         <nav class="rc-account-nav" aria-label="<%= t("nav.account_navigation") %>">
-          <%= link_to services_path, class: "app-brand rc-account-brand", aria: { label: "<%= t("nav.home") %>" } do %>
+          <%= link_to services_path, class: "app-brand rc-account-brand", aria: { label: t("nav.home") } do %>
             <span class="rc-brand-symbol" aria-hidden="true"><i class="bi bi-grid-1x2"></i></span>
             <span class="ws-brand-name">Rails Calendar<small>AI Workspace</small></span>
           <% end %>
