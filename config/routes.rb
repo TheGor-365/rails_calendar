@@ -11,6 +11,15 @@ Rails.application.routes.draw do
   get "/project_intakes/:project_intake_id/quiz/review", to: "intake_quizzes#review", as: :review_project_intake_quiz
   patch "/project_intakes/:project_intake_id/quiz/:question_key", to: "intake_quizzes#update", as: :project_intake_quiz_answer
 
+  # Verification-gated client account creation. No private owner grants.
+  get "/register", to: "client_registrations#new", as: :client_registration
+  post "/register", to: "client_registrations#create"
+  get "/register/verify", to: "client_registrations#verify_form", as: :verify_client_registration
+  post "/register/verify", to: "client_registrations#verify"
+  post "/register/resend", to: "client_registrations#resend", as: :resend_client_registration
+  get "/register/privacy", to: "client_registrations#privacy", as: :client_registration_privacy
+  get "/client", to: "client_home#show", as: :client_home
+
   # Private owner entry, never a public client cabinet.
   get "/workspace", to: "workspace#home", as: :workspace
 

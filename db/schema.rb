@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_09_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -34,6 +34,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_190000) do
     t.text "reason", null: false
     t.datetime "created_at", null: false
     t.index ["consultation_id", "created_at", "id"], name: "idx_reschedule_history_by_consultation_and_time"
+  end
+
+  create_table "client_signup_challenges", force: :cascade do |t|
+    t.string "email", limit: 254, null: false
+    t.string "password_digest", null: false
+    t.string "code_digest", limit: 64, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "sent_at", null: false
+    t.datetime "consent_at", null: false
+    t.integer "failed_attempts", default: 0, null: false
+    t.integer "send_count", default: 1, null: false
+    t.datetime "window_started_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((email)::text)", name: "idx_client_signup_email_unique", unique: true
+    t.index ["expires_at"], name: "index_client_signup_challenges_on_expires_at"
+  end
+
+  create_table "signup_rate_windows", force: :cascade do |t|
+    t.string "identity_digest", limit: 64, null: false
+    t.string "purpose", limit: 32, null: false
+    t.bigint "window_start_epoch", null: false
+    t.integer "attempts", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["purpose", "identity_digest", "window_start_epoch"], name: "idx_signup_rate_window_unique", unique: true
+    t.index ["window_start_epoch"], name: "index_signup_rate_windows_on_window_start_epoch"
   end
 
   create_table "consultations", force: :cascade do |t|
@@ -146,6 +173,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_09_190000) do
     t.string "role", limit: 20, default: "owner", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "email_verified_at"
+    t.datetime "signup_consent_at"
     t.index "lower((email)::text)", name: "idx_users_email_case_insensitive", unique: true
   end
 
