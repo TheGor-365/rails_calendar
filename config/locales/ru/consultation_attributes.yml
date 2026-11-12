@@ -1,0 +1,9 @@
+ru:
+  activerecord:
+    attributes:
+      consultation:
+        title: "Название"
+        description: "Описание"
+        start_time: "Начало"
+        end_time: "Окончание"
+        reschedule_reason: "Причина переноса"

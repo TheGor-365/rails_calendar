@@ -83,29 +83,29 @@ class ConsultationSearch
     return if value.blank?
 
     unless value.match?(/\A\d{4}-\d{2}-\d{2}\z/)
-      @errors << "#{label} must be a valid YYYY-MM-DD date"
+      @errors << I18n.t("consultations.filter_date_invalid", label: label)
       return
     end
 
     date = Date.iso8601(value)
     unless (Consultation::MIN_SCHEDULE_YEAR..Consultation::MAX_SCHEDULE_YEAR).cover?(date.year)
-      @errors << "#{label} must be between years 2000 and 2100"
+      @errors << I18n.t("consultations.filter_date_range", label: label)
       return
     end
 
     date
   rescue Date::Error
-    @errors << "#{label} must be a valid YYYY-MM-DD date"
+    @errors << I18n.t("consultations.filter_date_invalid", label: label)
     nil
   end
 
   def validate_filters
-    @errors << "Search is limited to #{MAX_QUERY_LENGTH} characters" if @query.length > MAX_QUERY_LENGTH
-    @errors << "Unknown time filter" unless STATUSES.include?(@status)
-    @from_date = parse_day(@from_value, "From")
-    @to_date = parse_day(@to_value, "To")
+    @errors << I18n.t("consultations.filter_search_length", max: MAX_QUERY_LENGTH) if @query.length > MAX_QUERY_LENGTH
+    @errors << I18n.t("consultations.filter_unknown_status") unless STATUSES.include?(@status)
+    @from_date = parse_day(@from_value, I18n.t("consultations.filter_from"))
+    @to_date = parse_day(@to_value, I18n.t("consultations.filter_to"))
     if @from_date && @to_date && @from_date > @to_date
-      @errors << "From date must not be later than To date"
+      @errors << I18n.t("consultations.filter_date_order")
     end
   end
 

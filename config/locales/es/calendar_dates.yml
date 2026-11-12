@@ -1,0 +1,20 @@
+es:
+  date:
+    day_names: ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"]
+    abbr_day_names: ["dom","lun","mar","mié","jue","vie","sáb"]
+    month_names: [null,"enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"]
+    abbr_month_names: [null,"ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"]
+    formats:
+      rc_month: "%B %Y"
+      rc_full: "%A, %d de %B de %Y"
+      rc_day_aria: "%A, %d de %B de %Y"
+      rc_short: "%a, %d %b"
+  time:
+    formats:
+      rc_date_time: "%d %b %Y, %H:%M"
+      rc_date_time_zone: "%d %b %Y, %H:%M %Z"
+      rc_short_time: "%d %b %H:%M"
+  simple_calendar:
+    previous: "Mes anterior"
+    next: "Mes siguiente"
+    week: "Semana"

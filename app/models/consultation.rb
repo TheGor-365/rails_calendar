@@ -34,7 +34,7 @@ class Consultation < ApplicationRecord
       next if value.blank?
 
       unless (MIN_SCHEDULE_YEAR..MAX_SCHEDULE_YEAR).cover?(value.year)
-        errors.add(attribute, "must be between years #{MIN_SCHEDULE_YEAR} and #{MAX_SCHEDULE_YEAR}")
+        errors.add(attribute, I18n.t("consultations.validation_range", min: MIN_SCHEDULE_YEAR, max: MAX_SCHEDULE_YEAR))
       end
     end
   end
@@ -48,7 +48,7 @@ class Consultation < ApplicationRecord
       next unless new_record? || will_save_change_to_attribute?(attribute)
 
       unless value.sec.zero? && value.subsec.zero?
-        errors.add(attribute, "must use whole minutes (seconds must be 00)")
+        errors.add(attribute, I18n.t("consultations.validation_minutes"))
       end
     end
   end
@@ -56,6 +56,6 @@ class Consultation < ApplicationRecord
   def end_time_after_start_time
     return if start_time.blank? || end_time.blank?
 
-    errors.add(:end_time, "must be after start time") if end_time <= start_time
+    errors.add(:end_time, I18n.t("consultations.validation_order")) if end_time <= start_time
   end
 end
