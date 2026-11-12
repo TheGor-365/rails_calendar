@@ -55,6 +55,12 @@ module Studio
         }
         return edge_receipt(existing, dependent, prerequisite) if existing
 
+        # A started task has already cleared its prerequisites. Do not let a
+        # subsequent edge silently invalidate that decision.
+        unless dependent.state == "proposed"
+          raise Denied, "Cannot add prerequisites after fictional task readiness"
+        end
+
         if reaches_prerequisite?(prerequisite.id, dependent.id, edges)
           raise Denied, "Cycle in fictional dependency graph"
         end
@@ -160,10 +166,12 @@ module Studio
         followers[edge.prerequisite_task_id] << edge.dependent_task_id
       end
       name_by_id = nodes.to_h { |task| [task.id, task.task_key] }
+      priority_by_id = nodes.to_h { |task| [task.id, task.priority] }
       ready = nodes.select { |task| indegree.fetch(task.id).zero? }.map(&:id)
       ordered = []
       until ready.empty?
-        ready.sort_by! { |id| name_by_id.fetch(id) }
+        # Smaller number means higher urgency, but prerequisite order wins.
+        ready.sort_by! { |id| [priority_by_id.fetch(id), name_by_id.fetch(id)] }
         id = ready.shift
         ordered << id
         followers[id].each do |dependent_id|
@@ -181,7 +189,10 @@ module Studio
         "task_id" => task.id,
         "task_key" => task.task_key,
         "phase" => PHASE_BY_TASK.fetch(task.task_key),
-        "state" => "proposed_unverified",
+        "state" => task.state == "proposed" ? "proposed_unverified" : task.state,
+        "workflow_state" => task.state,
+        "priority" => task.priority,
+        "version" => task.lock_version,
         "assigned_user_id" => nil,
         "due_on" => nil,
         "approved" => false,
