@@ -65,7 +65,7 @@
               <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
                           class: "rc-hour-band #{'rc-hour-band--busy' if slot[:count].positive?}",
                           role: "listitem",
-                          aria: { label: "Inspect #{from_label}–#{to_label}, #{rc_count(slot[:count], "calendar", "event")}" },
+                          aria: { label: t("calendar.inspect_interval_count", range: "#{from_label}–#{to_label}", events: rc_count(slot[:count], "calendar", "event")) },
                           title: t("calendar.inspect_interval", range: "#{from_label}–#{to_label}") do %>
                 <span class="visually-hidden">
                   <%= from_label %>–<%= to_label %>, <%= rc_count(slot[:count], "calendar", "event") %>
@@ -79,7 +79,7 @@
               <% event = item.consultation %>
               <% left = (item.lane * 100.0 / item.lanes).round(4) %>
               <% width = (100.0 / item.lanes).round(4) %>
-              <% time_span = "#{event.start_time.in_time_zone.strftime('%d %b %H:%M')} – #{event.end_time.in_time_zone.strftime('%d %b %H:%M')}" %>
+              <% time_span = "#{rc_local_datetime(event.start_time, format: :rc_short_time)} – #{rc_local_datetime(event.end_time, format: :rc_short_time)}" %>
               <article class="rc-range-event" id="event-<%= event.id %>"
                        style="top: <%= item.start_px %>px; height: <%= item.height_px %>px; left: <%= left %>%; width: calc(<%= width %>% - 8px);"
                        data-event-id="<%= event.id %>" data-lane="<%= item.lane %>"

@@ -4,7 +4,7 @@
   <% end %>
   <% if consultation.errors.any? %>
     <div id="consultation-form-errors" class="rc-notice rc-notice--error mb-4" role="alert" tabindex="-1">
-      <h2 class="h6 fw-semibold">Please correct <%= pluralize(consultation.errors.count, "error") %></h2>
+      <h2 class="h6 fw-semibold"><%= t("consultations.error_heading", errors: rc_count(consultation.errors.count, "consultations", "error")) %></h2>
       <ul class="mb-0">
         <% consultation.errors.each do |error| %>
           <li><%= error.full_message %></li>
@@ -14,12 +14,11 @@
   <% end %>
 
   <p id="consultation-timezone-hint" class="rc-hint mb-4">
-    Required fields are marked *. Times use <%= Time.zone.name %>.
-    Precision: whole minutes (HH:MM). Supported years: <%= Consultation::MIN_SCHEDULE_YEAR %>–<%= Consultation::MAX_SCHEDULE_YEAR %>.
+    <%= t("consultations.required_hint", zone: Time.zone.name, min: Consultation::MIN_SCHEDULE_YEAR, max: Consultation::MAX_SCHEDULE_YEAR) %>
   </p>
 
   <div class="rc-field">
-    <%= form.label :title, "Title *", class: "rc-field-label" %>
+    <%= form.label :title, t("consultations.field_title"), class: "rc-field-label" %>
     <%= form.text_field :title, class: "rc-input#{' rc-input--invalid' if consultation.errors.include?(:title)}",
                         maxlength: 120, required: true, autocomplete: "off",
                         aria: { invalid: consultation.errors.include?(:title) } %>
@@ -29,7 +28,7 @@
   </div>
 
   <div class="rc-field">
-    <%= form.label :description, class: "rc-field-label" %>
+    <%= form.label :description, t("consultations.field_description"), class: "rc-field-label" %>
     <%= form.text_area :description, rows: 3, maxlength: 5000,
                       class: "rc-input rc-input--area#{' rc-input--invalid' if consultation.errors.include?(:description)}",
                       aria: { invalid: consultation.errors.include?(:description) } %>
@@ -40,7 +39,7 @@
 
   <div class="row g-4 mb-4">
     <div class="col-12 col-md-6 rc-field">
-      <%= form.label :start_time, "Start time *", class: "rc-field-label" %>
+      <%= form.label :start_time, t("consultations.field_start"), class: "rc-field-label" %>
       <%= form.datetime_field :start_time,
                               class: "rc-input#{' rc-input--invalid' if consultation.errors.include?(:start_time)}",
                               value: consultation.start_time&.in_time_zone&.strftime("%Y-%m-%dT%H:%M"),
@@ -53,7 +52,7 @@
     </div>
 
     <div class="col-12 col-md-6 rc-field">
-      <%= form.label :end_time, "End time *", class: "rc-field-label" %>
+      <%= form.label :end_time, t("consultations.field_end"), class: "rc-field-label" %>
       <%= form.datetime_field :end_time,
                               class: "rc-input#{' rc-input--invalid' if consultation.errors.include?(:end_time)}",
                               value: consultation.end_time&.in_time_zone&.strftime("%Y-%m-%dT%H:%M"),
@@ -68,15 +67,14 @@
 
   <% if consultation.persisted? %>
     <div class="rc-field">
-      <%= form.label :reschedule_reason, "Reason for time change", class: "rc-field-label" %>
+      <%= form.label :reschedule_reason, t("consultations.reschedule_reason"), class: "rc-field-label" %>
       <%= form.text_area :reschedule_reason, rows: 2, maxlength: 500,
-                        placeholder: "For example: client requested a later time",
+                        placeholder: t("consultations.reschedule_placeholder"),
                         class: "rc-input rc-input--area#{' rc-input--invalid' if consultation.errors.include?(:reschedule_reason)}",
                         aria: { describedby: "reschedule-reason-help",
                                 invalid: consultation.errors.include?(:reschedule_reason) } %>
       <p id="reschedule-reason-help" class="rc-hint mt-2">
-        Required only if the start or end time changes. A successful move is recorded in the administrator-only history.
-        Title/description edits do not need a reason.
+        <%= t("consultations.reschedule_help") %>
       </p>
       <% if consultation.errors.include?(:reschedule_reason) %>
         <p class="rc-field-error"><%= consultation.errors.full_messages_for(:reschedule_reason).join(", ") %></p>
@@ -84,13 +82,13 @@
     </div>
   <% end %>
 
-  <p class="rc-hint mb-3">Overlapping bookings are currently allowed. Any detected overlaps are advisory and must be reviewed after saving.</p>
+  <p class="rc-hint mb-3"><%= t("consultations.overlap_hint") %></p>
   <%= render "overlap_advisory", overlaps: @overlaps, more: @overlaps_more, mode: :form %>
 
   <div class="d-flex flex-wrap align-items-center gap-2">
     <%= form.button type: :submit, class: "rc-action rc-action--primary" do %>
-      <%= rc_icon_label(consultation.persisted? ? "check2-circle" : "plus-lg", consultation.persisted? ? "Update Consultation" : "Create Consultation") %>
+      <%= rc_icon_label(consultation.persisted? ? "check2-circle" : "plus-lg", consultation.persisted? ? t("consultations.update_action") : t("consultations.create_action")) %>
     <% end %>
-    <%= link_to rc_icon_label("x-lg", "Cancel"), consultations_path, class: "rc-action rc-action--quiet" %>
+    <%= link_to rc_icon_label("x-lg", t("consultations.cancel")), consultations_path, class: "rc-action rc-action--quiet" %>
   </div>
 <% end %>
