@@ -1,0 +1,9 @@
+es:
+  activerecord:
+    attributes:
+      consultation:
+        title: "Título"
+        description: "Descripción"
+        start_time: "Inicio"
+        end_time: "Fin"
+        reschedule_reason: "Motivo del cambio"

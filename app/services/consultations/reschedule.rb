@@ -29,7 +29,7 @@ module Consultations
         unless current_edit_version?
           @consultation.errors.add(
             :base,
-            "This consultation changed in another tab, or the edit form is outdated. Your edits were not saved; review the latest values and try again."
+            I18n.t("consultations.validation_stale")
           )
           next :stale
         end
@@ -50,9 +50,9 @@ module Consultations
         @consultation.valid?
 
         if schedule_changed && @reason.blank?
-          @consultation.errors.add(:reschedule_reason, "is required when changing the schedule")
+          @consultation.errors.add(:reschedule_reason, I18n.t("consultations.validation_reason_required"))
         elsif schedule_changed && @reason.length > MAX_REASON_LENGTH
-          @consultation.errors.add(:reschedule_reason, "is too long (maximum #{MAX_REASON_LENGTH} characters)")
+          @consultation.errors.add(:reschedule_reason, I18n.t("consultations.validation_reason_length", max: MAX_REASON_LENGTH))
         end
 
         next :invalid if @consultation.errors.any?

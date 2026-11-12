@@ -35,7 +35,7 @@ class ConsultationsController < ApplicationController
 
     respond_to do |format|
       if @consultation.save
-        format.html { redirect_to consultation_url(@consultation), notice: "Consultation was successfully created" }
+        format.html { redirect_to consultation_url(@consultation), notice: I18n.t("consultations.created") }
       else
         prepare_overlap_advisory
         format.html { render :new, status: :unprocessable_entity }
@@ -60,7 +60,7 @@ class ConsultationsController < ApplicationController
     respond_to do |format|
       case result
       when :updated
-        format.html { redirect_to consultation_url(@consultation), notice: "Consultation was successfully updated" }
+        format.html { redirect_to consultation_url(@consultation), notice: I18n.t("consultations.updated") }
       when :stale
         prepare_overlap_advisory
         format.html { render :edit, status: :conflict }
@@ -75,7 +75,7 @@ class ConsultationsController < ApplicationController
     @consultation.destroy
 
     respond_to do |format|
-      format.html { redirect_to consultations_url, notice: "Consultation was successfully destroyed" }
+      format.html { redirect_to consultations_url, notice: I18n.t("consultations.destroyed") }
     end
   end
 

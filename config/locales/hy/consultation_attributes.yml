@@ -1,0 +1,9 @@
+hy:
+  activerecord:
+    attributes:
+      consultation:
+        title: "Վերնագիր"
+        description: "Նկարագրություն"
+        start_time: "Սկիզբ"
+        end_time: "Ավարտ"
+        reschedule_reason: "Տեղափոխման պատճառ"
