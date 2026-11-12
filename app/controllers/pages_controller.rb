@@ -9,6 +9,8 @@ class PagesController < ApplicationController
     end
 
     require_calendar_read_access!
+    return if performed?
+
     requested_date = params[:start_date].presence
     calendar_date = requested_date ? Date.iso8601(requested_date) : Time.zone.today
     @displayed_month = calendar_date
