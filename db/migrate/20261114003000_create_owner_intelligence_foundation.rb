@@ -31,7 +31,7 @@ class CreateOwnerIntelligenceFoundation < ActiveRecord::Migration[8.1]
               unique: true, name: "idx_owner_answer_per_section"
 
     create_table :owner_interview_answer_revisions do |t|
-      t.references :owner_interview_answer, null: false, foreign_key: true
+      t.references :owner_interview_answer, null: false, foreign_key: true, index: { name: "idx_owner_rev_answer" }
       t.integer :revision, null: false
       t.jsonb :snapshot, null: false, default: {}
       t.timestamps

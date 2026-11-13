@@ -81,7 +81,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_003000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_interview_answer_id", "revision"], name: "idx_owner_answer_revision_unique", unique: true
-    t.index ["owner_interview_answer_id"], name: "index_owner_interview_answer_revisions_on_owner_interview_answer_id"
+    t.index ["owner_interview_answer_id"], name: "idx_owner_rev_answer"
   end
 
   create_table "professional_context_snapshots", force: :cascade do |t|
