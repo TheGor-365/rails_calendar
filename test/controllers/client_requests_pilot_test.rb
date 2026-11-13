@@ -45,7 +45,7 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     get new_client_request_path
     assert_response :success
     assert_select "form[action=?]", client_requests_path
-    assert_difference ["ProjectIntake.count", "IntakeMessage.count"], [1, 2] do
+    assert_difference({"ProjectIntake.count" => 1, "IntakeMessage.count" => 2}) do
       @intake = create_fictional_request
     end
     assert_equal @client_a.id, @intake.client_user_id
