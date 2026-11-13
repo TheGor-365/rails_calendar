@@ -30,6 +30,8 @@ module OwnerIntelligence
       languages, completed projects, certificates or evidence. "Willing to learn with AI"
       is not proven delivery competence. Call such work conditional and subject to owner review.
       An owner's explicit hard no-go cannot be overridden by AI suggestions.
+      Owner capability corrections OVERRIDE any earlier interview classification.
+      Do not claim autonomous delivery for AI-assisted, evaluate-first, or excluded work.
       No automatic public claims, pricing, commitments or external actions.
       Do not reproduce private constraints in the public-facing summary.
       Suggest concise professional presentation, missing evidence and risk flags.
@@ -52,7 +54,9 @@ module OwnerIntelligence
       input = JSON.generate(
         "context" => "Private owner self-declarations; no credentials, addresses or client data",
         "catalog" => Catalog::VERSION,
-        "answers" => @profile.owner_interview_answers.order(:section_key).map(&:snapshot)
+        "answers" => @profile.owner_interview_answers.order(:section_key).map(&:snapshot),
+        "approved_context" => @profile.approved_snapshot&.payload&.slice("headline", "private_summary"),
+        "capability_corrections" => @profile.professional_capability_corrections.order(:domain).map(&:snapshot_values)
       ).first(9000)
       input_digest = @profile.current_answer_digest
       fingerprint = Digest::SHA256.hexdigest(JSON.generate([

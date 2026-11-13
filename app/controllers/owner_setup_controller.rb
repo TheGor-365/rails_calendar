@@ -69,6 +69,9 @@ class OwnerSetupController < ApplicationController
   end
 
   def approve
+    if @profile.professional_capability_corrections.exists?
+      return redirect_to(owner_capabilities_path, alert: t("capability_review.pending_first"))
+    end
     return redirect_to(owner_setup_path, alert: t("owner_setup.complete_first")) unless @profile.interview_complete?
     return redirect_to(owner_setup_review_path, alert: t("owner_setup.confirm_required")) unless params[:confirmation] == "1"
 

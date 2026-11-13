@@ -100,7 +100,9 @@ module OwnerIntelligence
       answers = profile.owner_interview_answers.order(:section_key).map do |answer|
         [answer.section_key, answer.revision, answer.selected_options, answer.notes.to_s, answer.unsure]
       end
-      Digest::SHA256.hexdigest(JSON.generate([VERSION, answers]))
+      corrections = profile.professional_capability_corrections.order(:domain).map(&:snapshot_values)
+      digest_input = corrections.empty? ? [VERSION, answers] : [VERSION, answers, corrections]
+      Digest::SHA256.hexdigest(JSON.generate(digest_input))
     end
   end
 end

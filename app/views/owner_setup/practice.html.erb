@@ -12,7 +12,8 @@
     </div>
     <div class="ws-owner-hero-actions">
       <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
-      <%= link_to rc_icon_label("pencil-square", t("owner_setup.update_profile")), owner_setup_path(step: "A"), class: "rc-action rc-action--primary" %>
+      <%= link_to rc_icon_label("sliders", t("capability_review.edit_link")), owner_capabilities_path, class: "rc-action rc-action--primary" %>
+      <%= link_to rc_icon_label("chat-square-dots", t("owner_setup.update_profile")), owner_setup_path(step: "A"), class: "rc-action rc-action--quiet" %>
     </div>
   </header>
 
@@ -59,10 +60,19 @@
         </div>
         <div class="ws-owner-skill-list">
           <% @capabilities.select { |c| c.delivery_mode == "ai_assisted" }.each do |c| %>
-            <span class="ws-owner-skill-chip ws-owner-skill-chip--conditional"><i class="bi bi-lightning-charge" aria-hidden="true"></i><%= owner_capability_title(c.domain) %></span>
+            <span class="ws-owner-skill-chip ws-owner-skill-chip--conditional"><i class="bi bi-lightning-charge" aria-hidden="true"></i><%= owner_capability_title(c.domain, c.delivery_mode) %></span>
           <% end %>
         </div>
         <p class="ws-owner-data-note"><i class="bi bi-shield-check" aria-hidden="true"></i><%= t("owner_setup.requires_review") %></p>
+        <% if @capabilities.any? { |c| %w[evaluate_first excluded].include?(c.delivery_mode) } %>
+          <div class="ws-owner-data-divider"></div>
+          <div class="ws-owner-data-head"><span class="ws-owner-data-icon"><i class="bi bi-search" aria-hidden="true"></i></span><h3><%= t("capability_review.special_cases") %></h3></div>
+          <div class="ws-owner-skill-list">
+            <% @capabilities.select { |c| %w[evaluate_first excluded].include?(c.delivery_mode) }.each do |c| %>
+              <span class="ws-owner-skill-chip ws-owner-skill-chip--conditional"><%= owner_capability_title(c.domain, c.delivery_mode) %> · <%= t("capability_review.modes.#{c.delivery_mode}") %></span>
+            <% end %>
+          </div>
+        <% end %>
       </section>
       <section class="ws-owner-data-panel">
         <div class="ws-owner-data-head">
