@@ -2,7 +2,7 @@
   <header class="ws-account-hero ws-client-heading">
     <div class="ws-account-hero-copy">
       <p class="eyebrow"><i class="bi bi-person-check" aria-hidden="true"></i> <%= t("account_hub.client_eyebrow") %></p>
-      <h1 class="page-title"><%= t("account_hub.client_title") %></h1>
+      <h1 class="page-title"><%= request.path == client_home_path ? t("client.title") : t("account_hub.client_title") %></h1>
       <p class="ws-account-lead rc-muted"><%= @pilot_enabled ? t("client_requests.pilot_intro") : t("client.description") %></p>
       <div class="ws-account-meta">
         <span class="ws-account-chip"><i class="bi bi-shield-check" aria-hidden="true"></i><%= t("account_hub.verified") %></span>
