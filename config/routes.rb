@@ -37,6 +37,11 @@ Rails.application.routes.draw do
   post "/workspace/setup/suggest", to: "owner_setup#suggest", as: :owner_setup_suggest
   post "/workspace/setup/approve", to: "owner_setup#approve", as: :owner_setup_approve
   get "/workspace/practice", to: "owner_setup#practice", as: :owner_practice
+  get "/workspace/practice/capabilities", to: "owner_capabilities#index", as: :owner_capabilities
+  patch "/workspace/practice/capabilities/:capability_key", to: "owner_capabilities#update", as: :owner_capability
+  delete "/workspace/practice/capabilities/:capability_key", to: "owner_capabilities#discard", as: :discard_owner_capability
+  post "/workspace/practice/capabilities/suggest", to: "owner_capabilities#suggest", as: :suggest_owner_capabilities
+  post "/workspace/practice/capabilities/approve", to: "owner_capabilities#approve", as: :approve_owner_capabilities
   get "/workspace/cabinet", to: "owner_setup#cabinet", as: :owner_cabinet
   get "/workspace/ai", to: "owner_setup#ai_activity", as: :owner_ai_activity
 

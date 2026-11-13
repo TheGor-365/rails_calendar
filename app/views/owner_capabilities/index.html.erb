@@ -1,0 +1,156 @@
+<div class="container ws-owner-page ws-capability-page my-4 my-sm-5" id="owner-capabilities">
+  <header class="ws-owner-hero">
+    <div class="ws-owner-hero-copy">
+      <p class="eyebrow"><i class="bi bi-person-gear" aria-hidden="true"></i> <%= t("capability_review.eyebrow") %></p>
+      <div class="ws-owner-heading">
+        <span class="ws-owner-heading-icon"><i class="bi bi-sliders" aria-hidden="true"></i></span>
+        <div>
+          <h1 class="page-title"><%= t("capability_review.title") %></h1>
+          <p class="rc-muted mb-0"><%= t("capability_review.intro") %></p>
+        </div>
+      </div>
+    </div>
+    <div class="ws-owner-hero-actions">
+      <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("arrow-left", t("capability_review.back")), owner_practice_path, class: "rc-action rc-action--quiet" %>
+    </div>
+  </header>
+
+  <section class="ws-capability-overview" aria-label="<%= t('capability_review.overview') %>">
+    <div class="ws-capability-overview-item">
+      <i class="bi bi-patch-check" aria-hidden="true"></i><span><%= t("capability_review.active_version", version: @snapshot.version) %></span>
+    </div>
+    <div class="ws-capability-overview-item">
+      <i class="bi bi-layers" aria-hidden="true"></i><span><%= t("capability_review.skill_count", count: @capabilities.length) %></span>
+    </div>
+    <div class="ws-capability-overview-item <%= 'is-dirty' if @corrections.any? %>">
+      <i class="bi bi-pencil-square" aria-hidden="true"></i><span><%= t("capability_review.pending_count", count: @corrections.size) %></span>
+    </div>
+  </section>
+
+  <div class="ws-capability-layout">
+    <section class="ws-capability-main">
+      <div class="ws-owner-data-head">
+        <span class="ws-owner-data-icon"><i class="bi bi-code-slash" aria-hidden="true"></i></span>
+        <div><p class="eyebrow"><%= t("capability_review.private") %></p><h2><%= t("capability_review.skills_heading") %></h2></div>
+      </div>
+      <p class="rc-muted"><%= t("capability_review.skills_help") %></p>
+      <div class="ws-capability-list">
+        <% @capabilities.each do |cap| %>
+          <% change = @corrections[cap.domain] %>
+          <% values = change || cap %>
+          <details id="cap-<%= cap.domain %>" class="ws-capability-item <%= 'is-edited' if change.present? %>">
+            <summary>
+              <span class="ws-capability-item-icon"><i class="bi bi-code-square" aria-hidden="true"></i></span>
+              <span class="ws-capability-item-title"><strong><%= owner_capability_title(cap.domain, values.delivery_mode) %></strong><small><%= t("capability_review.modes.#{values.delivery_mode}") %></small></span>
+              <% if change %><span class="ws-capability-draft-label"><%= t("capability_review.draft") %></span><% end %>
+              <i class="bi bi-chevron-down ws-capability-chevron" aria-hidden="true"></i>
+            </summary>
+            <div class="ws-capability-editor">
+              <p class="ws-owner-data-note"><i class="bi bi-info-circle" aria-hidden="true"></i><%= t("capability_review.self_assessed") %></p>
+              <%= form_with url: owner_capability_path(capability_key: cap.domain), method: :patch, class: "ws-owner-form" do %>
+                <div class="ws-capability-fields">
+                  <div class="ws-owner-field">
+                    <%= label_tag "mode_#{cap.domain}", t("capability_review.delivery_mode"), class: "rc-field-label" %>
+                    <%= select_tag "capability[delivery_mode]", options_for_select(ProfessionalCapabilityCorrection::MODES.map { |v| [t("capability_review.modes.#{v}"), v] }, values.delivery_mode), id: "mode_#{cap.domain}", class: "rc-input" %>
+                  </div>
+                  <div class="ws-owner-field">
+                    <%= label_tag "experience_#{cap.domain}", t("capability_review.experience"), class: "rc-field-label" %>
+                    <%= select_tag "capability[experience_claim]", options_for_select(ProfessionalCapabilityCorrection::EXPERIENCE.map { |v| [t("capability_review.experience_values.#{v}"), v] }, values.experience_claim), id: "experience_#{cap.domain}", class: "rc-input" %>
+                  </div>
+                  <div class="ws-owner-field">
+                    <%= label_tag "willingness_#{cap.domain}", t("capability_review.willingness"), class: "rc-field-label" %>
+                    <%= select_tag "capability[willingness]", options_for_select(ProfessionalCapabilityCorrection::WILLINGNESS.map { |v| [t("capability_review.willingness_values.#{v}"), v] }, values.willingness), id: "willingness_#{cap.domain}", class: "rc-input" %>
+                  </div>
+                </div>
+                <div class="ws-owner-field">
+                  <%= label_tag "conditions_#{cap.domain}", t("capability_review.conditions"), class: "rc-field-label" %>
+                  <%= text_area_tag "capability[conditions]", values.conditions, id: "conditions_#{cap.domain}", class: "rc-input", rows: 2, maxlength: 600, placeholder: t("capability_review.conditions_hint") %>
+                </div>
+                <p class="ws-owner-data-note"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("capability_review.rules_hint") %></p>
+                <div class="ws-capability-actions">
+                  <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+                    <%= rc_icon_label("check2-circle", t("capability_review.save")) %>
+                  <% end %>
+                </div>
+              <% end %>
+              <% if change %>
+                <%= button_to discard_owner_capability_path(capability_key: cap.domain), method: :delete,
+                      class: "rc-action rc-action--quiet rc-action--small ws-capability-discard" do %>
+                  <%= rc_icon_label("arrow-counterclockwise", t("capability_review.discard")) %>
+                <% end %>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+
+      <section class="ws-owner-data-panel ws-capability-approve" id="cap-approve">
+        <div class="ws-owner-data-head"><span class="ws-owner-data-icon"><i class="bi bi-patch-check" aria-hidden="true"></i></span>
+          <div><p class="eyebrow"><%= t("capability_review.manual_first") %></p><h2><%= t("capability_review.approval_heading") %></h2></div>
+        </div>
+        <% if @corrections.empty? %>
+          <p class="rc-muted"><%= t("capability_review.no_changes") %></p>
+        <% else %>
+          <p class="rc-muted"><%= t("capability_review.approval_explainer") %></p>
+          <%= form_with url: approve_owner_capabilities_path, method: :post, class: "ws-owner-form" do %>
+            <%= hidden_field_tag :base_version, @snapshot.version %>
+            <div class="ws-owner-field">
+              <%= label_tag "corrected_headline", t("owner_setup.headline"), class: "rc-field-label" %>
+              <%= text_field_tag "profile[headline]", @suggestion["headline"].presence || @snapshot.payload.fetch("headline"), id: "corrected_headline", maxlength: 160, required: true, class: "rc-input" %>
+            </div>
+            <div class="ws-owner-field">
+              <%= label_tag "corrected_private", t("owner_setup.private_summary"), class: "rc-field-label" %>
+              <%= text_area_tag "profile[private_summary]", @suggestion["private_summary"].presence || @snapshot.payload.fetch("private_summary"), id: "corrected_private", maxlength: 1500, rows: 5, required: true, class: "rc-input" %>
+            </div>
+            <div class="ws-owner-field">
+              <%= label_tag "corrected_public", t("owner_setup.public_summary"), class: "rc-field-label" %>
+              <%= text_area_tag "profile[public_summary]", @suggestion["public_summary"].presence || @snapshot.payload.fetch("public_summary_draft"), id: "corrected_public", maxlength: 1000, rows: 3, class: "rc-input" %>
+              <p class="ws-owner-data-note"><i class="bi bi-lock" aria-hidden="true"></i><%= t("owner_setup.not_published") %></p>
+            </div>
+            <label class="ws-owner-checkbox">
+              <%= check_box_tag :confirm, "1", false, required: true %>
+              <span><%= t("capability_review.confirm_details") %></span>
+            </label>
+            <div class="ws-owner-form-actions"><%= button_tag type: "submit", class: "rc-action rc-action--primary" do %><%= rc_icon_label("shield-check", t("capability_review.approve")) %><% end %></div>
+          <% end %>
+        <% end %>
+      </section>
+    </section>
+
+    <aside class="ws-capability-side">
+      <section class="ws-account-side-panel ws-capability-guide">
+        <span class="ws-account-side-icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
+        <h2><%= t("capability_review.ai_heading") %></h2>
+        <p><%= t("capability_review.ai_explainer") %></p>
+        <% if @ai_enabled %>
+          <%= form_with url: suggest_owner_capabilities_path, method: :post do %>
+            <label class="ws-owner-checkbox mb-3">
+              <%= check_box_tag :ai_consent, "1", false, required: true %>
+              <span><%= t("capability_review.ai_consent") %></span>
+            </label>
+            <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %><%= rc_icon_label("stars", t("capability_review.ai_button")) %><% end %>
+          <% end %>
+        <% else %><p class="rc-muted"><%= t("owner_setup.ai_disabled") %></p><% end %>
+        <% if @suggestion.present? %>
+          <div class="ws-capability-ai-result">
+            <strong><%= t("capability_review.suggested_headline") %></strong>
+            <p><%= @suggestion["headline"] %></p>
+            <% if @suggestion["risk_flags"].present? %>
+              <strong><%= t("capability_review.risk_flags") %></strong>
+              <ul><% @suggestion["risk_flags"].each do |risk| %><li><%= risk %></li><% end %></ul>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+      <section class="ws-account-side-panel ws-account-side-panel--soft">
+        <span class="ws-account-side-icon"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
+        <h2><%= t("capability_review.version_heading") %></h2>
+        <p><%= t("capability_review.version_help") %></p>
+        <div class="ws-account-fact"><span><%= t("capability_review.active") %></span><strong>v<%= @snapshot.version %></strong></div>
+        <div class="ws-account-fact"><span><%= t("capability_review.pending") %></span><strong><%= @corrections.size %></strong></div>
+        <%= link_to rc_icon_label("arrow-up-right", t("owner_setup.practice_title")), owner_practice_path, class: "rc-action rc-action--quiet rc-action--small" %>
+      </section>
+    </aside>
+  </div>
+</div>

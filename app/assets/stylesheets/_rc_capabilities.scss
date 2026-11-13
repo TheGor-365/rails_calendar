@@ -1,0 +1,42 @@
+
+// RC053: private capability corrections; inherits White Atlas / Workspace tokens.
+// Scoped to the owner capability page; no global overrides.
+.ws-capability-overview { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.65rem; margin:1rem 0 1.35rem; }
+.ws-capability-overview-item { display:flex; align-items:center; gap:.65rem; padding:.85rem 1.05rem; font-size:.76rem; font-weight:760; background:#fff; border:1px solid var(--ws-border); border-radius:13px; box-shadow:var(--ws-shadow); }
+.ws-capability-overview-item .bi { font-size:1rem; color:var(--ws-teal); }
+.ws-capability-overview-item.is-dirty { background:#f1faf7; border-color:#b9ded5; }
+.ws-capability-layout { display:grid; grid-template-columns:minmax(0,1fr) 285px; align-items:start; gap:.9rem; }
+.ws-capability-main,.ws-capability-side { min-width:0; }
+.ws-capability-main > .rc-muted { font-size:.81rem; margin-bottom:1rem; }
+.ws-capability-list { display:grid; gap:.56rem; margin-bottom:1.25rem; }
+.ws-capability-item { background:#fff; border:1px solid var(--ws-border); border-radius:13px; box-shadow:var(--ws-shadow); overflow:hidden; scroll-margin-top:1rem; }
+.ws-capability-item.is-edited { border-color:#92d1c3; }
+.ws-capability-item > summary { cursor:pointer; display:flex; gap:.75rem; align-items:center; padding:.84rem 1rem; list-style:none; min-height:66px; }
+.ws-capability-item > summary::-webkit-details-marker { display:none; }
+.ws-capability-item > summary:hover { background:#f8fcfb; }
+.ws-capability-item > summary:focus-visible { outline:3px solid rgba(14,128,115,.3); outline-offset:-3px; }
+.ws-capability-item-icon { flex:0 0 36px; height:36px; display:grid; place-items:center; border-radius:10px; color:var(--ws-teal); background:var(--ws-teal-wash); }
+.ws-capability-item-title { flex:1; display:grid; gap:.2rem; min-width:0; }
+.ws-capability-item-title strong { font-size:.85rem; font-weight:800; }
+.ws-capability-item-title small { color:#77909a; font-size:.72rem; }
+.ws-capability-chevron { color:#899da4; transition:transform .18s; }
+.ws-capability-item[open] .ws-capability-chevron { transform:rotate(180deg); }
+.ws-capability-draft-label { display:inline-flex; padding:.3rem .52rem; border-radius:8px; font-size:.69rem; font-weight:800; background:#dff5ee; color:#11695f; }
+.ws-capability-editor { border-top:1px solid #ebf2f2; padding:1.1rem 1.2rem; background:#fcfdfd; }
+.ws-capability-editor .ws-owner-data-note { margin:.2rem 0 .6rem; }
+.ws-capability-fields { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.55rem; }
+.ws-capability-fields .ws-owner-field { margin:.6rem 0; }
+.ws-capability-fields .rc-input { padding:.6rem .5rem; font-size:.74rem; }
+.ws-capability-actions { display:flex; align-items:center; gap:.6rem; margin-top:.7rem; }
+.ws-capability-discard { margin-top:.55rem; }
+.ws-capability-approve { margin-top:1.4rem; scroll-margin-top:1rem; }
+.ws-capability-approve .ws-owner-form .rc-input { width:100%; }
+.ws-capability-side { display:grid; gap:.65rem; }
+.ws-capability-guide .rc-action { width:100%; justify-content:center; }
+.ws-capability-ai-result { margin-top:1rem; border-top:1px solid #e4eff0; padding-top:.9rem; color:#4b6874; font-size:.76rem; }
+.ws-capability-ai-result strong { display:block; margin:.55rem 0 .25rem; }
+.ws-capability-ai-result p { line-height:1.55; margin:0; }
+.ws-capability-ai-result ul { padding-left:1rem; line-height:1.6; margin:0; }
+@media(max-width:1080px){ .ws-capability-layout{grid-template-columns:minmax(0,1fr)} .ws-capability-side{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media(max-width:720px){ .ws-capability-overview{grid-template-columns:1fr} .ws-capability-side{grid-template-columns:1fr} .ws-capability-fields{grid-template-columns:1fr} .ws-capability-editor{padding:.95rem} }
+@media(prefers-reduced-motion:reduce){ .ws-capability-item .ws-capability-chevron{transition:none} }

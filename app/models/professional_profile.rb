@@ -3,6 +3,7 @@ class ProfessionalProfile < ApplicationRecord
   has_many :owner_interview_answers, dependent: :restrict_with_exception
   has_many :professional_context_snapshots, dependent: :restrict_with_exception
   has_many :professional_capabilities, dependent: :restrict_with_exception
+  has_many :professional_capability_corrections, dependent: :restrict_with_exception
   has_many :work_policies, dependent: :restrict_with_exception
   has_many :ai_spend_entries, dependent: :restrict_with_exception
 
