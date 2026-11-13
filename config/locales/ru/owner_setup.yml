@@ -58,6 +58,7 @@ ru:
     practice_title: "Моя практика"
     profile_version: "Утверждённая версия v%{version}"
     not_approved: "Утверждённого профиля пока нет"
+    full_context: "Полное профессиональное описание"
     update_profile: "Обновить профиль"
     start_setup: "Познакомиться с ИИ"
     ai_activity: "AI-действия и расходы"

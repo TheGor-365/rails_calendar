@@ -58,6 +58,7 @@ en:
     practice_title: "My practice"
     profile_version: "Approved context v%{version}"
     not_approved: "No approved professional profile yet"
+    full_context: "Full professional context"
     update_profile: "Update profile"
     start_setup: "Introduce myself to AI"
     ai_activity: "AI activity and costs"
