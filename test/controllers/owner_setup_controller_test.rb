@@ -103,8 +103,9 @@ class OwnerSetupControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", owner_setup_approve_path
     assert_select "form[action=?]", owner_setup_suggest_path, count: 0
 
-    assert_difference ["ProfessionalContextSnapshot.count", "ProfessionalCapability.count", "WorkPolicy.count"],
-                      [1, 6, 1] do
+    assert_difference({ "ProfessionalContextSnapshot.count" => 1,
+                        "ProfessionalCapability.count" => 6,
+                        "WorkPolicy.count" => 1 }) do
       post owner_setup_approve_path, params: {
         professional_profile: {
           headline: "Ruby on Rails developer",
