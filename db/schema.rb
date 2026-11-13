@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_12_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_13_123000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -136,8 +136,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_230000) do
     t.string "status", limit: 32, default: "interviewing", null: false
     t.integer "ai_call_count", default: 0, null: false
     t.datetime "demo_consent_at", null: false
+    t.bigint "client_user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["client_user_id"], name: "index_project_intakes_on_client_user_id"
   end
 
   create_table "project_milestones", force: :cascade do |t|
@@ -184,6 +186,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_230000) do
   add_foreign_key "intake_answers", "project_intakes"
   add_foreign_key "intake_messages", "project_intakes"
   add_foreign_key "intake_spec_versions", "project_intakes"
+  add_foreign_key "project_intakes", "users", column: "client_user_id"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
   add_foreign_key "user_sessions", "users"

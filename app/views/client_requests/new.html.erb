@@ -1,0 +1,40 @@
+<div class="container my-4 my-sm-5">
+  <header class="rc-page-hero mb-4">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("client_requests.eyebrow") %></p>
+      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-plus"></i></span><h1 class="page-title"><%= t("client_requests.new_title") %></h1></div>
+      <p class="rc-muted"><%= t("client_requests.new_hint") %></p>
+    </div>
+  </header>
+  <div class="surface-panel p-3 p-sm-4">
+    <% if @intake.errors.any? %>
+      <div class="rc-notice rc-notice--error" role="alert"><%= @intake.errors.full_messages.to_sentence %></div>
+    <% end %>
+    <%= form_with model: @intake, url: client_requests_path, html: { class: "rc-form" } do |f| %>
+      <div class="rc-field mb-3">
+        <%= f.label :title, t("intake.field_title"), class: "rc-field-label" %>
+        <%= f.text_field :title, class: "rc-input", required: true, maxlength: 120, placeholder: t("client_requests.title_example") %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= f.label :project_type, t("intake.field_type"), class: "rc-field-label" %>
+        <%= f.select :project_type,
+          ProjectIntake::TYPES.map { |type| [rc_intake_type(type), type] },
+          { include_blank: t("intake.type_blank") }, class: "rc-input", required: true %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= f.label :goal, t("intake.field_goal"), class: "rc-field-label" %>
+        <%= f.text_area :goal, class: "rc-input", required: true, rows: 5, minlength: 10, maxlength: 1200,
+            placeholder: t("client_requests.goal_example") %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= check_box_tag :demo_consent, "1", false, required: true %>
+        <%= label_tag :demo_consent, t("client_requests.demo_consent") %>
+      </div>
+      <p class="rc-hint"><%= t("client_requests.demo_warning") %></p>
+      <%= f.button type: :submit, class: "rc-action rc-action--primary" do %>
+        <%= rc_icon_label("send", t("client_requests.send")) %>
+      <% end %>
+      <%= link_to rc_icon_label("arrow-left", t("client_requests.back")), client_home_path, class: "rc-action rc-action--quiet ms-2" %>
+    <% end %>
+  </div>
+</div>

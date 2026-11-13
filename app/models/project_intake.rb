@@ -3,6 +3,7 @@ class ProjectIntake < ApplicationRecord
   STATUSES = %w[interviewing draft_spec owner_approved client_reviewed].freeze
   MAX_CLIENT_MESSAGES = 8
 
+  belongs_to :client_user, class_name: "User", optional: true, inverse_of: :client_project_intakes
   has_many :intake_messages, dependent: :restrict_with_exception
   has_many :intake_answers, dependent: :restrict_with_exception
   has_many :intake_spec_versions, dependent: :restrict_with_exception

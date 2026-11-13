@@ -20,6 +20,11 @@ Rails.application.routes.draw do
   post "/register/resend", to: "client_registrations#resend", as: :resend_client_registration
   get "/register/privacy", to: "client_registrations#privacy", as: :client_registration_privacy
   get "/client", to: "client_home#show", as: :client_home
+  # Verified-client, local-only, fictional request handoff pilot.
+  get "/client/requests/new", to: "client_requests#new", as: :new_client_request
+  post "/client/requests", to: "client_requests#create", as: :client_requests
+  get "/client/requests/:id", to: "client_requests#show", as: :client_request
+  post "/client/requests/:id/review", to: "client_requests#review", as: :review_client_request
 
   # Private owner entry, never a public client cabinet.
   get "/workspace", to: "workspace#home", as: :workspace
