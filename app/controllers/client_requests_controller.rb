@@ -67,7 +67,8 @@ class ClientRequestsController < ApplicationController
   end
 
   def set_owned_request!
-    @intake = current_user.client_project_intakes.find_by!(id: params[:id])
+    @intake = current_user.client_project_intakes.find_by(id: params[:id])
+    head :not_found unless @intake
   end
 
   def request_params
