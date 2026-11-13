@@ -48,7 +48,7 @@
         </div>
         <div class="ws-owner-skill-list">
           <% @capabilities.select { |c| c.delivery_mode == "direct" }.each do |c| %>
-            <span class="ws-owner-skill-chip"><i class="bi bi-check-circle" aria-hidden="true"></i><%= owner_capability_title(c.domain) %></span>
+            <span class="ws-owner-skill-chip"><i class="bi bi-check-circle" aria-hidden="true"></i><%= owner_capability_title(c.domain, c.delivery_mode) %></span>
           <% end %>
         </div>
         <p class="ws-owner-data-note"><i class="bi bi-info-circle" aria-hidden="true"></i><%= t("owner_setup.self_reported") %></p>
