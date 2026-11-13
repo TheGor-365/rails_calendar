@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_14_003000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_14_023000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -94,6 +94,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_003000) do
     t.datetime "updated_at", null: false
     t.index ["professional_profile_id", "version"], name: "idx_owner_context_version", unique: true
     t.index ["professional_profile_id"], name: "index_professional_context_snapshots_on_professional_profile_id"
+  end
+
+  create_table "professional_capability_corrections", force: :cascade do |t|
+    t.bigint "professional_profile_id", null: false
+    t.string "domain", limit: 80, null: false
+    t.integer "base_snapshot_version", null: false
+    t.string "delivery_mode", limit: 20, null: false
+    t.string "experience_claim", limit: 20, null: false
+    t.string "willingness", limit: 24, null: false
+    t.text "conditions"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.check_constraint "base_snapshot_version > 0", name: "chk_cap_correction_version"
+    t.check_constraint "char_length(conditions) <= 600", name: "chk_cap_correction_conditions"
+    t.index ["professional_profile_id"], name: "idx_cap_correction_profile"
+    t.index ["professional_profile_id", "domain"], name: "idx_cap_correction_unique_domain", unique: true
   end
 
   create_table "professional_capabilities", force: :cascade do |t|
@@ -299,6 +315,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_003000) do
   add_foreign_key "owner_interview_answer_revisions", "owner_interview_answers"
   add_foreign_key "professional_context_snapshots", "professional_profiles"
   add_foreign_key "professional_capabilities", "professional_profiles"
+  add_foreign_key "professional_capability_corrections", "professional_profiles"
   add_foreign_key "professional_profiles", "workspaces"
   add_foreign_key "work_policies", "professional_profiles"
   add_foreign_key "workspaces", "users", column: "owner_user_id"
