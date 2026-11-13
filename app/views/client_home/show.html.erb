@@ -5,7 +5,26 @@
   <section class="ws-client-panel" aria-labelledby="client-start-title">
     <div class="ws-client-icon" aria-hidden="true"><i class="bi bi-grid-1x2"></i></div>
     <h2 id="client-start-title"><%= t("client.panel_title") %></h2>
-    <p><%= t("client.panel_body") %></p>
+    <p><%= @pilot_enabled ? t("client_requests.home_description") : t("client.panel_body") %></p>
+    <% if @pilot_enabled %><%= link_to rc_icon_label("clipboard2-plus", t("client_requests.new_action")), new_client_request_path, class: "rc-action rc-action--primary" %><% end %>
     <%= link_to rc_icon_label("globe", t("client.overview")), services_path, class: "rc-action rc-action--quiet" %>
   </section>
 </div>
+
+<% if @pilot_enabled %>
+  <section class="surface-panel p-3 p-sm-4 mt-4" aria-labelledby="client-requests-heading">
+    <h2 id="client-requests-heading" class="h4"><i class="bi bi-inboxes me-2" aria-hidden="true"></i><%= t("client_requests.list_title") %></h2>
+    <% if @client_requests.any? %>
+      <ul class="rc-record-list">
+        <% @client_requests.each do |item| %>
+          <li class="rc-record">
+            <h3 class="h5"><%= link_to rc_icon_label("arrow-up-right", item.title), client_request_path(item), class: "rc-text-link" %></h3>
+            <p class="rc-muted mb-0"><%= rc_intake_type(item.project_type) %> · <%= rc_intake_status(item.status) %></p>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="rc-muted"><%= t("client_requests.empty") %></p>
+    <% end %>
+  </section>
+<% end %>

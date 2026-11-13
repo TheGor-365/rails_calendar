@@ -11,7 +11,7 @@
     <% @intakes.each do |intake| %>
       <li class="rc-record">
         <h2 class="h5"><%= link_to rc_icon_label("arrow-up-right", intake.title), project_intake_path(intake), class: "rc-text-link" %></h2>
-        <p class="rc-muted"><%= rc_intake_type(intake.project_type) %> · <%= rc_intake_status(intake.status) %> · <%= rc_local_datetime(intake.created_at, format: :rc_date_time) + " UTC" %></p>
+        <p class="rc-muted"><%= rc_intake_type(intake.project_type) %> · <%= rc_intake_status(intake.status) %><% if intake.client_user_id.present? %> · <%= t("client_requests.origin_client") %><% end %> · <%= rc_local_datetime(intake.created_at, format: :rc_date_time) + " UTC" %></p>
       </li>
     <% end %>
   </ul>

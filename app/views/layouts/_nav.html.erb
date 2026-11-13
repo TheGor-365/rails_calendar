@@ -8,7 +8,11 @@
 
     <div class="rc-nav-group" aria-label="<%= t("nav.workspace_sections") %>">
       <% if client_signed_in? %>
-        <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-nav-link active" %>
+        <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-nav-link #{'active' if controller_path == 'client_home'}" %>
+        <% if ClientRequestPilot.enabled?(request: request) %>
+          <%= link_to rc_icon_label("clipboard2-plus", t("client_requests.new_action")), new_client_request_path,
+                      class: "rc-nav-link #{'active' if controller_path == 'client_requests'}" %>
+        <% end %>
       <% else %>
       <% if owner_signed_in? %>
         <%= link_to rc_icon_label("grid-1x2", t("nav.workspace")), workspace_path, class: "rc-nav-link" %>
