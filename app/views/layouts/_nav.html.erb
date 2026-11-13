@@ -10,7 +10,7 @@
       <% if client_signed_in? %>
         <%= link_to rc_icon_label("person-circle", t("account_hub.client_cabinet")), client_cabinet_path,
                       class: "rc-nav-link #{'active' if request.path == client_cabinet_path}" %>
-        <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-nav-link #{'active' if controller_path == 'client_home'}" %>
+        <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-nav-link #{'active' if request.path == client_home_path}" %>
         <% if ClientRequestPilot.enabled?(request: request) %>
           <%= link_to rc_icon_label("clipboard2-plus", t("client_requests.new_action")), new_client_request_path,
                       class: "rc-nav-link #{'active' if controller_path == 'client_requests'}" %>
