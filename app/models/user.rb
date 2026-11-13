@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   has_many :user_sessions, dependent: :destroy
+  has_one :owner_workspace, class_name: "Workspace", foreign_key: :owner_user_id, inverse_of: :owner_user, dependent: :restrict_with_exception
   has_many :client_project_intakes, class_name: "ProjectIntake", foreign_key: :client_user_id, inverse_of: :client_user, dependent: :restrict_with_exception
 
   def verified_client?
