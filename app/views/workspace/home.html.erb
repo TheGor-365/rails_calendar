@@ -8,7 +8,7 @@
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
       <div><h2 class="h5 mb-1"><%= t("owner_setup.practice_title") %></h2>
         <p class="rc-muted mb-0"><%= @practice_profile&.approved_snapshot ? t("owner_setup.profile_version", version: @practice_profile.approved_snapshot.version) : t("owner_setup.progress", done: (@practice_profile&.completed_sections || 0), total: 6) %></p></div>
-      <%= link_to rc_icon_label("person-badge", @practice_profile&.approved_snapshot ? t("owner_setup.update_profile") : t("owner_setup.start_setup")), @practice_profile&.approved_snapshot ? owner_practice_path : owner_setup_path, class: "rc-action rc-action--primary" %>
+      <%= link_to rc_icon_label("person-badge", @practice_profile&.approved_snapshot ? t("account_hub.owner_cabinet") : t("owner_setup.start_setup")), @practice_profile&.approved_snapshot ? owner_cabinet_path : owner_setup_path, class: "rc-action rc-action--primary" %>
     </div>
   </section>
   <section class="ws-hub-metrics" aria-label="<%= t("workspace.summary_aria") %>">
