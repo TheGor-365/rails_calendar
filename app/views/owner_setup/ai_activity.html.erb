@@ -1,13 +1,14 @@
-<div class="container my-4 my-sm-5" id="owner-ai-activity">
-  <header class="mb-4">
+<div class="container ws-owner-page ws-owner-activity my-4 my-sm-5" id="owner-ai-activity">
+  <header class="ws-owner-hero"><div class="ws-owner-hero-copy">
     <p class="eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_setup.practice_eyebrow") %></p>
     <h1 class="page-title"><%= t("owner_setup.ai_activity") %></h1>
     <p class="rc-muted"><%= t("owner_setup.activity_intro") %></p>
-    <p><%= t("owner_setup.budget", spent: format("%.5f", @spend[:billed_ticks].to_f / AiSpendLedger::USD_TICKS), cap: format("%.2f", @spend[:cap_ticks].to_f / AiSpendLedger::USD_TICKS)) %></p>
+    <p class="ws-owner-tag"><i class="bi bi-currency-dollar" aria-hidden="true"></i><%= t("owner_setup.budget", spent: format("%.5f", @spend[:billed_ticks].to_f / AiSpendLedger::USD_TICKS), cap: format("%.2f", @spend[:cap_ticks].to_f / AiSpendLedger::USD_TICKS)) %></p></div>
+    <div class="ws-owner-hero-actions"><%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %></div>
   </header>
-  <div class="surface-panel p-3 p-sm-4">
+  <div class="ws-owner-data-panel">
     <% if @entries.empty? %><p class="rc-muted"><%= t("owner_setup.no_activity") %></p><% end %>
-    <ol class="rc-record-list">
+    <ol class="rc-record-list ws-owner-activity-list">
       <% @entries.each do |entry| %>
         <li class="rc-record">
           <strong><%= entry.operation %> · <%= entry.status %></strong>

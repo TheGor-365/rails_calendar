@@ -1,19 +1,20 @@
-<div class="container my-4 my-sm-5" id="owner-setup-review">
-  <header class="mb-4">
-    <p class="eyebrow"><i class="bi bi-clipboard2-check" aria-hidden="true"></i> <%= t("owner_setup.eyebrow") %></p>
+<div class="container ws-owner-page ws-owner-review my-4 my-sm-5" id="owner-setup-review">
+  <header class="ws-owner-hero">
+    <div class="ws-owner-hero-copy"><p class="eyebrow"><i class="bi bi-clipboard2-check" aria-hidden="true"></i> <%= t("owner_setup.eyebrow") %></p>
     <h1 class="page-title"><%= t("owner_setup.review_title") %></h1>
-    <p class="rc-muted"><%= t("owner_setup.review_intro") %></p>
+    <p class="rc-muted"><%= t("owner_setup.review_intro") %></p></div>
+    <div class="ws-owner-hero-actions"><%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %></div>
   </header>
-  <div class="row g-3">
-    <section class="col-lg-5" aria-label="<%= t('owner_setup.answer_review_label') %>">
-      <div class="surface-panel p-3 p-sm-4">
-        <h2 class="h5"><%= t("owner_setup.your_answers") %></h2>
+  <div class="ws-owner-review-layout">
+    <section class="ws-owner-review-answers" aria-label="<%= t('owner_setup.answer_review_label') %>">
+      <div class="ws-owner-data-panel">
+        <div class="ws-owner-data-head"><span class="ws-owner-data-icon"><i class="bi bi-list-check" aria-hidden="true"></i></span><h2><%= t("owner_setup.your_answers") %></h2></div>
         <% OwnerIntelligence::Catalog::KEYS.each do |key| %>
           <% answer = @answers.fetch(key) %>
-          <div class="border-bottom py-3">
+          <div class="ws-owner-review-item">
             <div class="d-flex justify-content-between align-items-start gap-2">
               <strong><%= t("owner_setup.steps.#{key}.short") %></strong>
-              <%= link_to t("owner_setup.edit"), owner_setup_path(step: key) %>
+              <%= link_to rc_icon_label("pencil-square", t("owner_setup.edit")), owner_setup_path(step: key), class: "ws-owner-inline-link" %>
             </div>
             <p class="mb-1"><%= answer.selected_options.map { |v| t("owner_setup.options.#{key}.#{v}", default: OwnerIntelligence::Catalog.options_for(key)[v]) }.join(", ").presence || t("owner_setup.no_options") %></p>
             <% if answer.notes.present? %><p class="rc-hint mb-1"><%= answer.notes %></p><% end %>
@@ -23,18 +24,18 @@
       </div>
     </section>
 
-    <section class="col-lg-7">
-      <div class="surface-panel p-3 p-sm-4 mb-3">
-        <h2 class="h5"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_setup.ai_proposal") %></h2>
+    <section class="ws-owner-review-main">
+      <div class="ws-owner-data-panel ws-owner-review-ai mb-3">
+        <div class="ws-owner-data-head"><span class="ws-owner-data-icon"><i class="bi bi-stars" aria-hidden="true"></i></span><h2><%= t("owner_setup.ai_proposal") %></h2></div>
         <% if @profile.ai_suggestion.present? && !@profile.fresh_ai_suggestion? %>
           <p class="rc-notice rc-notice--neutral"><%= t("owner_setup.ai_stale") %></p>
         <% end %>
         <p class="rc-hint"><%= t("owner_setup.ai_consent_explanation") %></p>
         <% if @ai_enabled %>
           <%= form_with url: owner_setup_suggest_path, method: :post do %>
-            <div class="form-check mb-3">
-              <%= check_box_tag :ai_consent, "1", false, required: true, class: "form-check-input" %>
-              <%= label_tag :ai_consent, t("owner_setup.ai_consent"), class: "form-check-label" %>
+            <div class="ws-owner-checkbox mb-3">
+              <%= check_box_tag :ai_consent, "1", false, required: true %>
+              <%= label_tag :ai_consent, t("owner_setup.ai_consent") %>
             </div>
             <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
               <%= rc_icon_label("stars", t("owner_setup.generate_ai")) %>
@@ -48,40 +49,40 @@
           <% %w[suggested_services possible_stretch missing_facts risk_flags].each do |key| %>
             <% if @suggestion[key].present? %>
               <h3 class="h6 mt-3"><%= t("owner_setup.suggestion_sections.#{key}") %></h3>
-              <ul><% @suggestion[key].each do |item| %><li><%= item %></li><% end %></ul>
+              <ul class="ws-owner-suggestion-list"><% @suggestion[key].each do |item| %><li><i class="bi bi-dot" aria-hidden="true"></i><%= item %></li><% end %></ul>
             <% end %>
           <% end %>
         <% end %>
         <p class="rc-hint mb-0"><%= t("owner_setup.budget", spent: format("%.5f", @spend[:billed_ticks].to_f / AiSpendLedger::USD_TICKS), cap: format("%.2f", @spend[:cap_ticks].to_f / AiSpendLedger::USD_TICKS)) %></p>
       </div>
 
-      <div class="surface-panel p-3 p-sm-4" id="owner-profile-approval">
-        <h2 class="h5"><%= t("owner_setup.manual_review") %></h2>
+      <div class="ws-owner-data-panel ws-owner-review-approval" id="owner-profile-approval">
+        <div class="ws-owner-data-head"><span class="ws-owner-data-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span><h2><%= t("owner_setup.manual_review") %></h2></div>
         <p class="rc-hint"><%= t("owner_setup.manual_review_hint") %></p>
-        <%= form_with url: owner_setup_approve_path, method: :post do %>
-          <div class="mb-3">
+        <%= form_with url: owner_setup_approve_path, method: :post, class: "ws-owner-form" do %>
+          <div class="ws-owner-field">
             <%= label_tag "owner_headline", t("owner_setup.headline"), class: "rc-field-label" %>
             <%= text_field_tag "professional_profile[headline]",
                   @profile.headline.presence || @suggestion["headline"], id: "owner_headline",
                   maxlength: 160, required: true, class: "rc-input" %>
           </div>
-          <div class="mb-3">
+          <div class="ws-owner-field">
             <%= label_tag "owner_private_summary", t("owner_setup.private_summary"), class: "rc-field-label" %>
             <%= text_area_tag "professional_profile[private_summary]",
                   @profile.private_summary.presence || @suggestion["private_summary"],
                   id: "owner_private_summary", rows: 5, maxlength: 1500, required: true, class: "rc-input" %>
           </div>
-          <div class="mb-3">
+          <div class="ws-owner-field">
             <%= label_tag "owner_public_summary", t("owner_setup.public_summary"), class: "rc-field-label" %>
             <%= text_area_tag "professional_profile[public_summary]",
                   @profile.public_summary.presence || @suggestion["public_summary"],
                   id: "owner_public_summary", rows: 4, maxlength: 1000, class: "rc-input" %>
             <small class="rc-hint"><%= t("owner_setup.not_published") %></small>
           </div>
-          <div class="form-check mb-3">
+          <div class="ws-owner-checkbox mb-3">
             <%= check_box_tag :confirmation, "1", false, id: "owner_confirm_profile",
-                  required: true, class: "form-check-input" %>
-            <%= label_tag "owner_confirm_profile", t("owner_setup.confirm_owner_claims"), class: "form-check-label" %>
+                  required: true %>
+            <%= label_tag "owner_confirm_profile", t("owner_setup.confirm_owner_claims") %>
           </div>
           <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
             <%= rc_icon_label("shield-check", t("owner_setup.approve_action")) %>
