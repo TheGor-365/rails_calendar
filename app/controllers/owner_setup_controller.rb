@@ -89,6 +89,9 @@ class OwnerSetupController < ApplicationController
         profile: @profile, headline: headline, private_summary: private_summary,
         public_summary: public_summary
       )
+      OwnerIntelligence::CapabilityRevision.preserve_overrides!(
+        payload, previous_snapshot: @profile.approved_snapshot
+      )
       version = @profile.professional_context_snapshots.maximum(:version).to_i + 1
       digest = Digest::SHA256.hexdigest(JSON.generate(payload))
 

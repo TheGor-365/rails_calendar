@@ -8,7 +8,7 @@ module OwnerIntelligence
 
     MODEL = "grok-4.3"
     ENDPOINT = URI("https://api.x.ai/v1/responses")
-    PROMPT_VERSION = "owner_profile_summary_v1"
+    PROMPT_VERSION = "owner_profile_summary_v2"
     SCHEMA = {
       type: "object", additionalProperties: false,
       properties: {
@@ -57,10 +57,11 @@ module OwnerIntelligence
         "answers" => @profile.owner_interview_answers.order(:section_key).map(&:snapshot),
         "approved_context" => @profile.approved_snapshot&.payload&.slice("headline", "private_summary"),
         "capability_corrections" => @profile.professional_capability_corrections.order(:domain).map(&:snapshot_values)
-      ).first(9000)
+      )
+      raise Unavailable, "Profile context exceeds safe input size" if input.bytesize > 24_000
       input_digest = @profile.current_answer_digest
       fingerprint = Digest::SHA256.hexdigest(JSON.generate([
-        @profile.id, PROMPT_VERSION, MODEL, input_digest, SYSTEM_PROMPT
+        @profile.id, PROMPT_VERSION, MODEL, input_digest, Digest::SHA256.hexdigest(input), SYSTEM_PROMPT
       ]))
       entry, fresh = AiSpendLedger.reserve!(
         professional_profile: @profile, operation: PROMPT_VERSION, model: MODEL,

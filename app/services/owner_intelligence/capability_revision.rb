@@ -12,6 +12,7 @@ module OwnerIntelligence
     def self.merge!(payload, corrections:)
       data = payload.deep_dup
       present = data.fetch("capabilities").index_by { |row| row.fetch("domain") }
+      overrides = data.fetch("capability_overrides", {}).deep_dup
       corrections.each do |correction|
         row = present[correction.domain]
         raise Invalid, "Capability no longer exists in the interview" unless row
@@ -26,15 +27,44 @@ module OwnerIntelligence
         # Never raise confidence without independently reviewed evidence.
         row["evidence_status"] = "unverified" if correction.experience_claim != "practiced"
         row["privacy_scope"] = "private"
+        overrides[correction.domain] = row.slice(
+          "delivery_mode", "experience_claim", "willingness",
+          "conditions", "evidence_status", "privacy_scope"
+        )
       end
+      data["capability_overrides"] = overrides
       data
+    end
+
+    # Previous owner decisions outlive future edits to the six introductory
+    # questions. Introductory answers are not authority to reclassify work.
+    # Removed technologies are never resurrected from an old approval.
+    def self.preserve_overrides!(new_payload, previous_snapshot:)
+      return new_payload unless previous_snapshot
+      old = previous_snapshot.payload.fetch("capability_overrides", {})
+      return new_payload if old.empty?
+      present = new_payload.fetch("capabilities").index_by { |row| row.fetch("domain") }
+      retained = {}
+      old.each do |domain, fields|
+        row = present[domain]
+        next unless row
+        row.merge!(fields.slice(
+          "delivery_mode", "experience_claim", "willingness",
+          "conditions", "evidence_status", "privacy_scope"
+        ))
+        row["review_required"] = true
+        row["privacy_scope"] = "private"
+        retained[domain] = fields
+      end
+      new_payload["capability_overrides"] = retained
+      new_payload
     end
 
     def self.approve!(profile:, base_version:, headline:, private_summary:, public_summary:)
       profile.with_lock do
         source = profile.approved_snapshot
         raise Invalid, "No approved baseline" unless source
-        raise Stale, "Approved profile has changed" unless source.version == base_version.to_i
+        raise Stale, "Approved profile has changed" unless base_version.to_s == source.version.to_s
 
         current_answers = Catalog::KEYS.to_h do |key|
           answer = profile.owner_interview_answers.find_by(section_key: key)
