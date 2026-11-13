@@ -111,7 +111,9 @@ module OwnerIntelligence
         )
         profile.update!(headline: headline, private_summary: private_summary,
                         public_summary: public_summary, onboarding_state: "approved")
-        profile.professional_capability_corrections.delete_all
+        # Rails association.delete_all may NULLIFY foreign keys despite the
+        # NOT NULL constraint. Approved drafts are transient, delete their rows.
+        ProfessionalCapabilityCorrection.where(professional_profile_id: profile.id).delete_all
         snapshot
       end
     end
