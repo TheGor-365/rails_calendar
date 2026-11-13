@@ -29,6 +29,15 @@ Rails.application.routes.draw do
   # Private owner entry, never a public client cabinet.
   get "/workspace", to: "workspace#home", as: :workspace
 
+  # RC052: owner-only professional intelligence, AI review and immutable approval.
+  get "/workspace/setup", to: "owner_setup#show", as: :owner_setup
+  patch "/workspace/setup/sections/:section_key", to: "owner_setup#update", as: :owner_setup_section
+  get "/workspace/setup/review", to: "owner_setup#review", as: :owner_setup_review
+  post "/workspace/setup/suggest", to: "owner_setup#suggest", as: :owner_setup_suggest
+  post "/workspace/setup/approve", to: "owner_setup#approve", as: :owner_setup_approve
+  get "/workspace/practice", to: "owner_setup#practice", as: :owner_practice
+  get "/workspace/ai", to: "owner_setup#ai_activity", as: :owner_ai_activity
+
   # Public commercial showcase; never accepts or stores visitor contact data.
   get "/services", to: "marketing#index", as: :services
   root "pages#home"

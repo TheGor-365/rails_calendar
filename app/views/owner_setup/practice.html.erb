@@ -1,0 +1,60 @@
+<div class="container my-4 my-sm-5" id="owner-practice">
+  <header class="rc-page-hero mb-4">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("owner_setup.practice_eyebrow") %></p>
+      <h1 class="page-title"><%= t("owner_setup.practice_title") %></h1>
+      <p class="rc-muted"><%= @snapshot ? t("owner_setup.profile_version", version: @snapshot.version) : t("owner_setup.not_approved") %></p>
+      <div class="d-flex gap-2 flex-wrap">
+        <%= link_to rc_icon_label("pencil-square", t("owner_setup.update_profile")), owner_setup_path(step: "A"), class: "rc-action rc-action--primary" %>
+        <%= link_to rc_icon_label("stars", t("owner_setup.ai_activity")), owner_ai_activity_path, class: "rc-action rc-action--quiet" %>
+      </div>
+    </div>
+  </header>
+
+  <% if @snapshot %>
+    <section class="surface-panel p-3 p-sm-4 mb-3">
+      <h2 class="h4"><%= @snapshot.payload.fetch("headline") %></h2>
+      <p><%= @snapshot.payload.fetch("private_summary") %></p>
+      <p class="rc-hint"><%= t("owner_setup.snapshot_notice") %></p>
+      <% if @profile.onboarding_state == "draft" %>
+        <p class="rc-notice rc-notice--neutral"><%= t("owner_setup.pending_edits") %></p>
+      <% end %>
+    </section>
+    <div class="row g-3">
+      <section class="col-lg-6">
+        <div class="surface-panel p-3 h-100">
+          <h3 class="h5"><%= t("owner_setup.direct_capabilities") %></h3>
+          <ul><% @capabilities.select { |c| c.delivery_mode == "direct" }.each do |c| %>
+            <li><%= c.domain %> <small class="rc-hint"><%= t("owner_setup.self_reported") %></small></li>
+          <% end %></ul>
+          <h3 class="h5"><%= t("owner_setup.conditional_capabilities") %></h3>
+          <ul><% @capabilities.select { |c| c.delivery_mode == "ai_assisted" }.each do |c| %>
+            <li><%= c.domain %> <small class="rc-hint"><%= t("owner_setup.requires_review") %></small></li>
+          <% end %></ul>
+        </div>
+      </section>
+      <section class="col-lg-6">
+        <div class="surface-panel p-3 h-100">
+          <h3 class="h5"><%= t("owner_setup.hard_no_go") %></h3>
+          <ul><% Array(@policy&.hard_no_go).each do |rule| %>
+            <li><%= t("owner_setup.options.D.#{rule}", default: rule) %></li>
+          <% end %></ul>
+          <h3 class="h5"><%= t("owner_setup.public_preview") %></h3>
+          <p><%= @snapshot.payload.fetch("public_summary_draft") %></p>
+          <p class="rc-hint"><%= t("owner_setup.not_published") %></p>
+        </div>
+      </section>
+    </div>
+    <section class="surface-panel p-3 mt-3">
+      <h3 class="h6"><%= t("owner_setup.version_history") %></h3>
+      <ol class="mb-0"><% @profile.professional_context_snapshots.order(version: :desc).each do |snap| %>
+        <li><%= t("owner_setup.profile_version", version: snap.version) %> · <%= l(snap.approved_at, format: :short) %></li>
+      <% end %></ol>
+    </section>
+  <% else %>
+    <section class="surface-panel p-4">
+      <h2 class="h5"><%= t("owner_setup.not_approved") %></h2>
+      <p><%= t("owner_setup.intro") %></p>
+    </section>
+  <% end %>
+</div>
