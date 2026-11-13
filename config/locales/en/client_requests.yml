@@ -30,3 +30,6 @@ en:
     not_contract: "Not a contract, quote or delivery acceptance"
     milestones_title: "Proposed project phases"
     tentative: "Provisional, not booked"
+    pilot_intro: "Your email is verified. Create and track fictional test requests here; other clients' work remains private."
+    pilot_start_title: "Start your first test request"
+    pilot_active_title: "Manage your test requests"

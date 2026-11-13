@@ -30,3 +30,6 @@ es:
     not_contract: "No es un contrato, presupuesto ni aceptación de entrega"
     milestones_title: "Fases propuestas"
     tentative: "Provisional, sin reserva"
+    pilot_intro: "Tu correo está verificado. Crea y sigue solicitudes ficticias aquí; el trabajo de otros clientes permanece privado."
+    pilot_start_title: "Crea tu primera solicitud de prueba"
+    pilot_active_title: "Gestiona tus solicitudes de prueba"

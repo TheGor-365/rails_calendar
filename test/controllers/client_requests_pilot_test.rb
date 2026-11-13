@@ -55,6 +55,9 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
 
     get client_home_path
     assert_response :success
+    assert_select ".ws-client-home .surface-panel #client-requests-heading", count: 1
+    assert_select ".ws-client-panel h2", text: I18n.t("client_requests.pilot_active_title")
+    assert_select ".ws-client-heading .rc-muted", text: I18n.t("client_requests.pilot_intro")
     assert_select "a[href=?]", client_request_path(@intake)
     get client_request_path(@intake)
     assert_response :success
@@ -139,6 +142,7 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     ENV["RC_LOCAL_CLIENT_REQUESTS_ENABLED"] = "false"
     get client_home_path
     assert_response :success
+    assert_select ".ws-client-panel h2", text: I18n.t("client.panel_title")
     assert_select "a[href=?]", new_client_request_path, count: 0
     assert_no_difference "ProjectIntake.count" do
       post client_requests_path, params: {project_intake: {
@@ -156,6 +160,11 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     %w[en ru hy es].each do |locale|
       post language_path, params: {locale: locale, return_to: new_client_request_path}
       assert_response :see_other
+      get client_home_path
+      assert_response :success
+      assert_select ".ws-client-panel h2", text: I18n.t("client_requests.pilot_start_title", locale: locale)
+      assert_select ".ws-client-heading .rc-muted", text: I18n.t("client_requests.pilot_intro", locale: locale)
+      assert_select ".ws-client-home .surface-panel #client-requests-heading", count: 1
       get new_client_request_path
       assert_response :success
       assert_select "html[lang=?]", locale
