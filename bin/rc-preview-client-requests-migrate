@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+# Explicit one-migration-only helper for the EXISTING, ISOLATED local preview DB.
+# It cannot access production or the historical 3015 PostgreSQL instance.
+require "uri"
+name = "rails_calendar_mvp_preview_20261112"
+version = "20261113123000"
+abort "STOP: dev only" unless ENV["RAILS_ENV"] == "development"
+abort "STOP: DATABASE_URL must be absent" unless ENV["DATABASE_URL"].to_s.empty?
+begin
+  uri = URI.parse(ENV.fetch("RC_LOCAL_DEV_DATABASE_URL"))
+rescue KeyError, URI::InvalidURIError
+  abort "STOP: preview URL missing"
+end
+abort "STOP: wrong DB" unless
+  %w[postgres postgresql].include?(uri.scheme) &&
+  %w[localhost 127.0.0.1 ::1].include?(uri.host) &&
+  uri.port == 5432 &&
+  uri.path == "/#{name}"
+require_relative "../config/environment"
+abort "STOP: wrong Rails environment" unless Rails.env.development?
+conn = ActiveRecord::Base.connection
+abort "STOP: physical DB mismatch" unless conn.select_value("SELECT current_database()") == name
+abort "STOP: missing accounts" unless conn.data_source_exists?("users") &&
+  conn.column_exists?(:users, :email_verified_at) &&
+  conn.data_source_exists?("project_intakes") &&
+  conn.data_source_exists?("schema_migrations")
+abort "STOP: this migration already applied" if conn.column_exists?(:project_intakes, :client_user_id)
+abort "STOP: migration version exists" if conn.select_value(
+  "SELECT 1 FROM schema_migrations WHERE version = '#{version}'"
+)
+path = Rails.root.join("db/migrate/#{version}_add_client_ownership_to_project_intakes.rb")
+abort "STOP: migration file missing" unless path.file?
+require path
+puts "CLIENT_REQUEST_PREVIEW_MIGRATION_BEGIN: #{name}"
+AddClientOwnershipToProjectIntakes.migrate(:up)
+conn.execute("INSERT INTO schema_migrations (version) VALUES ('#{version}')")
+puts "CLIENT_REQUEST_PREVIEW_MIGRATION_OK: #{name}"
