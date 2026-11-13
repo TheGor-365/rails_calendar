@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_13_213000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_14_003000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "ai_spend_entries", force: :cascade do |t|
-    t.bigint "project_intake_id", null: false
+    t.bigint "project_intake_id"
+    t.bigint "professional_profile_id"
     t.string "operation", limit: 40, null: false
     t.string "model", limit: 64, null: false
     t.string "request_digest", limit: 64, null: false
@@ -30,10 +31,98 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_13_213000) do
     t.datetime "updated_at", null: false
     t.check_constraint "reserved_ticks >= 0 AND (charged_ticks IS NULL OR charged_ticks >= 0)", name: "chk_ai_spend_ticks_nonnegative"
     t.check_constraint "status IN ('reserved', 'settled', 'uncertain', 'cancelled')", name: "chk_ai_spend_status"
+    t.check_constraint "(project_intake_id IS NOT NULL) <> (professional_profile_id IS NOT NULL)", name: "chk_ai_spend_exactly_one_subject"
+    t.index ["professional_profile_id"], name: "index_ai_spend_entries_on_professional_profile_id"
     t.index ["project_intake_id", "created_at"], name: "index_ai_spend_entries_on_project_intake_id_and_created_at"
     t.index ["project_intake_id"], name: "index_ai_spend_entries_on_project_intake_id"
     t.index ["request_digest"], name: "index_ai_spend_entries_on_request_digest", unique: true
     t.index ["status", "created_at"], name: "index_ai_spend_entries_on_status_and_created_at"
+  end
+
+  create_table "workspaces", force: :cascade do |t|
+    t.bigint "owner_user_id", null: false
+    t.string "name", limit: 120, default: "My practice", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_user_id"], name: "index_workspaces_on_owner_user_id", unique: true
+  end
+
+  create_table "professional_profiles", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.string "onboarding_state", limit: 20, default: "draft", null: false
+    t.string "headline", limit: 160
+    t.text "private_summary"
+    t.text "public_summary"
+    t.jsonb "ai_suggestion", default: {}, null: false
+    t.string "ai_input_digest", limit: 64
+    t.datetime "ai_suggested_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_professional_profiles_on_workspace_id", unique: true
+  end
+
+  create_table "owner_interview_answers", force: :cascade do |t|
+    t.bigint "professional_profile_id", null: false
+    t.string "section_key", limit: 12, null: false
+    t.jsonb "selected_options", default: [], null: false
+    t.text "notes"
+    t.boolean "unsure", default: false, null: false
+    t.integer "revision", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["professional_profile_id", "section_key"], name: "idx_owner_answer_per_section", unique: true
+    t.index ["professional_profile_id"], name: "index_owner_interview_answers_on_professional_profile_id"
+  end
+
+  create_table "owner_interview_answer_revisions", force: :cascade do |t|
+    t.bigint "owner_interview_answer_id", null: false
+    t.integer "revision", null: false
+    t.jsonb "snapshot", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_interview_answer_id", "revision"], name: "idx_owner_answer_revision_unique", unique: true
+    t.index ["owner_interview_answer_id"], name: "idx_owner_rev_answer"
+  end
+
+  create_table "professional_context_snapshots", force: :cascade do |t|
+    t.bigint "professional_profile_id", null: false
+    t.integer "version", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.string "digest", limit: 64, null: false
+    t.datetime "approved_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["professional_profile_id", "version"], name: "idx_owner_context_version", unique: true
+    t.index ["professional_profile_id"], name: "index_professional_context_snapshots_on_professional_profile_id"
+  end
+
+  create_table "professional_capabilities", force: :cascade do |t|
+    t.bigint "professional_profile_id", null: false
+    t.integer "snapshot_version", null: false
+    t.string "domain", limit: 80, null: false
+    t.string "delivery_mode", limit: 20, null: false
+    t.string "experience_claim", limit: 20, null: false
+    t.string "evidence_status", limit: 24, default: "self_reported", null: false
+    t.string "willingness", limit: 24, null: false
+    t.string "privacy_scope", limit: 24, default: "private", null: false
+    t.text "conditions"
+    t.boolean "review_required", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["professional_profile_id", "snapshot_version", "domain"], name: "idx_owner_capability_snapshot", unique: true
+    t.index ["professional_profile_id"], name: "index_professional_capabilities_on_professional_profile_id"
+  end
+
+  create_table "work_policies", force: :cascade do |t|
+    t.bigint "professional_profile_id", null: false
+    t.integer "snapshot_version", null: false
+    t.jsonb "hard_no_go", default: [], null: false
+    t.jsonb "work_preferences", default: [], null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["professional_profile_id", "snapshot_version"], name: "idx_owner_policy_snapshot", unique: true
+    t.index ["professional_profile_id"], name: "index_work_policies_on_professional_profile_id"
   end
 
   create_table "admin_login_windows", force: :cascade do |t|
@@ -205,6 +294,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_13_213000) do
   end
 
   add_foreign_key "ai_spend_entries", "project_intakes"
+  add_foreign_key "ai_spend_entries", "professional_profiles"
+  add_foreign_key "owner_interview_answers", "professional_profiles"
+  add_foreign_key "owner_interview_answer_revisions", "owner_interview_answers"
+  add_foreign_key "professional_context_snapshots", "professional_profiles"
+  add_foreign_key "professional_capabilities", "professional_profiles"
+  add_foreign_key "professional_profiles", "workspaces"
+  add_foreign_key "work_policies", "professional_profiles"
+  add_foreign_key "workspaces", "users", column: "owner_user_id"
   add_foreign_key "intake_answer_revisions", "intake_answers"
   add_foreign_key "intake_answers", "project_intakes"
   add_foreign_key "intake_messages", "project_intakes"

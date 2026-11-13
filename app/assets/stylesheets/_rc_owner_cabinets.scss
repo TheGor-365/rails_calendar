@@ -1,0 +1,307 @@
+// RC052 UI contract: isolated companion of White Atlas / Workspace Surface.
+// Extend existing tokens and Bootstrap Icons. No global color, layout or component
+// overrides; Calendar, consultations, client intake and public services remain intact.
+.ws-account-page, .ws-owner-page {
+  --account-line: var(--ws-border);
+  --account-ink: var(--ws-ink);
+  --account-teal: var(--ws-teal);
+  --account-wash: var(--ws-teal-wash);
+  --account-muted: var(--ws-muted);
+  max-width: 1220px !important;
+  color: var(--account-ink);
+}
+.ws-account-page *, .ws-owner-page * { box-sizing: border-box; }
+.ws-account-page :is(h1,h2,h3,p), .ws-owner-page :is(h1,h2,h3,p) { overflow-wrap: anywhere; }
+.ws-account-hero, .ws-owner-hero {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 1.3rem; min-width: 0; margin-bottom: 1.3rem; padding: .18rem 0;
+}
+.ws-account-hero-copy, .ws-owner-hero-copy { flex: 1 1 450px; min-width: 0; }
+.ws-account-hero .page-title, .ws-owner-hero .page-title {
+  margin: .2rem 0 .48rem; font-weight: 820; letter-spacing: -.055em;
+  line-height: 1.14;
+}
+.ws-account-hero .eyebrow, .ws-owner-hero .eyebrow { margin: 0 0 .58rem; }
+.ws-account-lead, .ws-owner-hero .rc-muted { max-width: 720px; color: var(--account-muted); font-size: .88rem; line-height: 1.65; margin: 0; }
+.ws-account-meta { margin-top: 1.15rem; display: flex; align-items: center; gap: .48rem; flex-wrap: wrap; }
+.ws-account-chip {
+  display: inline-flex; align-items: center; gap: .45rem;
+  min-height: 33px; padding: .4rem .7rem; max-width: 100%;
+  color: #507078; background: white; border: 1px solid var(--account-line);
+  border-radius: 10px; font-size: .74rem; font-weight: 690;
+  overflow-wrap: anywhere; box-shadow: var(--ws-shadow);
+}
+.ws-account-chip .bi { color: var(--account-teal); }
+.ws-account-hero-symbol {
+  flex: 0 0 86px; height: 86px; display: grid; place-items: center;
+  color: var(--account-teal); border: 1px solid #cde9e1;
+  background: linear-gradient(155deg,#e5f5f0,#f8fcfb);
+  border-radius: 25px; box-shadow: 0 15px 27px -23px rgba(15,79,72,.43);
+}
+.ws-account-hero-symbol .bi { font-size: 2.05rem; }
+.ws-account-overview {
+  display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: .75rem; margin: 1.15rem 0 1.5rem;
+}
+.ws-account-metric {
+  position: relative; min-width: 0; display: flex; flex-direction: column; align-items: flex-start;
+  gap: .25rem; padding: 1rem 1.12rem; border: 1px solid var(--account-line);
+  border-radius: 16px; background: white; box-shadow: var(--ws-shadow);
+  transition: transform .18s var(--ws-easing), box-shadow .18s;
+}
+.ws-account-metric:hover { transform: translateY(-2px); box-shadow: var(--ws-shadow-up); }
+.ws-account-metric-icon {
+  display: grid; place-items: center; width: 34px; height: 34px;
+  border-radius: 10px; background: var(--account-wash); color: var(--account-teal); margin-bottom: .22rem;
+}
+.ws-account-metric-icon .bi { font-size: 1.03rem; }
+.ws-account-metric small { color: #65808a; font-size: .72rem; font-weight: 750; }
+.ws-account-metric strong { font-size: 1.36rem; letter-spacing: -.04em; line-height: 1.3; font-weight: 820; }
+.ws-account-metric strong span { color: #81969d; font-weight: 550; font-size: .9rem; }
+.ws-account-metric > span:last-child { color: #83949d; font-size: .68rem; line-height: 1.4; }
+.ws-account-content {
+  display: grid; grid-template-columns: minmax(0,1fr) 320px; align-items: start; gap: .92rem;
+}
+.ws-account-main, .ws-account-aside { min-width: 0; }
+.ws-account-section-heading { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: end; gap: .5rem; margin: .05rem 0 .75rem; }
+.ws-account-section-heading--later { margin-top: 1.5rem; }
+.ws-account-section-heading .eyebrow { margin: 0 0 .26rem; }
+.ws-account-section-heading h2 { font-size: 1.13rem; font-weight: 790; margin: 0; letter-spacing: -.035em; }
+.ws-account-feature, .ws-account-side-panel, .ws-account-tool {
+  background: white; border: 1px solid var(--account-line); border-radius: 16px; box-shadow: var(--ws-shadow);
+}
+.ws-account-feature { padding: 1.25rem; display: flex; gap: .95rem; }
+.ws-account-feature-icon, .ws-account-side-icon, .ws-account-tool-icon {
+  flex: 0 0 40px; width: 40px; height: 40px; display: grid; place-items: center;
+  border-radius: 12px; background: var(--account-wash); color: var(--account-teal);
+}
+.ws-account-feature-icon .bi, .ws-account-tool-icon .bi, .ws-account-side-icon .bi { font-size: 1.14rem; }
+.ws-account-feature-copy { min-width: 0; flex: 1; }
+.ws-account-feature h3 { font-size: 1.02rem; font-weight: 820; line-height: 1.35; margin: .04rem 0 .45rem; letter-spacing: -.03em; }
+.ws-account-feature p { color: var(--account-muted); font-size: .84rem; line-height: 1.62; margin: 0 0 .75rem; }
+.ws-account-feature-foot { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem .85rem; }
+.ws-account-status {
+  display: inline-flex; align-items: center; gap: .37rem;
+  background: var(--account-wash); border-radius: 9px; padding: .3rem .57rem;
+  font-size: .7rem; font-weight: 740; color: var(--ws-teal-deep);
+}
+.ws-account-muted { color: #80949d; font-size: .69rem; }
+.ws-account-link-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .75rem; }
+.ws-account-tool {
+  position: relative; display: flex; flex-direction: column; align-items: start; gap: .4rem;
+  padding: 1.05rem; min-height: 163px; text-decoration: none;
+  transition: transform .18s var(--ws-easing), box-shadow .18s, border-color .18s;
+}
+.ws-account-tool:hover, .ws-account-tool:focus-visible {
+  border-color: #b8dfd6; box-shadow: var(--ws-shadow-up); transform: translateY(-2px);
+  color: var(--account-ink);
+}
+.ws-account-tool strong { font-size: .86rem; color: var(--account-ink); font-weight: 790; margin-top: .24rem; }
+.ws-account-tool small { font-size: .72rem; color: #748991; line-height: 1.5; padding-right: .8rem; }
+.ws-account-tool-arrow { position: absolute; bottom: .88rem; right: .95rem; color: var(--account-teal); }
+.ws-account-side-panel { padding: 1.25rem; margin-bottom: .8rem; }
+.ws-account-side-icon { margin-bottom: .85rem; }
+.ws-account-side-panel h2 { font-size: 1rem; font-weight: 800; letter-spacing: -.025em; margin: 0 0 .65rem; }
+.ws-account-side-panel p { color: var(--account-muted); font-size: .77rem; line-height: 1.65; margin-bottom: 1rem; }
+.ws-account-side-panel--soft { background: #fbfdfc; }
+.ws-account-fact {
+  display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: .35rem;
+  border-top: 1px solid #edf2f3; padding: .64rem 0; font-size: .72rem;
+}
+.ws-account-fact span { color: #72868f; }
+.ws-account-fact strong { font-weight: 780; text-align: right; }
+.ws-account-side-panel .rc-action { margin-top: .55rem; }
+.ws-account-actions { display: flex; flex-wrap: wrap; gap: .55rem; }
+.ws-account-page .ws-client-panel.ws-account-feature-panel {
+  border: 1px solid var(--account-line); border-radius: 16px; box-shadow: var(--ws-shadow);
+  padding: clamp(1.25rem,2vw,1.6rem); margin: 0; background: #fff;
+}
+.ws-account-page .ws-client-panel.ws-account-feature-panel h2 { font-size: 1.08rem; font-weight: 800; margin: .8rem 0 .5rem; }
+.ws-account-page .ws-client-panel.ws-account-feature-panel p { color: var(--account-muted); font-size: .85rem; line-height: 1.63; }
+.ws-account-page .ws-client-icon { width: 42px; height: 42px; border-radius: 12px; }
+.ws-account-panel { padding: 1.15rem; }
+.ws-account-panel .rc-record-list { border: 0; display: grid; gap: .65rem; }
+.ws-account-panel .rc-record { margin: 0; padding: .95rem; }
+
+// Owner onboarding: compact workflow of steps, interview content, and AI guidance.
+.ws-owner-heading { display: flex; align-items: center; gap: .8rem; min-width: 0; }
+.ws-owner-heading-icon {
+  display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px;
+  border-radius: 13px; color: var(--account-teal);
+  background: var(--account-wash);
+}
+.ws-owner-heading-icon .bi { font-size: 1.2rem; }
+.ws-owner-hero-actions { flex: 0 0 auto; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.ws-owner-progress {
+  background: white; padding: 1rem 1.2rem; border: 1px solid var(--account-line); border-radius: 15px;
+  box-shadow: var(--ws-shadow); margin: .7rem 0 1rem;
+}
+.ws-owner-progress-top { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.ws-owner-progress-top > div { display: grid; gap: .12rem; }
+.ws-owner-overline { display: block; font-size: .65rem; font-weight: 830; letter-spacing: .09em; text-transform: uppercase; color: #82959e; }
+.ws-owner-progress-top strong { font-size: .9rem; font-weight: 800; }
+.ws-owner-progress-value { font-size: .79rem; font-weight: 800; color: var(--account-teal); }
+.ws-owner-progress-track { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 5px; margin-top: .72rem; }
+.ws-owner-progress-segment { height: 7px; border-radius: 10px; background: #ebf0f1; }
+.ws-owner-progress-segment.is-complete { background: var(--account-teal); }
+.ws-owner-interview-layout { display: grid; grid-template-columns: 226px minmax(0,1fr) 230px; align-items: start; gap: .8rem; }
+.ws-owner-step-nav, .ws-owner-question-panel, .ws-owner-guide, .ws-owner-data-panel, .ws-owner-profile-hero, .ws-owner-history {
+  min-width: 0; background: white; border: 1px solid var(--account-line);
+  border-radius: 17px; box-shadow: var(--ws-shadow);
+}
+.ws-owner-step-nav { padding: 1.1rem .75rem; }
+.ws-owner-step-nav > .ws-owner-overline { padding: 0 .53rem .7rem; }
+.ws-owner-step-list { display: grid; gap: .2rem; padding: 0; margin: 0; list-style: none; }
+.ws-owner-step { display: flex; align-items: center; gap: .55rem; min-width: 0; padding: .62rem .58rem; border-radius: 11px; text-decoration: none; color: #546b75; transition: background .16s,color .16s; }
+.ws-owner-step:hover, .ws-owner-step:focus-visible { color: var(--ws-teal-deep); background: #f2faf8; }
+.ws-owner-step.is-active { color: var(--ws-teal-deep); background: var(--account-wash); }
+.ws-owner-step-number {
+  width: 30px; height: 30px; flex: 0 0 30px; display: grid; place-items: center;
+  background: #f0f4f5; color: #7b9096; border-radius: 9px; font-size: .73rem; font-weight: 820;
+}
+.ws-owner-step.is-complete .ws-owner-step-number { color: var(--account-teal); background: #e2f2ed; }
+.ws-owner-step.is-active .ws-owner-step-number { background: var(--account-teal); color: white; }
+.ws-owner-step > span:nth-child(2) { min-width: 0; flex: 1; display: grid; gap: .17rem; }
+.ws-owner-step strong { color: inherit; font-weight: 790; font-size: .77rem; }
+.ws-owner-step small { color: #82959d; font-size: .67rem; }
+.ws-owner-step > .bi { color: #9bacb0; font-size: .73rem; }
+.ws-owner-question-panel { padding: clamp(1.1rem,2vw,1.7rem); }
+.ws-owner-panel-top { display: flex; align-items: center; justify-content: space-between; gap: .55rem; flex-wrap: wrap; margin-bottom: .95rem; }
+.ws-owner-tag {
+  display: inline-flex; gap: .39rem; align-items: center; font-size: .7rem; font-weight: 790;
+  color: var(--ws-teal-deep); background: var(--account-wash); border-radius: 9px; padding: .35rem .58rem; width: fit-content; max-width: 100%;
+}
+.ws-owner-panel-meta { display: inline-flex; align-items: center; gap: .35rem; color: #82959d; font-size: .7rem; }
+.ws-owner-question-panel h2 { font-size: clamp(1.2rem,1.6vw,1.55rem); font-weight: 820; letter-spacing: -.035em; margin: 0 0 .5rem; line-height: 1.3; }
+.ws-owner-section-lead { font-size: .81rem; color: #68808a; line-height: 1.58; margin-bottom: 1.12rem; }
+.ws-owner-form fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
+.ws-owner-form fieldset legend { float: none; width: auto; font-size: .78rem; font-weight: 790; padding: 0 0 .5rem; margin: 0; }
+.ws-owner-choice-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .55rem; }
+.ws-owner-choice {
+  display: flex; align-items: center; gap: .6rem; min-width: 0; min-height: 53px;
+  padding: .72rem .76rem; border: 1px solid #e0eaed; border-radius: 11px;
+  background: #f9fbfb; cursor: pointer; color: var(--account-ink); transition: background .16s, border-color .16s, box-shadow .16s;
+}
+.ws-owner-choice:hover, .ws-owner-choice:focus-within { border-color: #a7dcd0; background: #f1faf7; }
+.ws-owner-choice:has(input:checked) { background: var(--account-wash); border-color: #83cabc; box-shadow: inset 0 0 0 1px #c1e8df; }
+.ws-owner-choice input { flex: 0 0 17px; width: 17px; height: 17px; margin: 0; accent-color: var(--account-teal); }
+.ws-owner-choice > span { flex: 1; min-width: 0; font-size: .78rem; font-weight: 640; line-height: 1.45; }
+.ws-owner-choice > .bi { color: var(--account-teal); font-size: .95rem; visibility: hidden; }
+.ws-owner-choice:has(input:checked) > .bi { visibility: visible; }
+.ws-owner-field { margin: 1.08rem 0; }
+.ws-owner-field .rc-field-label { margin-bottom: .42rem; }
+.ws-owner-form .rc-input { width: 100%; min-height: 47px; border: 1px solid #e0eaed; background: #f9fbfc; border-radius: 11px; padding: .7rem .82rem; font-size: .86rem; }
+.ws-owner-form textarea.rc-input { min-height: 105px; line-height: 1.5; }
+.ws-owner-form .rc-input:focus { background: white; border-color: #7bc3b5; box-shadow: 0 0 0 3px rgba(10,118,109,.13); }
+.ws-owner-checkbox { display: flex; align-items: flex-start; gap: .65rem; color: #546f79; font-size: .78rem; line-height: 1.55; cursor: pointer; }
+.ws-owner-checkbox input { flex: 0 0 17px; margin: .15rem 0 0; width: 17px; height: 17px; accent-color: var(--account-teal); }
+.ws-owner-checkbox label { cursor: pointer; }
+.ws-owner-form-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem; border-top: 1px solid #ebf0f1; padding-top: 1rem; margin-top: 1.1rem; }
+.ws-owner-form-actions .rc-action { min-height: 41px; }
+.ws-owner-guide { padding: 1.1rem; }
+.ws-owner-guide-icon { width: 39px; height: 39px; display: grid; place-items: center; background: var(--account-wash); color: var(--account-teal); border-radius: 11px; margin-bottom: .8rem; }
+.ws-owner-guide-icon .bi { font-size: 1.1rem; }
+.ws-owner-guide h3 { font-size: .92rem; font-weight: 820; margin-bottom: .48rem; }
+.ws-owner-guide p { color: var(--account-muted); font-size: .75rem; line-height: 1.65; }
+.ws-owner-guide-rule { display: flex; align-items: flex-start; gap: .6rem; padding: .78rem .65rem; background: #f3faf8; border-radius: 11px; font-size: .73rem; line-height: 1.55; color: #487269; }
+.ws-owner-guide-rule .bi { color: var(--account-teal); font-size: 1rem; flex: 0 0 auto; }
+.ws-owner-guide-foot { margin: .8rem 0; }
+
+// Compact professional map, version history and manual reviewer.
+.ws-owner-profile-hero { padding: clamp(1.2rem,2.4vw,1.65rem); margin: 0 0 .85rem; }
+.ws-owner-profile-hero h2 { font-size: clamp(1.22rem,2vw,1.67rem); font-weight: 830; letter-spacing: -.04em; line-height: 1.28; max-width: 760px; margin-bottom: .7rem; }
+.ws-owner-profile-excerpt { color: #526e78; line-height: 1.7; font-size: .85rem; max-width: 920px; }
+.ws-owner-details { margin: .55rem 0 1rem; font-size: .82rem; color: #4f6b73; max-width: 930px; }
+.ws-owner-details summary { cursor: pointer; font-weight: 760; color: var(--account-teal); display: inline-flex; align-items: center; gap: .45rem; padding: .35rem 0; }
+.ws-owner-details[open] summary > .bi { transform: rotate(180deg); }
+.ws-owner-details p { margin: .65rem 0 0; white-space: pre-line; line-height: 1.65; }
+.ws-owner-profile-actions { display: flex; gap: .55rem; flex-wrap: wrap; margin: 1rem 0 .75rem; }
+.ws-owner-practice-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .85rem; }
+.ws-owner-data-panel { padding: clamp(1.05rem,2vw,1.45rem); }
+.ws-owner-data-head { display: flex; align-items: center; gap: .75rem; margin-bottom: .85rem; }
+.ws-owner-data-head .eyebrow { display: block; font-size: .61rem; margin: 0 0 .2rem; }
+.ws-owner-data-head h2, .ws-owner-data-head h3 { font-size: 1rem; font-weight: 810; letter-spacing: -.025em; margin: 0; }
+.ws-owner-data-icon { display: grid; place-items: center; width: 37px; height: 37px; flex: 0 0 37px; border-radius: 11px; background: var(--account-wash); color: var(--account-teal); }
+.ws-owner-data-icon--blue { background: #edf4ff; color: #326da6; }
+.ws-owner-data-icon--red { background: #fff0f1; color: #a94e59; }
+.ws-owner-data-note { display: flex; align-items: flex-start; gap: .4rem; margin: .72rem 0 0; font-size: .7rem; color: #81939b; line-height: 1.55; }
+.ws-owner-data-note .bi { flex: 0 0 auto; }
+.ws-owner-skill-list { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+.ws-owner-skill-chip { display: inline-flex; align-items: center; gap: .38rem; padding: .38rem .6rem; border: 1px solid #d8ece5; background: #f3faf7; border-radius: 9px; color: #18685b; font-size: .74rem; font-weight: 700; max-width: 100%; }
+.ws-owner-skill-chip--conditional { background: #f1f6fd; border-color: #d9e8f5; color: #326b9a; }
+.ws-owner-skill-chip .bi { font-size: .8rem; flex: 0 0 auto; }
+.ws-owner-data-divider { height: 1px; background: #ebf0f2; margin: 1.25rem 0; }
+.ws-owner-boundaries { margin: 0; padding: 0; list-style: none; display: grid; gap: .52rem; }
+.ws-owner-boundaries li { display: flex; gap: .54rem; align-items: flex-start; font-size: .79rem; color: #536b74; line-height: 1.5; }
+.ws-owner-boundaries .bi { flex: 0 0 auto; color: #aa6871; font-size: .9rem; margin-top: .03rem; }
+.ws-owner-public-draft { white-space: pre-line; line-height: 1.65; font-size: .82rem; color: #4f6d77; }
+.ws-owner-history { padding: 1.05rem 1.4rem; margin-top: .85rem; }
+.ws-owner-history .ws-owner-data-head { margin-bottom: .75rem; }
+.ws-owner-history-list { list-style: none; padding: 0; margin: 0; }
+.ws-owner-history-list li { display: flex; align-items: center; gap: .65rem; padding: .55rem 0; border-top: 1px solid #edf2f3; font-size: .77rem; }
+.ws-owner-history-dot { flex: 0 0 9px; height: 9px; background: var(--account-teal); border-radius: 50%; }
+.ws-owner-history-list time { margin-left: auto; color: #81949c; font-size: .72rem; }
+
+// Review: narrow answer rail + prominent AI proposal and editable approval.
+.ws-owner-review-layout { display: grid; grid-template-columns: minmax(265px, .85fr) minmax(0,1.15fr); align-items: start; gap: .85rem; }
+.ws-owner-review-answers, .ws-owner-review-main { min-width: 0; }
+.ws-owner-review-item { padding: 1rem 0; border-top: 1px solid #ecf1f3; }
+.ws-owner-review-item:first-of-type { border-top: 0; }
+.ws-owner-review-item > div { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; }
+.ws-owner-review-item strong { font-size: .82rem; font-weight: 790; }
+.ws-owner-review-item p { color: #536f7a; font-size: .79rem; line-height: 1.6; margin: .45rem 0 0; }
+.ws-owner-review-item .rc-hint { font-size: .73rem; color: #85979e; overflow-wrap: anywhere; }
+.ws-owner-inline-link { display: inline-flex; align-items: center; gap: .32rem; text-decoration: none; font-size: .72rem; font-weight: 770; white-space: nowrap; }
+.ws-owner-review-ai > .rc-hint { margin: 0 0 .9rem; }
+.ws-owner-review-ai h3 { margin: 1.1rem 0 .4rem; font-size: .82rem; font-weight: 790; }
+.ws-owner-suggestion-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+.ws-owner-suggestion-list li { display: flex; gap: .4rem; color: #526b75; line-height: 1.5; font-size: .79rem; }
+.ws-owner-suggestion-list .bi { color: var(--account-teal); flex: 0 0 auto; font-size: 1.2rem; }
+.ws-owner-review-approval .ws-owner-form { margin-top: 1.15rem; }
+.ws-owner-review-approval .ws-owner-form .rc-action { margin-top: 1rem; }
+.ws-owner-review-approval .ws-owner-form .rc-input { min-height: 48px; }
+.ws-owner-activity-list { display: grid; gap: .6rem; padding: 0; border: 0; list-style: none; }
+.ws-owner-activity-list .rc-record { margin: 0; border: 1px solid var(--account-line); border-radius: 12px; padding: .85rem; }
+.ws-owner-activity-list strong { font-size: .82rem; }
+.ws-owner-activity-list .rc-hint { margin: .4rem 0 0; }
+.ws-owner-activity .ws-owner-tag { margin-top: .65rem; }
+
+@media (max-width: 1130px) {
+  .ws-owner-interview-layout { grid-template-columns: 216px minmax(0,1fr); }
+  .ws-owner-guide { grid-column: 2; }
+  .ws-account-content { grid-template-columns: minmax(0,1fr) 280px; }
+}
+@media (max-width: 900px) {
+  .ws-account-content, .ws-owner-review-layout, .ws-owner-interview-layout { grid-template-columns: minmax(0,1fr); }
+  .ws-owner-guide { grid-column: auto; }
+  .ws-owner-step-nav { padding: .8rem; }
+  .ws-owner-step-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .35rem; }
+  .ws-owner-step > .bi { display: none; }
+  .ws-account-aside { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem; }
+  .ws-account-side-panel { margin: 0; }
+}
+@media (max-width: 640px) {
+  .ws-account-page, .ws-owner-page { padding-bottom: 4rem; }
+  .ws-account-hero, .ws-owner-hero { align-items: flex-start; }
+  .ws-account-hero-symbol { display: none; }
+  .ws-account-overview { gap: .52rem; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ws-account-metric:last-child { grid-column: 1 / -1; }
+  .ws-account-link-grid, .ws-owner-practice-grid, .ws-owner-choice-list, .ws-account-aside { grid-template-columns: minmax(0,1fr); }
+  .ws-account-metric { padding: .8rem; }
+  .ws-account-metric strong { font-size: 1.15rem; }
+  .ws-owner-heading { align-items: flex-start; }
+  .ws-owner-hero { display: block; }
+  .ws-owner-hero-actions { margin-top: .9rem; }
+  .ws-owner-step-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ws-owner-step { padding: .55rem; }
+  .ws-owner-step-number { flex-basis: 25px; width: 25px; height: 25px; }
+  .ws-owner-progress { padding: .88rem; }
+  .ws-owner-question-panel, .ws-owner-data-panel { padding: 1rem; }
+  .ws-owner-form-actions .rc-action { flex: 1 1 auto; }
+  .ws-account-feature { display: block; }
+  .ws-account-feature-icon { margin-bottom: .6rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ws-account-page :is(.ws-account-metric,.ws-account-tool),
+  .ws-owner-page :is(.ws-owner-step,.ws-owner-choice) { transition: none !important; transform: none !important; }
+}

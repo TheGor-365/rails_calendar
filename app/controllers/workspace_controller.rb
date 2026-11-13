@@ -8,6 +8,7 @@ class WorkspaceController < ApplicationController
     @intake_count = ProjectIntake.count
     @review_count = ProjectIntake.where(status: "draft_spec").count
     @recent_intakes = ProjectIntake.order(created_at: :desc, id: :desc).limit(5)
+    @practice_profile = current_user.owner_workspace&.professional_profile
   end
 
   private

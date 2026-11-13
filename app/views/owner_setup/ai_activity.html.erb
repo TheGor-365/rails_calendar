@@ -1,0 +1,22 @@
+<div class="container ws-owner-page ws-owner-activity my-4 my-sm-5" id="owner-ai-activity">
+  <header class="ws-owner-hero"><div class="ws-owner-hero-copy">
+    <p class="eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_setup.practice_eyebrow") %></p>
+    <h1 class="page-title"><%= t("owner_setup.ai_activity") %></h1>
+    <p class="rc-muted"><%= t("owner_setup.activity_intro") %></p>
+    <p class="ws-owner-tag"><i class="bi bi-currency-dollar" aria-hidden="true"></i><%= t("owner_setup.budget", spent: format("%.5f", @spend[:billed_ticks].to_f / AiSpendLedger::USD_TICKS), cap: format("%.2f", @spend[:cap_ticks].to_f / AiSpendLedger::USD_TICKS)) %></p></div>
+    <div class="ws-owner-hero-actions"><%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %></div>
+  </header>
+  <div class="ws-owner-data-panel">
+    <% if @entries.empty? %><p class="rc-muted"><%= t("owner_setup.no_activity") %></p><% end %>
+    <ol class="rc-record-list ws-owner-activity-list">
+      <% @entries.each do |entry| %>
+        <li class="rc-record">
+          <strong><%= entry.operation %> · <%= entry.status %></strong>
+          <p class="rc-hint mb-0"><%= entry.model %> · <%= l(entry.created_at, format: :short) %> ·
+            <%= entry.charged_ticks ? format("$%.8f", entry.charged_ticks.to_f / AiSpendLedger::USD_TICKS) : t("owner_setup.cost_pending") %></p>
+        </li>
+      <% end %>
+    </ol>
+    <%= link_to t("owner_setup.my_practice"), owner_practice_path, class: "rc-action rc-action--quiet" %>
+  </div>
+</div>

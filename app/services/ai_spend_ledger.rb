@@ -13,16 +13,18 @@ class AiSpendLedger
   TOTAL_CAP_TICKS = 2 * USD_TICKS
   DAILY_CAP_TICKS = USD_TICKS / 2
   PROJECT_CAP_TICKS = USD_TICKS / 2
+  MONTHLY_CAP_TICKS = 2 * USD_TICKS
   PER_CALL_RESERVE_TICKS = USD_TICKS / 10
   ADVISORY_KEY = 20_261_113_051
 
   class << self
-    def reserve!(project_intake:, operation:, model:, request_digest:)
+    def reserve!(project_intake: nil, professional_profile: nil, operation:, model:, request_digest:)
       raise Unavailable, "PostgreSQL required" unless AiSpendEntry.connection.adapter_name == "PostgreSQL"
       raise Unavailable, "Invalid request fingerprint" unless request_digest.match?(/\A[0-9a-f]{64}\z/)
+      raise Unavailable, "Exactly one billable subject required" if project_intake.present? == professional_profile.present?
 
       AiSpendEntry.transaction do
-        AiSpendEntry.connection.select_value("SELECT pg_advisory_xact_lock(#{ADVISORY_KEY})")
+        AiSpendEntry.connection.execute("SELECT pg_advisory_xact_lock(#{ADVISORY_KEY})")
         existing = AiSpendEntry.find_by(request_digest: request_digest)
         if existing
           raise ReplayBlocked, "Previous request has uncertain billing or is in progress" unless existing.status == "settled"
@@ -31,19 +33,25 @@ class AiSpendLedger
 
         now = Time.current
         day_start = now.utc.beginning_of_day
+        month_start = now.utc.beginning_of_month
         total = effective_sum(AiSpendEntry.all)
         today = effective_sum(AiSpendEntry.where("created_at >= ?", day_start))
-        project = effective_sum(AiSpendEntry.where(project_intake_id: project_intake.id))
+        monthly = effective_sum(AiSpendEntry.where("created_at >= ?", month_start))
+        subject_scope = project_intake ? AiSpendEntry.where(project_intake_id: project_intake.id) :
+                                         AiSpendEntry.where(professional_profile_id: professional_profile.id)
+        project = effective_sum(subject_scope)
         reserve = PER_CALL_RESERVE_TICKS
 
         if total + reserve > TOTAL_CAP_TICKS ||
            today + reserve > DAILY_CAP_TICKS ||
+           monthly + reserve > MONTHLY_CAP_TICKS ||
            project + reserve > PROJECT_CAP_TICKS
           raise LimitReached, "Pilot USD budget exhausted"
         end
 
         entry = AiSpendEntry.create!(
-          project_intake: project_intake, operation: operation, model: model,
+          project_intake: project_intake, professional_profile: professional_profile,
+          operation: operation, model: model,
           request_digest: request_digest, status: "reserved", reserved_ticks: reserve
         )
         [entry, true]

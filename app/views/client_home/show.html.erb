@@ -1,35 +1,88 @@
-<div class="container ws-client-home my-4 my-sm-5">
-  <div class="ws-client-heading">
-    <span class="eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("client.eyebrow") %></span>
-    <h1 class="page-title"><%= t("client.title") %></h1>
-    <p class="rc-muted"><%= @pilot_enabled ? t("client_requests.pilot_intro") : t("client.description") %></p>
-  </div>
+<div class="container ws-account-page ws-client-home my-4 my-sm-5" id="client-cabinet">
+  <header class="ws-account-hero ws-client-heading">
+    <div class="ws-account-hero-copy">
+      <p class="eyebrow"><i class="bi bi-person-check" aria-hidden="true"></i> <%= t("account_hub.client_eyebrow") %></p>
+      <h1 class="page-title"><%= request.path == client_home_path ? t("client.title") : t("account_hub.client_title") %></h1>
+      <p class="ws-account-lead rc-muted"><%= @pilot_enabled ? t("client_requests.pilot_intro") : t("client.description") %></p>
+      <div class="ws-account-meta">
+        <span class="ws-account-chip"><i class="bi bi-shield-check" aria-hidden="true"></i><%= t("account_hub.verified") %></span>
+        <span class="ws-account-chip"><i class="bi bi-envelope" aria-hidden="true"></i><%= current_user.email %></span>
+      </div>
+    </div>
+    <div class="ws-account-hero-symbol" aria-hidden="true"><i class="bi bi-person-circle"></i></div>
+  </header>
 
-  <section class="ws-client-panel" aria-labelledby="client-start-title">
-    <div class="ws-client-icon" aria-hidden="true"><i class="bi bi-grid-1x2"></i></div>
-    <h2 id="client-start-title"><%= @pilot_enabled ? t(@client_requests.any? ? "client_requests.pilot_active_title" : "client_requests.pilot_start_title") : t("client.panel_title") %></h2>
-    <p><%= @pilot_enabled ? t("client_requests.home_description") : t("client.panel_body") %></p>
-    <% if @pilot_enabled %>
-      <%= link_to rc_icon_label("clipboard2-plus", t("client_requests.new_action")), new_client_request_path, class: "rc-action rc-action--primary" %>
-    <% end %>
-    <%= link_to rc_icon_label("globe", t("client.overview")), services_path, class: "rc-action rc-action--quiet" %>
+  <section class="ws-account-overview" aria-label="<%= t('account_hub.client_account') %>">
+    <div class="ws-account-metric">
+      <span class="ws-account-metric-icon"><i class="bi bi-person-check" aria-hidden="true"></i></span>
+      <small><%= t("account_hub.client_account") %></small>
+      <strong><%= t("account_hub.verified") %></strong>
+      <span><%= t("account_hub.private_scope") %></span>
+    </div>
+    <div class="ws-account-metric">
+      <span class="ws-account-metric-icon"><i class="bi bi-inboxes" aria-hidden="true"></i></span>
+      <small><%= t("account_hub.client_requests") %></small>
+      <strong><%= @client_requests.size %></strong>
+      <span><%= t("account_hub.client_request_desc") %></span>
+    </div>
+    <div class="ws-account-metric">
+      <span class="ws-account-metric-icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
+      <small><%= t("account_hub.public_visibility") %></small>
+      <strong><%= t("account_hub.not_published") %></strong>
+      <span><%= t("account_hub.client_info") %></span>
+    </div>
   </section>
 
-  <% if @pilot_enabled %>
-    <section class="surface-panel p-3 p-sm-4 mt-4" aria-labelledby="client-requests-heading">
-      <h2 id="client-requests-heading" class="h4"><i class="bi bi-inboxes me-2" aria-hidden="true"></i><%= t("client_requests.list_title") %></h2>
-      <% if @client_requests.any? %>
-        <ul class="rc-record-list">
-          <% @client_requests.each do |item| %>
-            <li class="rc-record">
-              <h3 class="h5"><%= link_to rc_icon_label("arrow-up-right", item.title), client_request_path(item), class: "rc-text-link" %></h3>
-              <p class="rc-muted mb-0"><%= rc_intake_type(item.project_type) %> · <%= rc_intake_status(item.status) %></p>
-            </li>
+  <div class="ws-account-content">
+    <div class="ws-account-main">
+      <section class="ws-client-panel ws-account-feature-panel" aria-labelledby="client-start-title">
+        <div class="ws-client-icon" aria-hidden="true"><i class="bi bi-grid-1x2"></i></div>
+        <h2 id="client-start-title"><%= @pilot_enabled ? t(@client_requests.any? ? "client_requests.pilot_active_title" : "client_requests.pilot_start_title") : t("client.panel_title") %></h2>
+        <p><%= @pilot_enabled ? t("client_requests.home_description") : t("client.panel_body") %></p>
+        <div class="ws-account-actions">
+          <% if @pilot_enabled %>
+            <%= link_to rc_icon_label("clipboard2-plus", t("client_requests.new_action")), new_client_request_path, class: "rc-action rc-action--primary" %>
           <% end %>
-        </ul>
-      <% else %>
-        <p class="rc-muted"><%= t("client_requests.empty") %></p>
+          <%= link_to rc_icon_label("globe", t("client.overview")), services_path, class: "rc-action rc-action--quiet" %>
+        </div>
+      </section>
+
+      <% if @pilot_enabled %>
+        <section class="surface-panel ws-account-panel mt-3" aria-labelledby="client-requests-heading">
+          <div class="ws-account-section-heading">
+            <div>
+              <p class="eyebrow"><%= t("account_hub.client_request_list") %></p>
+              <h2 id="client-requests-heading"><i class="bi bi-inboxes me-2" aria-hidden="true"></i><%= t("client_requests.list_title") %></h2>
+            </div>
+          </div>
+          <% if @client_requests.any? %>
+            <ul class="rc-record-list">
+              <% @client_requests.each do |item| %>
+                <li class="rc-record">
+                  <h3 class="h5"><%= link_to rc_icon_label("arrow-up-right", item.title), client_request_path(item), class: "rc-text-link" %></h3>
+                  <p class="rc-muted mb-0"><%= rc_intake_type(item.project_type) %> · <%= rc_intake_status(item.status) %></p>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="rc-muted"><%= t("client_requests.empty") %></p>
+          <% end %>
+        </section>
       <% end %>
-    </section>
-  <% end %>
+    </div>
+    <aside class="ws-account-aside">
+      <section class="ws-account-side-panel">
+        <span class="ws-account-side-icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
+        <h2><%= t("account_hub.client_info") %></h2>
+        <p><%= t("account_hub.client_privacy") %></p>
+        <div class="ws-account-fact"><span><%= t("account_hub.client_account") %></span><strong><%= t("account_hub.verified") %></strong></div>
+        <div class="ws-account-fact"><span><%= t("account_hub.public_visibility") %></span><strong><%= t("account_hub.not_published") %></strong></div>
+      </section>
+      <section class="ws-account-side-panel ws-account-side-panel--soft">
+        <h2><%= t("account_hub.client_services") %></h2>
+        <p><%= t("client.description") %></p>
+        <%= link_to rc_icon_label("globe", t("client.overview")), services_path, class: "rc-action rc-action--quiet rc-action--small" %>
+      </section>
+    </aside>
+  </div>
 </div>

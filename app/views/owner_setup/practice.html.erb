@@ -1,0 +1,104 @@
+<div class="container ws-owner-page ws-owner-practice my-4 my-sm-5" id="owner-practice">
+  <header class="ws-owner-hero">
+    <div class="ws-owner-hero-copy">
+      <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("owner_setup.practice_eyebrow") %></p>
+      <div class="ws-owner-heading">
+        <span class="ws-owner-heading-icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></span>
+        <div>
+          <h1 class="page-title"><%= t("owner_setup.practice_title") %></h1>
+          <p class="rc-muted mb-0"><%= @snapshot ? t("owner_setup.profile_version", version: @snapshot.version) : t("owner_setup.not_approved") %></p>
+        </div>
+      </div>
+    </div>
+    <div class="ws-owner-hero-actions">
+      <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("pencil-square", t("owner_setup.update_profile")), owner_setup_path(step: "A"), class: "rc-action rc-action--primary" %>
+    </div>
+  </header>
+
+  <% if @snapshot %>
+    <section class="ws-owner-profile-hero">
+      <div class="ws-owner-panel-top">
+        <span class="ws-owner-tag"><i class="bi bi-patch-check" aria-hidden="true"></i><%= t("owner_setup.profile_version", version: @snapshot.version) %></span>
+        <span class="ws-owner-panel-meta"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.private_scope") %></span>
+      </div>
+      <h2><%= @snapshot.payload.fetch("headline") %></h2>
+      <p class="ws-owner-profile-excerpt"><%= truncate(@snapshot.payload.fetch("private_summary"), length: 320) %></p>
+      <% if @snapshot.payload.fetch("private_summary").length > 320 %>
+        <details class="ws-owner-details">
+          <summary><i class="bi bi-chevron-down" aria-hidden="true"></i><%= t("owner_setup.full_context") %></summary>
+          <p><%= @snapshot.payload.fetch("private_summary") %></p>
+        </details>
+      <% end %>
+      <div class="ws-owner-profile-actions">
+        <%= link_to rc_icon_label("chat-square-dots", t("account_hub.interview")), owner_setup_path(step: "A"), class: "rc-action rc-action--quiet" %>
+        <%= link_to rc_icon_label("stars", t("owner_setup.ai_activity")), owner_ai_activity_path, class: "rc-action rc-action--quiet" %>
+      </div>
+      <% if @profile.onboarding_state == "draft" %>
+        <p class="rc-notice rc-notice--neutral mt-3"><%= t("owner_setup.pending_edits") %></p>
+      <% end %>
+      <p class="rc-hint mb-0"><%= t("owner_setup.snapshot_notice") %></p>
+    </section>
+
+    <div class="ws-owner-practice-grid">
+      <section class="ws-owner-data-panel">
+        <div class="ws-owner-data-head">
+          <span class="ws-owner-data-icon"><i class="bi bi-code-slash" aria-hidden="true"></i></span>
+          <div><p class="eyebrow"><%= t("account_hub.profile_eyebrow") %></p><h3><%= t("owner_setup.direct_capabilities") %></h3></div>
+        </div>
+        <div class="ws-owner-skill-list">
+          <% @capabilities.select { |c| c.delivery_mode == "direct" }.each do |c| %>
+            <span class="ws-owner-skill-chip"><i class="bi bi-check-circle" aria-hidden="true"></i><%= owner_capability_title(c.domain, c.delivery_mode) %></span>
+          <% end %>
+        </div>
+        <p class="ws-owner-data-note"><i class="bi bi-info-circle" aria-hidden="true"></i><%= t("owner_setup.self_reported") %></p>
+        <div class="ws-owner-data-divider"></div>
+        <div class="ws-owner-data-head">
+          <span class="ws-owner-data-icon ws-owner-data-icon--blue"><i class="bi bi-stars" aria-hidden="true"></i></span>
+          <div><h3><%= t("owner_setup.conditional_capabilities") %></h3></div>
+        </div>
+        <div class="ws-owner-skill-list">
+          <% @capabilities.select { |c| c.delivery_mode == "ai_assisted" }.each do |c| %>
+            <span class="ws-owner-skill-chip ws-owner-skill-chip--conditional"><i class="bi bi-lightning-charge" aria-hidden="true"></i><%= owner_capability_title(c.domain) %></span>
+          <% end %>
+        </div>
+        <p class="ws-owner-data-note"><i class="bi bi-shield-check" aria-hidden="true"></i><%= t("owner_setup.requires_review") %></p>
+      </section>
+      <section class="ws-owner-data-panel">
+        <div class="ws-owner-data-head">
+          <span class="ws-owner-data-icon ws-owner-data-icon--red"><i class="bi bi-shield-exclamation" aria-hidden="true"></i></span>
+          <div><p class="eyebrow"><%= t("account_hub.private_scope") %></p><h3><%= t("owner_setup.hard_no_go") %></h3></div>
+        </div>
+        <ul class="ws-owner-boundaries">
+          <% Array(@policy&.hard_no_go).each do |rule| %>
+            <li><i class="bi bi-dash-circle" aria-hidden="true"></i><%= t("owner_setup.options.D.#{rule}", default: rule) %></li>
+          <% end %>
+        </ul>
+        <div class="ws-owner-data-divider"></div>
+        <div class="ws-owner-data-head">
+          <span class="ws-owner-data-icon"><i class="bi bi-globe" aria-hidden="true"></i></span>
+          <div><h3><%= t("owner_setup.public_preview") %></h3></div>
+        </div>
+        <p class="ws-owner-public-draft"><%= @snapshot.payload.fetch("public_summary_draft") %></p>
+        <p class="ws-owner-data-note"><i class="bi bi-lock" aria-hidden="true"></i><%= t("owner_setup.not_published") %></p>
+      </section>
+    </div>
+    <section class="ws-owner-history">
+      <div class="ws-owner-data-head">
+        <span class="ws-owner-data-icon"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
+        <div><h3><%= t("owner_setup.version_history") %></h3></div>
+      </div>
+      <ol class="ws-owner-history-list">
+        <% @profile.professional_context_snapshots.order(version: :desc).each do |snap| %>
+          <li><span class="ws-owner-history-dot"></span><strong><%= t("owner_setup.profile_version", version: snap.version) %></strong><time datetime="<%= snap.approved_at.iso8601 %>"><%= l(snap.approved_at, format: :short) %></time></li>
+        <% end %>
+      </ol>
+    </section>
+  <% else %>
+    <section class="ws-owner-data-panel">
+      <h2><%= t("owner_setup.not_approved") %></h2>
+      <p><%= t("owner_setup.intro") %></p>
+      <%= link_to rc_icon_label("arrow-right-circle", t("owner_setup.start_setup")), owner_setup_path, class: "rc-action rc-action--primary" %>
+    </section>
+  <% end %>
+</div>

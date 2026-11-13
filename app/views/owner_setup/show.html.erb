@@ -1,0 +1,104 @@
+<div class="container ws-owner-page my-4 my-sm-5" id="owner-setup">
+  <header class="ws-owner-hero">
+    <div class="ws-owner-hero-copy">
+      <p class="eyebrow"><i class="bi bi-person-workspace" aria-hidden="true"></i> <%= t("owner_setup.eyebrow") %></p>
+      <div class="ws-owner-heading">
+        <span class="ws-owner-heading-icon" aria-hidden="true"><i class="bi bi-chat-square-dots"></i></span>
+        <div>
+          <h1 class="page-title"><%= t("owner_setup.title") %></h1>
+          <p class="rc-muted mb-0"><%= t("owner_setup.intro") %></p>
+        </div>
+      </div>
+    </div>
+    <div class="ws-owner-hero-actions">
+      <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
+    </div>
+  </header>
+
+  <section class="ws-owner-progress" aria-label="<%= t('owner_setup.progress_label') %>">
+    <div class="ws-owner-progress-top">
+      <div>
+        <span class="ws-owner-overline"><%= t("owner_setup.progress_label") %></span>
+        <strong><%= t("owner_setup.progress", done: @answers.size, total: OwnerIntelligence::Catalog::KEYS.size) %></strong>
+      </div>
+      <span class="ws-owner-progress-value"><%= @answers.size %> / 6</span>
+    </div>
+    <div class="ws-owner-progress-track" role="progressbar" aria-label="<%= t('owner_setup.progress_label') %>"
+         aria-valuenow="<%= @answers.size %>" aria-valuemin="0" aria-valuemax="6">
+      <% OwnerIntelligence::Catalog::KEYS.each do |key| %>
+        <span class="ws-owner-progress-segment <%= 'is-complete' if @answers.key?(key) %>"></span>
+      <% end %>
+    </div>
+  </section>
+
+  <div class="ws-owner-interview-layout">
+    <nav class="ws-owner-step-nav" aria-label="<%= t('owner_setup.step_navigation') %>">
+      <p class="ws-owner-overline"><%= t("owner_setup.step_navigation") %></p>
+      <ol class="ws-owner-step-list">
+        <% OwnerIntelligence::Catalog::KEYS.each_with_index do |key, index| %>
+          <li>
+            <%= link_to owner_setup_path(step: key),
+                class: "ws-owner-step #{'is-active' if key == @current_key} #{'is-complete' if @answers.key?(key)}",
+                aria: { current: ("step" if key == @current_key) } do %>
+              <span class="ws-owner-step-number"><%= @answers.key?(key) ? "✓" : (index + 1).to_s %></span>
+              <span><strong><%= t("owner_setup.steps.#{key}.short") %></strong><small><%= @answers.key?(key) ? t("owner_setup.complete") : t("owner_setup.pending") %></small></span>
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            <% end %>
+          </li>
+        <% end %>
+      </ol>
+    </nav>
+
+    <section class="ws-owner-question-panel" aria-labelledby="owner-current-question">
+      <div class="ws-owner-panel-top">
+        <span class="ws-owner-tag"><i class="bi bi-ui-checks-grid" aria-hidden="true"></i><%= t("owner_setup.step_of", step: OwnerIntelligence::Catalog::KEYS.index(@current_key) + 1) %></span>
+        <span class="ws-owner-panel-meta"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.private_scope") %></span>
+      </div>
+      <h2 id="owner-current-question"><%= t("owner_setup.steps.#{@current_key}.title", default: @question.fetch(:title)) %></h2>
+      <p class="ws-owner-section-lead"><%= t("owner_setup.steps.#{@current_key}.hint", default: @question.fetch(:hint)) %></p>
+      <%= form_with url: owner_setup_section_path(section_key: @current_key), method: :patch, class: "ws-owner-form" do %>
+        <fieldset>
+          <legend><%= t("owner_setup.choose_options") %></legend>
+          <%= hidden_field_tag "owner_answer[selected_options][]", "" %>
+          <div class="ws-owner-choice-list">
+            <% @question.fetch(:options).each do |value, label| %>
+              <% id = "owner-#{@current_key}-#{value}" %>
+              <label class="ws-owner-choice" for="<%= id %>">
+                <%= check_box_tag "owner_answer[selected_options][]", value, @answer.selected_options.include?(value), id: id %>
+                <span><%= t("owner_setup.options.#{@current_key}.#{value}", default: label) %></span>
+                <i class="bi bi-check-lg" aria-hidden="true"></i>
+              </label>
+            <% end %>
+          </div>
+        </fieldset>
+        <div class="ws-owner-field">
+          <%= label_tag "owner_notes", t("owner_setup.notes"), class: "rc-field-label" %>
+          <%= text_area_tag "owner_answer[notes]", @answer.notes, id: "owner_notes",
+                rows: 4, maxlength: 800, class: "rc-input rc-input--area",
+                placeholder: t("owner_setup.notes_placeholder") %>
+        </div>
+        <label class="ws-owner-checkbox">
+          <%= check_box_tag "owner_answer[unsure]", "1", @answer.unsure, id: "owner_unsure" %>
+          <span><%= t("owner_setup.not_sure") %></span>
+        </label>
+        <div class="ws-owner-form-actions">
+          <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+            <%= rc_icon_label("arrow-right-circle", t("owner_setup.save_continue")) %>
+          <% end %>
+          <%= link_to rc_icon_label("person-badge", t("owner_setup.my_practice")), owner_practice_path, class: "rc-action rc-action--quiet" %>
+        </div>
+      <% end %>
+    </section>
+
+    <aside class="ws-owner-guide">
+      <div class="ws-owner-guide-icon"><i class="bi bi-stars" aria-hidden="true"></i></div>
+      <h3><%= t("owner_setup.ai_context_heading") %></h3>
+      <p><%= t("owner_setup.ai_context_help") %></p>
+      <div class="ws-owner-guide-rule"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("owner_setup.no_secrets") %></div>
+      <p class="ws-owner-guide-foot"><%= t("owner_setup.manual_first") %></p>
+      <% if @profile.interview_complete? %>
+        <%= link_to rc_icon_label("clipboard2-check", t("owner_setup.review_link")), owner_setup_review_path, class: "rc-action rc-action--quiet rc-action--small" %>
+      <% end %>
+    </aside>
+  </div>
+</div>
