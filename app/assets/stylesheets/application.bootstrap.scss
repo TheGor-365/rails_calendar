@@ -1750,3 +1750,6 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 @import 'rc_ui_consistency';
 
 @import 'rc_locale';
+
+// Scoped owner and client cabinet presentation; preserves White Atlas base.
+@import 'rc_owner_cabinets';
