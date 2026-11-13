@@ -124,6 +124,15 @@ class OwnerSetupController < ApplicationController
     @policy = @snapshot ? @profile.work_policies.find_by(snapshot_version: @snapshot.version) : nil
   end
 
+  def cabinet
+    @snapshot = @profile.approved_snapshot
+    @answered_count = @profile.completed_sections
+    @ai_spend = AiSpendLedger.spend_summary
+    @version_count = @profile.professional_context_snapshots.count
+    @open_intakes = ProjectIntake.where(status: %w[interviewing draft_spec]).count
+    @upcoming_consultations = Consultation.where("start_time >= ?", Time.current).count
+  end
+
   def ai_activity
     @entries = @profile.ai_spend_entries.order(id: :desc).limit(30)
     @spend = AiSpendLedger.spend_summary

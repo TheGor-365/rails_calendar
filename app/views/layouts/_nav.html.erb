@@ -8,6 +8,8 @@
 
     <div class="rc-nav-group" aria-label="<%= t("nav.workspace_sections") %>">
       <% if client_signed_in? %>
+        <%= link_to rc_icon_label("person-circle", t("account_hub.client_cabinet")), client_cabinet_path,
+                      class: "rc-nav-link #{'active' if request.path == client_cabinet_path}" %>
         <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-nav-link #{'active' if controller_path == 'client_home'}" %>
         <% if ClientRequestPilot.enabled?(request: request) %>
           <%= link_to rc_icon_label("clipboard2-plus", t("client_requests.new_action")), new_client_request_path,
@@ -15,7 +17,8 @@
         <% end %>
       <% else %>
       <% if owner_signed_in? %>
-        <%= link_to rc_icon_label("grid-1x2", t("nav.workspace")), workspace_path, class: "rc-nav-link" %>
+        <%= link_to rc_icon_label("grid-1x2", t("nav.workspace")), workspace_path, class: "rc-nav-link #{'active' if request.path == workspace_path}" %>
+        <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-nav-link #{'active' if request.path == owner_cabinet_path || controller_path == 'owner_setup'}" %>
       <% end %>
       <%= link_to root_path,
                   class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",

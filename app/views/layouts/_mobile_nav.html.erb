@@ -7,7 +7,9 @@
 
 <% if client_signed_in? %>
 <nav class="rc-mobile-dock" aria-label="<%= t("nav.client_navigation") %>">
-  <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-mobile-dock-item is-active" %>
+  <%= link_to rc_icon_label("person-circle", t("account_hub.client_cabinet")), client_cabinet_path,
+              class: "rc-mobile-dock-item #{'is-active' if request.path == client_cabinet_path}" %>
+  <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-mobile-dock-item #{'is-active' if request.path == client_home_path}" %>
   <%= link_to rc_icon_label("globe", t("nav.overview")), services_path, class: "rc-mobile-dock-item" %>
   <%= button_to sign_out_path, method: :delete, class: "rc-mobile-dock-item" do %>
     <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span><%= t("nav.sign_out") %></span>
@@ -37,10 +39,10 @@
     <span class="rc-mobile-dock-label"><%= t("nav.new") %></span>
   <% end %>
 
-  <%= link_to consultations_path, class: "rc-mobile-dock-item #{'is-active' if consultations_active}",
+  <%= link_to(owner_signed_in? ? owner_cabinet_path : consultations_path, class: "rc-mobile-dock-item #{'is-active' if consultations_active}",
               aria: { current: ("page" if consultations_active) } do %>
     <i class="bi bi-list-ul rc-mobile-dock-icon" aria-hidden="true"></i>
-    <span class="rc-mobile-dock-label"><%= t("nav.records") %></span>
+    <span class="rc-mobile-dock-label"><%= owner_signed_in? ? t("account_hub.owner_cabinet") : t("nav.records") %></span>
   <% end %>
 
   <% if admin_signed_in? %>

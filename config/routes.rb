@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   post "/register/resend", to: "client_registrations#resend", as: :resend_client_registration
   get "/register/privacy", to: "client_registrations#privacy", as: :client_registration_privacy
   get "/client", to: "client_home#show", as: :client_home
+  get "/client/cabinet", to: "client_home#show", as: :client_cabinet
   # Verified-client, local-only, fictional request handoff pilot.
   get "/client/requests/new", to: "client_requests#new", as: :new_client_request
   post "/client/requests", to: "client_requests#create", as: :client_requests
@@ -36,6 +37,7 @@ Rails.application.routes.draw do
   post "/workspace/setup/suggest", to: "owner_setup#suggest", as: :owner_setup_suggest
   post "/workspace/setup/approve", to: "owner_setup#approve", as: :owner_setup_approve
   get "/workspace/practice", to: "owner_setup#practice", as: :owner_practice
+  get "/workspace/cabinet", to: "owner_setup#cabinet", as: :owner_cabinet
   get "/workspace/ai", to: "owner_setup#ai_activity", as: :owner_ai_activity
 
   # Public commercial showcase; never accepts or stores visitor contact data.
