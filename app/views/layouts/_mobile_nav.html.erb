@@ -39,7 +39,7 @@
     <span class="rc-mobile-dock-label"><%= t("nav.new") %></span>
   <% end %>
 
-  <%= link_to(owner_signed_in? ? owner_cabinet_path : consultations_path, class: "rc-mobile-dock-item #{'is-active' if consultations_active}",
+  <%= link_to(owner_signed_in? ? owner_cabinet_path : consultations_path, class: "rc-mobile-dock-item #{'is-active' if (owner_signed_in? ? request.path == owner_cabinet_path : consultations_active)}",
               aria: { current: ("page" if consultations_active) } do %>
     <i class="bi bi-list-ul rc-mobile-dock-icon" aria-hidden="true"></i>
     <span class="rc-mobile-dock-label"><%= owner_signed_in? ? t("account_hub.owner_cabinet") : t("nav.records") %></span>

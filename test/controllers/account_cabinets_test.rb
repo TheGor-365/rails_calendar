@@ -65,7 +65,8 @@ class AccountCabinetsTest < ActionDispatch::IntegrationTest
     assert_response :success
     get services_path
     assert_response :success
-    assert_select "a[href=?]", owner_cabinet_path, count: 0
+    assert_select "#owner-cabinet", count: 0
+    assert_select "#owner-practice", count: 0
   end
 
   test "cabinets respect selected Russian UI locale without changing global calendar" do
