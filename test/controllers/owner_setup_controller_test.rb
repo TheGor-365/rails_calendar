@@ -79,7 +79,8 @@ class OwnerSetupControllerTest < ActionDispatch::IntegrationTest
     }
     assert_redirected_to owner_setup_path(step: "B")
     get owner_setup_path
-    assert_redirected_to owner_setup_path(step: "B")
+    assert_response :success
+    assert_select "form[action=?]", owner_setup_section_path(section_key: "B")
     profile = @owner.reload.owner_workspace.professional_profile
     answer = profile.owner_interview_answers.find_by!(section_key: "A")
     assert_equal 1, answer.revision
