@@ -10,9 +10,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_13_123000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_13_213000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "ai_spend_entries", force: :cascade do |t|
+    t.bigint "project_intake_id", null: false
+    t.string "operation", limit: 40, null: false
+    t.string "model", limit: 64, null: false
+    t.string "request_digest", limit: 64, null: false
+    t.string "status", limit: 16, default: "reserved", null: false
+    t.bigint "reserved_ticks", null: false
+    t.bigint "charged_ticks"
+    t.jsonb "result", default: {}, null: false
+    t.jsonb "usage", default: {}, null: false
+    t.string "provider_response_id", limit: 128
+    t.datetime "resolved_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.check_constraint "reserved_ticks >= 0 AND (charged_ticks IS NULL OR charged_ticks >= 0)", name: "chk_ai_spend_ticks_nonnegative"
+    t.check_constraint "status IN ('reserved', 'settled', 'uncertain', 'cancelled')", name: "chk_ai_spend_status"
+    t.index ["project_intake_id", "created_at"], name: "index_ai_spend_entries_on_project_intake_id_and_created_at"
+    t.index ["project_intake_id"], name: "index_ai_spend_entries_on_project_intake_id"
+    t.index ["request_digest"], name: "index_ai_spend_entries_on_request_digest", unique: true
+    t.index ["status", "created_at"], name: "index_ai_spend_entries_on_status_and_created_at"
+  end
 
   create_table "admin_login_windows", force: :cascade do |t|
     t.string "client_digest", limit: 64, null: false
@@ -182,6 +204,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_13_123000) do
     t.index "lower((email)::text)", name: "idx_users_email_case_insensitive", unique: true
   end
 
+  add_foreign_key "ai_spend_entries", "project_intakes"
   add_foreign_key "intake_answer_revisions", "intake_answers"
   add_foreign_key "intake_answers", "project_intakes"
   add_foreign_key "intake_messages", "project_intakes"
