@@ -14,7 +14,7 @@ end
 abort "STOP: wrong DB" unless
   %w[postgres postgresql].include?(uri.scheme) &&
   %w[localhost 127.0.0.1 ::1].include?(uri.host) &&
-  uri.port == 5432 &&
+  (uri.port || 5432) == 5432 &&
   uri.path == "/#{name}"
 require_relative "../config/environment"
 abort "STOP: wrong Rails environment" unless Rails.env.development?
