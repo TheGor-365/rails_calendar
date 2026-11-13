@@ -58,7 +58,7 @@ class OwnerCapabilitiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   def change_capability(domain, mode:, experience:, willingness:, conditions:)
-    patch owner_capability_path(domain: domain),
+    patch owner_capability_path(capability_key: domain),
           params: { capability: { delivery_mode: mode, experience_claim: experience,
                                   willingness: willingness, conditions: conditions } }
     assert_response :redirect
@@ -69,7 +69,7 @@ class OwnerCapabilitiesControllerTest < ActionDispatch::IntegrationTest
     get owner_capabilities_path
     assert_response :success
     assert_select "#owner-capabilities h1", text: I18n.t("capability_review.title")
-    assert_select "form[action=?]", owner_capability_path(domain: "react")
+    assert_select "form[action=?]", owner_capability_path(capability_key: "react")
     assert_select "#cap-react"
     assert_select "a[href=?]", owner_cabinet_path
 
@@ -124,14 +124,14 @@ class OwnerCapabilitiesControllerTest < ActionDispatch::IntegrationTest
   test "owner no-go and privacy gates reject direct mode without practiced experience and client edits" do
     get owner_capabilities_path
     assert_redirected_to sign_in_path
-    patch owner_capability_path(domain: "react"), params: { capability: {
+    patch owner_capability_path(capability_key: "react"), params: { capability: {
       delivery_mode: "direct", experience_claim: "new_to_me",
       willingness: "actively_offer", conditions: "unsafe" } }
     assert_redirected_to sign_in_path
     login_as(@client)
     get owner_capabilities_path
     assert_redirected_to sign_in_path
-    patch owner_capability_path(domain: "react"), params: { capability: {
+    patch owner_capability_path(capability_key: "react"), params: { capability: {
       delivery_mode: "excluded", experience_claim: "new_to_me",
       willingness: "not_interested", conditions: "client cannot mutate" } }
     assert_redirected_to sign_in_path
@@ -154,7 +154,7 @@ class OwnerCapabilitiesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, ProfessionalContextSnapshot.count
     assert_equal 1, ProfessionalCapabilityCorrection.count
 
-    delete discard_owner_capability_path(domain: "react")
+    delete discard_owner_capability_path(capability_key: "react")
     assert_redirected_to owner_capabilities_path
     assert_equal 0, ProfessionalCapabilityCorrection.count
     assert_equal "approved", @profile.reload.onboarding_state

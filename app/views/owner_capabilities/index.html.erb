@@ -48,7 +48,7 @@
             </summary>
             <div class="ws-capability-editor">
               <p class="ws-owner-data-note"><i class="bi bi-info-circle" aria-hidden="true"></i><%= t("capability_review.self_assessed") %></p>
-              <%= form_with url: owner_capability_path(domain: cap.domain), method: :patch, class: "ws-owner-form" do %>
+              <%= form_with url: owner_capability_path(capability_key: cap.domain), method: :patch, class: "ws-owner-form" do %>
                 <div class="ws-capability-fields">
                   <div class="ws-owner-field">
                     <%= label_tag "mode_#{cap.domain}", t("capability_review.delivery_mode"), class: "rc-field-label" %>
@@ -75,7 +75,7 @@
                 </div>
               <% end %>
               <% if change %>
-                <%= button_to discard_owner_capability_path(domain: cap.domain), method: :delete,
+                <%= button_to discard_owner_capability_path(capability_key: cap.domain), method: :delete,
                       class: "rc-action rc-action--quiet rc-action--small ws-capability-discard" do %>
                   <%= rc_icon_label("arrow-counterclockwise", t("capability_review.discard")) %>
                 <% end %>

@@ -11,7 +11,7 @@ class OwnerCapabilitiesController < ApplicationController
   end
 
   def update
-    domain = params[:domain].to_s
+    domain = params[:capability_key].to_s
     permitted = params.require(:capability).permit(:delivery_mode, :experience_claim, :willingness, :conditions)
     @profile.with_lock do
       baseline = @profile.professional_capabilities.find_by!(snapshot_version: @snapshot.version, domain: domain)
@@ -40,7 +40,7 @@ class OwnerCapabilitiesController < ApplicationController
 
   def discard
     @profile.with_lock do
-      draft = @profile.professional_capability_corrections.find_by!(domain: params[:domain].to_s)
+      draft = @profile.professional_capability_corrections.find_by!(domain: params[:capability_key].to_s)
       draft.destroy!
       @profile.update!(onboarding_state: "approved") if
         @profile.professional_capability_corrections.none? && interview_unchanged?

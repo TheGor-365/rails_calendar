@@ -23,7 +23,7 @@ class AccountCabinetsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#owner-cabinet h1", text: I18n.t("account_hub.owner_title")
     assert_select ".ws-account-tool[href=?]", owner_setup_path(step: "A")
-    assert_select ".ws-account-tool[href=?]", owner_practice_path
+    assert_select ".ws-account-tool[href=?]", owner_capabilities_path
     assert_select ".ws-account-tool[href=?]", owner_ai_activity_path
     assert_select ".ws-account-tool[href=?]", workspace_path
     assert_select "a[href=?]", owner_cabinet_path
