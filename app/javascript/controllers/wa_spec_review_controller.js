@@ -19,12 +19,21 @@ export default class extends Controller {
     }
   }
 
-  navigate() {
-    // Anchor navigation must always work, including when a prior filter hid
-    // its target. The link's default fragment jump is preserved.
+  navigate(event) {
+    // Turbo Drive may treat same-page fragment links as a visit and replace
+    // the form, losing in-progress edits. Handle the in-page jump without
+    // navigation; plain anchors still work when JavaScript is disabled.
+    const id = event.currentTarget.getAttribute("href")?.slice(1)
+    const destination = this.sectionTargets.find((section) => section.id === id)
+    if (!destination) return
+
+    event.preventDefault()
     this.category = "all"
     this.searchTarget.value = ""
     this.update()
+    destination.scrollIntoView({ block: "start", behavior: "instant" })
+    destination.focus({ preventScroll: true })
+    window.history.replaceState(window.history.state, "", `#${id}`)
   }
 
   clearSearch(event) {
