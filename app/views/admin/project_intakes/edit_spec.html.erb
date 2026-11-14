@@ -63,7 +63,7 @@
         <% end %>
         <% sections.each do |section| %>
           <% key = section.fetch(:key) %>
-          <section id="spec-section-<%= key %>"
+          <section id="spec-section-<%= key %>" tabindex="-1"
                    class="surface-panel wa-spec-editor__section"
                    aria-labelledby="spec-section-title-<%= key %>"
                    data-wa-spec-review-target="section"
