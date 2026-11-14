@@ -20,7 +20,11 @@ class WhiteAtlasSelectMenuTest < ApplicationSystemTestCase
     assert_equal "false", trigger["aria-expanded"]
     assert_equal "upcoming", page.evaluate_script("document.querySelector('select[name=status]').value")
 
+    assert_equal "upcoming", page.evaluate_script(
+      "new FormData(document.querySelector('form.rc-consultation-filters')).get('status')"
+    )
     click_on "Apply filters"
+    assert_current_path(/status=upcoming/, wait: 5)
     assert_equal "upcoming", Rack::Utils.parse_nested_query(URI.parse(page.current_url).query).fetch("status")
   end
 
@@ -70,8 +74,11 @@ class WhiteAtlasSelectMenuTest < ApplicationSystemTestCase
     assert_operator geometry["bottom"], :<=, 844 + 1
     assert_equal "0", geometry["nativeHidden"]
 
-    click_on "Clear"
+    # Outside-click closes the popup; a button physically under an open menu
+    # cannot be clicked until it is dismissed.
+    find("header.app-header").click
     assert_no_selector ".rc-select-menu:not([hidden])"
+    click_on "Clear"
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
