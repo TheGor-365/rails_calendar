@@ -155,6 +155,57 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     refute_equal @client_b.id, intake.client_user_id
   end
 
+
+  test "client desktop and mobile navigation use one canonical cabinet and correct active states" do
+    sign_in_as(@client_a)
+
+    [client_home_path, client_cabinet_path].each do |path|
+      get path
+      assert_response :success
+      assert_select "h1.page-title", text: I18n.t("nav.client_home")
+      assert_select "header.app-header .rc-nav-group a[href=?]", client_home_path, count: 1
+      assert_select "header.app-header .rc-nav-group a[href=?]", client_cabinet_path, count: 0
+      assert_select "nav.rc-mobile-dock a[href=?]", client_home_path, count: 1
+      assert_select "nav.rc-mobile-dock a[href=?]", client_cabinet_path, count: 0
+      assert_select "header.app-header .rc-nav-group a.active[href=?]", client_home_path, count: 1
+      assert_select "nav.rc-mobile-dock a.is-active[href=?]", client_home_path, count: 1
+    end
+
+    intake = create_fictional_request
+    get client_home_path
+    assert_select ".wa-client-home__request .rc-status-pill", count: 2
+    assert_select ".wa-client-home__request a[href=?]", client_request_path(intake), count: 1
+
+    get client_request_path(intake)
+    assert_response :success
+    assert_select "header.app-header .rc-nav-group a.active[href=?]", client_home_path, count: 1
+    assert_select "header.app-header .rc-nav-group a.active[href=?]", new_client_request_path, count: 0
+    assert_select "nav.rc-mobile-dock a.is-active[href=?]", client_home_path, count: 1
+    assert_select "nav.rc-mobile-dock a.is-active[href=?]", new_client_request_path, count: 0
+
+    get new_client_request_path
+    assert_response :success
+    assert_select "header.app-header .rc-nav-group a.active[href=?]", new_client_request_path, count: 1
+    assert_select "nav.rc-mobile-dock a.is-active[href=?]", new_client_request_path, count: 1
+    assert_select "header.app-header .rc-nav-group a.active[href=?]", client_home_path, count: 0
+  end
+
+  test "client empty state is actionable and owner navigation never leaks client links" do
+    sign_in_as(@client_a)
+    get client_home_path
+    assert_response :success
+    assert_select ".wa-client-home__empty", count: 1
+    assert_select ".wa-client-home__empty a[href=?]", new_client_request_path, count: 1
+    delete sign_out_path
+
+    sign_in_as(@owner)
+    get workspace_path
+    assert_response :success
+    assert_select "header.app-header .rc-nav-group a[href=?]", client_home_path, count: 0
+    assert_select "header.app-header .rc-nav-group a[href=?]", new_client_request_path, count: 0
+    assert_select "nav.rc-mobile-dock a[href=?]", client_home_path, count: 0
+  end
+
   test "local flag disabled denies all pilot routes and keeps verified client isolated" do
     sign_in_as(@client_a)
     ENV["RC_LOCAL_CLIENT_REQUESTS_ENABLED"] = "false"
@@ -162,6 +213,8 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".ws-client-panel h2", text: I18n.t("client.panel_title")
     assert_select "a[href=?]", new_client_request_path, count: 0
+    assert_select "header.app-header .rc-nav-group a[href=?]", client_home_path, count: 1
+    assert_select "nav.rc-mobile-dock a[href=?]", client_home_path, count: 1
     assert_no_difference "ProjectIntake.count" do
       post client_requests_path, params: {project_intake: {
         title: "Synthetic", project_type: "website",

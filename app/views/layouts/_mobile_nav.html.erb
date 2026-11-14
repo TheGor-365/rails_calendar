@@ -6,10 +6,17 @@
 <% access_active = controller_path == "admin/sessions" %>
 
 <% if client_signed_in? %>
+<% client_cabinet_active = [client_home_path, client_cabinet_path].include?(request.path) || (controller_path == "client_requests" && %w[show review].include?(action_name)) %>
+<% client_creation_active = controller_path == "client_requests" && %w[new create].include?(action_name) %>
 <nav class="rc-mobile-dock" aria-label="<%= t("nav.client_navigation") %>">
-  <%= link_to rc_icon_label("person-circle", t("account_hub.client_cabinet")), client_cabinet_path,
-              class: "rc-mobile-dock-item #{'is-active' if request.path == client_cabinet_path}" %>
-  <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path, class: "rc-mobile-dock-item #{'is-active' if request.path == client_home_path}" %>
+  <%= link_to rc_icon_label("grid-1x2", t("nav.client_home")), client_home_path,
+              class: "rc-mobile-dock-item #{'is-active' if client_cabinet_active}",
+              aria: { current: ("page" if [client_home_path, client_cabinet_path].include?(request.path)) } %>
+  <% if ClientRequestPilot.enabled?(request: request) %>
+    <%= link_to rc_icon_label("clipboard2-plus", t("nav.new")), new_client_request_path,
+                class: "rc-mobile-dock-item #{'is-active' if client_creation_active}",
+                aria: { label: t("client_requests.new_action"), current: ("page" if client_creation_active) } %>
+  <% end %>
   <%= link_to rc_icon_label("globe", t("nav.overview")), services_path, class: "rc-mobile-dock-item" %>
   <%= button_to sign_out_path, method: :delete, class: "rc-mobile-dock-item" do %>
     <i class="bi bi-box-arrow-right" aria-hidden="true"></i><span><%= t("nav.sign_out") %></span>

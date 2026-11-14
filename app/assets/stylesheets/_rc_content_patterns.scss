@@ -157,3 +157,22 @@
   .wa-spec-section { padding: .85rem; }
   .wa-client-request__review .rc-action { width: 100%; }
 }
+
+/* RC054.2: scoped request-list readability; existing account card geometry stays intact. */
+.wa-client-home__request { min-width: 0; }
+.wa-client-home__request-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .7rem 1rem;
+}
+.wa-client-home__request-head h3 { min-width: 0; flex: 1 1 15rem; overflow-wrap: anywhere; line-height: 1.5; }
+.wa-client-home__request-meta { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; min-width: 0; }
+.wa-client-home__request-meta .rc-status-pill { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.wa-client-home__empty { padding: 1.25rem; background: var(--rc-ground); box-shadow: none; }
+.wa-client-home__empty p { margin: .5rem 0 1rem; }
+@media (max-width: 430px) {
+  .wa-client-home__request-head { display: block; }
+  .wa-client-home__request-meta { margin-top: .65rem; }
+}
