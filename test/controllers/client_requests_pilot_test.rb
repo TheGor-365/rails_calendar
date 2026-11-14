@@ -63,6 +63,8 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: @intake.title
     assert_select "#client-request-spec", text: /Owner-reviewed specification/
+    assert_select ".wa-client-request__pending", count: 1
+    assert_select "form[action=?]", review_client_request_path(@intake), count: 0
 
     # Existing owner-only paths do not acquire client access by sharing an ID.
     get project_intake_path(@intake)
@@ -105,6 +107,8 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", review_client_request_path(@intake)
     assert_select "h2#client-request-spec"
     assert_select "h3", text: "Acceptance criteria"
+    assert_select ".wa-spec-section--acceptance-criteria .wa-spec-list__item", minimum: 1
+    assert_select ".wa-client-request__pending", count: 0
     post review_client_request_path(@intake), params: {version: draft.version + 1}
     assert_response :conflict
     assert_nil draft.reload.client_reviewed_at
@@ -113,6 +117,20 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     assert draft.reload.client_reviewed_at.present?
     assert_equal "client_reviewed", @intake.reload.status
     assert_equal 0, IntakeAiQuota.count
+  end
+
+  test "client detail preserves multiline content and escapes untrusted markup" do
+    sign_in_as(@client_a)
+    intake = create_fictional_request
+    intake.update!(goal: "First line\n<script>alert('demo')</script>\nLast line")
+
+    get client_request_path(intake)
+    assert_response :success
+    assert_select ".wa-client-request__description.wa-prose", text: /First line/
+    assert_select ".wa-client-request__pending", count: 1
+    assert_select "form[action=?]", review_client_request_path(intake), count: 0
+    assert_includes response.body, "&lt;script&gt;"
+    assert_select "script", text: /alert\('demo'\)/, count: 0
   end
 
   test "client request rejects missing consent, overlong content and cross-user assignment" do
