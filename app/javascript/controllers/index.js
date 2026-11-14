@@ -20,3 +20,7 @@ application.register("rc-select", RcSelectController)
 // Native textarea enhancement; opt in only where manually reviewed.
 import WaAutogrowController from "./wa_autogrow_controller"
 application.register("wa-autogrow", WaAutogrowController)
+
+// Local, no-network UX filter for versioned specification review.
+import WaSpecReviewController from "./wa_spec_review_controller"
+application.register("wa-spec-review", WaSpecReviewController)
