@@ -64,7 +64,7 @@ export default class extends Controller {
       const field = section.querySelector("textarea")
       const counter = section.querySelector("[data-wa-spec-review-count]")
       if (!field || !counter) return
-      counter.textContent = String(field.value.split(/\\r?\\n/).filter((line) => line.trim().length > 0).length)
+      counter.textContent = String(field.value.split(/\r?\n/).filter((line) => line.trim().length > 0).length)
     })
   }
 }
