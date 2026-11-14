@@ -1,9 +1,15 @@
-<div class="container my-4 my-sm-5">
+<div class="container wa-owner-intake my-4 my-sm-5">
   <header class="rc-page-hero mb-4">
     <div class="rc-page-hero__content">
     <p class="eyebrow"><%= t("intake.show_eyebrow", id: @intake.id) %></p>
     <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-kanban"></i></span><h1 class="page-title"><%= @intake.title %></h1></div>
-    <p class="rc-muted"><%= t("intake.show_status", status: rc_intake_status(@intake.status), category: rc_intake_type(@intake.project_type)) %></p>
+    <div class="wa-owner-intake__meta" aria-label="<%= t("intake.owner_view.meta_label") %>">
+      <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= rc_intake_type(@intake.project_type) %></span>
+      <span class="rc-status-pill"><i class="bi bi-circle-half" aria-hidden="true"></i><%= rc_intake_status(@intake.status) %></span>
+      <% if @latest_spec.present? %>
+        <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-file-earmark-text" aria-hidden="true"></i><%= t("intake.spec_eyebrow", version: @latest_spec.version) %></span>
+      <% end %>
+    </div>
     <p class="rc-hint"><%= t("intake.show_hint") %></p>
     <% if owner_signed_in? %>
       <% quiz_questions = Intake::QuizCatalog.for(@intake.project_type) %>
@@ -18,17 +24,82 @@
   </header>
   <% current_stage = @milestones.any? ? "plan" : (@latest_spec.present? ? "review" : "interview") %>
   <%= render "shared/workflow", title: t("intake.workflow_show"), current: current_stage, steps: [ ["request", "clipboard2-plus", t("intake.step_request"), t("intake.step_request_desc")], ["interview", "chat-left-text", t("intake.step_interview"), t("intake.step_interview_desc")], ["review", "clipboard2-check", t("intake.step_review"), t("intake.step_review_desc")], ["plan", "calendar-range", t("intake.step_plan"), t("intake.step_plan_desc")] ] %>
-  <section class="surface-panel p-3 p-sm-4 mb-4" aria-label="<%= t("intake.interview_aria") %>">
-    <h2 class="h4"><i class="bi bi-chat-left-text me-2" aria-hidden="true"></i><%= t("intake.interview_title") %></h2>
-    <p class="rc-muted"><%= @intake.goal %></p>
-    <ol class="rc-record-list" id="intake-conversation">
-      <% @messages.each do |message| %>
-        <li class="rc-record">
-          <strong><%= message.role == "client" ? t("intake.role_client") : t("intake.role_assistant") %></strong>
-          <p class="mb-0"><%= message.body %></p>
-        </li>
-      <% end %>
-    </ol>
+  <nav class="wa-owner-intake__jump" aria-label="<%= t("intake.owner_view.jump_label") %>">
+    <a href="#intake-brief"><i class="bi bi-card-text" aria-hidden="true"></i><%= t("intake.owner_view.brief") %></a>
+    <a href="#intake-interview"><i class="bi bi-chat-left-text" aria-hidden="true"></i><%= t("intake.interview_title") %></a>
+    <% if admin_signed_in? %>
+      <a href="#intake-review"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("intake.admin_title") %></a>
+    <% end %>
+    <% if @latest_spec && (admin_signed_in? || @latest_spec.approved?) %>
+      <a href="#intake-spec"><i class="bi bi-file-earmark-text" aria-hidden="true"></i><%= t("intake.spec_title") %></a>
+    <% end %>
+    <% if @milestones.any? && (admin_signed_in? || @latest_spec&.approved?) %>
+      <a href="#private-project-calendar"><i class="bi bi-calendar-range" aria-hidden="true"></i><%= t("intake.calendar_title") %></a>
+    <% end %>
+  </nav>
+  <section class="surface-panel wa-owner-intake__panel mb-4" id="intake-brief"
+           aria-labelledby="intake-brief-heading">
+    <div class="wa-owner-intake__section-heading">
+      <span class="wa-owner-intake__icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
+      <div><h2 id="intake-brief-heading"><%= t("intake.owner_view.brief") %></h2>
+      <p class="rc-hint mb-0"><%= t("intake.owner_view.brief_help") %></p></div>
+    </div>
+    <div class="wa-owner-intake__brief">
+      <p class="wa-owner-intake__prose"><%= @intake.goal %></p>
+    </div>
+    <% if admin_signed_in? %>
+      <% next_hint = if @milestones.any?
+           t("intake.owner_view.next_milestones")
+         elsif @latest_spec&.approved?
+           t("intake.owner_view.next_published")
+         elsif @latest_spec.present?
+           t("intake.owner_view.next_draft")
+         else
+           t("intake.owner_view.next_interview")
+         end %>
+      <div class="wa-owner-intake__next">
+        <i class="bi bi-signpost-split" aria-hidden="true"></i>
+        <div><strong><%= t("intake.owner_view.next_heading") %></strong>
+          <p class="mb-0"><%= next_hint %></p>
+        </div>
+      </div>
+    <% end %>
+  </section>
+  <section class="surface-panel wa-owner-intake__panel mb-4" id="intake-interview"
+           aria-label="<%= t("intake.interview_aria") %>">
+    <div class="wa-owner-intake__section-heading">
+      <span class="wa-owner-intake__icon" aria-hidden="true"><i class="bi bi-chat-left-text"></i></span>
+      <div><h2><%= t("intake.interview_title") %></h2>
+        <p class="rc-hint mb-0"><%= t("intake.owner_view.messages_help") %></p>
+      </div>
+    </div>
+    <div class="wa-owner-intake__thread" data-controller="wa-intake-thread">
+      <div class="wa-owner-intake__filters" role="group" aria-label="<%= t("intake.owner_view.filter_label") %>">
+        <% [["all", t("intake.owner_view.filter_all")], ["client", t("intake.role_client")], ["assistant", t("intake.role_assistant")]].each do |role, label| %>
+          <button type="button" class="wa-owner-intake__filter"
+                  data-wa-intake-thread-target="filter"
+                  data-wa-intake-thread-role-param="<%= role %>"
+                  data-action="click->wa-intake-thread#filter"
+                  aria-pressed="<%= role == "all" %>"><%= label %></button>
+        <% end %>
+      </div>
+      <ol class="rc-record-list wa-owner-intake__messages" id="intake-conversation">
+        <% @messages.each do |message| %>
+          <li class="rc-record wa-owner-intake__message wa-owner-intake__message--<%= message.role %>"
+              data-wa-intake-thread-target="item" data-wa-intake-thread-role="<%= message.role %>">
+            <div class="wa-owner-intake__message-top">
+              <strong><i class="bi bi-<%= message.role == "client" ? "person-circle" : "chat-left-dots" %>" aria-hidden="true"></i>
+                <%= message.role == "client" ? t("intake.role_client") : t("intake.role_assistant") %></strong>
+              <time datetime="<%= message.created_at.iso8601 %>"><%= l(message.created_at, format: :short) %></time>
+            </div>
+            <p class="wa-owner-intake__prose mb-0"><%= message.body %></p>
+          </li>
+        <% end %>
+      </ol>
+      <p class="wa-owner-intake__filter-empty rc-hint" data-wa-intake-thread-target="empty" hidden role="status">
+        <%= t("intake.owner_view.no_messages") %>
+      </p>
+    </div>
     <% if @message_errors.present? %>
       <div class="rc-notice rc-notice--error" role="alert"><%= @message_errors.to_sentence %></div>
     <% end %>
@@ -46,9 +117,12 @@
   </section>
 
   <% if admin_signed_in? %>
-    <section class="surface-panel p-3 p-sm-4 mb-4" aria-label="<%= t("intake.admin_aria") %>">
-      <h2 class="h4"><i class="bi bi-shield-lock me-2" aria-hidden="true"></i><%= t("intake.admin_title") %></h2>
-      <p><%= t("intake.admin_hint") %></p>
+    <section class="surface-panel wa-owner-intake__panel mb-4" id="intake-review"
+             aria-label="<%= t("intake.admin_aria") %>">
+      <div class="wa-owner-intake__section-heading">
+        <span class="wa-owner-intake__icon" aria-hidden="true"><i class="bi bi-shield-lock"></i></span>
+        <div><h2><%= t("intake.admin_title") %></h2><p class="rc-hint mb-0"><%= t("intake.admin_hint") %></p></div>
+      </div>
       <% if @intake.client_message_count.positive? %>
         <%= button_to rc_icon_label("stars", t("intake.generate_spec")),
             draft_spec_admin_project_intake_path(@intake), method: :post,
@@ -66,18 +140,31 @@
   <% end %>
 
   <% if @latest_spec && (admin_signed_in? || @latest_spec.approved?) %>
-    <section class="surface-panel p-3 p-sm-4" aria-label="<%= t("intake.spec_aria") %>">
+    <section class="surface-panel wa-owner-intake__panel mb-4" id="intake-spec" aria-label="<%= t("intake.spec_aria") %>">
       <p class="eyebrow"><%= t("intake.spec_eyebrow", version: @latest_spec.version) %></p>
-      <h2 class="h4"><i class="bi bi-file-earmark-text me-2" aria-hidden="true"></i><%= t("intake.spec_title") %></h2>
-      <p class="rc-hint"><%= t("intake.generated_source", source: { "grok" => "Grok", "human" => t("intake.source_human") }.fetch(@latest_spec.source, t("intake.source_template"))) %>
-        <%= @latest_spec.approved? ? t("intake.spec_approved") : t("intake.spec_private") %></p>
-      <p><%= @latest_spec.document["summary"] %></p>
-      <% { "goals" => t("intake.section_goals"), "deliverables" => t("intake.section_deliverables"),
-           "acceptance_criteria" => t("intake.section_acceptance_criteria"),
-           "unknowns" => t("intake.section_unknowns"), "exclusions" => t("intake.section_exclusions") }.each do |key, title| %>
-        <h3 class="h5 mt-4"><%= title %></h3>
-        <ul><% Array(@latest_spec.document[key]).each do |line| %><li><%= line %></li><% end %></ul>
-      <% end %>
+      <div class="wa-owner-intake__section-heading">
+        <span class="wa-owner-intake__icon" aria-hidden="true"><i class="bi bi-file-earmark-text"></i></span>
+        <div><h2><%= t("intake.spec_title") %></h2>
+          <p class="rc-hint mb-0"><%= t("intake.generated_source", source: { "grok" => "Grok", "human" => t("intake.source_human") }.fetch(@latest_spec.source, t("intake.source_template"))) %></p>
+        </div>
+      </div>
+      <p class="wa-owner-intake__spec-state"><i class="bi bi-<%= @latest_spec.approved? ? "check2-circle" : "lock" %>" aria-hidden="true"></i>
+        <%= @latest_spec.approved? ? t("intake.spec_approved") : t("intake.spec_private") %>
+        <span class="rc-status-pill rc-status-pill--muted"><%= t("intake.spec_eyebrow", version: @latest_spec.version) %></span>
+      </p>
+      <p class="wa-owner-intake__prose wa-owner-intake__summary"><%= @latest_spec.document["summary"] %></p>
+      <div class="wa-owner-intake__spec-grid">
+        <% [
+          ["goals", "bullseye", "goals", t("intake.section_goals")],
+          ["deliverables", "box-seam", "deliverables", t("intake.section_deliverables")],
+          ["acceptance_criteria", "check2-square", "acceptance-criteria", t("intake.section_acceptance_criteria")],
+          ["unknowns", "question-circle", "unknowns", t("intake.section_unknowns")],
+          ["exclusions", "slash-circle", "exclusions", t("intake.section_exclusions")]
+        ].each do |key, icon, kind, title| %>
+          <%= render "shared/white_atlas/spec_section", id: "owner-spec-#{kind}", kind: kind,
+                icon: icon, title: title, items: @latest_spec.document[key] %>
+        <% end %>
+      </div>
       <h3 class="h5 mt-4"><%= t("intake.milestone_title") %></h3>
       <ol>
         <% Array(@latest_spec.document["milestones"]).each do |phase| %>
@@ -110,7 +197,7 @@
   <% end %>
 
   <% if @milestones.any? && (admin_signed_in? || @latest_spec&.approved?) %>
-    <section class="surface-panel p-3 p-sm-4 mt-4" aria-label="<%= t("intake.calendar_aria") %>" id="private-project-calendar">
+    <section class="surface-panel wa-owner-intake__panel mt-4" aria-label="<%= t("intake.calendar_aria") %>" id="private-project-calendar">
       <p class="eyebrow"><%= t("intake.calendar_eyebrow") %></p>
       <h2 class="h4"><i class="bi bi-calendar-range me-2" aria-hidden="true"></i><%= t("intake.calendar_title") %></h2>
       <p class="rc-hint"><%= t("intake.calendar_hint") %></p>

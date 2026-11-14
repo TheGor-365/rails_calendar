@@ -98,6 +98,9 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", project_intake_path(@intake), count: 1
     get project_intake_path(@intake)
     assert_response :success
+    assert_select "#intake-brief .wa-owner-intake__prose", text: /fictional bakery/i
+    assert_select "#intake-conversation li[data-wa-intake-thread-role='client']", count: 1
+    assert_select "#intake-conversation li[data-wa-intake-thread-role='assistant']", count: 1
     post draft_spec_admin_project_intake_path(@intake)
     assert_response :redirect
     draft = @intake.reload.latest_spec

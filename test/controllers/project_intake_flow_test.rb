@@ -54,6 +54,11 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
     get project_intake_url(intake)
     assert_response :success
     assert_select "#intake-conversation li", count: 1
+    assert_select "#intake-brief .wa-owner-intake__prose", count: 1
+    assert_select "#intake-interview .wa-owner-intake__filters button[type=button]", count: 3
+    assert_select "#intake-conversation li[data-wa-intake-thread-role='assistant']", count: 1
+    assert_select "nav.wa-owner-intake__jump a[href='#intake-interview']", count: 1
+    assert_select "#intake-review", count: 1
     assert_select "textarea[name='answer'][data-controller='wa-autogrow']", count: 1
 
     post reply_project_intake_url(intake),
@@ -74,6 +79,9 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
     get project_intake_url(intake)
     assert_response :success
     assert_select "section[aria-label='Technical specification'] h2", text: "Draft technical specification"
+    assert_select "#intake-spec .wa-owner-intake__spec-grid .wa-spec-section", minimum: 1
+    assert_select "#intake-spec .wa-owner-intake__spec-state", text: /Internal draft/
+    assert_select "#intake-spec a[href]", count: 0
     assert_select "ol li", minimum: 1
 
     post approve_spec_admin_project_intake_url(intake)

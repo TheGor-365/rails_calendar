@@ -291,3 +291,49 @@ textarea[data-controller~="wa-autogrow"] { resize: vertical; min-height: 6rem; m
   .wa-spec-editor__section-icon { width: 31px; height: 31px; flex-basis: 31px; }
   .wa-spec-editor__footer .rc-action { width: 100%; }
 }
+
+// RC054.4a — White Atlas owner intake summary, thread and versioned spec.
+.wa-owner-intake { max-width: 1280px; min-width: 0; }
+.wa-owner-intake__meta { display: flex; gap: .45rem; align-items: center; flex-wrap: wrap; margin: .65rem 0; }
+.wa-owner-intake__jump { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: -.1rem 0 1.1rem; }
+.wa-owner-intake__jump a {
+  display: inline-flex; align-items: center; gap: .45rem; padding: .52rem .72rem;
+  border: 1px solid var(--rc-line); background: var(--rc-paper); border-radius: .55rem;
+  color: var(--rc-ink); font-size: .8rem; font-weight: 680; text-decoration: none;
+}
+.wa-owner-intake__jump a:hover, .wa-owner-intake__jump a:focus-visible { background: var(--rc-accent-wash); color: var(--rc-accent-dark); }
+.wa-owner-intake__jump i { color: var(--rc-accent); }
+.wa-owner-intake__panel { min-width: 0; padding: clamp(1rem, 2.4vw, 1.55rem); scroll-margin-top: 1rem; }
+.wa-owner-intake__section-heading { display: flex; gap: .7rem; align-items: flex-start; margin-bottom: 1rem; }
+.wa-owner-intake__section-heading > div { min-width: 0; flex: 1; }
+.wa-owner-intake__section-heading h2 { font-size: 1.15rem; font-weight: 790; margin: .15rem 0 .2rem; letter-spacing: -.03em; }
+.wa-owner-intake__icon { display: grid; place-items: center; background: var(--rc-accent-wash); color: var(--rc-accent-dark); border-radius: .7rem; width: 38px; height: 38px; flex: 0 0 38px; }
+.wa-owner-intake__brief { padding: .85rem 1rem; background: var(--rc-ground); border: 1px solid var(--rc-line); border-radius: .6rem; }
+.wa-owner-intake__prose { max-width: 90ch; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; margin-bottom: 0; }
+.wa-owner-intake__next { display: flex; gap: .6rem; margin-top: .85rem; padding: .75rem .85rem; border-radius: .6rem; border-left: 3px solid var(--rc-accent); background: var(--rc-accent-wash); font-size: .84rem; }
+.wa-owner-intake__next > i { color: var(--rc-accent); }
+.wa-owner-intake__next p { color: var(--rc-muted); margin-top: .2rem; }
+.wa-owner-intake__filters { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .85rem; }
+.wa-owner-intake__filter { padding: .38rem .65rem; border-radius: 99px; border: 1px solid var(--rc-line); background: white; color: var(--rc-muted); font-size: .76rem; font-weight: 750; cursor: pointer; }
+.wa-owner-intake__filter[aria-pressed="true"] { color: var(--rc-accent-dark); border-color: #add3c7; background: var(--rc-accent-wash); }
+.wa-owner-intake__messages { display: grid; gap: .55rem; border: 0; }
+.wa-owner-intake__message { min-width: 0; padding: .8rem 1rem; background: #fafbf9; border: 1px solid var(--rc-line); border-left: 3px solid #91a4a0; border-radius: .65rem; }
+.wa-owner-intake__message--client { border-left-color: var(--rc-accent); background: #f5faf7; }
+.wa-owner-intake__message--assistant { border-left-color: #7388b2; background: #f7f9fc; }
+.wa-owner-intake__message[hidden], .wa-owner-intake__filter-empty[hidden] { display: none !important; }
+.wa-owner-intake__message-top { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .3rem .8rem; margin-bottom: .5rem; }
+.wa-owner-intake__message-top strong { display: inline-flex; gap: .4rem; align-items: center; font-size: .82rem; }
+.wa-owner-intake__message-top time { font-size: .72rem; color: var(--rc-muted); font-variant-numeric: tabular-nums; }
+.wa-owner-intake__filter-empty { padding: 1rem; }
+.wa-owner-intake__spec-state { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; color: var(--rc-muted); font-size: .84rem; }
+.wa-owner-intake__summary { padding: .8rem 1rem; border: 1px solid var(--rc-line); background: var(--rc-ground); border-radius: .6rem; margin: .6rem 0 1rem; }
+.wa-owner-intake__spec-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.wa-owner-intake__spec-grid .wa-spec-section { background: #fbfcfb; }
+@media (max-width: 750px) {
+  .wa-owner-intake__spec-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 430px) {
+  .wa-owner-intake__panel { padding: .95rem; }
+  .wa-owner-intake__message { padding: .75rem; }
+  .wa-owner-intake__jump a { font-size: .75rem; }
+}

@@ -116,6 +116,21 @@ en:
       unknowns: "Unknowns"
       exclusions: "Exclusions"
 
+  owner_view:
+    meta_label: "Request type and workflow state"
+    jump_label: "Request sections"
+    brief: "Request brief"
+    brief_help: "Original submitted task, kept separate from interview messages."
+    next_heading: "Current review position"
+    next_interview: "Clarification or owner review is needed; no scope is approved yet."
+    next_draft: "A specification draft exists. Check facts, unknowns, and acceptance criteria before owner approval."
+    next_published: "Owner-approved specification exists. Client viewing does not confirm a contract or payment."
+    next_milestones: "Tentative milestones exist; dates and availability are not commitments."
+    messages_help: "Only recorded messages are shown. Assistant text may be a local template or AI suggestion; it is not a verified fact."
+    filter_label: "Message role filter"
+    filter_all: "All messages"
+    no_messages: "No messages for this filter."
+
   spec_editor:
     heading: "Specification workbench"
     nav: "Sections"
