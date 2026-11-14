@@ -16,3 +16,7 @@ application.register("quiz-live", QuizLiveController)
 // One White Atlas select-only combobox for all Rails forms; progressive enhancement.
 import RcSelectController from "./rc_select_controller"
 application.register("rc-select", RcSelectController)
+
+// Native textarea enhancement; opt in only where manually reviewed.
+import WaAutogrowController from "./wa_autogrow_controller"
+application.register("wa-autogrow", WaAutogrowController)
