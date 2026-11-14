@@ -90,7 +90,7 @@
             <div class="wa-owner-intake__message-top">
               <strong><i class="bi bi-<%= message.role == "client" ? "person-circle" : "chat-left-dots" %>" aria-hidden="true"></i>
                 <%= message.role == "client" ? t("intake.role_client") : t("intake.role_assistant") %></strong>
-              <time datetime="<%= message.created_at.iso8601 %>"><%= l(message.created_at, format: :short) %></time>
+              <time datetime="<%= message.created_at.iso8601 %>"><%= message.created_at.utc.strftime("%Y-%m-%d %H:%M UTC") %></time>
             </div>
             <p class="wa-owner-intake__prose mb-0"><%= message.body %></p>
           </li>
