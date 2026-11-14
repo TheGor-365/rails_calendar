@@ -12,3 +12,7 @@ import UiFeedbackController from "./ui_feedback_controller"
 application.register("ui-feedback", UiFeedbackController)
 import QuizLiveController from "./quiz_live_controller"
 application.register("quiz-live", QuizLiveController)
+
+// One White Atlas select-only combobox for all Rails forms; progressive enhancement.
+import RcSelectController from "./rc_select_controller"
+application.register("rc-select", RcSelectController)

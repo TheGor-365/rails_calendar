@@ -13,7 +13,7 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   </head>
-  <body class="app-shell rc-account-shell" data-controller="ui-feedback"
+  <body class="app-shell rc-account-shell" data-controller="ui-feedback rc-select"
         data-action="turbo:submit-start->ui-feedback#start turbo:submit-end->ui-feedback#finish turbo:load@document->ui-feedback#reset">
     <a class="skip-link" href="#main-content"><%= t("nav.skip") %></a>
     <header class="app-header rc-account-header">
