@@ -31,7 +31,7 @@ export default class extends Controller {
     this.category = "all"
     this.searchTarget.value = ""
     this.update()
-    destination.scrollIntoView({ block: "start", behavior: "instant" })
+    destination.scrollIntoView({ block: "start", behavior: "auto" })
     destination.focus({ preventScroll: true })
     window.history.replaceState(window.history.state, "", `#${id}`)
   }
