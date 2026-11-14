@@ -176,3 +176,33 @@
   .wa-client-home__request-head { display: block; }
   .wa-client-home__request-meta { margin-top: .65rem; }
 }
+
+// RC054.3a: isolated client request form and opt-in, viewport-capped textareas.
+.wa-client-form { max-width: 940px; min-width: 0; }
+.wa-client-form__form { display: grid; gap: 1rem; }
+.wa-client-form__section { min-width: 0; padding: clamp(1rem, 2vw, 1.5rem); }
+.wa-client-form__section-head { display: flex; align-items: start; gap: .8rem; margin-bottom: 1.15rem; }
+.wa-client-form__section-head > div { min-width: 0; }
+.wa-client-form__section-head h2 { margin: 0 0 .25rem; font-size: 1.08rem; font-weight: 800; letter-spacing: -.02em; }
+.wa-client-form__section-head .rc-hint { margin: 0; }
+.wa-client-form__icon { display: grid; place-items: center; width: 39px; height: 39px; flex: 0 0 39px; background: var(--rc-accent-wash); color: var(--rc-accent-dark); border-radius: 12px; font-size: 1rem; }
+.wa-client-form__brief-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 1rem; }
+.wa-client-form__brief-grid .rc-field { min-width: 0; margin-bottom: 0; }
+.wa-client-form__section .rc-input { max-width: 100%; }
+textarea[data-controller~="wa-autogrow"] { resize: vertical; min-height: 6rem; max-height: min(48vh, 420px); }
+.wa-client-form__field-foot { display: flex; flex-wrap: wrap; gap: .4rem .8rem; align-items: baseline; justify-content: space-between; margin-top: .5rem; }
+.wa-client-form__field-foot .rc-hint { min-width: 0; flex: 1 1 15rem; }
+.wa-client-form__count { white-space: nowrap; font-size: .75rem; font-weight: 750; color: var(--rc-muted); font-variant-numeric: tabular-nums; }
+.wa-client-form__consent { display: flex; gap: .7rem; align-items: start; }
+.wa-client-form__consent input { flex: 0 0 auto; width: 17px; height: 17px; margin-top: .18rem; accent-color: var(--rc-accent); }
+.wa-client-form__consent label { flex: 1; font-size: .88rem; line-height: 1.55; cursor: pointer; }
+.wa-client-form__safety { border-top: 1px solid var(--rc-line); padding-top: .8rem; margin: 1rem 0 0; }
+.wa-client-form__actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+@media (max-width: 620px) {
+  .wa-client-form__brief-grid { grid-template-columns: minmax(0, 1fr); }
+  .wa-client-form__section-head { gap: .6rem; }
+}
+@media (max-width: 390px) {
+  .wa-client-form__actions .rc-action { width: 100%; }
+  .wa-client-form__section { padding: 1rem; }
+}

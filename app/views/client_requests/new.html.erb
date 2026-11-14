@@ -1,40 +1,89 @@
-<div class="container my-4 my-sm-5">
+<div class="container wa-client-form my-4 my-sm-5">
   <header class="rc-page-hero mb-4">
     <div class="rc-page-hero__content">
       <p class="eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("client_requests.eyebrow") %></p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-plus"></i></span><h1 class="page-title"><%= t("client_requests.new_title") %></h1></div>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-plus"></i></span>
+        <h1 class="page-title"><%= t("client_requests.new_title") %></h1>
+      </div>
       <p class="rc-muted"><%= t("client_requests.new_hint") %></p>
     </div>
   </header>
-  <div class="surface-panel p-3 p-sm-4">
+
+  <%= form_with model: @intake, url: client_requests_path,
+                html: { class: "rc-form wa-client-form__form" } do |f| %>
     <% if @intake.errors.any? %>
       <div class="rc-notice rc-notice--error" role="alert"><%= @intake.errors.full_messages.to_sentence %></div>
     <% end %>
-    <%= form_with model: @intake, url: client_requests_path, html: { class: "rc-form" } do |f| %>
-      <div class="rc-field mb-3">
-        <%= f.label :title, t("intake.field_title"), class: "rc-field-label" %>
-        <%= f.text_field :title, class: "rc-input", required: true, maxlength: 120, placeholder: t("client_requests.title_example") %>
+
+    <section class="surface-panel wa-client-form__section" aria-labelledby="client-request-brief-title">
+      <div class="wa-client-form__section-head">
+        <span class="wa-client-form__icon" aria-hidden="true"><i class="bi bi-grid-1x2"></i></span>
+        <div>
+          <h2 id="client-request-brief-title"><%= t("client_requests.form_brief_title") %></h2>
+          <p class="rc-hint"><%= t("client_requests.form_brief_help") %></p>
+        </div>
       </div>
-      <div class="rc-field mb-3">
-        <%= f.label :project_type, t("intake.field_type"), class: "rc-field-label" %>
-        <%= f.select :project_type,
-          ProjectIntake::TYPES.map { |type| [rc_intake_type(type), type] },
-          { include_blank: t("intake.type_blank") }, class: "rc-input", required: true %>
+      <div class="wa-client-form__brief-grid">
+        <div class="rc-field">
+          <%= f.label :title, t("intake.field_title"), class: "rc-field-label" %>
+          <%= f.text_field :title, class: "rc-input", required: true, maxlength: 120,
+                           placeholder: t("client_requests.title_example") %>
+        </div>
+        <div class="rc-field">
+          <%= f.label :project_type, t("intake.field_type"), class: "rc-field-label" %>
+          <%= f.select :project_type,
+                ProjectIntake::TYPES.map { |type| [rc_intake_type(type), type] },
+                { include_blank: t("intake.type_blank") }, class: "rc-input", required: true %>
+        </div>
       </div>
-      <div class="rc-field mb-3">
+    </section>
+
+    <section class="surface-panel wa-client-form__section" aria-labelledby="client-request-goal-title">
+      <div class="wa-client-form__section-head">
+        <span class="wa-client-form__icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
+        <div>
+          <h2 id="client-request-goal-title"><%= t("client_requests.form_goal_title") %></h2>
+          <p class="rc-hint"><%= t("client_requests.form_goal_help") %></p>
+        </div>
+      </div>
+      <div class="rc-field mb-0">
         <%= f.label :goal, t("intake.field_goal"), class: "rc-field-label" %>
-        <%= f.text_area :goal, class: "rc-input", required: true, rows: 5, minlength: 10, maxlength: 1200,
-            placeholder: t("client_requests.goal_example") %>
+        <%= f.text_area :goal, class: "rc-input rc-input--area", required: true,
+                          rows: 5, minlength: 10, maxlength: 1200,
+                          placeholder: t("client_requests.goal_example"),
+                          aria: { describedby: "client-goal-help client-goal-count" },
+                          data: { controller: "wa-autogrow",
+                                  action: "input->wa-autogrow#resize",
+                                  wa_autogrow_counter_id_value: "client-goal-count" } %>
+        <div class="wa-client-form__field-foot">
+          <p id="client-goal-help" class="rc-hint mb-0"><%= t("client_requests.form_goal_hint") %></p>
+          <output id="client-goal-count" for="project_intake_goal" class="wa-client-form__count" aria-live="off"><%= @intake.goal.to_s.length %> / 1200</output>
+        </div>
       </div>
-      <div class="rc-field mb-3">
+    </section>
+
+    <section class="surface-panel wa-client-form__section wa-client-form__confirmation" aria-labelledby="client-request-privacy-title">
+      <div class="wa-client-form__section-head">
+        <span class="wa-client-form__icon" aria-hidden="true"><i class="bi bi-shield-lock"></i></span>
+        <div>
+          <h2 id="client-request-privacy-title"><%= t("client_requests.form_privacy_title") %></h2>
+          <p class="rc-hint"><%= t("client_requests.form_privacy_help") %></p>
+        </div>
+      </div>
+      <div class="wa-client-form__consent">
         <%= check_box_tag :demo_consent, "1", false, required: true %>
         <%= label_tag :demo_consent, t("client_requests.demo_consent") %>
       </div>
-      <p class="rc-hint"><%= t("client_requests.demo_warning") %></p>
+      <p class="rc-hint wa-client-form__safety"><i class="bi bi-shield-check me-1" aria-hidden="true"></i><%= t("client_requests.demo_warning") %></p>
+    </section>
+
+    <div class="wa-client-form__actions">
       <%= f.button type: :submit, class: "rc-action rc-action--primary" do %>
         <%= rc_icon_label("send", t("client_requests.send")) %>
       <% end %>
-      <%= link_to rc_icon_label("arrow-left", t("client_requests.back")), client_home_path, class: "rc-action rc-action--quiet ms-2" %>
-    <% end %>
-  </div>
+      <%= link_to rc_icon_label("arrow-left", t("client_requests.back")), client_home_path,
+                  class: "rc-action rc-action--quiet" %>
+    </div>
+  <% end %>
 </div>

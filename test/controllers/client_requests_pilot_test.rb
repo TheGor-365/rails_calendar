@@ -45,6 +45,13 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     get new_client_request_path
     assert_response :success
     assert_select "form[action=?]", client_requests_path
+    assert_select "section.wa-client-form__section", count: 3
+    assert_select "h2#client-request-brief-title", count: 1
+    assert_select "h2#client-request-goal-title", count: 1
+    assert_select "h2#client-request-privacy-title", count: 1
+    assert_select "textarea[name='project_intake[goal]'][data-controller='wa-autogrow'][maxlength='1200']", count: 1
+    assert_select "textarea[aria-describedby='client-goal-help client-goal-count']", count: 1
+    assert_select "output#client-goal-count", text: "0 / 1200"
     assert_difference({"ProjectIntake.count" => 1, "IntakeMessage.count" => 2}) do
       @intake = create_fictional_request
     end
