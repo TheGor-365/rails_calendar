@@ -21,6 +21,7 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
     get new_project_intake_url
     assert_response :success
     assert_select "input[name='demo_consent']"
+    assert_select "textarea[name='project_intake[goal]'][data-controller='wa-autogrow']", count: 1
   end
 
   test "consent and server validations prevent accidental data collection" do
@@ -53,6 +54,7 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
     get project_intake_url(intake)
     assert_response :success
     assert_select "#intake-conversation li", count: 1
+    assert_select "textarea[name='answer'][data-controller='wa-autogrow']", count: 1
 
     post reply_project_intake_url(intake),
          params: { answer: "The goal is a sample menu and online quote request without payments." }

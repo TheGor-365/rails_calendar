@@ -8,12 +8,12 @@
     <% if @review_errors.present? %>
       <div class="rc-notice rc-notice--error" role="alert"><%= @review_errors.to_sentence %></div>
     <% end %>
-    <%= form_with url: revise_spec_admin_project_intake_path(@intake), method: :patch, html: { class: "rc-form" } do |f| %>
+    <%= form_with url: revise_spec_admin_project_intake_path(@intake), method: :patch, scope: :review, html: { class: "rc-form" } do |f| %>
       <%= hidden_field_tag :expected_version, @spec.version %>
       <div class="rc-field mb-3">
         <%= f.label :summary, t("intake.field_summary"), class: "rc-field-label" %>
         <%= f.text_area :summary, value: @spec.document["summary"], maxlength: 1200,
-              required: true, rows: 4, class: "rc-input" %>
+              required: true, rows: 4, class: "rc-input rc-input--area", data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
       </div>
       <% { "goals" => t("intake.sections.goals"), "deliverables" => t("intake.sections.deliverables"),
            "acceptance_criteria" => t("intake.sections.acceptance_criteria"),
@@ -21,7 +21,7 @@
         <div class="rc-field mb-3">
           <%= f.label key, t("intake.field_lines", label: label), class: "rc-field-label" %>
           <%= f.text_area key, value: Array(@spec.document[key]).join("\n"),
-                rows: 4, class: "rc-input" %>
+                rows: 4, class: "rc-input rc-input--area", data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
         </div>
       <% end %>
       <p class="rc-hint"><%= t("intake.spec_edit_hint") %></p>

@@ -70,13 +70,13 @@
             <%= label_tag "owner_private_summary", t("owner_setup.private_summary"), class: "rc-field-label" %>
             <%= text_area_tag "professional_profile[private_summary]",
                   @profile.private_summary.presence || @suggestion["private_summary"],
-                  id: "owner_private_summary", rows: 5, maxlength: 1500, required: true, class: "rc-input" %>
+                  id: "owner_private_summary", rows: 5, maxlength: 1500, required: true, class: "rc-input rc-input--area", data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
           </div>
           <div class="ws-owner-field">
             <%= label_tag "owner_public_summary", t("owner_setup.public_summary"), class: "rc-field-label" %>
             <%= text_area_tag "professional_profile[public_summary]",
                   @profile.public_summary.presence || @suggestion["public_summary"],
-                  id: "owner_public_summary", rows: 4, maxlength: 1000, class: "rc-input" %>
+                  id: "owner_public_summary", rows: 4, maxlength: 1000, class: "rc-input rc-input--area", data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
             <small class="rc-hint"><%= t("owner_setup.not_published") %></small>
           </div>
           <div class="ws-owner-checkbox mb-3">

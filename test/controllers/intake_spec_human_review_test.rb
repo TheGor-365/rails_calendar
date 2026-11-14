@@ -30,6 +30,10 @@ class IntakeSpecHumanReviewTest < ActionDispatch::IntegrationTest
     get edit_spec_admin_project_intake_url(@intake)
     assert_response :success
     assert_select "form input[name='expected_version'][value=?]", @first_spec.version.to_s
+    assert_select "form[action=?] textarea[name='review[summary]'][data-controller='wa-autogrow']", revise_spec_admin_project_intake_path(@intake), count: 1
+    %w[goals deliverables acceptance_criteria unknowns exclusions].each do |section|
+      assert_select "form[action=?] textarea[name=?][data-controller='wa-autogrow']", revise_spec_admin_project_intake_path(@intake), "review[#{section}]", count: 1
+    end
 
     assert_difference "IntakeSpecVersion.count", 1 do
       patch revise_spec_admin_project_intake_url(@intake), params: {

@@ -71,6 +71,7 @@ class OwnerSetupControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#owner-setup h1", text: I18n.t("owner_setup.title")
     assert_select "form[action=?]", owner_setup_section_path(section_key: "A")
+    assert_select "textarea[name='owner_answer[notes]'][data-controller='wa-autogrow']", count: 1
     assert_equal 1, Workspace.count
 
     patch owner_setup_section_path(section_key: "A"), params: {
@@ -102,6 +103,8 @@ class OwnerSetupControllerTest < ActionDispatch::IntegrationTest
     get owner_setup_review_path
     assert_response :success
     assert_select "form[action=?]", owner_setup_approve_path
+    assert_select "textarea[name='professional_profile[private_summary]'][data-controller='wa-autogrow']", count: 1
+    assert_select "textarea[name='professional_profile[public_summary]'][data-controller='wa-autogrow']", count: 1
     assert_select "form[action=?]", owner_setup_suggest_path, count: 0
 
     assert_difference({ "ProfessionalContextSnapshot.count" => 1,

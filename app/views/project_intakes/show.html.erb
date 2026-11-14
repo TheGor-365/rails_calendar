@@ -36,7 +36,7 @@
       <%= form_with url: reply_project_intake_path(@intake), method: :post, html: { class: "rc-form mt-3" } do |f| %>
         <div class="rc-field mb-2">
           <%= f.label :answer, t("intake.answer"), class: "rc-field-label" %>
-          <%= f.text_area :answer, class: "rc-input", maxlength: 1200, required: true, rows: 3 %>
+          <%= f.text_area :answer, class: "rc-input rc-input--area", maxlength: 1200, required: true, rows: 3, data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
         </div>
         <%= f.button type: :submit, class: "rc-action rc-action--primary" do %><%= rc_icon_label("send", t("intake.send_answer")) %><% end %>
       <% end %>

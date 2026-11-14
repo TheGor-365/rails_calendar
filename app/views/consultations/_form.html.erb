@@ -31,7 +31,7 @@
     <%= form.label :description, t("consultations.field_description"), class: "rc-field-label" %>
     <%= form.text_area :description, rows: 3, maxlength: 5000,
                       class: "rc-input rc-input--area#{' rc-input--invalid' if consultation.errors.include?(:description)}",
-                      aria: { invalid: consultation.errors.include?(:description) } %>
+                      aria: { invalid: consultation.errors.include?(:description) }, data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
     <% if consultation.errors.include?(:description) %>
       <p class="rc-field-error"><%= consultation.errors.full_messages_for(:description).join(", ") %></p>
     <% end %>
@@ -72,7 +72,7 @@
                         placeholder: t("consultations.reschedule_placeholder"),
                         class: "rc-input rc-input--area#{' rc-input--invalid' if consultation.errors.include?(:reschedule_reason)}",
                         aria: { describedby: "reschedule-reason-help",
-                                invalid: consultation.errors.include?(:reschedule_reason) } %>
+                                invalid: consultation.errors.include?(:reschedule_reason) }, data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
       <p id="reschedule-reason-help" class="rc-hint mt-2">
         <%= t("consultations.reschedule_help") %>
       </p>
