@@ -37,10 +37,11 @@ class AccountCabinetsTest < ActionDispatch::IntegrationTest
     login_as(@client)
     get client_cabinet_path
     assert_response :success
-    assert_select "#client-cabinet h1", text: I18n.t("account_hub.client_title")
+    assert_select "#client-cabinet h1", text: I18n.t("nav.client_home")
     assert_select ".ws-client-panel h2", text: I18n.t("client.panel_title")
     assert_select ".ws-client-heading .rc-muted", text: I18n.t("client.description")
-    assert_select "a[href=?]", client_cabinet_path
+    assert_select "header.app-header .rc-nav-group a[href=?]", client_home_path, count: 1
+    assert_select "header.app-header .rc-nav-group a[href=?]", client_cabinet_path, count: 0
     assert_no_match(/cabinet-owner@example.test/, response.body)
     assert_equal 0, Workspace.count
     assert_equal 0, ProfessionalProfile.count
