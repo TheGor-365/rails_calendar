@@ -56,4 +56,15 @@ export default class extends Controller {
     })
     this.emptyTarget.hidden = visible > 0
   }
+
+  // Keep the editor stable while users modify text that previously matched a
+  // search query. Re-filter only on an explicit search/filter interaction.
+  refreshCounts() {
+    this.sectionTargets.forEach((section) => {
+      const field = section.querySelector("textarea")
+      const counter = section.querySelector("[data-wa-spec-review-count]")
+      if (!field || !counter) return
+      counter.textContent = String(field.value.split(/\\r?\\n/).filter((line) => line.trim().length > 0).length)
+    })
+  }
 }
