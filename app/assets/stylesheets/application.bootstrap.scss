@@ -1755,3 +1755,6 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 @import 'rc_owner_cabinets';
 
 @import 'rc_capabilities';
+
+// Native dropdowns are enhanced to one themed, keyboard-accessible menu.
+@import 'rc_select_menu';
