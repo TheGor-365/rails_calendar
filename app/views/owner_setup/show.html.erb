@@ -75,7 +75,7 @@
           <%= label_tag "owner_notes", t("owner_setup.notes"), class: "rc-field-label" %>
           <%= text_area_tag "owner_answer[notes]", @answer.notes, id: "owner_notes",
                 rows: 4, maxlength: 800, class: "rc-input rc-input--area",
-                placeholder: t("owner_setup.notes_placeholder") %>
+                placeholder: t("owner_setup.notes_placeholder"), data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
         </div>
         <label class="ws-owner-checkbox">
           <%= check_box_tag "owner_answer[unsure]", "1", @answer.unsure, id: "owner_unsure" %>

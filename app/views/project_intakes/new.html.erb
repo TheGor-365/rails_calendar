@@ -26,7 +26,7 @@
       <div class="rc-field mb-3">
         <%= f.label :goal, t("intake.field_goal"), class: "rc-field-label" %>
         <%= f.text_area :goal, class: "rc-input", rows: 5, required: true, minlength: 10, maxlength: 3000,
-            placeholder: t("intake.example_goal") %>
+            placeholder: t("intake.example_goal"), data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
       </div>
       <div class="rc-field mb-3">
         <%= check_box_tag :demo_consent, "1", false, required: true %>
