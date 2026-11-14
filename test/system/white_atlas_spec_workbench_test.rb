@@ -36,7 +36,7 @@ class WhiteAtlasSpecWorkbenchTest < ApplicationSystemTestCase
     assert_selector "button[data-wa-spec-review-category-param='all'][aria-pressed='true']"
 
     field = find("textarea[name='review[summary]']")
-    long = ("A fictional test step and an explicitly unverified observation.\n" * 15).strip
+    long = ("Fictional verification step.\n" * 36).strip
     field.set(long)
     assert_equal long, field.value
     height = field.evaluate_script("this.getBoundingClientRect().height")
