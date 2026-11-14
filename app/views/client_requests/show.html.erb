@@ -1,47 +1,86 @@
-<div class="container my-4 my-sm-5">
+<div class="container wa-client-request my-4 my-sm-5">
   <header class="rc-page-hero mb-4">
     <div class="rc-page-hero__content">
       <p class="eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("client_requests.eyebrow") %></p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-kanban"></i></span><h1 class="page-title"><%= @intake.title %></h1></div>
-      <p class="rc-muted"><%= t("client_requests.status", type: rc_intake_type(@intake.project_type), status: rc_intake_status(@intake.status)) %></p>
-      <%= link_to rc_icon_label("arrow-left", t("client_requests.back")), client_home_path, class: "rc-action rc-action--quiet rc-action--small" %>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-kanban"></i></span>
+        <h1 class="page-title"><%= @intake.title %></h1>
+      </div>
+      <div class="wa-client-request__meta">
+        <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= rc_intake_type(@intake.project_type) %></span>
+        <span class="rc-status-pill"><i class="bi bi-circle-half" aria-hidden="true"></i><%= rc_intake_status(@intake.status) %></span>
+        <% if @spec %>
+          <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-file-earmark-check" aria-hidden="true"></i><%= t("client_requests.spec_version", version: @spec.version) %></span>
+        <% end %>
+      </div>
+      <div class="rc-page-hero__actions mt-3">
+        <%= link_to rc_icon_label("arrow-left", t("client_requests.back")), client_home_path, class: "rc-action rc-action--quiet rc-action--small" %>
+      </div>
     </div>
   </header>
-  <section class="surface-panel p-3 p-sm-4 mb-4" aria-labelledby="client-request-description">
-    <h2 class="h4" id="client-request-description"><%= t("client_requests.description_title") %></h2>
-    <p class="mb-0"><%= @intake.goal %></p>
-    <p class="rc-hint mt-3"><%= t("client_requests.demo_warning") %></p>
+
+  <section class="surface-panel wa-client-request__panel mb-4" aria-labelledby="client-request-description">
+    <div class="wa-client-request__section-head">
+      <span class="wa-client-request__section-icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
+      <h2 id="client-request-description"><%= t("client_requests.description_title") %></h2>
+    </div>
+    <div class="wa-client-request__description wa-prose"><%= @intake.goal %></div>
+    <p class="rc-hint wa-client-request__safety"><i class="bi bi-shield-lock me-1" aria-hidden="true"></i><%= t("client_requests.demo_warning") %></p>
   </section>
-  <section class="surface-panel p-3 p-sm-4 mb-4" aria-labelledby="client-request-spec">
-    <h2 class="h4" id="client-request-spec"><i class="bi bi-file-earmark-text me-2" aria-hidden="true"></i><%= t("client_requests.spec_title") %></h2>
+
+  <section class="surface-panel wa-client-request__panel mb-4" aria-labelledby="client-request-spec">
+    <div class="wa-client-request__section-head">
+      <span class="wa-client-request__section-icon" aria-hidden="true"><i class="bi bi-file-earmark-text"></i></span>
+      <h2 id="client-request-spec"><%= t("client_requests.spec_title") %></h2>
+    </div>
     <% if @spec %>
       <p class="rc-hint"><%= t("client_requests.spec_version", version: @spec.version) %> · <%= t("client_requests.not_contract") %></p>
-      <p><%= @spec.document["summary"] %></p>
-      <% {"goals" => "section_goals", "deliverables" => "section_deliverables",
-           "acceptance_criteria" => "section_acceptance_criteria", "unknowns" => "section_unknowns",
-           "exclusions" => "section_exclusions"}.each do |key, translation_key| %>
-        <h3 class="h5 mt-4"><%= t("intake.#{translation_key}") %></h3>
-        <ul><% Array(@spec.document[key]).each do |line| %><li><%= line %></li><% end %></ul>
+      <% if @spec.document["summary"].present? %>
+        <p class="wa-prose wa-client-request__summary"><%= @spec.document["summary"] %></p>
       <% end %>
-      <% if @spec.client_reviewed_at.nil? %>
-        <%= button_to rc_icon_label("check2-circle", t("client_requests.review_action")),
-          review_client_request_path(@intake), method: :post,
-          params: { version: @spec.version }, class: "rc-action rc-action--primary" %>
-      <% else %>
-        <p class="rc-notice rc-notice--success" role="status"><%= t("client_requests.reviewed") %></p>
-      <% end %>
+      <div class="wa-client-request__spec-sections">
+        <% [
+          ["goals", "section_goals", "bullseye"],
+          ["deliverables", "section_deliverables", "box-seam"],
+          ["acceptance_criteria", "section_acceptance_criteria", "clipboard2-check"],
+          ["unknowns", "section_unknowns", "question-circle"],
+          ["exclusions", "section_exclusions", "slash-circle"]
+        ].each do |key, translation_key, icon| %>
+          <%= render "shared/white_atlas/spec_section",
+            id: "client-spec-#{key}", kind: key.dasherize, icon: icon,
+            title: t("intake.#{translation_key}"), items: @spec.document[key] %>
+        <% end %>
+      </div>
+      <div class="wa-client-request__review">
+        <% if @spec.client_reviewed_at.nil? %>
+          <p class="rc-hint"><%= t("client_requests.not_contract") %></p>
+          <%= button_to rc_icon_label("check2-circle", t("client_requests.review_action")),
+            review_client_request_path(@intake), method: :post,
+            params: { version: @spec.version }, class: "rc-action rc-action--primary" %>
+        <% else %>
+          <p class="rc-notice rc-notice--success mb-0" role="status"><%= t("client_requests.reviewed") %></p>
+        <% end %>
+      </div>
     <% else %>
-      <p class="rc-muted"><%= t("client_requests.spec_pending") %></p>
+      <div class="rc-empty-state wa-client-request__pending">
+        <span class="rc-empty-state__icon" aria-hidden="true"><i class="bi bi-hourglass-split"></i></span>
+        <h3><%= t("client_requests.spec_pending") %></h3>
+        <p><%= t("client_requests.not_contract") %></p>
+      </div>
     <% end %>
   </section>
+
   <% if @milestones.any? %>
-    <section class="surface-panel p-3 p-sm-4" aria-labelledby="client-request-milestones">
-      <h2 id="client-request-milestones" class="h4"><i class="bi bi-calendar-range me-2" aria-hidden="true"></i><%= t("client_requests.milestones_title") %></h2>
-      <ol class="rc-record-list">
+    <section class="surface-panel wa-client-request__panel" aria-labelledby="client-request-milestones">
+      <div class="wa-client-request__section-head">
+        <span class="wa-client-request__section-icon" aria-hidden="true"><i class="bi bi-calendar-range"></i></span>
+        <h2 id="client-request-milestones"><%= t("client_requests.milestones_title") %></h2>
+      </div>
+      <ol class="rc-record-list wa-client-request__milestones">
         <% @milestones.each do |milestone| %>
           <li class="rc-record">
             <strong><%= milestone.title %></strong>
-            <p class="rc-muted mb-0"><%= milestone.start_on %> – <%= milestone.end_on %> · <%= t("client_requests.tentative") %></p>
+            <p class="rc-muted mb-0"><time datetime="<%= milestone.start_on.iso8601 %>"><%= milestone.start_on %></time> – <time datetime="<%= milestone.end_on.iso8601 %>"><%= milestone.end_on %></time> · <%= t("client_requests.tentative") %></p>
           </li>
         <% end %>
       </ol>
