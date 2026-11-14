@@ -1,33 +1,112 @@
-<div class="container my-4 my-sm-5">
-  <header class="mb-4">
-    <p class="eyebrow"><%= t("intake.admin_spec_eyebrow") %></p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span><h1 class="page-title"><%= t("intake.admin_spec_title", id: @intake.id) %></h1></div>
-    <p class="rc-muted"><%= t("intake.admin_spec_hint") %></p>
-  </header>
-  <section class="surface-panel p-3 p-sm-4">
-    <% if @review_errors.present? %>
-      <div class="rc-notice rc-notice--error" role="alert"><%= @review_errors.to_sentence %></div>
-    <% end %>
-    <%= form_with url: revise_spec_admin_project_intake_path(@intake), method: :patch, scope: :review, html: { class: "rc-form" } do |f| %>
-      <%= hidden_field_tag :expected_version, @spec.version %>
-      <div class="rc-field mb-3">
-        <%= f.label :summary, t("intake.field_summary"), class: "rc-field-label" %>
-        <%= f.text_area :summary, value: @spec.document["summary"], maxlength: 1200,
-              required: true, rows: 4, class: "rc-input rc-input--area", data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
+<div class="container wa-spec-editor my-4 my-sm-5">
+  <header class="rc-page-hero mb-4">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow"><%= t("intake.admin_spec_eyebrow") %></p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span>
+        <h1 class="page-title"><%= t("intake.admin_spec_title", id: @intake.id) %></h1>
       </div>
-      <% { "goals" => t("intake.sections.goals"), "deliverables" => t("intake.sections.deliverables"),
-           "acceptance_criteria" => t("intake.sections.acceptance_criteria"),
-           "unknowns" => t("intake.sections.unknowns"), "exclusions" => t("intake.sections.exclusions") }.each do |key, label| %>
-        <div class="rc-field mb-3">
-          <%= f.label key, t("intake.field_lines", label: label), class: "rc-field-label" %>
-          <%= f.text_area key, value: Array(@spec.document[key]).join("\n"),
-                rows: 4, class: "rc-input rc-input--area", data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
+      <p class="rc-muted wa-spec-editor__intro"><%= t("intake.admin_spec_hint") %></p>
+      <span class="wa-spec-editor__version"><i class="bi bi-lock" aria-hidden="true"></i><%= t("spec_editor.version", version: @spec.version) %></span>
+    </div>
+  </header>
+
+  <% sections = [
+    { key: "summary", group: "overview", icon: "card-text", title: t("intake.field_summary"), value: @spec.document["summary"].to_s, count: nil },
+    { key: "goals", group: "scope", icon: "bullseye", title: t("intake.sections.goals"), value: Array(@spec.document["goals"]).join("\n"), count: Array(@spec.document["goals"]).count },
+    { key: "deliverables", group: "scope", icon: "box-seam", title: t("intake.sections.deliverables"), value: Array(@spec.document["deliverables"]).join("\n"), count: Array(@spec.document["deliverables"]).count },
+    { key: "acceptance_criteria", group: "verification", icon: "check2-square", title: t("intake.sections.acceptance_criteria"), value: Array(@spec.document["acceptance_criteria"]).join("\n"), count: Array(@spec.document["acceptance_criteria"]).count },
+    { key: "unknowns", group: "risks", icon: "question-circle", title: t("intake.sections.unknowns"), value: Array(@spec.document["unknowns"]).join("\n"), count: Array(@spec.document["unknowns"]).count },
+    { key: "exclusions", group: "risks", icon: "slash-circle", title: t("intake.sections.exclusions"), value: Array(@spec.document["exclusions"]).join("\n"), count: Array(@spec.document["exclusions"]).count }
+  ] %>
+  <%= form_with url: revise_spec_admin_project_intake_path(@intake), method: :patch,
+                scope: :review, html: { class: "rc-form wa-spec-editor__form",
+                                       data: { controller: "wa-spec-review" } } do |f| %>
+    <%= hidden_field_tag :expected_version, @spec.version %>
+    <div class="wa-spec-editor__layout">
+      <aside class="surface-panel wa-spec-editor__rail" aria-label="<%= t("spec_editor.nav") %>">
+        <h2><%= t("spec_editor.nav") %></h2>
+        <p class="wa-spec-editor__rail-help"><%= t("spec_editor.nav_hint") %></p>
+        <nav aria-label="<%= t("spec_editor.nav") %>">
+          <ul class="wa-spec-editor__jump">
+            <% sections.each do |section| %>
+              <li>
+                <%= link_to "#spec-section-#{section.fetch(:key)}", data: { action: "click->wa-spec-review#navigate" } do %>
+                  <i class="bi bi-<%= section.fetch(:icon) %>" aria-hidden="true"></i><%= section.fetch(:title) %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </nav>
+        <div class="wa-spec-editor__filters" data-wa-spec-review-target="toolbar" hidden>
+          <label for="spec-section-search"><%= t("spec_editor.search") %></label>
+          <%= search_field_tag :spec_section_search, nil, id: "spec-section-search",
+                name: nil, class: "wa-spec-editor__search",
+                autocomplete: "off", placeholder: t("spec_editor.search_placeholder"),
+                data: { wa_spec_review_target: "search",
+                        action: "input->wa-spec-review#update keydown.esc->wa-spec-review#clearSearch" } %>
+          <div class="wa-spec-editor__filter-buttons" role="group" aria-label="<%= t("spec_editor.nav") %>">
+            <% %w[all overview scope verification risks].each do |group| %>
+              <button type="button" class="wa-spec-editor__filter"
+                      data-wa-spec-review-target="filter"
+                      data-wa-spec-review-category-param="<%= group %>"
+                      data-action="click->wa-spec-review#filter"
+                      aria-pressed="<%= group == 'all' %>"><%= t("spec_editor.#{group}") %></button>
+            <% end %>
+          </div>
         </div>
-      <% end %>
-      <p class="rc-hint"><%= t("intake.spec_edit_hint") %></p>
-      <%= f.button type: :submit, class: "rc-action rc-action--primary" do %><%= rc_icon_label("check2-circle", t("intake.spec_save")) %><% end %>
-      <%= link_to rc_icon_label("x-circle", t("intake.spec_cancel")), project_intake_path(@intake),
-          class: "rc-action rc-action--quiet" %>
-    <% end %>
-  </section>
+      </aside>
+
+      <div class="wa-spec-editor__main">
+        <% if @review_errors.present? %>
+          <div class="rc-notice rc-notice--error" role="alert"><%= @review_errors.to_sentence %></div>
+        <% end %>
+        <% sections.each do |section| %>
+          <% key = section.fetch(:key) %>
+          <section id="spec-section-<%= key %>" tabindex="-1"
+                   class="surface-panel wa-spec-editor__section"
+                   aria-labelledby="spec-section-title-<%= key %>"
+                   data-wa-spec-review-target="section"
+                   data-wa-spec-review-group="<%= section.fetch(:group) %>"
+                   data-wa-spec-review-label="<%= section.fetch(:title) %>">
+            <div class="wa-spec-editor__section-head">
+              <span class="wa-spec-editor__section-icon" aria-hidden="true"><i class="bi bi-<%= section.fetch(:icon) %>"></i></span>
+              <div class="wa-spec-editor__section-heading">
+                <h2 id="spec-section-title-<%= key %>"><%= section.fetch(:title) %></h2>
+                <div class="wa-spec-editor__meta">
+                  <span class="wa-spec-editor__group-label"><%= t("spec_editor.#{section.fetch(:group)}") %></span>
+                  <% unless key == "summary" %>
+                    <span class="wa-spec-editor__count"><span data-wa-spec-review-count><%= section.fetch(:count) %></span> <%= t("spec_editor.items") %></span>
+                  <% end %>
+                </div>
+                <p class="wa-spec-editor__section-help"><%= t(key == "summary" ? "spec_editor.summary_help" : "spec_editor.section_help") %></p>
+              </div>
+            </div>
+            <div class="rc-field">
+              <%= f.label key, t(key == "summary" ? "intake.field_summary" : "intake.field_lines", label: section.fetch(:title)), class: "rc-field-label" %>
+              <%= f.text_area key, value: section.fetch(:value),
+                    rows: key == "summary" ? 4 : 5,
+                    maxlength: (1200 if key == "summary"),
+                    required: (key == "summary"),
+                    class: "rc-input rc-input--area",
+                    data: { controller: "wa-autogrow",
+                            action: "input->wa-autogrow#resize input->wa-spec-review#refreshCounts" } %>
+            </div>
+          </section>
+        <% end %>
+        <div class="surface-panel wa-spec-editor__empty" data-wa-spec-review-target="empty" hidden role="status">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <p class="mb-0"><%= t("spec_editor.no_results") %></p>
+        </div>
+        <p class="rc-hint"><%= t("intake.spec_edit_hint") %></p>
+        <div class="wa-spec-editor__footer">
+          <%= f.button type: :submit, class: "rc-action rc-action--primary" do %>
+            <%= rc_icon_label("check2-circle", t("intake.spec_save")) %>
+          <% end %>
+          <%= link_to rc_icon_label("x-circle", t("intake.spec_cancel")), project_intake_path(@intake),
+                      class: "rc-action rc-action--quiet" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

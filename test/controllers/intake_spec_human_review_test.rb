@@ -33,7 +33,15 @@ class IntakeSpecHumanReviewTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?] textarea[name='review[summary]'][data-controller='wa-autogrow']", revise_spec_admin_project_intake_path(@intake), count: 1
     %w[goals deliverables acceptance_criteria unknowns exclusions].each do |section|
       assert_select "form[action=?] textarea[name=?][data-controller='wa-autogrow']", revise_spec_admin_project_intake_path(@intake), "review[#{section}]", count: 1
+      assert_select "section#spec-section-#{section}[data-wa-spec-review-target='section']", count: 1
     end
+    assert_select "form[data-controller='wa-spec-review']", count: 1
+    assert_select "section.wa-spec-editor__section", count: 6
+    assert_select "button[type='button'][data-wa-spec-review-target='filter']", count: 5
+    assert_select "input#spec-section-search[data-wa-spec-review-target='search']", count: 1
+    assert_select "section#spec-section-summary textarea[name='review[summary]']", count: 1
+    assert_select "section.wa-spec-editor__section[data-wa-spec-review-group='risks']", count: 2
+    assert_select "a[href='#spec-section-exclusions']", count: 1
 
     assert_difference "IntakeSpecVersion.count", 1 do
       patch revise_spec_admin_project_intake_url(@intake), params: {
