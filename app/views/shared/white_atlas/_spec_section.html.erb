@@ -1,0 +1,18 @@
+<%# White Atlas: render text-only, version-bound specification sections; no untrusted HTML. %>
+<% entries = Array(items).reject { |entry| entry.to_s.strip.empty? } %>
+<% if entries.any? %>
+  <section class="wa-spec-section wa-spec-section--<%= kind %>" aria-labelledby="<%= id %>">
+    <h3 class="wa-spec-section__title" id="<%= id %>">
+      <span class="wa-spec-section__icon" aria-hidden="true"><i class="bi bi-<%= icon %>"></i></span>
+      <%= title %>
+    </h3>
+    <ul class="wa-spec-list">
+      <% entries.each do |entry| %>
+        <li class="wa-spec-list__item">
+          <span class="wa-spec-list__marker" aria-hidden="true"></span>
+          <span class="wa-spec-list__text"><%= entry %></span>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
