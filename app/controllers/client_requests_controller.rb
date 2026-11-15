@@ -3,7 +3,7 @@
 class ClientRequestsController < ApplicationController
   before_action :require_local_pilot!
   before_action :require_verified_client!
-  before_action :set_owned_request!, only: %i[show review]
+  before_action :set_owned_request!, only: %i[show review reply]
 
   def new
     @intake = current_user.client_project_intakes.new
@@ -32,8 +32,58 @@ class ClientRequestsController < ApplicationController
   end
 
   def show
-    @spec = @intake.published_spec
-    @milestones = @spec ? @intake.project_milestones.where(intake_spec_version_id: @spec.id).order(:position) : []
+    load_details
+  end
+
+  # Local fictional clarification only; not a new offer, contract, spec approval,
+  # or invocation of an AI provider. Enforces account ownership in set_owned_request!.
+  def reply
+    raw_key = params[:submission_key]
+    token = raw_key.is_a?(String) ? raw_key : ""
+    raw_body = params[:reply_body]
+    @reply_body = raw_body.is_a?(String) ? raw_body.strip : ""
+    @reply_submission_key = token if token.match?(/\A[0-9a-f]{32}\z/)
+
+    if @reply_submission_key.nil?
+      @reply_error = I18n.t("client_requests.reply_invalid_request")
+    elsif @reply_body.blank?
+      @reply_error = I18n.t("client_requests.reply_required")
+    elsif @reply_body.length > 1200
+      @reply_error = I18n.t("client_requests.reply_too_long")
+    end
+
+    if @reply_error
+      load_details
+      return render :show, status: :unprocessable_entity
+    end
+
+    # A row lock serializes simultaneous submits for this particular intake.
+    # DB uniqueness on (intake, token) remains the definitive replay guard.
+    outcome = @intake.with_lock do
+      if @intake.intake_messages.exists?(role: "client", client_submission_key: token)
+        :duplicate
+      elsif @intake.client_message_count >= ProjectIntake::MAX_CLIENT_MESSAGES
+        :limit
+      else
+        @intake.intake_messages.create!(
+          role: "client", body: @reply_body, client_submission_key: token
+        )
+        :created
+      end
+    end
+
+    case outcome
+    when :created
+      redirect_to client_request_path(@intake),
+                  notice: I18n.t("client_requests.reply_saved"), status: :see_other
+    when :duplicate
+      redirect_to client_request_path(@intake),
+                  notice: I18n.t("client_requests.reply_duplicate"), status: :see_other
+    else
+      @reply_error = I18n.t("client_requests.reply_limit")
+      load_details
+      render :show, status: :unprocessable_entity
+    end
   end
 
   # Only acknowledges having read a specific owner-approved revision.
@@ -57,6 +107,14 @@ class ClientRequestsController < ApplicationController
   end
 
   private
+
+  def load_details
+    @spec = @intake.published_spec
+    @milestones = @spec ? @intake.project_milestones.where(intake_spec_version_id: @spec.id).order(:position) : []
+    @conversation = @intake.intake_messages.order(:id).limit(20).to_a
+    @client_turn_count = @intake.client_message_count
+    @reply_submission_key ||= SecureRandom.hex(16)
+  end
 
   def require_local_pilot!
     head :not_found unless ClientRequestPilot.enabled?(request: request)

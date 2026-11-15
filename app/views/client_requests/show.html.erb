@@ -28,6 +28,57 @@
     <p class="rc-hint wa-client-request__safety"><i class="bi bi-shield-lock me-1" aria-hidden="true"></i><%= t("client_requests.demo_warning") %></p>
   </section>
 
+
+  <section class="surface-panel wa-client-request__panel wa-client-request__conversation mb-4"
+           aria-labelledby="client-request-conversation-heading">
+    <div class="wa-client-request__section-head">
+      <span class="wa-client-request__section-icon" aria-hidden="true"><i class="bi bi-chat-left-text"></i></span>
+      <h2 id="client-request-conversation-heading"><%= t("client_requests.conversation_title") %></h2>
+    </div>
+    <p class="rc-hint"><%= t("client_requests.conversation_help") %></p>
+    <ol class="wa-client-request__thread" id="client-request-conversation">
+      <% @conversation.each do |message| %>
+        <li class="wa-client-request__message wa-client-request__message--<%= message.role %>">
+          <div class="wa-client-request__message-header">
+            <strong><i class="bi bi-<%= message.role == "client" ? "person-circle" : "chat-left-dots" %>" aria-hidden="true"></i>
+              <%= t("client_requests.message_#{message.role}") %>
+            </strong>
+            <time datetime="<%= message.created_at.iso8601 %>"><%= message.created_at.utc.strftime("%Y-%m-%d %H:%M UTC") %></time>
+          </div>
+          <p class="wa-client-request__message-body"><%= message.body %></p>
+        </li>
+      <% end %>
+    </ol>
+
+    <% if @reply_error.present? %>
+      <p class="rc-notice rc-notice--error" role="alert"><%= @reply_error %></p>
+    <% end %>
+    <% if @client_turn_count < ProjectIntake::MAX_CLIENT_MESSAGES %>
+      <div class="wa-client-request__reply">
+        <h3><%= t("client_requests.reply_title") %></h3>
+        <p class="rc-hint" id="client-reply-help"><%= t("client_requests.reply_help", remaining: ProjectIntake::MAX_CLIENT_MESSAGES - @client_turn_count) %></p>
+        <%= form_with url: reply_client_request_path(@intake), method: :post,
+                      html: { class: "rc-form", id: "client-reply-form" } do %>
+          <%= hidden_field_tag :submission_key, @reply_submission_key %>
+          <div class="rc-field">
+            <%= label_tag :reply_body, t("client_requests.reply_label"), class: "rc-field-label" %>
+            <%= text_area_tag :reply_body, @reply_body, id: "reply_body",
+                rows: 4, maxlength: 1200, required: true,
+                class: "rc-input rc-input--area", aria: { describedby: "client-reply-help" },
+                placeholder: t("client_requests.reply_placeholder"),
+                data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
+          </div>
+          <p class="rc-hint"><%= t("client_requests.demo_warning") %></p>
+          <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+            <%= rc_icon_label("send", t("client_requests.reply_send")) %>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="rc-hint wa-client-request__reply-closed"><%= t("client_requests.reply_limit") %></p>
+    <% end %>
+  </section>
+
   <section class="surface-panel wa-client-request__panel mb-4" aria-labelledby="client-request-spec">
     <div class="wa-client-request__section-head">
       <span class="wa-client-request__section-icon" aria-hidden="true"><i class="bi bi-file-earmark-text"></i></span>
