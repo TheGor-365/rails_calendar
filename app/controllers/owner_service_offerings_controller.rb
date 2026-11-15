@@ -103,7 +103,8 @@ class OwnerServiceOfferingsController < ApplicationController
   end
 
   def load_offering
-    @offering = @workspace.service_offerings.find(params[:id])
+    @offering = @workspace.service_offerings.find_by(id: params[:id])
+    head :not_found unless @offering
   end
 
   def offering_params

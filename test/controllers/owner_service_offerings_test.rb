@@ -48,7 +48,7 @@ class OwnerServiceOfferingsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_no_match(/Fix a fictional Rails error/, response.body)
     get new_client_request_path
-    assert_redirected_to sign_in_path
+    assert_response :not_found # Local client pilot flag is intentionally disabled.
 
     post publish_owner_service_path(offer), params: {
       version_id: offer.approved_version.id, digest: offer.approved_version.digest, confirm: "0"

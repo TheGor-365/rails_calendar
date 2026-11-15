@@ -37,6 +37,7 @@ class OwnerServicesCatalogueTest < ActiveSupport::TestCase
     assert approved.approved?
     assert_nil offer.reload.published_version
     assert_raises(ActiveRecord::ReadOnlyError) { approved.update!(title: "Changed approved description") }
+    approved.reload # Discard unsaved in-memory changes before using the exact approved digest.
     assert_raises(ActiveRecord::ReadOnlyError) { approved.destroy! }
 
     assert_raises(OwnerServices::Catalogue::PolicyError) do
@@ -146,7 +147,9 @@ class OwnerServicesCatalogueTest < ActiveSupport::TestCase
     assert_equal new_cap.id, draft_v2.professional_capability_id
     assert_equal approved_v1.id, offer.reload.published_version_id
     assert_equal approved_v1.title, draft_v2.title
-    assert_raises(ActiveRecord::ReadOnlyError) { approved_v1.update!(summary: "Overwritten") }
+    assert_raises(ActiveRecord::ReadOnlyError) do
+      approved_v1.update!(summary: "A long fictional revised description that must not overwrite approved v1.")
+    end
     approved_v2 = @catalogue.approve!(
       offering: offer, version: draft_v2.version, digest: draft_v2.digest, confirmed: true
     )

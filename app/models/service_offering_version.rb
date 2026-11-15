@@ -19,6 +19,7 @@ class ServiceOfferingVersion < ApplicationRecord
   validates :digest, format: { with: /\A[0-9a-f]{64}\z/ }
   validate :source_matches_approved_owner_context
 
+  before_validation :protect_approved_record, on: :update
   before_validation :compute_digest
   before_update :protect_approved_record
   before_destroy :protect_approved_record
