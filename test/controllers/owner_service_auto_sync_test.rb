@@ -30,7 +30,7 @@ class OwnerServiceAutoSyncTest < ActionDispatch::IntegrationTest
     end
     get owner_services_path
     assert_select ".wa-services__card", count: 2
-    assert_select ".wa-services__state--draft", text: /Автоматически из профиля v1/
+    assert_select ".wa-services__state--draft", text: /Generated from profile v1/
     get services_path
     assert_response :success
     assert_no_match(/Исправление ошибок Ruby on Rails/, response.body)
