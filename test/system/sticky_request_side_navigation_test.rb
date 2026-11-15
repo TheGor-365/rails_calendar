@@ -13,13 +13,13 @@ class StickyRequestSideNavigationTest < ApplicationSystemTestCase
       email_verified_at: Time.current, signup_consent_at: Time.current,
       signup_policy_version: "fictional-sticky-rail"
     )
-    @request = @client.client_project_intakes.create!(
+    @intake = @client.client_project_intakes.create!(
       title: "Fictional pinned navigation", project_type: "rails_bugfix",
       goal: "A" * 920, demo_consent_at: Time.current
     )
-    @request.intake_messages.create!(role: "client", body: "A fictional client first message")
-    @request.intake_messages.create!(role: "assistant", body: "Template only; no paid AI")
-    @request.intake_messages.create!(role: "client", body: "A fictional second message")
+    @intake.intake_messages.create!(role: "client", body: "A fictional client first message")
+    @intake.intake_messages.create!(role: "assistant", body: "Template only; no paid AI")
+    @intake.intake_messages.create!(role: "client", body: "A fictional second message")
   end
 
   teardown do
@@ -28,7 +28,7 @@ class StickyRequestSideNavigationTest < ApplicationSystemTestCase
 
   test "owner's left rail follows scroll and links target actual authorized sections" do
     sign_in_as(@owner)
-    visit project_intake_path(@request)
+    visit project_intake_path(@intake)
     assert_selector ".wa-detail-shell[data-controller='wa-section-nav']"
     assert_selector ".wa-detail-shell__aside .wa-detail-shell__link", count: 5
     assert_selector ".wa-detail-shell__link[href='#intake-current'][aria-current='location']"
@@ -63,7 +63,7 @@ class StickyRequestSideNavigationTest < ApplicationSystemTestCase
 
   test "client rail has only available links, reply navigation, and no horizontal overflow" do
     sign_in_as(@client)
-    visit client_request_path(@request)
+    visit client_request_path(@intake)
     assert_selector ".wa-detail-shell__aside .wa-detail-shell__link", count: 5
     assert_selector ".wa-detail-shell__link[href='#intake-current'][aria-current='location']"
     assert_selector ".wa-detail-shell__link[href='#client-request-description']"

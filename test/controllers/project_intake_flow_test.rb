@@ -67,14 +67,14 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
     assert_select "#intake-conversation li", count: 1
     assert_select "#intake-brief .wa-owner-intake__prose", count: 1
     assert_select ".wa-owner-intake__meta[aria-label='Request type and workflow state']", count: 1
-    assert_select "nav.wa-owner-intake__jump[aria-label='Request sections']", count: 1
+    assert_select "aside.wa-detail-shell__aside nav.wa-detail-shell__links[aria-label='Request navigation']", count: 1
     assert_select "#intake-brief h2", text: "Request brief"
     assert_select ".wa-owner-intake__next strong", text: "Current review position"
     assert_select "#intake-interview .wa-owner-intake__filters[aria-label='Message role filter']", count: 1
     assert_select "#intake-interview button", text: "All messages", count: 1
     assert_select "#intake-interview .wa-owner-intake__filters button[type=button]", count: 3
     assert_select "#intake-conversation li[data-wa-intake-thread-role='assistant']", count: 1
-    assert_select "nav.wa-owner-intake__jump a[href='#intake-interview']", count: 1
+    assert_select "aside.wa-detail-shell__aside a[href='#intake-interview']", count: 1
     assert_select "#intake-review", count: 1
     assert_select "textarea[name='answer'][data-controller='wa-autogrow']", count: 1
 

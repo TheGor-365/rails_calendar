@@ -13,12 +13,12 @@ class RequestSideNavigationTest < ActionDispatch::IntegrationTest
       email_verified_at: Time.current, signup_consent_at: Time.current,
       signup_policy_version: "fictional-side-nav"
     )
-    @request = @client.client_project_intakes.create!(
+    @intake = @client.client_project_intakes.create!(
       title: "Fictional test navigation", project_type: "website",
       goal: "Fictional site", demo_consent_at: Time.current
     )
-    @request.intake_messages.create!(role: "client", body: "Fictional brief")
-    @request.intake_messages.create!(role: "assistant", body: "Fictional acknowledgement")
+    @intake.intake_messages.create!(role: "client", body: "Fictional brief")
+    @intake.intake_messages.create!(role: "assistant", body: "Fictional acknowledgement")
   end
 
   teardown do
@@ -28,7 +28,7 @@ class RequestSideNavigationTest < ActionDispatch::IntegrationTest
   test "one owner navigation landmark has section ids and no unpublished-spec link" do
     post account_session_path, params: { email: @owner.email, password: PASSWORD }
     assert_redirected_to workspace_path
-    get project_intake_path(@request)
+    get project_intake_path(@intake)
     assert_response :success
     assert_select "aside.wa-detail-shell__aside nav.wa-detail-shell__links", count: 1
     assert_select "aside.wa-detail-shell__aside nav a[href='#intake-current']"
@@ -40,7 +40,7 @@ class RequestSideNavigationTest < ActionDispatch::IntegrationTest
   test "client gets only permitted nav targets, with locale labels across four languages" do
     post account_session_path, params: { email: @client.email, password: PASSWORD }
     assert_redirected_to client_home_path
-    get client_request_path(@request)
+    get client_request_path(@intake)
     assert_response :success
     assert_select "aside.wa-detail-shell__aside nav.wa-detail-shell__links", count: 1
     assert_select "aside.wa-detail-shell__aside nav a[href='#client-request-reply']", count: 1
