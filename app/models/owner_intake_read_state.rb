@@ -5,7 +5,8 @@ class OwnerIntakeReadState < ApplicationRecord
   belongs_to :project_intake, inverse_of: :owner_intake_read_states
   belongs_to :last_seen_client_message, class_name: "IntakeMessage"
 
-  validates :owner_user_id, uniqueness: { scope: :project_intake_id }
+  # The DB unique index is authoritative. A Rails uniqueness validator would
+  # make create_or_find_by! fail before handling the concurrent/duplicate row.
   validates :first_seen_at, :last_seen_at, presence: true
 
   validate :owner_role_and_client_source
