@@ -44,7 +44,8 @@ class WhiteAtlasOwnerIntakeTest < ApplicationSystemTestCase
     assert_selector "#intake-conversation li:not([hidden])", count: 1
     fill_in "Search displayed history", with: ""
     assert_selector "#intake-conversation li:not([hidden])", count: 2
-    find("select[data-wa-intake-thread-target='order']").select("Newest first")
+    find(".wa-context__sort-label .rc-select-trigger[role='combobox']").click
+    find(".rc-select-menu:not([hidden]) [role='option']", text: "Newest first").click
     assert_selector "#intake-conversation li:first-child[data-wa-intake-thread-role='assistant']"
 
     [390, 320].each do |width|

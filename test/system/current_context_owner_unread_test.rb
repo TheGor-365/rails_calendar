@@ -4,6 +4,7 @@ class CurrentContextOwnerUnreadSystemTest < ApplicationSystemTestCase
   PASSWORD = "fictional-current-context-owner-password-2026".freeze
 
   setup do
+    AdminLoginWindow.delete_all
     @owner = User.create!(email: "current-record-owner@example.test", role: "owner", password: PASSWORD)
     @client = User.create!(
       email: "current-record-client@example.test", role: "client", password: PASSWORD,
@@ -24,6 +25,8 @@ class CurrentContextOwnerUnreadSystemTest < ApplicationSystemTestCase
     fill_in "Email address", with: @owner.email
     fill_in "Password", with: PASSWORD
     click_button "Sign in"
+    assert_current_path workspace_path
+    assert_equal 1, OwnerIntakeInbox.unread_for(owner: @owner).count
 
     visit admin_project_intakes_path
     assert_selector "header a.wa-inbox-nav .wa-unread-count", text: "1"

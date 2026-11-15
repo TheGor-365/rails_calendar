@@ -51,7 +51,8 @@ class ClientRequestClarificationsSystemTest < ApplicationSystemTestCase
     assert_selector "#client-request-conversation li", count: 3
     fill_in "Search displayed history", with: "keyboard"
     assert_selector "#client-request-conversation li:not([hidden])", count: 1
-    find("select[data-wa-intake-thread-target='order']").select("Newest first")
+    find(".wa-context__sort-label .rc-select-trigger[role='combobox']").click
+    find(".rc-select-menu:not([hidden]) [role='option']", text: "Newest first").click
     assert_selector "#client-request-conversation li:not([hidden])", count: 1
     fill_in "Search displayed history", with: ""
     assert_selector "#client-request-conversation li:not([hidden])", count: 3
