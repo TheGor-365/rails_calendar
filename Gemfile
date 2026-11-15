@@ -8,7 +8,7 @@ gem "bcrypt", "~> 3.1.22"
 
 gem "sprockets-rails"
 gem "pg", "~> 1.5"
-gem "puma", "~> 8.0", ">= 8.0.2"
+gem "puma", "~> 8.0", ">= 8.0.3"
 gem "jsbundling-rails"
 gem "turbo-rails"
 gem "stimulus-rails"
