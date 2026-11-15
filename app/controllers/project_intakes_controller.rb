@@ -29,6 +29,11 @@ class ProjectIntakesController < ApplicationController
 
   def show
     prepare_show
+    # A legacy administrator can view the demo but must not consume an
+    # actual DB owner's read receipt. Only displayed client turns count.
+    if owner_signed_in?
+      OwnerIntakeInbox.mark_seen!(owner: current_user, intake: @intake, displayed_messages: @messages.to_a)
+    end
   end
 
   def reply

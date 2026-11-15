@@ -23,7 +23,7 @@
   <% end %>
 </nav>
 <% else %>
-<nav class="rc-mobile-dock" aria-label="<%= t("nav.mobile_navigation") %>">
+<nav class="rc-mobile-dock<%= ' rc-mobile-dock--owner' if owner_signed_in? %>" aria-label="<%= t("nav.mobile_navigation") %>">
   <%= link_to root_path, class: "rc-mobile-dock-item #{'is-active' if calendar_active}",
               aria: { current: ("page" if calendar_active) } do %>
     <i class="bi bi-calendar3 rc-mobile-dock-icon" aria-hidden="true"></i>
@@ -44,6 +44,20 @@
                       current: ("page" if creation_active) }) do %>
     <span class="rc-mobile-dock-create-icon"><i class="bi bi-plus-lg" aria-hidden="true"></i></span>
     <span class="rc-mobile-dock-label"><%= t("nav.new") %></span>
+  <% end %>
+
+  <% if owner_signed_in? %>
+    <%= link_to admin_project_intakes_path,
+                class: "rc-mobile-dock-item wa-inbox-mobile #{'is-active' if controller_path == 'admin/project_intakes' && action_name == 'index'}",
+                aria: { label: t("nav.intake_inbox"), current: ("page" if controller_path == 'admin/project_intakes' && action_name == 'index') } do %>
+      <span class="rc-mobile-dock-icon wa-unread-mobile-icon">
+        <i class="bi bi-inboxes" aria-hidden="true"></i>
+        <% if owner_unread_intake_count.positive? %>
+          <span class="wa-unread-count wa-unread-count--mobile" aria-label="<%= t("intake.unread_count", count: owner_unread_intake_count) %>"><%= owner_unread_badge_label %></span>
+        <% end %>
+      </span>
+      <span class="rc-mobile-dock-label"><%= t("nav.intake_inbox") %></span>
+    <% end %>
   <% end %>
 
   <% records_destination = owner_signed_in? ? owner_cabinet_path : consultations_path %>

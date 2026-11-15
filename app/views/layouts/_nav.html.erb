@@ -42,8 +42,13 @@
         <%= link_to rc_icon_label("clipboard2-plus", t("nav.ai_request")), new_project_intake_path,
                     class: "rc-nav-link #{'active' if controller_path == 'project_intakes' && action_name == 'new'}" %>
         <% if admin_signed_in? %>
-          <%= link_to rc_icon_label("inboxes", t("nav.intake_inbox")), admin_project_intakes_path,
-                      class: "rc-nav-link #{'active' if controller_path == 'admin/project_intakes' && action_name == 'index'}" %>
+          <%= link_to admin_project_intakes_path,
+                      class: "rc-nav-link wa-inbox-nav #{'active' if controller_path == 'admin/project_intakes' && action_name == 'index'}" do %>
+            <%= rc_icon_label("inboxes", t("nav.intake_inbox")) %>
+            <% if owner_signed_in? && owner_unread_intake_count.positive? %>
+              <span class="wa-unread-count" aria-label="<%= t("intake.unread_count", count: owner_unread_intake_count) %>"><%= owner_unread_badge_label %></span>
+            <% end %>
+          <% end %>
         <% end %>
       <% end %>
       <% end %>
