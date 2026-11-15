@@ -1,6 +1,7 @@
 class ServiceOffering < ApplicationRecord
   belongs_to :workspace
   has_many :versions, class_name: "ServiceOfferingVersion", dependent: :restrict_with_exception
+  has_many :media_items, class_name: "ServiceOfferingMediaItem", dependent: :restrict_with_exception
   has_many :publications, class_name: "ServiceOfferingPublication", dependent: :restrict_with_exception
   belongs_to :approved_version, class_name: "ServiceOfferingVersion", optional: true
   belongs_to :published_version, class_name: "ServiceOfferingVersion", optional: true

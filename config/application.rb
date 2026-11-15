@@ -31,6 +31,10 @@ module RailsCalendar
     config.time_zone = "UTC"
     config.active_record.default_timezone = :utc
 
+    # Private pilot files must NEVER be reachable through signed Active Storage
+    # public proxy/redirect controllers. Only owner-scoped routes may serve them.
+    config.active_storage.draw_routes = false
+
     # Enforce same-origin checks for authenticated form mutations when CSRF
     # protection is enabled; the test-only opt-in exercises this HTTP path.
     config.action_controller.forgery_protection_origin_check = true
