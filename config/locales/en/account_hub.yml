@@ -29,6 +29,8 @@ en:
     interview_desc: "Revise the six saved sections"
     capabilities: "My skills and limits"
     capabilities_desc: "Approved experience and AI-assisted work"
+    my_services: "My services"
+    my_services_desc: "Service catalogue, revisions, media and review"
     ai_activity: "AI actions and costs"
     ai_activity_desc: "Provider history and application spending"
     workspace: "Work dashboard"

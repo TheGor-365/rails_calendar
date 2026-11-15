@@ -29,6 +29,8 @@ ru:
     interview_desc: "Изменить ответы в шести разделах"
     capabilities: "Навыки и ограничения"
     capabilities_desc: "Опыт и условные возможности с ИИ"
+    my_services: "Мои услуги"
+    my_services_desc: "Каталог услуг, редакции, медиа и утверждение"
     ai_activity: "Действия ИИ и расходы"
     ai_activity_desc: "История запросов и бюджет"
     workspace: "Рабочее пространство"

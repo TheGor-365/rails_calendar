@@ -10,6 +10,18 @@ class OwnerServiceOfferingsController < ApplicationController
     @bulk_approval = OwnerServices::BulkApproval.new(workspace: @workspace)
     @draft_count = @bulk_approval.drafts.size
     @draft_fingerprint = @bulk_approval.fingerprint
+    @media_cover_by_offering_id = {}
+    if Rails.env.test? || (Rails.env.development? && request.local?)
+      ServiceOfferingMediaItem.visible
+        .where(service_offering_id: @offerings.map(&:id), media_kind: %w[banner image])
+        .where.not(approved_at: nil)
+        .includes(file_attachment: :blob).each do |media|
+          current = @media_cover_by_offering_id[media.service_offering_id]
+          if current.nil? || (media.media_kind == "banner" && current.media_kind != "banner")
+            @media_cover_by_offering_id[media.service_offering_id] = media
+          end
+        end
+    end
   end
 
   def approve_all
@@ -53,6 +65,8 @@ class OwnerServiceOfferingsController < ApplicationController
     @history = @offering.versions.order(version: :desc)
     @publications = @offering.publications.order(id: :desc).limit(12)
     @eligible = current_capability?(@draft || @approved)
+    @media_enabled = Rails.env.test? || (Rails.env.development? && request.local?)
+    @media_items = @media_enabled ? @offering.media_items.visible.includes(:service_offering_version).to_a : []
   end
 
   def update_draft

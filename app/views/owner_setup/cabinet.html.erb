@@ -42,8 +42,8 @@
       <div class="ws-account-feature">
         <div class="ws-account-feature-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></div>
         <div class="ws-account-feature-copy">
-          <h3><%= @snapshot ? @snapshot.payload.fetch("headline") : t("account_hub.profile_not_approved") %></h3>
-          <p><%= @snapshot ? truncate(@snapshot.payload.fetch("private_summary"), length: 270) : t("account_hub.setup_explanation") %></p>
+          <h3><%= @snapshot&.payload&.dig("headline").presence || t("account_hub.profile_not_approved") %></h3>
+          <p><%= @snapshot&.payload&.dig("private_summary").present? ? truncate(@snapshot.payload["private_summary"], length: 270) : t("account_hub.setup_explanation") %></p>
           <div class="ws-account-feature-foot">
             <span class="ws-account-status"><i class="bi bi-database-lock" aria-hidden="true"></i><%= t("account_hub.stored_private") %></span>
             <span class="ws-account-muted"><%= t("account_hub.version_count", count: @version_count) %></span>
@@ -62,6 +62,10 @@
         <%= link_to owner_capabilities_path, class: "ws-account-tool" do %>
           <span class="ws-account-tool-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span>
           <strong><%= t("account_hub.capabilities") %></strong><small><%= t("account_hub.capabilities_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+        <% end %>
+        <%= link_to owner_services_path, class: "ws-account-tool" do %>
+          <span class="ws-account-tool-icon"><i class="bi bi-boxes" aria-hidden="true"></i></span>
+          <strong><%= t("account_hub.my_services") %></strong><small><%= t("account_hub.my_services_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
         <% end %>
         <%= link_to owner_ai_activity_path, class: "ws-account-tool" do %>
           <span class="ws-account-tool-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>

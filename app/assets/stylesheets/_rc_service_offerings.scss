@@ -175,3 +175,70 @@
   .wa-services__card,.wa-services__restrictions .wa-services__chevron,
   .wa-services__restriction-content { animation: none; transition: none; }
 }
+
+
+/* Owner-only private media. Mirrors White Atlas card proportions and motion. */
+.wa-services__media-section { scroll-margin-top: 180px; }
+.wa-services__media-gallery {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  align-items: stretch; gap: .75rem; margin: 1rem 0 1.25rem;
+}
+.wa-services__media-item {
+  display: flex; flex-direction: column; min-width: 0;
+  padding: .7rem; border: 1px solid var(--ws-border);
+  border-radius: 14px; background: var(--ws-paper);
+  box-shadow: var(--ws-shadow);
+  transition: transform .18s var(--ws-easing), box-shadow .18s var(--ws-easing);
+}
+.wa-services__media-item:hover { transform: translateY(-2px); box-shadow: var(--ws-shadow-up); }
+.wa-services__media-thumb,.wa-services__media-placeholder {
+  display: block; aspect-ratio: 16 / 10; width: 100%; border-radius: 10px;
+  background: var(--ws-canvas); border: 1px solid var(--ws-border);
+}
+.wa-services__media-thumb { object-fit: cover; }
+.wa-services__media-placeholder { display: grid; place-items: center; color: var(--ws-teal); }
+.wa-services__media-placeholder i { font-size: 2.1rem; }
+.wa-services__media-meta { display: grid; min-width: 0; gap: .2rem; padding: .68rem .15rem; }
+.wa-services__media-meta strong {
+  color: var(--ws-ink); font-size: .85rem; line-height: 1.42; font-weight: 790;
+  overflow-wrap: anywhere;
+}
+.wa-services__media-meta strong i { color: var(--ws-teal); margin-right: .2rem; }
+.wa-services__media-meta small { color: var(--ws-muted); font-size: .72rem; }
+.wa-services__media-actions {
+  display: flex; gap: .38rem; flex-wrap: wrap;
+  margin-top: auto; border-top: 1px solid var(--ws-border); padding-top: .68rem;
+}
+.wa-services__media-actions .rc-action { font-size: .69rem; }
+.wa-services__media-subheading {
+  margin: 1rem 0 .8rem; font-size: .96rem; font-weight: 790; letter-spacing: -.025em;
+}
+.wa-services__media-subheading i { color: var(--ws-teal); }
+.wa-services__media-form {
+  display: grid; gap: .85rem; min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.wa-services__media-form .rc-field { min-width: 0; }
+.wa-services__media-form .rc-field:last-of-type { grid-column: 1 / -1; }
+.wa-services__media-form > button { width: fit-content; }
+.wa-services__media-form input[type=file] {
+  padding: .45rem; height: auto; max-width: 100%; font-size: .77rem;
+}
+.wa-services__media-ai-notice {
+  display: flex; align-items: flex-start; gap: .4rem; padding-top: .85rem;
+  margin: .85rem 0 0; border-top: 1px solid var(--ws-border);
+}
+.wa-services__media-ai-notice i { color: var(--ws-teal); }
+@media(max-width:575px) {
+  .wa-services__media-form { grid-template-columns: 1fr; }
+  .wa-services__media-form .rc-field:last-of-type { grid-column: auto; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .wa-services__media-item { transition: none; }
+}
+
+.wa-services__card-banner {
+  width: 100%; aspect-ratio: 16 / 8; display: block; object-fit: cover;
+  border: 1px solid var(--ws-border); border-radius: 10px; margin: 0 0 .83rem;
+  background: var(--ws-canvas);
+}
