@@ -1,0 +1,104 @@
+<div class="container wa-services my-4 my-sm-5" id="owner-service-detail">
+  <header class="rc-page-hero mb-4">
+    <p class="eyebrow"><%= t("owner_services.eyebrow") %></p>
+    <h1 class="page-title"><%= (@draft || @approved || @published).title %></h1>
+    <p class="rc-hint"><%= t("owner_services.record_key", key: @offering.key) %></p>
+    <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path, class: "rc-action rc-action--quiet" %>
+  </header>
+  <section class="surface-panel wa-services__notice mb-4">
+    <i class="bi bi-shield-lock" aria-hidden="true"></i>
+    <div><strong><%= t("owner_services.private_title") %></strong><p><%= t("owner_services.private_help") %></p></div>
+  </section>
+  <div class="wa-services__detail">
+    <main class="wa-services__main">
+      <% if @draft %>
+        <section class="surface-panel wa-services__panel" id="offering-draft">
+          <h2><i class="bi bi-pencil-square" aria-hidden="true"></i> <%= t("owner_services.draft_version", version: @draft.version) %></h2>
+          <p class="rc-hint"><%= t("owner_services.draft_help") %></p>
+          <%= form_with url: owner_service_draft_path(@offering), method: :patch, html: { class: "rc-form", id: "offering-draft-form" } do %>
+            <%= hidden_field_tag :base_version, @draft.version %>
+            <%= hidden_field_tag :base_digest, @draft.digest %>
+            <%= render "fields", values: @draft.attributes, creating: false, draft: @draft, capabilities: @eligible_capabilities %>
+            <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %><%= rc_icon_label("floppy", t("owner_services.save_draft")) %><% end %>
+          <% end %>
+        </section>
+        <section class="surface-panel wa-services__panel" id="offering-approval">
+          <h2><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("owner_services.approval_title") %></h2>
+          <% if @eligible %>
+            <p><%= t("owner_services.approval_help") %></p>
+            <%= form_with url: approve_owner_service_path(@offering), method: :post do %>
+              <%= hidden_field_tag :version, @draft.version %>
+              <%= hidden_field_tag :digest, @draft.digest %>
+              <div class="wa-services__check"><%= check_box_tag :confirm, "1", false, required: true, id: "confirm-offering-approval" %>
+                <%= label_tag "confirm-offering-approval", t("owner_services.confirm_approval") %></div>
+              <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %><%= rc_icon_label("patch-check", t("owner_services.approve_action")) %><% end %>
+            <% end %>
+          <% else %>
+            <p class="rc-notice rc-notice--neutral"><%= t("owner_services.pending_context") %></p>
+          <% end %>
+        </section>
+      <% elsif @approved %>
+        <section class="surface-panel wa-services__panel" id="offering-approved">
+          <h2><i class="bi bi-patch-check" aria-hidden="true"></i> <%= t("owner_services.approved_version", version: @approved.version) %></h2>
+          <p class="rc-hint"><%= t("owner_services.immutable") %></p>
+          <h3><%= @approved.title %></h3>
+          <p class="wa-services__prose"><%= @approved.summary %></p>
+          <dl class="wa-services__boundaries">
+            <dt><%= t("owner_services.included_scope") %></dt><dd><%= @approved.included_scope %></dd>
+            <dt><%= t("owner_services.excluded_scope") %></dt><dd><%= @approved.excluded_scope %></dd>
+            <% if @approved.requirements_prompt.present? %><dt><%= t("owner_services.requirements_prompt") %></dt><dd><%= @approved.requirements_prompt %></dd><% end %>
+          </dl>
+          <%= button_to rc_icon_label("files", t("owner_services.new_revision")), revise_owner_service_path(@offering), method: :post, class: "rc-action rc-action--quiet" %>
+        </section>
+      <% end %>
+      <% if @approved %>
+        <section class="surface-panel wa-services__panel" id="offering-publication">
+          <h2><i class="bi bi-eye" aria-hidden="true"></i> <%= t("owner_services.publication_title") %></h2>
+          <p class="rc-hint"><%= t("owner_services.publication_help") %></p>
+          <% if @published %>
+            <p class="wa-services__state wa-services__state--enabled"><%= t("owner_services.enabled_version", version: @published.version) %></p>
+            <%= button_to rc_icon_label("eye-slash", t("owner_services.unpublish_action")), unpublish_owner_service_path(@offering),
+                          method: :post, params: { confirm: "1" }, class: "rc-action rc-action--quiet" %>
+          <% end %>
+          <% if @eligible_capabilities.any? && @approved.professional_context_snapshot_id == @snapshot&.id && @profile.onboarding_state == "approved" && @profile.professional_capability_corrections.none? && @published&.id != @approved.id %>
+            <%= form_with url: publish_owner_service_path(@offering), method: :post do %>
+              <%= hidden_field_tag :version_id, @approved.id %>
+              <%= hidden_field_tag :digest, @approved.digest %>
+              <div class="wa-services__check"><%= check_box_tag :confirm, "1", false, required: true, id: "confirm-offering-publication" %>
+                <%= label_tag "confirm-offering-publication", t("owner_services.confirm_publication") %></div>
+              <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %><%= rc_icon_label("eye", t("owner_services.publish_action")) %><% end %>
+            <% end %>
+          <% elsif @approved.professional_context_snapshot_id != @snapshot&.id %>
+            <p class="rc-notice rc-notice--neutral"><%= t("owner_services.stale_context") %></p>
+          <% end %>
+        </section>
+      <% end %>
+    </main>
+    <aside class="wa-services__aside">
+      <% source = @draft || @approved || @published %>
+      <section class="surface-panel wa-services__panel">
+        <h2><i class="bi bi-link-45deg" aria-hidden="true"></i> <%= t("owner_services.source_title") %></h2>
+        <p><strong><%= owner_capability_title(source.source_capability_domain, source.professional_capability.delivery_mode) %></strong></p>
+        <p class="rc-hint"><%= t("owner_services.snapshot_version", version: source.professional_context_snapshot.version) %> · <%= t("owner_services.modes.#{source.delivery_mode}") %></p>
+        <p class="rc-hint"><%= t("owner_services.self_reported") %></p>
+        <% if @policy %><details><summary><%= t("owner_services.policy_title") %></summary>
+          <ul><% Array(@policy.hard_no_go).each do |code| %><li><%= t("owner_setup.options.D.#{code}", default: code) %></li><% end %></ul></details><% end %>
+      </section>
+      <section class="surface-panel wa-services__panel">
+        <h2><i class="bi bi-clock-history" aria-hidden="true"></i> <%= t("owner_services.history") %></h2>
+        <ol class="wa-services__history">
+          <% @history.each do |row| %>
+            <li><strong><%= t("owner_services.version", version: row.version) %></strong>
+              <span><%= row.approved? ? t("owner_services.approved_label") : t("owner_services.draft_label") %></span>
+              <small><%= t("owner_services.snapshot_version", version: row.professional_context_snapshot.version) %> · SHA <%= row.digest.first(12) %></small></li>
+          <% end %>
+        </ol>
+        <% if @publications.any? %><h3><%= t("owner_services.audit") %></h3>
+          <ol class="wa-services__history">
+            <% @publications.each do |event| %><li><strong><%= t("owner_services.event_#{event.event}") %></strong><small><%= l(event.created_at, format: :short) %></small></li><% end %>
+          </ol>
+        <% end %>
+      </section>
+    </aside>
+  </div>
+</div>

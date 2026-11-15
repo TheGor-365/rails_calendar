@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_15_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_15_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -300,6 +300,59 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_15_160000) do
     t.index ["project_intake_id"], name: "index_project_milestones_on_project_intake_id"
   end
 
+  create_table "service_offerings", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.string "key", limit: 32, null: false
+    t.integer "position", default: 0, null: false
+    t.bigint "approved_version_id"
+    t.bigint "published_version_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id", "key"], name: "idx_service_offerings_workspace_key", unique: true
+    t.index ["workspace_id"], name: "index_service_offerings_on_workspace_id"
+    t.index ["approved_version_id"], name: "index_service_offerings_on_approved_version_id"
+    t.index ["published_version_id"], name: "index_service_offerings_on_published_version_id"
+  end
+
+  create_table "service_offering_versions", force: :cascade do |t|
+    t.bigint "service_offering_id", null: false
+    t.bigint "professional_context_snapshot_id", null: false
+    t.bigint "professional_capability_id", null: false
+    t.integer "version", null: false
+    t.string "title", limit: 120, null: false
+    t.text "summary", null: false
+    t.text "included_scope", null: false
+    t.text "excluded_scope", null: false
+    t.text "requirements_prompt"
+    t.string "project_category", limit: 32, null: false
+    t.string "delivery_mode", limit: 20, null: false
+    t.string "source_capability_domain", limit: 80, null: false
+    t.string "digest", limit: 64, null: false
+    t.datetime "approved_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service_offering_id", "version"], name: "idx_service_offering_versions_unique", unique: true
+    t.index ["service_offering_id"], name: "idx_service_offering_single_draft", unique: true, where: "(approved_at IS NULL)"
+    t.index ["service_offering_id"], name: "index_service_offering_versions_on_service_offering_id"
+    t.index ["professional_context_snapshot_id"], name: "idx_offering_version_snapshot"
+    t.index ["professional_capability_id"], name: "idx_offering_version_capability"
+    t.check_constraint "version > 0", name: "chk_service_offering_version_positive"
+    t.check_constraint "delivery_mode IN ('direct', 'conditional', 'evaluate_first')", name: "chk_service_offering_delivery_mode"
+  end
+
+  create_table "service_offering_publications", force: :cascade do |t|
+    t.bigint "service_offering_id", null: false
+    t.bigint "service_offering_version_id"
+    t.bigint "owner_user_id", null: false
+    t.string "event", limit: 16, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service_offering_id"], name: "idx_service_publication_offering"
+    t.index ["service_offering_version_id"], name: "idx_service_publication_version"
+    t.index ["owner_user_id"], name: "idx_service_publication_owner"
+    t.check_constraint "event IN ('publish', 'unpublish')", name: "chk_service_publication_event"
+  end
+
   create_table "user_sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "token_digest", limit: 64, null: false
@@ -343,5 +396,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_15_160000) do
   add_foreign_key "project_intakes", "users", column: "client_user_id"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
+  add_foreign_key "service_offerings", "workspaces"
+  add_foreign_key "service_offerings", "service_offering_versions", column: "approved_version_id"
+  add_foreign_key "service_offerings", "service_offering_versions", column: "published_version_id"
+  add_foreign_key "service_offering_versions", "service_offerings"
+  add_foreign_key "service_offering_versions", "professional_context_snapshots"
+  add_foreign_key "service_offering_versions", "professional_capabilities"
+  add_foreign_key "service_offering_publications", "service_offerings"
+  add_foreign_key "service_offering_publications", "service_offering_versions"
+  add_foreign_key "service_offering_publications", "users", column: "owner_user_id"
   add_foreign_key "user_sessions", "users"
 end
