@@ -15,8 +15,7 @@
          data-wa-avatar-editor-failure-value="<%= t("account_hub.avatar_crop_failed") %>">
       <% if (avatar = local_owner_avatar_attachment(current_user)) %>
         <%= image_tag owner_avatar_file_path(avatar), class: "ws-account-avatar",
-              alt: t("account_hub.avatar_alt"), loading: "lazy",
-              data: { wa_avatar_editor_target: "preview" } %>
+              alt: t("account_hub.avatar_alt"), loading: "lazy" %>
       <% else %>
         <i class="bi bi-person-workspace ws-account-avatar-placeholder" aria-hidden="true"></i>
       <% end %>
@@ -45,6 +44,11 @@
                 <%= file_field_tag "avatar[file]", id: "owner-avatar-file",
                     accept: "image/jpeg,image/png,image/webp", required: true,
                     data: { wa_avatar_editor_target: "file", action: "change->wa-avatar-editor#prepare" } %>
+              </div>
+              <div class="ws-avatar-edit-crop-preview" aria-label="<%= t("account_hub.avatar_alt") %>">
+                <img class="ws-avatar-edit-crop-preview__image"
+                     data-wa-avatar-editor-target="preview"
+                     alt="<%= t("account_hub.avatar_alt") %>" hidden>
               </div>
               <p class="ws-avatar-edit-status" role="status" aria-live="polite"
                  data-wa-avatar-editor-target="status"></p>

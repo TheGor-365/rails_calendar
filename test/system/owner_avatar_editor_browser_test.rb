@@ -32,6 +32,8 @@ class OwnerAvatarEditorBrowserTest < ApplicationSystemTestCase
       tmp.flush
       attach_file "owner-avatar-file", tmp.path
       assert_text "Square image prepared. Ready to save."
+      assert_selector ".ws-avatar-edit-crop-preview__image", visible: true
+      assert_no_selector ".ws-account-avatar-frame > img.ws-account-avatar"
       click_button "Upload avatar"
     end
 

@@ -358,6 +358,14 @@
 .ws-account-avatar-form .rc-action { width: 100%; }
 .ws-avatar-edit-panel .wa-file-drop label { font-size: .73rem; }
 .ws-avatar-edit-panel .wa-file-drop input[type=file] { font-size: .72rem; }
+.ws-avatar-edit-crop-preview { display: flex; justify-content: center; }
+.ws-avatar-edit-crop-preview__image {
+  width: 88px; height: 88px; aspect-ratio: 1 / 1; display: block;
+  object-fit: cover; border-radius: 16px; border: 1px solid #c7e5dc;
+  box-shadow: var(--ws-shadow);
+}
+.ws-avatar-edit-crop-preview__image[hidden] { display: none; }
+.ws-avatar-edit-crop-preview:has(img[hidden]) { display: none; }
 .ws-avatar-edit-status { margin: 0; font-size: .74rem; color: var(--ws-teal-deep); line-height: 1.45; }
 .ws-avatar-edit-status:empty { display: none; }
 .ws-avatar-edit-panel__footer { display: flex; gap: .45rem; align-items: flex-start; margin: 0; }

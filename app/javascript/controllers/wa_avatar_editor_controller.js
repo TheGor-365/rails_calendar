@@ -9,6 +9,11 @@ export default class extends Controller {
   connect() {
     this.processing = false
     this.previewObjectUrl = null
+    this.details = this.element.querySelector(".ws-avatar-edit")
+    this.onPointerDown = this.onPointerDown.bind(this)
+    this.onKeyDown = this.onKeyDown.bind(this)
+    document.addEventListener("pointerdown", this.onPointerDown)
+    document.addEventListener("keydown", this.onKeyDown)
   }
 
   async prepare() {
@@ -46,6 +51,7 @@ export default class extends Controller {
         if (this.previewObjectUrl) URL.revokeObjectURL(this.previewObjectUrl)
         this.previewObjectUrl = URL.createObjectURL(blob)
         this.previewTarget.src = this.previewObjectUrl
+        this.previewTarget.hidden = false
       }
       this.statusTarget.textContent = this.successValue
     } catch (_) {
@@ -61,7 +67,19 @@ export default class extends Controller {
     if (this.processing) event.preventDefault()
   }
 
+  onPointerDown(event) {
+    if (this.details?.open && !this.element.contains(event.target)) this.details.open = false
+  }
+
+  onKeyDown(event) {
+    if (event.key !== "Escape" || !this.details?.open) return
+    this.details.open = false
+    this.details.querySelector("summary")?.focus()
+  }
+
   disconnect() {
+    document.removeEventListener("pointerdown", this.onPointerDown)
+    document.removeEventListener("keydown", this.onKeyDown)
     if (this.previewObjectUrl) URL.revokeObjectURL(this.previewObjectUrl)
   }
 }
