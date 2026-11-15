@@ -130,8 +130,9 @@ class OwnerServiceMediaItemsTest < ActionDispatch::IntegrationTest
     }
     item = @offer.media_items.last
     blob = item.file.blob
-    get "/rails/active_storage/blobs/redirect/#{blob.signed_id}/sample.png"
-    assert_response :not_found
+    assert_raises(ActionController::RoutingError) do
+      get "/rails/active_storage/blobs/redirect/#{blob.signed_id}/sample.png"
+    end
 
     post approve_owner_service_media_path(@offer, item)
     assert_raises(ActiveRecord::RecordInvalid) { item.reload.update!(caption: "Tampered") }
