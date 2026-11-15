@@ -1,0 +1,131 @@
+<div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-catalogue-copilot">
+  <header class="ws-owner-hero wa-services__hero">
+    <div class="ws-owner-hero-copy">
+      <p class="eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_services.copilot_eyebrow") %></p>
+      <h1 class="page-title"><%= t("owner_services.copilot_title") %></h1>
+      <p class="rc-muted"><%= t("owner_services.copilot_intro") %></p>
+    </div>
+    <div class="wa-services__actions">
+      <%= link_to rc_icon_label("boxes", t("owner_services.back")), owner_services_path,
+                    class: "rc-action rc-action--quiet" %>
+    </div>
+  </header>
+
+  <section class="surface-panel wa-services__panel wa-services__copilot-run">
+    <h2><i class="bi bi-cpu" aria-hidden="true"></i> <%= t("owner_services.copilot_check_title") %></h2>
+    <p class="rc-muted"><%= t("owner_services.copilot_check_intro") %></p>
+    <div class="wa-services__copilot-points">
+      <span><i class="bi bi-tags" aria-hidden="true"></i> <%= t("owner_services.copilot_categories") %></span>
+      <span><i class="bi bi-spellcheck" aria-hidden="true"></i> <%= t("owner_services.copilot_copy") %></span>
+      <span><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("owner_services.copilot_risks") %></span>
+    </div>
+    <p class="rc-hint"><i class="bi bi-shield-lock" aria-hidden="true"></i>
+      <%= t("owner_services.copilot_privacy") %></p>
+    <p class="rc-hint"><i class="bi bi-cash-coin" aria-hidden="true"></i>
+      <%= t("owner_services.copilot_budget", max: "$0.10") %></p>
+
+    <% if @ai_enabled %>
+      <%= form_with url: run_owner_catalogue_ai_path, method: :post,
+            html: { class: "wa-services__copilot-form" } do %>
+        <div class="wa-services__check">
+          <%= check_box_tag :paid_consent, "1", false, required: true, id: "catalogue-paid-consent" %>
+          <%= label_tag "catalogue-paid-consent", t("owner_services.copilot_consent_label") %>
+        </div>
+        <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+          <%= rc_icon_label("stars", t("owner_services.copilot_run")) %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <p class="rc-notice rc-notice--neutral"><%= t("owner_services.copilot_disabled") %></p>
+    <% end %>
+  </section>
+
+  <section class="wa-services__copilot-results mt-3" id="copilot-results">
+    <div class="wa-services__toolbar">
+      <h2><i class="bi bi-clipboard-data" aria-hidden="true"></i> <%= t("owner_services.copilot_results") %></h2>
+      <% if @entry %>
+        <span class="wa-services__state wa-services__state--approved">
+          <i class="bi bi-check2-circle" aria-hidden="true"></i>
+          <%= t("owner_services.copilot_recommendations", count: @recommendations.size) %>
+        </span>
+      <% end %>
+    </div>
+    <% if @entry.nil? %>
+      <div class="surface-panel wa-services__empty">
+        <i class="bi bi-chat-square-dots" aria-hidden="true"></i>
+        <h3><%= t("owner_services.copilot_no_review") %></h3>
+        <p><%= t("owner_services.copilot_no_review_hint") %></p>
+      </div>
+    <% elsif @recommendations.empty? %>
+      <div class="surface-panel wa-services__empty">
+        <i class="bi bi-check2-circle" aria-hidden="true"></i>
+        <h3><%= t("owner_services.copilot_no_edits") %></h3>
+      </div>
+    <% else %>
+      <div class="wa-services__copilot-list">
+        <% @recommendations.each do |row| %>
+          <% valid_now = @copilot.recommendation_current?(row) %>
+          <% offering = @workspace.service_offerings.find_by(id: row["offering_id"]) %>
+          <% original = offering && (offering.draft_version || offering.approved_version || offering.published_version) %>
+          <article class="surface-panel wa-services__panel wa-services__copilot-item" id="copilot-offer-<%= row["offering_id"] %>">
+            <div class="wa-services__copilot-item-head">
+              <div>
+                <p class="eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_services.copilot_suggestion") %></p>
+                <h3><%= row["title"] %></h3>
+              </div>
+              <span class="wa-services__state wa-services__state--<%= valid_now ? "draft" : "approved" %>">
+                <%= t(valid_now ? "owner_services.copilot_ready" : "owner_services.copilot_changed") %>
+              </span>
+            </div>
+            <div class="wa-services__copilot-compare">
+              <section class="wa-services__copilot-column">
+                <h4><i class="bi bi-card-text" aria-hidden="true"></i> <%= t("owner_services.copilot_current") %></h4>
+                <% if original %>
+                  <strong><%= original.title %></strong>
+                  <p><%= original.summary %></p>
+                  <small><%= t("owner_services.category") %>: <%= original.project_category %></small>
+                <% else %>
+                  <p><%= t("owner_services.copilot_changed") %></p>
+                <% end %>
+              </section>
+              <section class="wa-services__copilot-column wa-services__copilot-column--suggested">
+                <h4><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_services.copilot_proposed") %></h4>
+                <strong><%= row["title"] %></strong>
+                <p><%= row["summary"] %></p>
+                <small><%= t("owner_services.category") %>: <%= row["project_category"] %></small>
+              </section>
+            </div>
+            <details class="wa-services__copilot-details">
+              <summary><i class="bi bi-list-check" aria-hidden="true"></i> <%= t("owner_services.copilot_review_details") %></summary>
+              <dl class="wa-services__boundaries">
+                <% %w[included_scope excluded_scope requirements_prompt].each do |key| %>
+                  <dt><%= t("owner_services.#{key}") %></dt>
+                  <dd><%= row[key] %></dd>
+                <% end %>
+                <dt><%= t("owner_services.copilot_reason") %></dt>
+                <dd><%= row["rationale"] %></dd>
+                <% if row["risk_flags"].any? %>
+                  <dt><%= t("owner_services.copilot_risks") %></dt>
+                  <dd><ul class="wa-services__copilot-risk-list">
+                    <% row["risk_flags"].each do |risk| %>
+                      <li><i class="bi bi-exclamation-circle" aria-hidden="true"></i> <%= risk %></li>
+                    <% end %>
+                  </ul></dd>
+                <% end %>
+              </dl>
+            </details>
+            <footer class="wa-services__copilot-footer">
+              <p class="rc-hint"><%= t("owner_services.copilot_draft_notice") %></p>
+              <% if valid_now %>
+                <%= button_to rc_icon_label("file-earmark-plus", t("owner_services.copilot_apply")),
+                      apply_owner_catalogue_ai_path(row["offering_id"]), method: :post,
+                      params: { entry_id: @entry.id, base_digest: row["base_digest"] },
+                      form: { class: "wa-services__inline-form" }, class: "rc-action rc-action--soft" %>
+              <% end %>
+            </footer>
+          </article>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+</div>
