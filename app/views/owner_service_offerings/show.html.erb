@@ -1,8 +1,8 @@
-<div class="container wa-services my-4 my-sm-5" id="owner-service-detail">
+<div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-service-detail">
   <header class="rc-page-hero mb-4">
     <p class="eyebrow"><%= t("owner_services.eyebrow") %></p>
     <h1 class="page-title"><%= (@draft || @approved || @published).title %></h1>
-    <p class="rc-hint"><%= t("owner_services.record_key", key: @offering.key) %></p>
+    <p class="rc-hint"><i class="bi bi-person-check" aria-hidden="true"></i> <%= owner_capability_title((@draft || @approved || @published).source_capability_domain, (@draft || @approved || @published).professional_capability.delivery_mode) %></p>
     <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path, class: "rc-action rc-action--quiet" %>
   </header>
   <section class="surface-panel wa-services__notice mb-4">
@@ -13,7 +13,7 @@
     <main class="wa-services__main">
       <% if @draft %>
         <section class="surface-panel wa-services__panel" id="offering-draft">
-          <h2><i class="bi bi-pencil-square" aria-hidden="true"></i> <%= t("owner_services.draft_version", version: @draft.version) %></h2>
+          <h2><i class="bi bi-pencil-square" aria-hidden="true"></i> <%= t("owner_services.draft_label") %></h2>
           <p class="rc-hint"><%= t("owner_services.draft_help") %></p>
           <%= form_with url: owner_service_draft_path(@offering), method: :patch, html: { class: "rc-form", id: "offering-draft-form" } do %>
             <%= hidden_field_tag :base_version, @draft.version %>
@@ -29,9 +29,10 @@
             <%= form_with url: approve_owner_service_path(@offering), method: :post do %>
               <%= hidden_field_tag :version, @draft.version %>
               <%= hidden_field_tag :digest, @draft.digest %>
-              <div class="wa-services__check"><%= check_box_tag :confirm, "1", false, required: true, id: "confirm-offering-approval" %>
-                <%= label_tag "confirm-offering-approval", t("owner_services.confirm_approval") %></div>
-              <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %><%= rc_icon_label("patch-check", t("owner_services.approve_action")) %><% end %>
+              <%= hidden_field_tag :confirm, "1" %>
+              <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+                <%= rc_icon_label("patch-check", t("owner_services.finalize_one")) %>
+              <% end %>
             <% end %>
           <% else %>
             <p class="rc-notice rc-notice--neutral"><%= t("owner_services.pending_context") %></p>
@@ -39,7 +40,7 @@
         </section>
       <% elsif @approved %>
         <section class="surface-panel wa-services__panel" id="offering-approved">
-          <h2><i class="bi bi-patch-check" aria-hidden="true"></i> <%= t("owner_services.approved_version", version: @approved.version) %></h2>
+          <h2><i class="bi bi-patch-check" aria-hidden="true"></i> <%= t("owner_services.final_label") %></h2>
           <p class="rc-hint"><%= t("owner_services.immutable") %></p>
           <h3><%= @approved.title %></h3>
           <p class="wa-services__prose"><%= @approved.summary %></p>
@@ -81,8 +82,17 @@
         <p><strong><%= owner_capability_title(source.source_capability_domain, source.professional_capability.delivery_mode) %></strong></p>
         <p class="rc-hint"><%= t("owner_services.snapshot_version", version: source.professional_context_snapshot.version) %> · <%= t("owner_services.modes.#{source.delivery_mode}") %></p>
         <p class="rc-hint"><%= t("owner_services.self_reported") %></p>
-        <% if @policy %><details><summary><%= t("owner_services.policy_title") %></summary>
-          <ul><% Array(@policy.hard_no_go).each do |code| %><li><%= t("owner_setup.options.D.#{code}", default: code) %></li><% end %></ul></details><% end %>
+        <% if @policy %>
+          <details class="wa-services__restrictions">
+            <summary><i class="bi bi-shield-exclamation" aria-hidden="true"></i> <%= t("owner_services.policy_title") %>
+              <i class="bi bi-chevron-down wa-services__chevron" aria-hidden="true"></i></summary>
+            <div class="wa-services__restriction-content">
+              <ul><% Array(@policy.hard_no_go).each do |code| %>
+                <li><%= t("owner_setup.options.D.#{code}", default: code) %></li>
+              <% end %></ul>
+            </div>
+          </details>
+        <% end %>
       </section>
       <section class="surface-panel wa-services__panel">
         <h2><i class="bi bi-clock-history" aria-hidden="true"></i> <%= t("owner_services.history") %></h2>
@@ -90,7 +100,7 @@
           <% @history.each do |row| %>
             <li><strong><%= t("owner_services.version", version: row.version) %></strong>
               <span><%= row.approved? ? t("owner_services.approved_label") : t("owner_services.draft_label") %></span>
-              <small><%= t("owner_services.snapshot_version", version: row.professional_context_snapshot.version) %> · SHA <%= row.digest.first(12) %></small></li>
+              <small><%= l(row.created_at, format: :short) %></small></li>
           <% end %>
         </ol>
         <% if @publications.any? %><h3><%= t("owner_services.audit") %></h3>
@@ -98,6 +108,15 @@
             <% @publications.each do |event| %><li><strong><%= t("owner_services.event_#{event.event}") %></strong><small><%= l(event.created_at, format: :short) %></small></li><% end %>
           </ol>
         <% end %>
+        <details class="wa-services__technical">
+          <summary><i class="bi bi-code-slash" aria-hidden="true"></i> <%= t("owner_services.technical_details") %></summary>
+          <p><%= t("owner_services.record_key", key: @offering.key) %></p>
+          <% @history.each do |row| %>
+            <p><%= t("owner_services.version", version: row.version) %> ·
+              <%= t("owner_services.snapshot_version", version: row.professional_context_snapshot.version) %> ·
+              SHA <%= row.digest.first(12) %></p>
+          <% end %>
+        </details>
       </section>
     </aside>
   </div>

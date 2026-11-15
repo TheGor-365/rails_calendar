@@ -7,6 +7,20 @@ class OwnerServiceOfferingsController < ApplicationController
     @offerings = @workspace.service_offerings.includes(
       :approved_version, :published_version, :versions
     ).order(:position, :id)
+    @bulk_approval = OwnerServices::BulkApproval.new(workspace: @workspace)
+    @draft_count = @bulk_approval.drafts.size
+    @draft_fingerprint = @bulk_approval.fingerprint
+  end
+
+  def approve_all
+    count = OwnerServices::BulkApproval.new(workspace: @workspace).approve_all!(
+      expected_fingerprint: params[:fingerprint]
+    )
+    redirect_to owner_services_path, notice: t("owner_services.bulk_approved", count: count)
+  rescue OwnerServices::BulkApproval::Conflict, OwnerServices::Catalogue::Conflict
+    redirect_to owner_services_path, alert: t("owner_services.stale")
+  rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid
+    redirect_to owner_services_path, alert: t("owner_services.review_required")
   end
 
   def sync
@@ -59,11 +73,11 @@ class OwnerServiceOfferingsController < ApplicationController
       offering: @offering, version: params[:version], digest: params[:digest],
       confirmed: params[:confirm] == "1"
     )
-    redirect_to owner_service_path(@offering), notice: t("owner_services.approved")
+    redirect_to approval_return_path, notice: t("owner_services.approved")
   rescue OwnerServices::Catalogue::Conflict
-    redirect_to owner_service_path(@offering), alert: t("owner_services.stale")
+    redirect_to approval_return_path, alert: t("owner_services.stale")
   rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid
-    redirect_to owner_service_path(@offering), alert: t("owner_services.review_required")
+    redirect_to approval_return_path, alert: t("owner_services.review_required")
   end
 
   def publish
@@ -97,6 +111,12 @@ class OwnerServiceOfferingsController < ApplicationController
   end
 
   private
+
+  # Only these two internal destinations are allowed; never accept a client
+  # supplied redirect URL after a state-changing POST.
+  def approval_return_path
+    params[:return_to_catalog] == "1" ? owner_services_path : owner_service_path(@offering)
+  end
 
   def require_owner!
     redirect_to sign_in_path, alert: t("owner_setup.owner_only") unless owner_signed_in?

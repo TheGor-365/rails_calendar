@@ -42,6 +42,7 @@ Rails.application.routes.draw do
   # RC055.1: private owner-controlled service offering revisions.
   get "/workspace/services", to: "owner_service_offerings#index", as: :owner_services
   post "/workspace/services/sync", to: "owner_service_offerings#sync", as: :sync_owner_services
+  post "/workspace/services/approve_all", to: "owner_service_offerings#approve_all", as: :approve_all_owner_services
   get "/workspace/services/new", to: "owner_service_offerings#new", as: :new_owner_service
   post "/workspace/services", to: "owner_service_offerings#create"
   get "/workspace/services/:id", to: "owner_service_offerings#show", as: :owner_service

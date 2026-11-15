@@ -23,7 +23,7 @@ class OwnerServiceOfferingsBrowserTest < ApplicationSystemTestCase
     assert_selector "#owner-services"
     assert_text "Internal catalog only"
     assert_selector ".wa-services__card", count: 1
-    assert_text "Draft v1"
+    assert_text "Draft"
     click_link "Fix a fictional Rails error"
     assert_current_path owner_service_path(@offering)
     assert_selector "#offering-draft-form"
@@ -38,12 +38,11 @@ class OwnerServiceOfferingsBrowserTest < ApplicationSystemTestCase
     end
     page.driver.browser.manage.window.resize_to(1400, 900)
 
-    check "I reviewed this exact revision and its feasibility."
-    click_button "Approve revision"
+    click_button "Finalize"
     assert_selector "#offering-approved"
     assert_selector "#offering-publication"
     assert_no_selector "#offering-draft-form"
-    assert_text "Approved v1"
+    assert_text "Final copy"
 
     check "I confirm enabling this approved revision without unsupported promises."
     click_button "Enable"
