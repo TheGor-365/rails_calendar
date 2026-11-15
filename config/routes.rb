@@ -38,6 +38,17 @@ Rails.application.routes.draw do
   post "/workspace/setup/suggest", to: "owner_setup#suggest", as: :owner_setup_suggest
   post "/workspace/setup/approve", to: "owner_setup#approve", as: :owner_setup_approve
   get "/workspace/practice", to: "owner_setup#practice", as: :owner_practice
+
+  # RC055.1: private owner-controlled service offering revisions.
+  get "/workspace/services", to: "owner_service_offerings#index", as: :owner_services
+  get "/workspace/services/new", to: "owner_service_offerings#new", as: :new_owner_service
+  post "/workspace/services", to: "owner_service_offerings#create"
+  get "/workspace/services/:id", to: "owner_service_offerings#show", as: :owner_service
+  patch "/workspace/services/:id/draft", to: "owner_service_offerings#update_draft", as: :owner_service_draft
+  post "/workspace/services/:id/approve", to: "owner_service_offerings#approve", as: :approve_owner_service
+  post "/workspace/services/:id/publish", to: "owner_service_offerings#publish", as: :publish_owner_service
+  post "/workspace/services/:id/unpublish", to: "owner_service_offerings#unpublish", as: :unpublish_owner_service
+  post "/workspace/services/:id/new_revision", to: "owner_service_offerings#new_revision", as: :revise_owner_service
   get "/workspace/practice/capabilities", to: "owner_capabilities#index", as: :owner_capabilities
   patch "/workspace/practice/capabilities/:capability_key", to: "owner_capabilities#update", as: :owner_capability
   delete "/workspace/practice/capabilities/:capability_key", to: "owner_capabilities#discard", as: :discard_owner_capability
