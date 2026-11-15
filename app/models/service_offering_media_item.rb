@@ -62,7 +62,7 @@ class ServiceOfferingMediaItem < ApplicationRecord
     if service_offering_version && service_offering_version.service_offering_id != service_offering_id
       errors.add(:service_offering_version, "must belong to this offering")
     end
-    if uploaded_by_user && service_offering.workspace.user_id != uploaded_by_user.id
+    if uploaded_by_user && service_offering.workspace.owner_user_id != uploaded_by_user.id
       errors.add(:uploaded_by_user, "must own this offering")
     end
   end
