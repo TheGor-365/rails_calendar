@@ -7,6 +7,20 @@ class OwnerServiceOfferingsController < ApplicationController
     @offerings = @workspace.service_offerings.includes(
       :approved_version, :published_version, :versions
     ).order(:position, :id)
+    @bulk_approval = OwnerServices::BulkApproval.new(workspace: @workspace)
+    @draft_count = @bulk_approval.drafts.size
+    @draft_fingerprint = @bulk_approval.fingerprint
+  end
+
+  def approve_all
+    count = OwnerServices::BulkApproval.new(workspace: @workspace).approve_all!(
+      expected_fingerprint: params[:fingerprint]
+    )
+    redirect_to owner_services_path, notice: t("owner_services.bulk_approved", count: count)
+  rescue OwnerServices::BulkApproval::Conflict, OwnerServices::Catalogue::Conflict
+    redirect_to owner_services_path, alert: t("owner_services.stale")
+  rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid
+    redirect_to owner_services_path, alert: t("owner_services.review_required")
   end
 
   def sync
