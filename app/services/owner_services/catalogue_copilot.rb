@@ -174,6 +174,32 @@ module OwnerServices
       raise Conflict, "Service or professional context changed"
     end
 
+    def batch_fingerprint(entry:)
+      raise Conflict unless entry && entry.status == "settled" &&
+                            entry.professional_profile_id == profile&.id &&
+                            entry.operation == OPERATION
+      rows = Array(entry.result["recommendations"])
+      Digest::SHA256.hexdigest(JSON.generate([
+        entry.id, entry.request_digest,
+        rows.map { |row| [row["offering_id"], row["base_version"], row["base_digest"]] }
+      ]))
+    end
+
+    # All-or-nothing: protects the whole review against concurrent manual edits.
+    # Approved and enabled service pointers remain untouched.
+    def apply_all!(entry:, expected_fingerprint:)
+      raise Conflict unless batch_fingerprint(entry: entry) == expected_fingerprint
+      rows = Array(entry.result["recommendations"])
+      raise Conflict if rows.empty? || !rows.all? { |row| recommendation_current?(row) }
+
+      ServiceOffering.transaction do
+        rows.each do |row|
+          apply!(entry: entry, offering_id: row["offering_id"], base_digest: row["base_digest"])
+        end
+      end
+      rows.length
+    end
+
     def latest_review
       profile&.ai_spend_entries&.where(operation: OPERATION, status: "settled")&.order(id: :desc)&.first
     end

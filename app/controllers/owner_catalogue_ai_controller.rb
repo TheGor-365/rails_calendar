@@ -19,6 +19,14 @@ class OwnerCatalogueAiController < ApplicationController
     redirect_to owner_catalogue_ai_path, alert: t("owner_services.copilot_unavailable")
   end
 
+  def apply_all
+    entry = @profile&.ai_spend_entries&.find_by(id: params[:entry_id])
+    count = @copilot.apply_all!(entry: entry, expected_fingerprint: params[:fingerprint].to_s)
+    redirect_to owner_catalogue_ai_path, notice: t("owner_services.copilot_all_drafts", count: count)
+  rescue OwnerServices::CatalogueCopilot::Conflict
+    redirect_to owner_catalogue_ai_path, alert: t("owner_services.copilot_stale")
+  end
+
   def apply
     entry = @profile&.ai_spend_entries&.find_by(id: params[:entry_id])
     @copilot.apply!(entry: entry, offering_id: params[:offering_id], base_digest: params[:base_digest])

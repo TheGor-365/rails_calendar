@@ -144,3 +144,6 @@ es:
     copilot_unavailable: "IA no disponible."
     copilot_draft_created: "Sugerencia guardada como borrador."
     copilot_stale: "Sugerencia obsoleta."
+    copilot_apply_all: "Crear borradores de todas las sugerencias (%{count})"
+    copilot_apply_all_confirm: "¿Crear %{count} borradores? Las versiones aprobadas no cambiarán."
+    copilot_all_drafts: "Se crearon %{count} borradores."

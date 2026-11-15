@@ -144,3 +144,6 @@ hy:
     copilot_unavailable: "AI-ն հասանելի չէ։"
     copilot_draft_created: "Առաջարկը պահպանվել է սևագրում։"
     copilot_stale: "Առաջարկը հնացել է։"
+    copilot_apply_all: "Ստեղծել բոլոր սևագրերը (%{count})"
+    copilot_apply_all_confirm: "Ստեղծե՞լ %{count} սևագիր։ Հաստատվածները չեն փոխվի։"
+    copilot_all_drafts: "Ստեղծվել է %{count} սևագիր։"

@@ -144,3 +144,6 @@ en:
     copilot_unavailable: "AI unavailable: configuration, budget or provider response. Manual editing remains possible."
     copilot_draft_created: "AI suggestion saved as a draft; review and approve separately."
     copilot_stale: "This suggestion is stale or not associated with your service; refresh the audit."
+    copilot_apply_all: "Create drafts from all suggestions (%{count})"
+    copilot_apply_all_confirm: "Create %{count} AI-based drafts? Approved and enabled copies will remain unchanged."
+    copilot_all_drafts: "Drafts created: %{count}. Review and finalize each revision separately."
