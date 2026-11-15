@@ -83,7 +83,7 @@
                 <% if offering.draft_version && latest.professional_context_snapshot_id == @snapshot.id && @profile.onboarding_state == "approved" && @profile.professional_capability_corrections.none? %>
                   <%= button_to rc_icon_label("patch-check", t("owner_services.finalize_one")),
                         approve_owner_service_path(offering), method: :post,
-                        params: { version: latest.version, digest: latest.digest, confirm: "1" },
+                        params: { version: latest.version, digest: latest.digest, confirm: "1", return_to_catalog: "1" },
                         form: { class: "wa-services__inline-form" }, class: "rc-action rc-action--soft rc-action--small" %>
                 <% end %>
                 <%= link_to rc_icon_label("arrow-up-right", t("owner_services.open")), owner_service_path(offering),

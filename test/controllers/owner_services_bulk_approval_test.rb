@@ -38,6 +38,18 @@ class OwnerServicesBulkApprovalTest < ActionDispatch::IntegrationTest
     assert_response :redirect
   end
 
+  test "card finalization returns to catalog without a supplied open redirect" do
+    sign_in(@owner)
+    draft = @second.draft_version
+    post approve_owner_service_path(@second), params: {
+      version: draft.version, digest: draft.digest,
+      confirm: "1", return_to_catalog: "1"
+    }
+    assert_redirected_to owner_services_path
+    assert @second.reload.approved_version
+    assert_nil @second.published_version
+  end
+
   test "stale fingerprint fails atomically without approving partial draft list" do
     sign_in(@owner)
     old = @bulk.fingerprint

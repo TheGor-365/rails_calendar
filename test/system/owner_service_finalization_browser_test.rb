@@ -32,6 +32,7 @@ class OwnerServiceFinalizationBrowserTest < ApplicationSystemTestCase
     within first(".wa-services__card") do
       click_button "Finalize"
     end
+    assert_current_path owner_services_path
     assert_selector ".wa-services__state--approved", count: 1
     assert_selector ".wa-services__state--draft", count: 1
     assert_equal 0, ServiceOfferingPublication.count
