@@ -7,6 +7,19 @@ class OwnerCatalogueAiController < ApplicationController
     @recommendations = Array(@entry&.result&.dig("recommendations"))
     @ai_enabled = OwnerServices::CatalogueCopilot.enabled?
     @spend = AiSpendLedger.spend_summary
+    @offer_count = @workspace.service_offerings.count
+    @review_filter = %w[all category copy risk ready].include?(params[:filter]) ? params[:filter] : "all"
+    @filtered_recommendations = @recommendations.select do |row|
+      offering = @workspace.service_offerings.find_by(id: row["offering_id"])
+      current = offering && (offering.draft_version || offering.approved_version || offering.published_version)
+      case @review_filter
+      when "category" then current && row["project_category"] != current.project_category
+      when "copy" then current && %w[title summary included_scope excluded_scope requirements_prompt].any? { |key| row[key] != current.public_send(key) }
+      when "risk" then Array(row["risk_flags"]).any?
+      when "ready" then @copilot.recommendation_current?(row)
+      else true
+      end
+    end
   end
 
   def run

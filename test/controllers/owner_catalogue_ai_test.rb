@@ -55,7 +55,15 @@ class OwnerCatalogueAiTest < ActionDispatch::IntegrationTest
     sign_in(@owner)
     get owner_catalogue_ai_path
     assert_response :success
-    assert_select ".wa-services__copilot-item", count: 1
+    assert_select ".ai-workspace__review-card", count: 1
+    assert_select ".ai-workspace__metric", count: 3
+    assert_select ".ai-workspace__tool-link", count: 3
+    get owner_catalogue_ai_path(filter: "category")
+    assert_response :success
+    assert_select ".ai-workspace__filter[aria-current=page]", count: 1
+    get owner_catalogue_ai_path(filter: "risk")
+    assert_response :success
+    assert_select ".ai-workspace__review-card", count: 1
     assert_select "form[action=?]", apply_owner_catalogue_ai_path(@offering), count: 1
 
     assert_difference("ServiceOfferingVersion.count", 1) do

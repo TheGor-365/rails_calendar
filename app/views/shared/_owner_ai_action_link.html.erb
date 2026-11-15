@@ -1,0 +1,8 @@
+<%= link_to item.fetch(:path), class: "ai-workspace__tool-link", aria: { current: current_page?(item.fetch(:path)) ? "page" : nil } do %>
+  <span class="ai-workspace__tool-icon" aria-hidden="true"><i class="bi <%= item.fetch(:icon) %>"></i></span>
+  <span class="ai-workspace__tool-copy">
+    <strong><%= t("owner_services.copilot_tool_#{item.fetch(:key)}") %></strong>
+    <small><%= t("owner_services.copilot_tool_#{item.fetch(:key)}_desc") %></small>
+  </span>
+  <i class="bi bi-arrow-up-right ai-workspace__tool-arrow" aria-hidden="true"></i>
+<% end %>

@@ -32,3 +32,7 @@ application.register("wa-intake-thread", WaIntakeThreadController)
 // Sticky desktop section rail, horizontal/stacked navigation on mobile.
 import WaSectionNavController from "./wa_section_nav_controller"
 application.register("wa-section-nav", WaSectionNavController)
+
+// Owner avatar: square center-crop in the browser before the private upload.
+import WaAvatarEditorController from "./wa_avatar_editor_controller"
+application.register("wa-avatar-editor", WaAvatarEditorController)
