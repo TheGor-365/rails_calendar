@@ -72,3 +72,7 @@ en:
     avatar_alt: "Owner avatar"
     catalogue_copilot: "Catalogue AI assistant"
     catalogue_copilot_desc: "Review service copy and categories with AI"
+    avatar_edit: "Edit photo"
+    avatar_crop_hint: "The image is automatically center-cropped to a 1:1 square before upload."
+    avatar_crop_ready: "Square image prepared. Ready to save."
+    avatar_crop_failed: "Could not crop the image; the original file can still be uploaded and displayed in a square frame."

@@ -307,22 +307,78 @@
 }
 
 
-.ws-account-avatar { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
-.ws-account-avatar-panel {
-  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
-  gap: 1rem; padding: .75rem 1rem; margin-bottom: 1rem; border-radius: 16px;
+/* RC055.1e: avatar is a compact hero control — not a separate full-width panel. */
+.ws-account-hero .ws-account-avatar-frame {
+  width: 94px; height: 94px; flex: 0 0 94px; min-width: 94px;
+  aspect-ratio: 1 / 1; padding: 0; position: relative;
+  display: grid; place-items: center;
+  border-radius: 20px; overflow: visible;
+  box-shadow: var(--ws-shadow-up);
 }
-.ws-account-avatar-copy h2 { font-size: .91rem; font-weight: 790; margin: 0 0 .2rem; }
-.ws-account-avatar-copy h2 i { color: var(--ws-teal); margin-right: .3rem; }
-.ws-account-avatar-copy p { margin: 0; max-width: 35rem; }
-.ws-account-avatar-form { display: flex; align-items: flex-end; flex-wrap: wrap; gap: .7rem; }
-.ws-account-avatar-form .wa-file-drop { min-width: min(100%, 260px); }
+.ws-account-avatar {
+  position: absolute; inset: 0; display: block;
+  width: 100%; height: 100%; aspect-ratio: 1 / 1;
+  border-radius: 20px; object-fit: cover; object-position: center;
+}
+.ws-account-avatar-placeholder { font-size: 2.05rem; }
+.ws-avatar-edit { position: absolute; right: -9px; bottom: -9px; z-index: 26; }
+.ws-avatar-edit-trigger {
+  display: grid; place-items: center; width: 34px; height: 34px;
+  border-radius: 11px; color: var(--ws-teal-deep); cursor: pointer;
+  border: 1px solid #bbded4; background: #fff;
+  box-shadow: 0 8px 23px -12px rgba(8, 78, 69, .55);
+  transition: transform .18s var(--ws-easing), box-shadow .18s var(--ws-easing);
+  list-style: none;
+}
+.ws-avatar-edit-trigger .bi { font-size: 1rem !important; }
+.ws-avatar-edit-trigger::-webkit-details-marker { display: none; }
+.ws-avatar-edit-trigger::marker { content: ""; }
+.ws-avatar-edit-trigger:hover { transform: translateY(-2px); box-shadow: var(--ws-shadow-up); }
+.ws-avatar-edit-trigger:focus-visible { outline: 3px solid var(--ws-teal); outline-offset: 3px; }
+.ws-avatar-edit[open] .ws-avatar-edit-trigger { color: #fff; background: var(--ws-teal); }
+.ws-avatar-edit-panel {
+  position: absolute; z-index: 30; top: calc(100% + 12px); right: 0;
+  width: min(330px, calc(100vw - 2rem)); min-width: 0;
+  display: grid; gap: .85rem; padding: 1.1rem;
+  text-align: left; color: var(--ws-ink);
+  border-radius: 18px; background: #fff; border: 1px solid var(--ws-border);
+  box-shadow: 0 30px 58px -27px rgba(20, 63, 71, .28), var(--ws-shadow);
+  animation: wa-avatar-enter .2s var(--ws-easing) both;
+}
+.ws-avatar-edit-panel__heading { display: flex; align-items: flex-start; gap: .7rem; }
+.ws-avatar-edit-panel__heading strong { display: block; font-size: .89rem; font-weight: 820; }
+.ws-avatar-edit-panel__heading p { margin: .2rem 0 0; color: var(--ws-muted); font-size: .75rem; line-height: 1.55; }
+.ws-avatar-edit-panel__icon {
+  display: grid; place-items: center; width: 36px; height: 36px; flex: 0 0 36px;
+  border-radius: 11px; background: var(--ws-teal-wash); color: var(--ws-teal);
+}
+.ws-avatar-edit-panel__icon .bi { font-size: 1.08rem !important; }
+.ws-account-avatar-form { display: grid; gap: .6rem; min-width: 0; }
+.ws-account-avatar-form .wa-file-drop { min-width: 0; width: 100%; text-align: left; }
+.ws-account-avatar-form .rc-action { width: 100%; }
+.ws-avatar-edit-panel .wa-file-drop label { font-size: .73rem; }
+.ws-avatar-edit-panel .wa-file-drop input[type=file] { font-size: .72rem; }
+.ws-avatar-edit-status { margin: 0; font-size: .74rem; color: var(--ws-teal-deep); line-height: 1.45; }
+.ws-avatar-edit-status:empty { display: none; }
+.ws-avatar-edit-panel__footer { display: flex; gap: .45rem; align-items: flex-start; margin: 0; }
+.ws-avatar-edit-panel__footer i { flex: 0 0 auto; color: var(--ws-teal); }
 .ws-nav-avatar-link { display: grid; place-items: center; flex: 0 0 32px; }
 .ws-nav-avatar {
-  width: 32px; height: 32px; object-fit: cover; border-radius: 50%;
+  width: 32px; height: 32px; object-fit: cover; border-radius: 10px;
   border: 2px solid #cbe8e0;
 }
-@media(max-width:575px) {
-  .ws-account-avatar-form { width: 100%; }
-  .ws-account-avatar-form .wa-file-drop { width: 100%; }
+@keyframes wa-avatar-enter { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+@media(max-width:640px) {
+  .ws-account-hero { align-items: flex-start; }
+  .ws-account-hero .ws-account-avatar-frame {
+    width: 76px; height: 76px; flex: 0 0 76px; min-width: 76px; display: grid;
+  }
+  .ws-account-hero .ws-account-avatar-frame .ws-account-avatar { border-radius: 17px; }
+  .ws-avatar-edit { right: -6px; bottom: -6px; }
+}
+@media(max-width:390px) {
+  .ws-account-hero .ws-account-avatar-frame { width: 66px; height: 66px; flex-basis: 66px; min-width: 66px; }
+}
+@media(prefers-reduced-motion: reduce) {
+  .ws-avatar-edit-trigger, .ws-avatar-edit-panel { transition: none; animation: none; }
 }

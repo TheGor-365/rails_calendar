@@ -9,36 +9,59 @@
         <span class="ws-account-chip"><i class="bi bi-person-check" aria-hidden="true"></i><%= current_user.email %></span>
       </div>
     </div>
-    <div class="ws-account-hero-symbol">
+    <div class="ws-account-hero-symbol ws-account-avatar-frame" id="owner-avatar"
+      <%= 'data-controller="wa-avatar-editor"' if local_owner_avatar_enabled? %>
+      <% if local_owner_avatar_enabled? %>
+        data-wa-avatar-editor-success-value="<%= t("account_hub.avatar_crop_ready") %>"
+        data-wa-avatar-editor-failure-value="<%= t("account_hub.avatar_crop_failed") %>"
+      <% end %>>
       <% if (avatar = local_owner_avatar_attachment(current_user)) %>
         <%= image_tag owner_avatar_file_path(avatar), class: "ws-account-avatar",
-              alt: t("account_hub.avatar_alt"), loading: "lazy" %>
+              alt: t("account_hub.avatar_alt"), loading: "lazy",
+              data: { wa_avatar_editor_target: "preview" } %>
       <% else %>
-        <i class="bi bi-person-workspace" aria-hidden="true"></i>
+        <i class="bi bi-person-workspace ws-account-avatar-placeholder" aria-hidden="true"></i>
+      <% end %>
+      <% if local_owner_avatar_enabled? %>
+        <details class="ws-avatar-edit">
+          <summary class="ws-avatar-edit-trigger" title="<%= t("account_hub.avatar_edit") %>"
+                   aria-label="<%= t("account_hub.avatar_edit") %>">
+            <i class="bi bi-pencil-square" aria-hidden="true"></i>
+          </summary>
+          <div class="ws-avatar-edit-panel">
+            <div class="ws-avatar-edit-panel__heading">
+              <span class="ws-avatar-edit-panel__icon"><i class="bi bi-image" aria-hidden="true"></i></span>
+              <div>
+                <strong><%= t("account_hub.avatar_title") %></strong>
+                <p><%= t("account_hub.avatar_crop_hint") %></p>
+              </div>
+            </div>
+            <%= form_with url: owner_avatars_path, method: :post, multipart: true,
+                html: { id: "owner-avatar-form", class: "ws-account-avatar-form",
+                        data: { action: "submit->wa-avatar-editor#guard" } } do %>
+              <div class="wa-file-drop">
+                <label for="owner-avatar-file">
+                  <i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
+                  <%= t("account_hub.avatar_file") %>
+                </label>
+                <%= file_field_tag "avatar[file]", id: "owner-avatar-file",
+                    accept: "image/jpeg,image/png,image/webp", required: true,
+                    data: { wa_avatar_editor_target: "file", action: "change->wa-avatar-editor#prepare" } %>
+              </div>
+              <p class="ws-avatar-edit-status" role="status" aria-live="polite"
+                 data-wa-avatar-editor-target="status"></p>
+              <%= button_tag type: "submit", class: "rc-action rc-action--primary",
+                    data: { wa_avatar_editor_target: "submit" } do %>
+                <%= rc_icon_label("check2", t("account_hub.avatar_upload")) %>
+              <% end %>
+            <% end %>
+            <p class="rc-hint ws-avatar-edit-panel__footer"><i class="bi bi-shield-lock" aria-hidden="true"></i>
+              <%= t("account_hub.avatar_hint") %></p>
+          </div>
+        </details>
       <% end %>
     </div>
   </header>
-  <% if local_owner_avatar_enabled? %>
-    <section class="surface-panel ws-account-avatar-panel" id="owner-avatar">
-      <div class="ws-account-avatar-copy">
-        <h2><i class="bi bi-person-circle" aria-hidden="true"></i> <%= t("account_hub.avatar_title") %></h2>
-        <p class="rc-hint"><%= t("account_hub.avatar_hint") %></p>
-      </div>
-      <%= form_with url: owner_avatars_path, method: :post, multipart: true,
-            html: { id: "owner-avatar-form", class: "ws-account-avatar-form" } do %>
-        <div class="wa-file-drop">
-          <label for="owner-avatar-file">
-            <i class="bi bi-image" aria-hidden="true"></i> <%= t("account_hub.avatar_file") %>
-          </label>
-          <%= file_field_tag "avatar[file]", id: "owner-avatar-file",
-                accept: "image/jpeg,image/png,image/webp", required: true %>
-        </div>
-        <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
-          <%= rc_icon_label("cloud-arrow-up", t("account_hub.avatar_upload")) %>
-        <% end %>
-      <% end %>
-    </section>
-  <% end %>
 
   <section class="ws-account-overview" aria-label="<%= t('account_hub.owner_overview') %>">
     <div class="ws-account-metric">
