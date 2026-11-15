@@ -18,3 +18,15 @@ module ApplicationHelper
     ])
   end
 end
+
+  # One SQL count per rendered owner request; client and legacy admin get zero.
+  def owner_unread_intake_count
+    return 0 unless owner_signed_in?
+
+    @owner_unread_intake_count ||= OwnerIntakeInbox.unread_for(owner: current_user).count
+  end
+
+  def owner_unread_badge_label
+    total = owner_unread_intake_count
+    total > 99 ? "99+" : total.to_s
+  end

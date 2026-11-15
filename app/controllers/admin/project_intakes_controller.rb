@@ -5,6 +5,8 @@ module Admin
 
     def index
       @intakes = ProjectIntake.order(created_at: :desc, id: :desc).limit(50)
+      @unread_intake_ids = owner_signed_in? ?
+        OwnerIntakeInbox.unread_for(owner: current_user).where(id: @intakes.map(&:id)).pluck(:id) : []
     end
 
     def draft_spec

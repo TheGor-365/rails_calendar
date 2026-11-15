@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_14_023000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_15_020000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -243,6 +243,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_023000) do
     t.index ["project_intake_id"], name: "index_intake_messages_on_project_intake_id"
   end
 
+  create_table "owner_intake_read_states", force: :cascade do |t|
+    t.bigint "owner_user_id", null: false
+    t.bigint "project_intake_id", null: false
+    t.bigint "last_seen_client_message_id", null: false
+    t.datetime "first_seen_at", null: false
+    t.datetime "last_seen_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_user_id", "project_intake_id"], name: "idx_owner_intake_read_state_unique", unique: true
+    t.index ["project_intake_id"], name: "idx_owner_intake_read_state_intake"
+  end
+
   create_table "intake_spec_versions", force: :cascade do |t|
     t.bigint "project_intake_id", null: false
     t.integer "version", null: false
@@ -322,6 +334,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_023000) do
   add_foreign_key "intake_answer_revisions", "intake_answers"
   add_foreign_key "intake_answers", "project_intakes"
   add_foreign_key "intake_messages", "project_intakes"
+  add_foreign_key "owner_intake_read_states", "users", column: "owner_user_id"
+  add_foreign_key "owner_intake_read_states", "project_intakes"
+  add_foreign_key "owner_intake_read_states", "intake_messages", column: "last_seen_client_message_id"
   add_foreign_key "intake_spec_versions", "project_intakes"
   add_foreign_key "project_intakes", "users", column: "client_user_id"
   add_foreign_key "project_milestones", "intake_spec_versions"
