@@ -109,3 +109,5 @@ hy:
       document: "Փաստաթուղթ"
       audio: "Աուդիո"
       video: "Վիդեո"
+    media_choose_file: "Ընտրել ֆայլ"
+    media_preview_only: "Նախադիտում — սպասում է ստուգման"

@@ -109,3 +109,5 @@ en:
       document: "Document"
       audio: "Audio"
       video: "Video"
+    media_choose_file: "Choose an image, document, audio or video"
+    media_preview_only: "Preview — awaiting review"

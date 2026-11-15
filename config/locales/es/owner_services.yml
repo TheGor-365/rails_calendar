@@ -109,3 +109,5 @@ es:
       document: "Documento"
       audio: "Audio"
       video: "Vídeo"
+    media_choose_file: "Seleccionar imagen, documento, audio o vídeo"
+    media_preview_only: "Vista previa: pendiente de revisión"
