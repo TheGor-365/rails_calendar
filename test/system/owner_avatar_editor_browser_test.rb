@@ -6,7 +6,7 @@ require_relative "../support/owner_service_catalogue_test_data"
 class OwnerAvatarEditorBrowserTest < ApplicationSystemTestCase
   include OwnerServiceCatalogueTestData
 
-  PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg==".freeze
+  PNG = "iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAIAAAAt/+nTAAAAQ0lEQVR4nO3PQQ3AIADAQEADWjGB6YngcVnSU9DOfc/4s6UDXjWgNaA1oDWgNaA1oDWgNaA1oDWgNaA1oDWgNaA1oH015wFVe6iKsAAAAABJRU5ErkJggg==".freeze
 
   test "owner edits 1-to-1 avatar through compact pencil popover without a full-width panel" do
     owner = make_test_owner("avatar-editor-browser@example.test")
@@ -39,7 +39,7 @@ class OwnerAvatarEditorBrowserTest < ApplicationSystemTestCase
 
     assert_current_path owner_cabinet_path(anchor: "owner-avatar")
     assert_selector ".ws-account-avatar-frame img.ws-account-avatar"
-    blob = owner.reload.owner_avatars.last.blob
+    blob = owner.reload.owner_avatars_attachments.order(id: :desc).first.blob
     assert_equal "image/jpeg", blob.content_type
     assert_equal "avatar-square.jpg", blob.filename.to_s
 
