@@ -131,8 +131,12 @@
             </div>
             <div class="rc-field">
               <%= label_tag :media_file, t("owner_services.media_file"), class: "rc-field-label" %>
-              <%= file_field_tag "media[file]", id: :media_file, required: true, class: "rc-input",
-                    accept: ServiceOfferingMediaItem::ALLOWED_MIME_TYPES.values.flatten.uniq.join(",") %>
+              <div class="wa-file-drop">
+                <label for="media_file"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i>
+                  <%= t("owner_services.media_choose_file") %></label>
+                <%= file_field_tag "media[file]", id: :media_file, required: true,
+                      accept: ServiceOfferingMediaItem::ALLOWED_MIME_TYPES.values.flatten.uniq.join(",") %>
+              </div>
               <p class="rc-hint"><%= t("owner_services.media_limits") %></p>
             </div>
             <div class="rc-field">

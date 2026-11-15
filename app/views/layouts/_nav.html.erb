@@ -60,6 +60,11 @@
         <%= rc_icon_label("grid-1x2", t("nav.services")) %>
       <% end %>
       <% if owner_signed_in? %>
+        <% if (avatar = local_owner_avatar_attachment(current_user)) %>
+          <%= link_to owner_cabinet_path, class: "ws-nav-avatar-link", aria: { label: t("account_hub.avatar_title") } do %>
+            <%= image_tag owner_avatar_file_path(avatar), class: "ws-nav-avatar", alt: t("account_hub.avatar_alt") %>
+          <% end %>
+        <% end %>
         <span class="rc-nav-admin d-none d-sm-inline" title="Owner session"><%= t("nav.owner") %>: <%= current_user.email %></span>
         <%= button_to rc_icon_label("box-arrow-right", t("nav.sign_out")), sign_out_path, method: :delete, class: "rc-action rc-action--quiet rc-action--small" %>
       <% elsif client_signed_in? %>

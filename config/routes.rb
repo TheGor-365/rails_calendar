@@ -62,6 +62,8 @@ Rails.application.routes.draw do
   post "/workspace/practice/capabilities/suggest", to: "owner_capabilities#suggest", as: :suggest_owner_capabilities
   post "/workspace/practice/capabilities/approve", to: "owner_capabilities#approve", as: :approve_owner_capabilities
   get "/workspace/cabinet", to: "owner_setup#cabinet", as: :owner_cabinet
+  post "/workspace/avatar", to: "owner_avatars#create", as: :owner_avatars
+  get "/workspace/avatar/:attachment_id", to: "owner_avatars#file", as: :owner_avatar_file
   get "/workspace/ai", to: "owner_setup#ai_activity", as: :owner_ai_activity
 
   # Public commercial showcase; never accepts or stores visitor contact data.

@@ -62,9 +62,15 @@
           <% icon, state, kind = service_offering_state(offering) %>
           <article class="surface-panel wa-services__card">
             <% if (cover = @media_cover_by_offering_id[offering.id]) %>
-              <%= image_tag owner_service_media_file_path(offering, cover),
-                    alt: cover.caption.presence || t("owner_services.media_image_alt"),
-                    loading: "lazy", class: "wa-services__card-banner" %>
+              <div class="wa-services__cover-wrap">
+                <%= image_tag owner_service_media_file_path(offering, cover),
+                      alt: cover.caption.presence || t("owner_services.media_image_alt"),
+                      loading: "lazy", class: "wa-services__card-banner" %>
+                <% unless cover.approved? %>
+                  <span class="wa-services__cover-pending"><i class="bi bi-eye" aria-hidden="true"></i>
+                    <%= t("owner_services.media_preview_only") %></span>
+                <% end %>
+              </div>
             <% end %>
             <header class="wa-services__card-heading">
               <span aria-hidden="true"><i class="bi <%= service_offering_icon(offering) %>"></i></span>
