@@ -4,6 +4,8 @@ class ClientRequestClarificationsSystemTest < ApplicationSystemTestCase
   PASSWORD = "fictional-client-reply-browser-password-2026".freeze
 
   setup do
+    @prior_pilot = ENV["RC_LOCAL_CLIENT_REQUESTS_ENABLED"]
+    ENV["RC_LOCAL_CLIENT_REQUESTS_ENABLED"] = "true"
     @owner = User.create!(email: "client-reply-browser-owner@example.test", role: "owner", password: PASSWORD)
     @client = User.create!(
       email: "client-reply-browser@example.test", role: "client", password: PASSWORD,
@@ -18,6 +20,10 @@ class ClientRequestClarificationsSystemTest < ApplicationSystemTestCase
     first = @intake.intake_messages.create!(role: "client", body: "Synthetic initial mobile requirement.")
     @intake.intake_messages.create!(role: "assistant", body: "A local sample acknowledgement.")
     OwnerIntakeInbox.mark_seen!(owner: @owner, intake: @intake, displayed_messages: [first])
+  end
+
+  teardown do
+    ENV["RC_LOCAL_CLIENT_REQUESTS_ENABLED"] = @prior_pilot
   end
 
   test "client reply becomes unread for owner, then owner opens request and clears badge" do
