@@ -32,3 +32,6 @@ es:
     history_nav: "Historial"
     spec_nav: "Especificación"
     owner_reply_not_available: "Esta solicitud pertenece a un cliente verificado. El antiguo formulario de demo no es una respuesta del proveedor y aquí está deshabilitado."
+    side_nav_title: "Secciones de la solicitud"
+    side_nav_help: "Ir a una sección"
+    side_nav_note: "Los hechos actuales están separados del historial y los borradores."

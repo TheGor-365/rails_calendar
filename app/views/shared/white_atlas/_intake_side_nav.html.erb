@@ -1,0 +1,22 @@
+<aside class="wa-detail-shell__aside" aria-label="<%= t("intake_context.side_nav_title") %>">
+  <div class="wa-detail-shell__aside-header">
+    <span class="wa-detail-shell__aside-icon" aria-hidden="true"><i class="bi bi-list-task"></i></span>
+    <div>
+      <p class="wa-detail-shell__aside-title"><%= t("intake_context.side_nav_title") %></p>
+      <p class="wa-detail-shell__aside-subtitle"><%= t("intake_context.side_nav_help") %></p>
+    </div>
+  </div>
+  <nav class="wa-detail-shell__links" aria-label="<%= t("intake_context.jump_label") %>">
+    <% sections.each_with_index do |(anchor, icon, title), index| %>
+      <a href="#<%= anchor %>" class="wa-detail-shell__link"
+         data-wa-section-nav-target="link"
+         aria-current="<%= index.zero? ? 'location' : 'false' %>">
+        <i class="bi bi-<%= icon %>" aria-hidden="true"></i>
+        <span><%= title %></span>
+      </a>
+    <% end %>
+  </nav>
+  <p class="wa-detail-shell__aside-note"><i class="bi bi-shield-check" aria-hidden="true"></i>
+    <%= t("intake_context.side_nav_note") %>
+  </p>
+</aside>

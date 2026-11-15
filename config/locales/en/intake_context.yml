@@ -32,3 +32,6 @@ en:
     history_nav: "History"
     spec_nav: "Specification"
     owner_reply_not_available: "This belongs to a verified client. The legacy demo answer form is not a provider reply and is disabled here."
+    side_nav_title: "Request sections"
+    side_nav_help: "Jump to a section"
+    side_nav_note: "Current facts are separate from history and drafts."

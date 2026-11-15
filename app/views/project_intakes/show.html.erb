@@ -22,27 +22,27 @@
     <% end %>
     </div>
   </header>
+  <% owner_nav_sections = [
+    ["intake-current", "pin-angle", t("intake_context.current_title")],
+    ["intake-workflow", "diagram-3", t("intake.workflow_show")],
+    ["intake-brief", "card-text", t("intake.owner_view.brief")],
+    ["intake-interview", "chat-left-text", t("intake.interview_title")]
+  ] %>
+  <% owner_nav_sections << ["intake-review", "shield-lock", t("intake.admin_title")] if admin_signed_in? %>
+  <% owner_nav_sections << ["intake-spec", "file-earmark-text", t("intake.spec_title")] if @latest_spec && (admin_signed_in? || @latest_spec.approved?) %>
+  <% owner_nav_sections << ["private-project-calendar", "calendar-range", t("intake.calendar_title")] if @milestones.any? && (admin_signed_in? || @latest_spec&.approved?) %>
+  <div class="wa-detail-shell" data-controller="wa-section-nav">
+    <%= render "shared/white_atlas/intake_side_nav", sections: owner_nav_sections %>
+    <div class="wa-detail-shell__main">
   <%= render "shared/white_atlas/intake_current_context",
              intake: @intake, latest_message: @latest_client_message,
              visible_spec: @latest_spec, message_total: @message_total, perspective: "owner" %>
 
   <% current_stage = @milestones.any? ? "plan" : (@latest_spec.present? ? "review" : "interview") %>
+  <div id="intake-workflow">
   <%= render "shared/workflow", title: t("intake.workflow_show"), current: current_stage, steps: [ ["request", "clipboard2-plus", t("intake.step_request"), t("intake.step_request_desc")], ["interview", "chat-left-text", t("intake.step_interview"), t("intake.step_interview_desc")], ["review", "clipboard2-check", t("intake.step_review"), t("intake.step_review_desc")], ["plan", "calendar-range", t("intake.step_plan"), t("intake.step_plan_desc")] ] %>
-  <nav class="wa-owner-intake__jump" aria-label="<%= t("intake.owner_view.jump_label") %>">
-    <a href="#intake-current"><i class="bi bi-pin-angle" aria-hidden="true"></i><%= t("intake_context.current_title") %></a>
-    <a href="#intake-brief"><i class="bi bi-card-text" aria-hidden="true"></i><%= t("intake.owner_view.brief") %></a>
-    <a href="#intake-interview"><i class="bi bi-chat-left-text" aria-hidden="true"></i><%= t("intake.interview_title") %></a>
-    <% if admin_signed_in? %>
-      <a href="#intake-review"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("intake.admin_title") %></a>
-    <% end %>
-    <% if @latest_spec && (admin_signed_in? || @latest_spec.approved?) %>
-      <a href="#intake-spec"><i class="bi bi-file-earmark-text" aria-hidden="true"></i><%= t("intake.spec_title") %></a>
-    <% end %>
-    <% if @milestones.any? && (admin_signed_in? || @latest_spec&.approved?) %>
-      <a href="#private-project-calendar"><i class="bi bi-calendar-range" aria-hidden="true"></i><%= t("intake.calendar_title") %></a>
-    <% end %>
-  </nav>
-  <section class="surface-panel wa-owner-intake__panel mb-4" id="intake-brief"
+  </div>
+    <section class="surface-panel wa-owner-intake__panel mb-4" id="intake-brief"
            aria-labelledby="intake-brief-heading">
     <div class="wa-owner-intake__section-heading">
       <span class="wa-owner-intake__icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
@@ -254,4 +254,6 @@
       </div>
     </section>
   <% end %>
+    </div>
+  </div>
 </div>
