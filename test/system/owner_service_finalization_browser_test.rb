@@ -19,7 +19,9 @@ class OwnerServiceFinalizationBrowserTest < ApplicationSystemTestCase
     fill_in "Email address", with: @owner.email
     fill_in "Password", with: PASSWORD
     click_button "Sign in"
+    assert_current_path workspace_path
     visit owner_services_path
+    assert_current_path owner_services_path
     assert_selector ".wa-services__card", count: 2
     assert_selector ".wa-services__card-heading .bi", count: 2
     assert_selector ".wa-services__card-footer", count: 2
