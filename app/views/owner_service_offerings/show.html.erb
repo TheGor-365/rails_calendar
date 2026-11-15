@@ -3,7 +3,11 @@
     <p class="eyebrow"><%= t("owner_services.eyebrow") %></p>
     <h1 class="page-title"><%= (@draft || @approved || @published).title %></h1>
     <p class="rc-hint"><i class="bi bi-person-check" aria-hidden="true"></i> <%= owner_capability_title((@draft || @approved || @published).source_capability_domain, (@draft || @approved || @published).professional_capability.delivery_mode) %></p>
-    <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path, class: "rc-action rc-action--quiet" %>
+    <div class="wa-services__actions">
+      <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path,
+            class: "rc-action rc-action--soft" %>
+      <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path, class: "rc-action rc-action--quiet" %>
+    </div>
   </header>
   <section class="surface-panel wa-services__notice mb-4">
     <i class="bi bi-shield-lock" aria-hidden="true"></i>
