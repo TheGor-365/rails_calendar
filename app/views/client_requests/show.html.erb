@@ -19,12 +19,25 @@
     </div>
   </header>
 
+  <%= render "shared/white_atlas/intake_current_context",
+             intake: @intake, latest_message: @latest_client_message,
+             visible_spec: @spec, message_total: @message_total, perspective: "client" %>
+
+  <nav class="wa-context__jump" aria-label="<%= t("intake_context.jump_label") %>">
+    <a href="#intake-current"><i class="bi bi-pin-angle" aria-hidden="true"></i><%= t("intake_context.current_title") %></a>
+    <a href="#client-request-conversation-heading"><i class="bi bi-chat-dots" aria-hidden="true"></i><%= t("intake_context.history_nav") %></a>
+    <a href="#client-request-spec"><i class="bi bi-file-earmark-text" aria-hidden="true"></i><%= t("intake_context.spec_nav") %></a>
+  </nav>
+
   <section class="surface-panel wa-client-request__panel mb-4" aria-labelledby="client-request-description">
     <div class="wa-client-request__section-head">
       <span class="wa-client-request__section-icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
       <h2 id="client-request-description"><%= t("client_requests.description_title") %></h2>
     </div>
-    <div class="wa-client-request__description wa-prose"><%= @intake.goal %></div>
+    <details class="wa-context__original" <%= "open" if @intake.goal.length <= 360 %>>
+      <summary><i class="bi bi-journal-text" aria-hidden="true"></i><%= t("intake_context.original_toggle") %></summary>
+      <div class="wa-client-request__description wa-prose"><%= @intake.goal %></div>
+    </details>
     <p class="rc-hint wa-client-request__safety"><i class="bi bi-shield-lock me-1" aria-hidden="true"></i><%= t("client_requests.demo_warning") %></p>
   </section>
 
@@ -36,11 +49,42 @@
       <h2 id="client-request-conversation-heading"><%= t("client_requests.conversation_title") %></h2>
     </div>
     <p class="rc-hint"><%= t("client_requests.conversation_help") %></p>
-    <ol class="wa-client-request__thread" id="client-request-conversation">
+    <div data-controller="wa-intake-thread">
+      <details class="wa-context__history" <%= "open" if @conversation.size <= 2 %>>
+      <summary><i class="bi bi-clock-history" aria-hidden="true"></i><%= t("intake_context.history_toggle", count: @message_total) %></summary>
+      <p class="rc-hint"><%= t("intake_context.history_window", count: @conversation.size, total: @message_total) %></p>
+      <div class="wa-context__history-tools">
+        <div class="wa-owner-intake__filters" role="group" aria-label="<%= t("intake_context.role_filters") %>">
+          <% [["all", t("intake_context.all_roles")], ["client", t("client_requests.message_client")], ["assistant", t("client_requests.message_assistant")]].each do |role, label| %>
+            <button type="button" class="wa-owner-intake__filter"
+                    data-wa-intake-thread-target="filter"
+                    data-wa-intake-thread-role-param="<%= role %>"
+                    data-action="click->wa-intake-thread#filter"
+                    aria-pressed="<%= role == "all" %>"><%= label %></button>
+          <% end %>
+        </div>
+        <label class="wa-context__search-label"><%= t("intake_context.search_label") %>
+          <input type="search" class="wa-context__search"
+                 placeholder="<%= t("intake_context.search_placeholder") %>"
+                 data-wa-intake-thread-target="search" data-action="input->wa-intake-thread#search"/>
+        </label>
+        <label class="wa-context__sort-label"><%= t("intake_context.sort_label") %>
+          <select class="wa-context__sort" data-wa-intake-thread-target="order"
+                  data-action="change->wa-intake-thread#sort">
+            <option value="oldest"><%= t("intake_context.oldest_first") %></option>
+            <option value="newest"><%= t("intake_context.newest_first") %></option>
+          </select>
+        </label>
+      </div>
+      <p class="wa-context__visible-count rc-hint" role="status" data-wa-intake-thread-target="count"></p>
+    <ol class="wa-client-request__thread" id="client-request-conversation"
+        data-wa-intake-thread-target="list">
       <% @conversation.each do |message| %>
-        <li class="wa-client-request__message wa-client-request__message--<%= message.role %>">
+        <li class="wa-client-request__message wa-client-request__message--<%= message.role %>"
+            data-wa-intake-thread-target="item" data-wa-intake-thread-role="<%= message.role %>"
+            data-wa-intake-thread-id="<%= message.id %>">
           <div class="wa-client-request__message-header">
-            <strong><i class="bi bi-<%= message.role == "client" ? "person-circle" : "chat-left-dots" %>" aria-hidden="true"></i>
+            <strong><span class="wa-context__actor-icon wa-context__actor-icon--<%= message.role %>" aria-hidden="true"><i class="bi bi-<%= message.role == "client" ? "person-fill" : "robot" %>"></i></span>
               <%= t("client_requests.message_#{message.role}") %>
             </strong>
             <time datetime="<%= message.created_at.iso8601 %>"><%= message.created_at.utc.strftime("%Y-%m-%d %H:%M UTC") %></time>
@@ -49,6 +93,9 @@
         </li>
       <% end %>
     </ol>
+    <p class="rc-hint wa-owner-intake__filter-empty" role="status" data-wa-intake-thread-target="empty" hidden><%= t("intake_context.no_matches") %></p>
+      </details>
+    </div>
 
     <% if @reply_error.present? %>
       <p class="rc-notice rc-notice--error" role="alert"><%= @reply_error %></p>

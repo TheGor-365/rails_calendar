@@ -32,11 +32,18 @@ class ProjectIntakesController < ApplicationController
     # A legacy administrator can view the demo but must not consume an
     # actual DB owner's read receipt. Only displayed client turns count.
     if owner_signed_in?
-      OwnerIntakeInbox.mark_seen!(owner: current_user, intake: @intake, displayed_messages: @messages.to_a)
+      # The latest client-authored turn is fully visible in the current-context
+      # panel. Never advance the read cursor to a hidden or undisplayed turn.
+      OwnerIntakeInbox.mark_seen!(owner: current_user, intake: @intake,
+                                  displayed_messages: [@latest_client_message].compact)
     end
   end
 
   def reply
+    # The legacy offline quiz accepts a synthetic participant's answer, not a
+    # provider-authored reply. Do not impersonate a real verified client.
+    return head :forbidden if @intake.client_user_id.present?
+
     unless @intake.status == "interviewing" && @intake.client_message_count < ProjectIntake::MAX_CLIENT_MESSAGES
       return redirect_to project_intake_path(@intake), alert: I18n.t("intake.flash_interview_limit")
     end
@@ -101,7 +108,9 @@ class ProjectIntakesController < ApplicationController
   end
 
   def prepare_show
-    @messages = @intake.intake_messages.order(:id).limit(20)
+    @message_total = @intake.intake_messages.count
+    @messages = @intake.intake_messages.order(id: :desc).limit(20).reverse
+    @latest_client_message = @intake.intake_messages.where(role: "client").order(id: :desc).first
     @latest_spec = admin_signed_in? ? @intake.latest_spec : @intake.published_spec
     @milestones = @intake.project_milestones.order(:position).to_a
     @visible_month = begin

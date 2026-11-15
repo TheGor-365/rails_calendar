@@ -111,7 +111,9 @@ class ClientRequestsController < ApplicationController
   def load_details
     @spec = @intake.published_spec
     @milestones = @spec ? @intake.project_milestones.where(intake_spec_version_id: @spec.id).order(:position) : []
-    @conversation = @intake.intake_messages.order(:id).limit(20).to_a
+    @message_total = @intake.intake_messages.count
+    @conversation = @intake.intake_messages.order(id: :desc).limit(20).reverse
+    @latest_client_message = @intake.intake_messages.where(role: "client").order(id: :desc).first
     @client_turn_count = @intake.client_message_count
     @reply_submission_key ||= SecureRandom.hex(16)
   end

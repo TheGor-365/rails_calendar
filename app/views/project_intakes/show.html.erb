@@ -22,9 +22,14 @@
     <% end %>
     </div>
   </header>
+  <%= render "shared/white_atlas/intake_current_context",
+             intake: @intake, latest_message: @latest_client_message,
+             visible_spec: @latest_spec, message_total: @message_total, perspective: "owner" %>
+
   <% current_stage = @milestones.any? ? "plan" : (@latest_spec.present? ? "review" : "interview") %>
   <%= render "shared/workflow", title: t("intake.workflow_show"), current: current_stage, steps: [ ["request", "clipboard2-plus", t("intake.step_request"), t("intake.step_request_desc")], ["interview", "chat-left-text", t("intake.step_interview"), t("intake.step_interview_desc")], ["review", "clipboard2-check", t("intake.step_review"), t("intake.step_review_desc")], ["plan", "calendar-range", t("intake.step_plan"), t("intake.step_plan_desc")] ] %>
   <nav class="wa-owner-intake__jump" aria-label="<%= t("intake.owner_view.jump_label") %>">
+    <a href="#intake-current"><i class="bi bi-pin-angle" aria-hidden="true"></i><%= t("intake_context.current_title") %></a>
     <a href="#intake-brief"><i class="bi bi-card-text" aria-hidden="true"></i><%= t("intake.owner_view.brief") %></a>
     <a href="#intake-interview"><i class="bi bi-chat-left-text" aria-hidden="true"></i><%= t("intake.interview_title") %></a>
     <% if admin_signed_in? %>
@@ -44,9 +49,12 @@
       <div><h2 id="intake-brief-heading"><%= t("intake.owner_view.brief") %></h2>
       <p class="rc-hint mb-0"><%= t("intake.owner_view.brief_help") %></p></div>
     </div>
-    <div class="wa-owner-intake__brief">
-      <p class="wa-owner-intake__prose"><%= @intake.goal %></p>
-    </div>
+    <details class="wa-context__original" <%= "open" if @intake.goal.length <= 360 %>>
+      <summary><i class="bi bi-journal-text" aria-hidden="true"></i><%= t("intake_context.original_toggle") %></summary>
+      <div class="wa-owner-intake__brief">
+        <p class="wa-owner-intake__prose"><%= @intake.goal %></p>
+      </div>
+    </details>
     <% if admin_signed_in? %>
       <% next_hint = if @milestones.any?
            t("intake.owner_view.next_milestones")
@@ -74,6 +82,10 @@
       </div>
     </div>
     <div class="wa-owner-intake__thread" data-controller="wa-intake-thread">
+      <details class="wa-context__history" <%= "open" if @messages.length <= 2 %>>
+      <summary><i class="bi bi-clock-history" aria-hidden="true"></i><%= t("intake_context.history_toggle", count: @message_total) %></summary>
+      <p class="rc-hint"><%= t("intake_context.history_window", count: @messages.size, total: @message_total) %></p>
+      <div class="wa-context__history-tools">
       <div class="wa-owner-intake__filters" role="group" aria-label="<%= t("intake.owner_view.filter_label") %>">
         <% [["all", t("intake.owner_view.filter_all")], ["client", t("intake.role_client")], ["assistant", t("intake.role_assistant")]].each do |role, label| %>
           <button type="button" class="wa-owner-intake__filter"
@@ -83,12 +95,28 @@
                   aria-pressed="<%= role == "all" %>"><%= label %></button>
         <% end %>
       </div>
-      <ol class="rc-record-list wa-owner-intake__messages" id="intake-conversation">
+      <label class="wa-context__search-label"><%= t("intake_context.search_label") %>
+        <input type="search" class="wa-context__search"
+               placeholder="<%= t("intake_context.search_placeholder") %>"
+               data-wa-intake-thread-target="search" data-action="input->wa-intake-thread#search"/>
+      </label>
+      <label class="wa-context__sort-label"><%= t("intake_context.sort_label") %>
+        <select class="wa-context__sort" data-wa-intake-thread-target="order"
+                data-action="change->wa-intake-thread#sort">
+          <option value="oldest"><%= t("intake_context.oldest_first") %></option>
+          <option value="newest"><%= t("intake_context.newest_first") %></option>
+        </select>
+      </label>
+      </div>
+      <p class="wa-context__visible-count rc-hint" role="status" data-wa-intake-thread-target="count"></p>
+      <ol class="rc-record-list wa-owner-intake__messages" id="intake-conversation"
+          data-wa-intake-thread-target="list">
         <% @messages.each do |message| %>
           <li class="rc-record wa-owner-intake__message wa-owner-intake__message--<%= message.role %>"
-              data-wa-intake-thread-target="item" data-wa-intake-thread-role="<%= message.role %>">
+              data-wa-intake-thread-target="item" data-wa-intake-thread-role="<%= message.role %>"
+              data-wa-intake-thread-id="<%= message.id %>">
             <div class="wa-owner-intake__message-top">
-              <strong><i class="bi bi-<%= message.role == "client" ? "person-circle" : "chat-left-dots" %>" aria-hidden="true"></i>
+              <strong><span class="wa-context__actor-icon wa-context__actor-icon--<%= message.role %>" aria-hidden="true"><i class="bi bi-<%= message.role == "client" ? "person-fill" : "robot" %>"></i></span>
                 <%= message.role == "client" ? t("intake.role_client") : t("intake.role_assistant") %></strong>
               <time datetime="<%= message.created_at.iso8601 %>"><%= message.created_at.utc.strftime("%Y-%m-%d %H:%M UTC") %></time>
             </div>
@@ -99,11 +127,14 @@
       <p class="wa-owner-intake__filter-empty rc-hint" data-wa-intake-thread-target="empty" hidden role="status">
         <%= t("intake.owner_view.no_messages") %>
       </p>
+      </details>
     </div>
     <% if @message_errors.present? %>
       <div class="rc-notice rc-notice--error" role="alert"><%= @message_errors.to_sentence %></div>
     <% end %>
-    <% if @intake.status == "interviewing" && @intake.client_message_count < ProjectIntake::MAX_CLIENT_MESSAGES %>
+    <% if @intake.client_user_id.present? %>
+      <p class="rc-hint wa-context__owner-reply-note"><i class="bi bi-shield-check" aria-hidden="true"></i><%= t("intake_context.owner_reply_not_available") %></p>
+    <% elsif @intake.status == "interviewing" && @intake.client_message_count < ProjectIntake::MAX_CLIENT_MESSAGES %>
       <%= form_with url: reply_project_intake_path(@intake), method: :post, html: { class: "rc-form mt-3" } do |f| %>
         <div class="rc-field mb-2">
           <%= f.label :answer, t("intake.answer"), class: "rc-field-label" %>
