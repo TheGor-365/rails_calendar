@@ -28,3 +28,7 @@ application.register("wa-spec-review", WaSpecReviewController)
 // Read-only role filter for the owner intake conversation.
 import WaIntakeThreadController from "./wa_intake_thread_controller"
 application.register("wa-intake-thread", WaIntakeThreadController)
+
+// Sticky desktop section rail, horizontal/stacked navigation on mobile.
+import WaSectionNavController from "./wa_section_nav_controller"
+application.register("wa-section-nav", WaSectionNavController)

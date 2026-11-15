@@ -19,16 +19,24 @@
     </div>
   </header>
 
+  <% client_nav_sections = [
+    ["intake-current", "pin-angle", t("intake_context.current_title")],
+    ["client-request-description", "card-text", t("client_requests.description_title")],
+    ["client-request-conversation-heading", "chat-dots", t("intake_context.history_nav")]
+  ] %>
+  <% if @client_turn_count < ProjectIntake::MAX_CLIENT_MESSAGES %>
+    <% client_nav_sections << ["client-request-reply", "send", t("client_requests.reply_title")] %>
+  <% end %>
+  <% client_nav_sections << ["client-request-spec", "file-earmark-text", t("intake_context.spec_nav")] %>
+  <% client_nav_sections << ["client-request-milestones", "calendar-range", t("client_requests.milestones_title")] if @milestones.any? %>
+  <div class="wa-detail-shell" data-controller="wa-section-nav">
+    <%= render "shared/white_atlas/intake_side_nav", sections: client_nav_sections %>
+    <div class="wa-detail-shell__main">
   <%= render "shared/white_atlas/intake_current_context",
              intake: @intake, latest_message: @latest_client_message,
              visible_spec: @spec, message_total: @message_total, perspective: "client" %>
 
-  <nav class="wa-context__jump" aria-label="<%= t("intake_context.jump_label") %>">
-    <a href="#intake-current"><i class="bi bi-pin-angle" aria-hidden="true"></i><%= t("intake_context.current_title") %></a>
-    <a href="#client-request-conversation-heading"><i class="bi bi-chat-dots" aria-hidden="true"></i><%= t("intake_context.history_nav") %></a>
-    <a href="#client-request-spec"><i class="bi bi-file-earmark-text" aria-hidden="true"></i><%= t("intake_context.spec_nav") %></a>
-  </nav>
-
+  
   <section class="surface-panel wa-client-request__panel mb-4" aria-labelledby="client-request-description">
     <div class="wa-client-request__section-head">
       <span class="wa-client-request__section-icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
@@ -101,7 +109,7 @@
       <p class="rc-notice rc-notice--error" role="alert"><%= @reply_error %></p>
     <% end %>
     <% if @client_turn_count < ProjectIntake::MAX_CLIENT_MESSAGES %>
-      <div class="wa-client-request__reply">
+      <div class="wa-client-request__reply" id="client-request-reply">
         <h3><%= t("client_requests.reply_title") %></h3>
         <p class="rc-hint" id="client-reply-help"><%= t("client_requests.reply_help", remaining: ProjectIntake::MAX_CLIENT_MESSAGES - @client_turn_count) %></p>
         <%= form_with url: reply_client_request_path(@intake), method: :post,
@@ -184,4 +192,6 @@
       </ol>
     </section>
   <% end %>
+    </div>
+  </div>
 </div>
