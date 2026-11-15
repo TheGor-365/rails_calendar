@@ -37,7 +37,8 @@ class OwnerAvatarEditorBrowserTest < ApplicationSystemTestCase
       click_button "Upload avatar"
     end
 
-    assert_current_path owner_cabinet_path(anchor: "owner-avatar")
+    assert_current_path owner_cabinet_path
+    assert_text "Avatar saved"
     assert_selector ".ws-account-avatar-frame img.ws-account-avatar"
     blob = owner.reload.owner_avatars_attachments.order(id: :desc).first.blob
     assert_equal "image/jpeg", blob.content_type
