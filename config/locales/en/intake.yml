@@ -71,6 +71,8 @@ en:
     calendar_title: "Calendar of proposed delivery phases"
     calendar_hint: "Only this intake's milestones are visible. Dates are proposals, not contractual deadlines or booked consultations. Weekends excluded; no public access to other projects."
     dates_proposed: "UTC calendar dates, proposed"
+    unread_new: "New"
+    unread_count: "%{count} unread client requests"
     admin_index_eyebrow: "ADMIN / INTAKE REVIEW"
     admin_index_title: "Incoming project briefs (demo)"
     admin_index_hint: "Only the signed-in administrator can see the intake inbox. Public access is disabled by default."

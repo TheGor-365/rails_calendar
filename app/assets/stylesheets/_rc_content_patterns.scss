@@ -337,3 +337,32 @@ textarea[data-controller~="wa-autogrow"] { resize: vertical; min-height: 6rem; m
   .wa-owner-intake__message { padding: .75rem; }
   .wa-owner-intake__jump a { font-size: .75rem; }
 }
+
+// RC055.0 — persistent owner unread markers; no simulated alerts.
+.wa-inbox-nav { position: relative; }
+.wa-unread-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.35rem; height: 1.35rem; padding: 0 .27rem;
+  border-radius: 100px; background: #bf384f; color: white;
+  font-size: .69rem; font-weight: 840; line-height: 1;
+  font-variant-numeric: tabular-nums; box-shadow: 0 1px 3px rgba(38, 25, 31, .12);
+}
+.wa-inbox-record--unread { border-left: 3px solid var(--rc-accent); }
+.wa-inbox-record__heading { display: flex; gap: .65rem; align-items: center; flex-wrap: wrap; margin-bottom: .35rem; }
+.wa-inbox-record__heading > a { min-width: 0; overflow-wrap: anywhere; }
+.wa-inbox-record__new {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .22rem .55rem; border-radius: 99px; background: var(--rc-accent-wash);
+  color: var(--rc-accent-dark); font-size: .71rem; font-weight: 790;
+}
+.wa-unread-dot { display: inline-block; flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%; background: var(--rc-accent); }
+.wa-unread-mobile-icon { position: relative; }
+.wa-unread-count--mobile { position: absolute; top: -6px; right: -8px; min-width: 1.12rem; height: 1.12rem; font-size: .59rem; padding: 0 .2rem; }
+@media(max-width: 767.98px) {
+  .rc-mobile-dock--owner { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .rc-mobile-dock--owner .rc-mobile-dock-label { font-size: .62rem; }
+}
+@media(max-width: 340px) {
+  .rc-mobile-dock--owner .rc-mobile-dock-label { font-size: .6rem; }
+  .rc-mobile-dock--owner .rc-mobile-dock-item { padding-inline: 0; }
+}

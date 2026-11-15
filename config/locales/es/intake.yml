@@ -71,6 +71,8 @@ es:
     calendar_title: "Calendario de fases propuestas"
     calendar_hint: "Solo se ven fases de esta solicitud. Fechas provisionales, no plazos contractuales ni consultas reservadas."
     dates_proposed: "Fechas UTC, provisionales"
+    unread_new: "Nueva"
+    unread_count: "Solicitudes sin leer: %{count}"
     admin_index_eyebrow: "ADMIN / REVISIÓN DE SOLICITUDES"
     admin_index_title: "Solicitudes de proyectos recibidas (demo)"
     admin_index_hint: "Solo el administrador autenticado puede ver estas solicitudes. El acceso público está desactivado."
