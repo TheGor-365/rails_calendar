@@ -74,6 +74,80 @@
           <% end %>
         </section>
       <% end %>
+        <% if @media_enabled %>
+        <section class="surface-panel wa-services__panel wa-services__media-section" id="offering-media">
+          <h2><i class="bi bi-images" aria-hidden="true"></i> <%= t("owner_services.media_title") %></h2>
+          <p class="rc-hint"><%= t("owner_services.media_private_notice") %></p>
+
+          <div class="wa-services__media-gallery">
+            <% @media_items.each do |media| %>
+              <article class="wa-services__media-item">
+                <% if media.image? %>
+                  <%= image_tag owner_service_media_file_path(@offering, media),
+                        alt: media.caption.presence || t("owner_services.media_image_alt"),
+                        class: "wa-services__media-thumb", loading: "lazy" %>
+                <% else %>
+                  <div class="wa-services__media-placeholder" aria-hidden="true"><i class="bi <%= case media.media_kind
+                        when "document" then "bi-file-earmark-text"
+                        when "audio" then "bi-file-earmark-music"
+                        else "bi-file-earmark-play" end %>"></i></div>
+                <% end %>
+                <div class="wa-services__media-meta">
+                  <strong><i class="bi bi-paperclip" aria-hidden="true"></i>
+                    <%= media.caption.presence || t("owner_services.media_kinds.#{media.media_kind}") %></strong>
+                  <small><%= t("owner_services.media_kinds.#{media.media_kind}") %> ·
+                    <%= t("owner_services.version", version: media.service_offering_version.version) %></small>
+                </div>
+                <span class="wa-services__state wa-services__state--<%= media.approved? ? "approved" : "draft" %>">
+                  <i class="bi bi-<%= media.approved? ? "patch-check" : "clock-history" %>" aria-hidden="true"></i>
+                  <%= t(media.approved? ? "owner_services.media_reviewed" : "owner_services.media_pending_review") %>
+                </span>
+                <div class="wa-services__media-actions">
+                  <%= link_to rc_icon_label("download", t("owner_services.media_download")),
+                        owner_service_media_file_path(@offering, media), class: "rc-action rc-action--quiet rc-action--small" %>
+                  <% unless media.approved? %>
+                    <%= button_to rc_icon_label("patch-check", t("owner_services.media_approve")),
+                          approve_owner_service_media_path(@offering, media),
+                          method: :post, form: { class: "wa-services__inline-form" },
+                          class: "rc-action rc-action--soft rc-action--small" %>
+                  <% end %>
+                  <%= button_to rc_icon_label("archive", t("owner_services.media_archive")),
+                        archive_owner_service_media_path(@offering, media),
+                        method: :delete, form: { class: "wa-services__inline-form", data: { turbo_confirm: t("owner_services.media_archive_confirm") } },
+                        class: "rc-action rc-action--quiet rc-action--small" %>
+                </div>
+              </article>
+            <% end %>
+          </div>
+
+          <h3 class="wa-services__media-subheading"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> <%= t("owner_services.media_upload_title") %></h3>
+          <%= form_with url: owner_service_media_items_path(@offering), method: :post,
+                        multipart: true, html: { class: "rc-form wa-services__media-form", id: "offering-media-upload" } do %>
+            <div class="rc-field">
+              <%= label_tag :media_kind, t("owner_services.media_kind"), class: "rc-field-label" %>
+              <%= select_tag "media[media_kind]",
+                  options_for_select(ServiceOfferingMediaItem::KINDS.map { |kind| [t("owner_services.media_kinds.#{kind}"), kind] }),
+                  id: :media_kind, class: "rc-input", required: true %>
+            </div>
+            <div class="rc-field">
+              <%= label_tag :media_file, t("owner_services.media_file"), class: "rc-field-label" %>
+              <%= file_field_tag "media[file]", id: :media_file, required: true, class: "rc-input",
+                    accept: ServiceOfferingMediaItem::ALLOWED_MIME_TYPES.values.flatten.uniq.join(",") %>
+              <p class="rc-hint"><%= t("owner_services.media_limits") %></p>
+            </div>
+            <div class="rc-field">
+              <%= label_tag :media_caption, t("owner_services.media_caption"), class: "rc-field-label" %>
+              <%= text_field_tag "media[caption]", nil, id: :media_caption, maxlength: 160, class: "rc-input" %>
+            </div>
+            <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+              <%= rc_icon_label("cloud-arrow-up", t("owner_services.media_upload")) %>
+            <% end %>
+          <% end %>
+          <p class="rc-hint wa-services__media-ai-notice">
+            <i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.media_ai_off") %>
+          </p>
+        </section>
+      <% end %>
     </main>
     <aside class="wa-services__aside">
       <% source = @draft || @approved || @published %>

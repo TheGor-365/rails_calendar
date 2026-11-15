@@ -45,6 +45,11 @@ Rails.application.routes.draw do
   post "/workspace/services/approve_all", to: "owner_service_offerings#approve_all", as: :approve_all_owner_services
   get "/workspace/services/new", to: "owner_service_offerings#new", as: :new_owner_service
   post "/workspace/services", to: "owner_service_offerings#create"
+  # RC055.1c: local-only owner-scoped media. Direct Active Storage routes disabled.
+  post "/workspace/services/:id/media", to: "owner_service_media_items#create", as: :owner_service_media_items
+  post "/workspace/services/:id/media/:media_id/approve", to: "owner_service_media_items#approve", as: :approve_owner_service_media
+  delete "/workspace/services/:id/media/:media_id", to: "owner_service_media_items#archive", as: :archive_owner_service_media
+  get "/workspace/services/:id/media/:media_id/file", to: "owner_service_media_items#file", as: :owner_service_media_file
   get "/workspace/services/:id", to: "owner_service_offerings#show", as: :owner_service
   patch "/workspace/services/:id/draft", to: "owner_service_offerings#update_draft", as: :owner_service_draft
   post "/workspace/services/:id/approve", to: "owner_service_offerings#approve", as: :approve_owner_service

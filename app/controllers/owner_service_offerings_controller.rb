@@ -53,6 +53,8 @@ class OwnerServiceOfferingsController < ApplicationController
     @history = @offering.versions.order(version: :desc)
     @publications = @offering.publications.order(id: :desc).limit(12)
     @eligible = current_capability?(@draft || @approved)
+    @media_enabled = Rails.env.test? || (Rails.env.development? && request.local?)
+    @media_items = @media_enabled ? @offering.media_items.visible.includes(:service_offering_version).to_a : []
   end
 
   def update_draft
