@@ -38,13 +38,16 @@ module OwnerServices
       end
     end
 
-    def create_draft!(attributes)
+    def create_draft!(attributes, stable_key: nil)
       ensure_approved_profile!
+      if stable_key && !stable_key.match?(/\Aauto-[a-z0-9-]{1,27}\z/)
+        raise PolicyError, "Invalid generated service key"
+      end
       capability = eligible_capabilities.find_by(id: attributes.fetch(:professional_capability_id))
       raise PolicyError, "Choose a capability from the latest approved context" unless capability
 
       ServiceOffering.transaction do
-        offering = workspace.service_offerings.create!(key: "svc-#{SecureRandom.hex(10)}")
+        offering = workspace.service_offerings.create!(key: stable_key || "svc-#{SecureRandom.hex(10)}")
         offering.versions.create!(
           offered_fields(attributes).merge(
             version: 1, professional_context_snapshot: snapshot,

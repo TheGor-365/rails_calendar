@@ -13,13 +13,13 @@ module OwnerServiceCatalogueTestData
     )
   end
 
-  def approved_profile_for(owner, version: 1, capabilities: %w[rails react])
+  def approved_profile_for(owner, version: 1, capabilities: %w[rails react], desired_services: [])
     workspace = owner.owner_workspace || owner.create_owner_workspace!
     profile = workspace.professional_profile || workspace.create_professional_profile!(onboarding_state: "approved")
     profile.update!(onboarding_state: "approved")
     snapshot = profile.professional_context_snapshots.create!(
       version: version, digest: Digest::SHA256.hexdigest("fictional-offering-source-#{owner.id}-#{version}"),
-      payload: { "source" => "owner_confirmed", "capabilities" => capabilities },
+      payload: { "source" => "owner_confirmed", "capabilities" => capabilities, "desired_services" => desired_services },
       approved_at: Time.current
     )
     rows = capabilities.map do |domain|

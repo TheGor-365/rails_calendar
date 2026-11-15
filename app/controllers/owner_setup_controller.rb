@@ -119,7 +119,15 @@ class OwnerSetupController < ApplicationController
       @profile.update!(headline: headline, private_summary: private_summary,
                        public_summary: public_summary, onboarding_state: "approved")
     end
-    redirect_to owner_practice_path, notice: t("owner_setup.approved")
+    # Proposed services are derived only after the profile vN is approved.
+    # Errors do not roll back the already committed owner-approved snapshot.
+    begin
+      OwnerServices::AutoCatalogue.new(workspace: @workspace).sync!
+      redirect_to owner_practice_path, notice: t("owner_setup.approved")
+    rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid => error
+      Rails.logger.warn("Automatic offering draft generation failed: #{error.class}")
+      redirect_to owner_practice_path, alert: t("owner_services.auto_sync_blocked")
+    end
   rescue ActiveRecord::RecordInvalid, ArgumentError, ActionController::ParameterMissing
     redirect_to owner_setup_review_path, alert: t("owner_setup.invalid_profile")
   end
