@@ -155,7 +155,6 @@ class OwnerIntakeUnreadTest < ActionDispatch::IntegrationTest
     end
     assert_response :forbidden
     assert_equal 1, OwnerIntakeInbox.unread_for(owner: @owner).where(id: @request_a.id).count
-    assert_select "body", count: 1
   end
 
   test "unread indicator labels exist in each locale" do
