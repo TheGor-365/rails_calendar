@@ -9,8 +9,36 @@
         <span class="ws-account-chip"><i class="bi bi-person-check" aria-hidden="true"></i><%= current_user.email %></span>
       </div>
     </div>
-    <div class="ws-account-hero-symbol" aria-hidden="true"><i class="bi bi-person-workspace"></i></div>
+    <div class="ws-account-hero-symbol">
+      <% if (avatar = local_owner_avatar_attachment(current_user)) %>
+        <%= image_tag owner_avatar_file_path(avatar), class: "ws-account-avatar",
+              alt: t("account_hub.avatar_alt"), loading: "lazy" %>
+      <% else %>
+        <i class="bi bi-person-workspace" aria-hidden="true"></i>
+      <% end %>
+    </div>
   </header>
+  <% if local_owner_avatar_enabled? %>
+    <section class="surface-panel ws-account-avatar-panel" id="owner-avatar">
+      <div class="ws-account-avatar-copy">
+        <h2><i class="bi bi-person-circle" aria-hidden="true"></i> <%= t("account_hub.avatar_title") %></h2>
+        <p class="rc-hint"><%= t("account_hub.avatar_hint") %></p>
+      </div>
+      <%= form_with url: owner_avatars_path, method: :post, multipart: true,
+            html: { id: "owner-avatar-form", class: "ws-account-avatar-form" } do %>
+        <div class="wa-file-drop">
+          <label for="owner-avatar-file">
+            <i class="bi bi-image" aria-hidden="true"></i> <%= t("account_hub.avatar_file") %>
+          </label>
+          <%= file_field_tag "avatar[file]", id: "owner-avatar-file",
+                accept: "image/jpeg,image/png,image/webp", required: true %>
+        </div>
+        <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+          <%= rc_icon_label("cloud-arrow-up", t("account_hub.avatar_upload")) %>
+        <% end %>
+      <% end %>
+    </section>
+  <% end %>
 
   <section class="ws-account-overview" aria-label="<%= t('account_hub.owner_overview') %>">
     <div class="ws-account-metric">
@@ -66,6 +94,10 @@
         <%= link_to owner_services_path, class: "ws-account-tool" do %>
           <span class="ws-account-tool-icon"><i class="bi bi-boxes" aria-hidden="true"></i></span>
           <strong><%= t("account_hub.my_services") %></strong><small><%= t("account_hub.my_services_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+        <% end %>
+        <%= link_to owner_catalogue_ai_path, class: "ws-account-tool" do %>
+          <span class="ws-account-tool-icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
+          <strong><%= t("account_hub.catalogue_copilot") %></strong><small><%= t("account_hub.catalogue_copilot_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
         <% end %>
         <%= link_to owner_ai_activity_path, class: "ws-account-tool" do %>
           <span class="ws-account-tool-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>

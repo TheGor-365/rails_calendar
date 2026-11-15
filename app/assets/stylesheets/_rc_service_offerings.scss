@@ -242,3 +242,77 @@
   border: 1px solid var(--ws-border); border-radius: 10px; margin: 0 0 .83rem;
   background: var(--ws-canvas);
 }
+
+
+/* WCAG-friendly native file control in White Atlas visual language. */
+.wa-file-drop {
+  display: grid; gap: .4rem; min-width: 0;
+  border: 1px dashed #a8d6cd; background: #f6fcfa;
+  border-radius: 14px; padding: .75rem .88rem;
+  transition: border-color .2s var(--ws-easing), background-color .2s var(--ws-easing);
+}
+.wa-file-drop:focus-within, .wa-file-drop:hover { border-color: var(--ws-teal); background: #edfaf6; }
+.wa-file-drop label {
+  display: flex; align-items: center; gap: .45rem;
+  color: var(--ws-teal-deep); font-size: .79rem; font-weight: 780;
+}
+.wa-file-drop label .bi { font-size: 1.18rem; }
+.wa-file-drop input[type=file] {
+  display: block; width: 100%; max-width: 100%; min-width: 0;
+  padding: .24rem 0; font-size: .77rem; color: var(--ws-muted);
+  background: transparent; border: 0; cursor: pointer;
+}
+.wa-file-drop input[type=file]::file-selector-button {
+  margin-right: .7rem; padding: .54rem .8rem; cursor: pointer;
+  border-radius: 10px; border: 1px solid var(--ws-border);
+  color: var(--ws-ink); font-weight: 760; background: #fff;
+  box-shadow: var(--ws-shadow); transition: background-color .18s;
+}
+.wa-file-drop input[type=file]:hover::file-selector-button { background: var(--ws-teal-wash); }
+.wa-file-drop input[type=file]:focus-visible { outline: 2px solid var(--ws-teal); outline-offset: 3px; }
+.wa-services__cover-wrap { position: relative; margin-bottom: .83rem; }
+.wa-services__cover-wrap .wa-services__card-banner { margin: 0; }
+.wa-services__cover-pending {
+  display: inline-flex; align-items: center; gap: .4rem;
+  position: absolute; right: .45rem; bottom: .5rem;
+  max-width: calc(100% - .9rem); border-radius: 9px;
+  background: rgba(255,255,255,.95); color: #385d68;
+  font-size: .68rem; font-weight: 750; padding: .38rem .56rem;
+  box-shadow: var(--ws-shadow); overflow-wrap: anywhere;
+}
+
+
+/* Owner catalogue AI — review proposals, never automatic public updates. */
+.wa-services__copilot-run { max-width: 100%; }
+.wa-services__copilot-points { display: flex; flex-wrap: wrap; gap: .55rem; margin: 1rem 0; }
+.wa-services__copilot-points span {
+  display: inline-flex; align-items: center; gap: .38rem;
+  background: var(--ws-teal-wash); color: var(--ws-teal-deep);
+  font-size: .76rem; border-radius: 10px; padding: .38rem .65rem; font-weight: 750;
+}
+.wa-services__copilot-results .wa-services__toolbar h2 { font-size: 1.05rem; font-weight: 800; margin: 0; }
+.wa-services__copilot-results .wa-services__toolbar h2 .bi { color: var(--ws-teal); }
+.wa-services__copilot-list { display: grid; gap: .9rem; }
+.wa-services__copilot-item-head { display: flex; align-items: start; justify-content: space-between; flex-wrap: wrap; gap: .8rem; }
+.wa-services__copilot-item-head h3 { font-size: 1.08rem; font-weight: 800; margin: 0; }
+.wa-services__copilot-item-head .eyebrow { margin: 0 0 .35rem; }
+.wa-services__copilot-compare { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .65rem; margin: 1rem 0; }
+.wa-services__copilot-column { padding: 1rem; border-radius: 12px; background: var(--ws-canvas); border: 1px solid var(--ws-border); }
+.wa-services__copilot-column--suggested { background: #f0faf7; border-color: #c1e9df; }
+.wa-services__copilot-column h4 { font-size: .76rem; font-weight: 800; color: var(--ws-muted); }
+.wa-services__copilot-column h4 i { color: var(--ws-teal); }
+.wa-services__copilot-column strong { font-size: .89rem; font-weight: 800; }
+.wa-services__copilot-column p { font-size: .81rem; line-height: 1.6; overflow-wrap: anywhere; margin: .5rem 0; white-space: pre-wrap; }
+.wa-services__copilot-column small { font-size: .73rem; color: var(--ws-muted); }
+.wa-services__copilot-details { border-top: 1px solid var(--ws-border); padding: .8rem 0; }
+.wa-services__copilot-details summary { cursor: pointer; font-size: .83rem; font-weight: 790; color: var(--ws-teal-deep); }
+.wa-services__copilot-details .wa-services__boundaries { margin-top: .9rem; }
+.wa-services__copilot-risk-list { list-style: none; padding: 0; }
+.wa-services__copilot-risk-list li { display: flex; gap: .5rem; font-size: .81rem; margin-bottom: .35rem; }
+.wa-services__copilot-risk-list .bi { color: var(--rc-error); }
+.wa-services__copilot-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: .8rem; border-top: 1px solid var(--ws-border); padding-top: .8rem;
+}
+.wa-services__copilot-footer p { margin: 0; }
+@media(max-width:600px) { .wa-services__copilot-compare { grid-template-columns: 1fr; } }

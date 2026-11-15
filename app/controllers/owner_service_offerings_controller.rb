@@ -14,10 +14,13 @@ class OwnerServiceOfferingsController < ApplicationController
     if Rails.env.test? || (Rails.env.development? && request.local?)
       ServiceOfferingMediaItem.visible
         .where(service_offering_id: @offerings.map(&:id), media_kind: %w[banner image])
-        .where.not(approved_at: nil)
-        .includes(file_attachment: :blob).each do |media|
+        .includes(file_attachment: :blob)
+        .order(created_at: :desc, id: :desc).each do |media|
+          # Owner can preview pending media, with an explicit unapproved label.
+          # The approved banner has priority over images and pending revisions.
           current = @media_cover_by_offering_id[media.service_offering_id]
-          if current.nil? || (media.media_kind == "banner" && current.media_kind != "banner")
+          rank = ->(m) { (m.approved? ? 2 : 0) + (m.media_kind == "banner" ? 1 : 0) }
+          if current.nil? || rank.call(media) > rank.call(current)
             @media_cover_by_offering_id[media.service_offering_id] = media
           end
         end

@@ -41,6 +41,10 @@ Rails.application.routes.draw do
 
   # RC055.1: private owner-controlled service offering revisions.
   get "/workspace/services", to: "owner_service_offerings#index", as: :owner_services
+  get "/workspace/services/ai", to: "owner_catalogue_ai#index", as: :owner_catalogue_ai
+  post "/workspace/services/ai/run", to: "owner_catalogue_ai#run", as: :run_owner_catalogue_ai
+  post "/workspace/services/ai/apply_all", to: "owner_catalogue_ai#apply_all", as: :apply_all_owner_catalogue_ai
+  post "/workspace/services/ai/apply/:offering_id", to: "owner_catalogue_ai#apply", as: :apply_owner_catalogue_ai
   post "/workspace/services/sync", to: "owner_service_offerings#sync", as: :sync_owner_services
   post "/workspace/services/approve_all", to: "owner_service_offerings#approve_all", as: :approve_all_owner_services
   get "/workspace/services/new", to: "owner_service_offerings#new", as: :new_owner_service
@@ -62,6 +66,8 @@ Rails.application.routes.draw do
   post "/workspace/practice/capabilities/suggest", to: "owner_capabilities#suggest", as: :suggest_owner_capabilities
   post "/workspace/practice/capabilities/approve", to: "owner_capabilities#approve", as: :approve_owner_capabilities
   get "/workspace/cabinet", to: "owner_setup#cabinet", as: :owner_cabinet
+  post "/workspace/avatar", to: "owner_avatars#create", as: :owner_avatars
+  get "/workspace/avatar/:attachment_id", to: "owner_avatars#file", as: :owner_avatar_file
   get "/workspace/ai", to: "owner_setup#ai_activity", as: :owner_ai_activity
 
   # Public commercial showcase; never accepts or stores visitor contact data.

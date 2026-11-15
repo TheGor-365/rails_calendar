@@ -6,6 +6,8 @@
       <p class="rc-muted"><%= t("owner_services.intro") %></p>
     </div>
     <div class="wa-services__actions">
+      <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path,
+            class: "rc-action rc-action--soft" %>
       <%= link_to rc_icon_label("person-badge", t("owner_setup.practice_title")), owner_practice_path, class: "rc-action rc-action--quiet" %>
       <% if @snapshot && @eligible_capabilities.any? && @profile.onboarding_state == "approved" && @profile.professional_capability_corrections.none? %>
         <%= button_to rc_icon_label("arrow-repeat", t("owner_services.auto_sync_action")), sync_owner_services_path,
@@ -62,9 +64,15 @@
           <% icon, state, kind = service_offering_state(offering) %>
           <article class="surface-panel wa-services__card">
             <% if (cover = @media_cover_by_offering_id[offering.id]) %>
-              <%= image_tag owner_service_media_file_path(offering, cover),
-                    alt: cover.caption.presence || t("owner_services.media_image_alt"),
-                    loading: "lazy", class: "wa-services__card-banner" %>
+              <div class="wa-services__cover-wrap">
+                <%= image_tag owner_service_media_file_path(offering, cover),
+                      alt: cover.caption.presence || t("owner_services.media_image_alt"),
+                      loading: "lazy", class: "wa-services__card-banner" %>
+                <% unless cover.approved? %>
+                  <span class="wa-services__cover-pending"><i class="bi bi-eye" aria-hidden="true"></i>
+                    <%= t("owner_services.media_preview_only") %></span>
+                <% end %>
+              </div>
             <% end %>
             <header class="wa-services__card-heading">
               <span aria-hidden="true"><i class="bi <%= service_offering_icon(offering) %>"></i></span>

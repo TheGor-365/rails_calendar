@@ -305,3 +305,24 @@
   .ws-account-page :is(.ws-account-metric,.ws-account-tool),
   .ws-owner-page :is(.ws-owner-step,.ws-owner-choice) { transition: none !important; transform: none !important; }
 }
+
+
+.ws-account-avatar { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.ws-account-avatar-panel {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  gap: 1rem; padding: .75rem 1rem; margin-bottom: 1rem; border-radius: 16px;
+}
+.ws-account-avatar-copy h2 { font-size: .91rem; font-weight: 790; margin: 0 0 .2rem; }
+.ws-account-avatar-copy h2 i { color: var(--ws-teal); margin-right: .3rem; }
+.ws-account-avatar-copy p { margin: 0; max-width: 35rem; }
+.ws-account-avatar-form { display: flex; align-items: flex-end; flex-wrap: wrap; gap: .7rem; }
+.ws-account-avatar-form .wa-file-drop { min-width: min(100%, 260px); }
+.ws-nav-avatar-link { display: grid; place-items: center; flex: 0 0 32px; }
+.ws-nav-avatar {
+  width: 32px; height: 32px; object-fit: cover; border-radius: 50%;
+  border: 2px solid #cbe8e0;
+}
+@media(max-width:575px) {
+  .ws-account-avatar-form { width: 100%; }
+  .ws-account-avatar-form .wa-file-drop { width: 100%; }
+}
