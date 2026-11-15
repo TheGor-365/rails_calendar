@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_15_020000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_15_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -237,8 +237,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_15_020000) do
     t.bigint "project_intake_id", null: false
     t.string "role", limit: 16, null: false
     t.text "body", null: false
+    t.string "client_submission_key", limit: 32
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["project_intake_id", "client_submission_key"], name: "idx_intake_messages_client_submission_unique", unique: true, where: "(client_submission_key IS NOT NULL)"
     t.index ["project_intake_id", "created_at", "id"], name: "idx_intake_conversation_order"
     t.index ["project_intake_id"], name: "index_intake_messages_on_project_intake_id"
   end

@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   get "/client/requests/new", to: "client_requests#new", as: :new_client_request
   post "/client/requests", to: "client_requests#create", as: :client_requests
   get "/client/requests/:id", to: "client_requests#show", as: :client_request
+  post "/client/requests/:id/reply", to: "client_requests#reply", as: :reply_client_request
   post "/client/requests/:id/review", to: "client_requests#review", as: :review_client_request
 
   # Private owner entry, never a public client cabinet.

@@ -366,3 +366,22 @@ textarea[data-controller~="wa-autogrow"] { resize: vertical; min-height: 6rem; m
   .rc-mobile-dock--owner .rc-mobile-dock-label { font-size: .6rem; }
   .rc-mobile-dock--owner .rc-mobile-dock-item { padding-inline: 0; }
 }
+
+/* RC055.0b: fictional client clarification thread, opt-in native textarea. */
+.wa-client-request__thread { list-style: none; padding: 0; margin: .65rem 0 1.1rem; display: grid; gap: .65rem; }
+.wa-client-request__message {
+  padding: .8rem 1rem; min-width: 0;
+  border: 1px solid var(--rc-line); border-left: 3px solid var(--rc-accent);
+  border-radius: .65rem; background: #f5faf7;
+}
+.wa-client-request__message--assistant { border-left-color: #7388b2; background: #f7f9fc; }
+.wa-client-request__message-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .35rem .8rem; margin-bottom: .5rem; }
+.wa-client-request__message-header strong { display: inline-flex; align-items: center; gap: .4rem; font-size: .83rem; }
+.wa-client-request__message-header time { color: var(--rc-muted); font-size: .73rem; font-variant-numeric: tabular-nums; }
+.wa-client-request__message-body { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; margin: 0; }
+.wa-client-request__reply { border-top: 1px solid var(--rc-line); padding-top: 1.1rem; }
+.wa-client-request__reply h3 { font-size: 1rem; font-weight: 800; margin-bottom: .4rem; }
+.wa-client-request__reply .rc-field { margin: 0 0 .7rem; min-width: 0; }
+.wa-client-request__reply textarea { width: 100%; max-width: 100%; min-height: 7rem; }
+.wa-client-request__reply-closed { padding: .7rem .85rem; background: var(--rc-ground); border-radius: .6rem; }
+@media(max-width: 430px) { .wa-client-request__message { padding: .75rem; } .wa-client-request__reply .rc-action { width: 100%; } }
