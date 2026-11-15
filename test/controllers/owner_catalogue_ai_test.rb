@@ -80,6 +80,66 @@ class OwnerCatalogueAiTest < ActionDispatch::IntegrationTest
     assert_redirected_to owner_catalogue_ai_path
   end
 
+  test "owner applies every current recommendation atomically into draft versions" do
+    first = @offering.draft_version
+    @catalogue.approve!(offering: @offering, version: first.version,
+                        digest: first.digest, confirmed: true)
+    original = @offering.reload.approved_version
+    second = @catalogue.create_draft!(
+      service_fields(@caps.last, title: "Review an isolated fictional React form")
+    )
+    row1 = suggestion_for(original)
+    row2 = suggestion_for(second.draft_version)
+    row2["title"] = "Review a limited synthetic React form"
+    entry = stored_suggestion(@profile, [row1, row2])
+    copilot = OwnerServices::CatalogueCopilot.new(workspace: @workspace)
+    key = copilot.batch_fingerprint(entry: entry)
+
+    sign_in(@owner)
+    get owner_catalogue_ai_path
+    assert_select "form[action=?]", apply_all_owner_catalogue_ai_path
+
+    assert_difference("ServiceOfferingVersion.count", 1) do
+      post apply_all_owner_catalogue_ai_path,
+           params: { entry_id: entry.id, fingerprint: key }
+    end
+    assert_redirected_to owner_catalogue_ai_path
+    assert_equal row1["title"], @offering.reload.draft_version.title
+    assert_equal original.id, @offering.approved_version_id
+    assert_equal row2["title"], second.reload.draft_version.title
+    assert_equal 0, ServiceOfferingPublication.count
+
+    assert_no_difference("ServiceOfferingVersion.count") do
+      post apply_all_owner_catalogue_ai_path,
+           params: { entry_id: entry.id, fingerprint: key }
+    end
+    assert_redirected_to owner_catalogue_ai_path
+  end
+
+  test "stale batch cannot partially overwrite another service" do
+    other = @catalogue.create_draft!(
+      service_fields(@caps.last, title: "A fictional frontend review")
+    )
+    row1 = suggestion_for(@offering.draft_version)
+    row2 = suggestion_for(other.draft_version)
+    entry = stored_suggestion(@profile, [row1, row2])
+    key = OwnerServices::CatalogueCopilot.new(workspace: @workspace).batch_fingerprint(entry: entry)
+
+    sign_in(@owner)
+    @catalogue.update_draft!(
+      offering: other, version: other.draft_version.version,
+      digest: other.draft_version.digest,
+      attributes: service_fields(@caps.last, title: "Modified synthetic frontend work")
+    )
+
+    before = @offering.reload.draft_version.digest
+    post apply_all_owner_catalogue_ai_path,
+         params: { entry_id: entry.id, fingerprint: key }
+    assert_redirected_to owner_catalogue_ai_path
+    assert_equal before, @offering.reload.draft_version.digest
+    assert_equal "Modified synthetic frontend work", other.reload.draft_version.title
+  end
+
   test "stale, forged digest, client and foreign owner cannot apply AI copy" do
     row = suggestion_for(@offering.draft_version)
     entry = stored_suggestion(@profile, row)
@@ -135,12 +195,13 @@ class OwnerCatalogueAiTest < ActionDispatch::IntegrationTest
   end
 
   def stored_suggestion(profile, row)
+    rows = row.is_a?(Array) ? row : [row]
     AiSpendEntry.create!(
       professional_profile: profile,
       operation: OwnerServices::CatalogueCopilot::OPERATION,
-      model: "grok-4.3", request_digest: Digest::SHA256.hexdigest("copilot-#{profile.id}-#{row["base_digest"]}"),
+      model: "grok-4.3", request_digest: Digest::SHA256.hexdigest("copilot-#{profile.id}-#{rows.first["base_digest"]}"),
       status: "settled", reserved_ticks: 10_000, charged_ticks: 10_000,
-      result: { "recommendations" => [row] }, resolved_at: Time.current
+      result: { "recommendations" => rows }, resolved_at: Time.current
     )
   end
 end
