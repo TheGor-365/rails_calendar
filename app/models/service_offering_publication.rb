@@ -6,8 +6,13 @@ class ServiceOfferingPublication < ApplicationRecord
   validates :event, inclusion: { in: %w[publish unpublish] }
   validate :consistent_event
 
-  before_update { raise ActiveRecord::ReadOnlyError, "Publication audit is immutable" }
-  before_destroy { raise ActiveRecord::ReadOnlyError, "Publication audit is immutable" }
+  before_validation :protect_immutable_event, on: :update
+  before_update :protect_immutable_event
+  before_destroy :protect_immutable_event
+
+  def protect_immutable_event
+    raise ActiveRecord::ReadOnlyError, "Publication audit is immutable"
+  end
 
   private
 
