@@ -1,23 +1,27 @@
-<div class="container wa-services my-4 my-sm-5" id="owner-services">
-  <header class="rc-page-hero mb-4">
-    <p class="eyebrow"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.eyebrow") %></p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol"><i class="bi bi-boxes" aria-hidden="true"></i></span><h1 class="page-title"><%= t("owner_services.title") %></h1></div>
-    <p class="rc-hint"><%= t("owner_services.intro") %></p>
+<div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-services">
+  <header class="ws-owner-hero wa-services__hero">
+    <div class="ws-owner-hero-copy">
+      <p class="eyebrow"><i class="bi bi-boxes" aria-hidden="true"></i> <%= t("owner_services.eyebrow") %></p>
+      <h1 class="page-title"><%= t("owner_services.title") %></h1>
+      <p class="rc-muted"><%= t("owner_services.intro") %></p>
+    </div>
     <div class="wa-services__actions">
       <%= link_to rc_icon_label("person-badge", t("owner_setup.practice_title")), owner_practice_path, class: "rc-action rc-action--quiet" %>
       <% if @snapshot && @eligible_capabilities.any? && @profile.onboarding_state == "approved" && @profile.professional_capability_corrections.none? %>
         <%= button_to rc_icon_label("arrow-repeat", t("owner_services.auto_sync_action")), sync_owner_services_path,
-              method: :post, class: "rc-action rc-action--primary" %>
+              method: :post, form: { class: "wa-services__inline-form" }, class: "rc-action rc-action--quiet" %>
       <% end %>
       <% if @snapshot && @eligible_capabilities.any? %>
         <%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--primary" %>
       <% end %>
     </div>
   </header>
-  <section class="surface-panel wa-services__notice mb-4">
+
+  <section class="surface-panel wa-services__notice mb-4" aria-label="<%= t('owner_services.private_title') %>">
     <i class="bi bi-shield-lock" aria-hidden="true"></i>
     <div><strong><%= t("owner_services.private_title") %></strong><p><%= t("owner_services.private_help") %></p></div>
   </section>
+
   <% if @snapshot.nil? %>
     <section class="surface-panel wa-services__empty">
       <h2><%= t("owner_services.need_profile") %></h2>
@@ -25,39 +29,67 @@
       <%= link_to rc_icon_label("arrow-right", t("owner_setup.start_setup")), owner_setup_path, class: "rc-action rc-action--primary" %>
     </section>
   <% else %>
-    <p class="rc-hint"><%= t("owner_services.snapshot_version", version: @snapshot.version) %> · <%= t("owner_services.count", count: @offerings.size) %></p>
+    <div class="wa-services__toolbar">
+      <p class="wa-services__count">
+        <i class="bi bi-grid" aria-hidden="true"></i>
+        <%= t("owner_services.count", count: @offerings.size) %>
+        <% if @draft_count.positive? %>
+          <span class="wa-services__draft-total"><i class="bi bi-pencil-square" aria-hidden="true"></i>
+            <%= t("owner_services.drafts_total", count: @draft_count) %></span>
+        <% end %>
+      </p>
+      <% if @draft_count.positive? && @profile.onboarding_state == "approved" && @profile.professional_capability_corrections.none? %>
+        <%= button_to rc_icon_label("patch-check", t("owner_services.finalize_all", count: @draft_count)),
+              approve_all_owner_services_path, method: :post,
+              params: { fingerprint: @draft_fingerprint },
+              form: { class: "wa-services__inline-form", data: { turbo_confirm: t("owner_services.finalize_all_confirm", count: @draft_count) } },
+              class: "rc-action rc-action--primary" %>
+      <% end %>
+    </div>
     <% if @profile.onboarding_state != "approved" || @profile.professional_capability_corrections.exists? %>
       <p class="rc-notice rc-notice--neutral"><%= t("owner_services.pending_context") %></p>
     <% end %>
+
     <% if @offerings.empty? %>
       <section class="surface-panel wa-services__empty">
         <h2><%= t("owner_services.empty") %></h2>
-        <p><%= t("owner_services.empty_help") %></p>
-        <p class="rc-hint"><%= t("owner_services.auto_sync_help") %></p>
-        <% if @eligible_capabilities.any? %><%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--primary" %><% end %>
+        <p><%= t("owner_services.auto_sync_help") %></p>
       </section>
     <% else %>
       <div class="wa-services__cards">
         <% @offerings.each do |offering| %>
           <% latest = offering.draft_version || offering.approved_version || offering.published_version %>
+          <% icon, state, kind = service_offering_state(offering) %>
           <article class="surface-panel wa-services__card">
-            <div class="wa-services__card-heading"><span aria-hidden="true"><i class="bi bi-tools"></i></span>
-              <div><h2><%= link_to latest.title, owner_service_path(offering) %></h2>
-                <small><%= t("owner_services.snapshot_version", version: latest.professional_context_snapshot.version) %> · <%= owner_capability_title(latest.source_capability_domain, latest.professional_capability.delivery_mode) %></small></div>
+            <header class="wa-services__card-heading">
+              <span aria-hidden="true"><i class="bi <%= service_offering_icon(offering) %>"></i></span>
+              <div>
+                <h2><%= link_to latest.title, owner_service_path(offering) %></h2>
+                <small><i class="bi bi-person-check" aria-hidden="true"></i>
+                  <%= owner_capability_title(latest.source_capability_domain, latest.professional_capability.delivery_mode) %>
+                </small>
+              </div>
+            </header>
+            <p class="wa-services__summary"><%= truncate(latest.summary, length: 240) %></p>
+            <div class="wa-services__scope">
+              <strong><i class="bi bi-check2-circle" aria-hidden="true"></i> <%= t("owner_services.included_scope") %></strong>
+              <p><%= truncate(latest.included_scope, length: 125) %></p>
             </div>
-            <p><%= truncate(latest.summary, length: 230) %></p>
-            <div class="wa-services__badges">
-              <% if offering.key.start_with?("auto-") %>
-                <span class="wa-services__state wa-services__state--draft">
-                  <i class="bi bi-stars" aria-hidden="true"></i>
-                  <%= t("owner_services.auto_source", version: latest.professional_context_snapshot.version) %>
-                </span>
-              <% end %>
-              <% if offering.draft_version %><span class="wa-services__state wa-services__state--draft"><%= t("owner_services.draft_version", version: offering.draft_version.version) %></span><% end %>
-              <% if offering.approved_version %><span class="wa-services__state wa-services__state--approved"><%= t("owner_services.approved_version", version: offering.approved_version.version) %></span><% end %>
-              <% if offering.published_version %><span class="wa-services__state wa-services__state--enabled"><%= t("owner_services.enabled_version", version: offering.published_version.version) %></span><% end %>
-            </div>
-            <%= link_to rc_icon_label("arrow-up-right", t("owner_services.open")), owner_service_path(offering), class: "rc-action rc-action--quiet rc-action--small" %>
+            <footer class="wa-services__card-footer">
+              <span class="wa-services__state wa-services__state--<%= kind %>">
+                <i class="bi <%= icon %>" aria-hidden="true"></i> <%= state %>
+              </span>
+              <div class="wa-services__card-actions">
+                <% if offering.draft_version && latest.professional_context_snapshot_id == @snapshot.id && @profile.onboarding_state == "approved" && @profile.professional_capability_corrections.none? %>
+                  <%= button_to rc_icon_label("patch-check", t("owner_services.finalize_one")),
+                        approve_owner_service_path(offering), method: :post,
+                        params: { version: latest.version, digest: latest.digest, confirm: "1" },
+                        form: { class: "wa-services__inline-form" }, class: "rc-action rc-action--soft rc-action--small" %>
+                <% end %>
+                <%= link_to rc_icon_label("arrow-up-right", t("owner_services.open")), owner_service_path(offering),
+                      class: "rc-action rc-action--quiet rc-action--small wa-services__open" %>
+              </div>
+            </footer>
           </article>
         <% end %>
       </div>
