@@ -17,7 +17,6 @@ module ApplicationHelper
       tag.span(mobile_label, class: "rc-action-label rc-action-label--compact", aria: { hidden: "true" })
     ])
   end
-end
 
   # One SQL count per rendered owner request; client and legacy admin get zero.
   def owner_unread_intake_count
@@ -30,3 +29,4 @@ end
     total = owner_unread_intake_count
     total > 99 ? "99+" : total.to_s
   end
+end
