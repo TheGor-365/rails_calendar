@@ -143,6 +143,28 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     assert_select "script", text: /alert\('demo'\)/, count: 0
   end
 
+  test "client sees current saved message without receiving private owner drafts" do
+    sign_in_as(@client_a)
+    intake = create_fictional_request
+    intake.intake_messages.create!(role: "client", body: "Current fictional accessibility requirement")
+    intake.intake_spec_versions.create!(
+      version: 1, source: "human",
+      document: {
+        "summary" => "Private scope for owner only",
+        "goals" => [], "deliverables" => [], "acceptance_criteria" => [],
+        "unknowns" => [], "exclusions" => [], "milestones" => []
+      }
+    )
+
+    get client_request_path(intake)
+    assert_response :success
+    assert_select "#intake-current .wa-context__latest-body", text: /accessibility requirement/
+    assert_select "#intake-current", text: /No owner-approved specification yet/
+    assert_select "body", text: /Private scope for owner only/, count: 0
+    assert_select "details.wa-context__history:not([open])", count: 1
+    assert_select "form#client-reply-form", count: 1
+  end
+
   test "client request rejects missing consent, overlong content and cross-user assignment" do
     sign_in_as(@client_a)
     assert_no_difference "ProjectIntake.count" do

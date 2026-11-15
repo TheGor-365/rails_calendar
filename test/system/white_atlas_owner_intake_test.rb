@@ -39,6 +39,13 @@ class WhiteAtlasOwnerIntakeTest < ApplicationSystemTestCase
     find("button[data-wa-intake-thread-role-param='all']").click
     assert_selector "#intake-conversation li:not([hidden])", count: 2
     assert_selector "#intake-review"
+    assert_selector "#intake-current .wa-context__latest-body", text: /Fictional client question/
+    fill_in "Search displayed history", with: "credentials"
+    assert_selector "#intake-conversation li:not([hidden])", count: 1
+    fill_in "Search displayed history", with: ""
+    assert_selector "#intake-conversation li:not([hidden])", count: 2
+    find("select[data-wa-intake-thread-target='order']").select("Newest first")
+    assert_selector "#intake-conversation li:first-child[data-wa-intake-thread-role='assistant']"
 
     [390, 320].each do |width|
       page.driver.browser.manage.window.resize_to(width, 932)
