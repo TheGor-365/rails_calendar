@@ -20,7 +20,7 @@ class OwnerCatalogueAiController < ApplicationController
   end
 
   def apply
-    entry = @profile.ai_spend_entries.find_by(id: params[:entry_id])
+    entry = @profile&.ai_spend_entries&.find_by(id: params[:entry_id])
     @copilot.apply!(entry: entry, offering_id: params[:offering_id], base_digest: params[:base_digest])
     redirect_to owner_service_path(params[:offering_id]), notice: t("owner_services.copilot_draft_created")
   rescue OwnerServices::CatalogueCopilot::Conflict
