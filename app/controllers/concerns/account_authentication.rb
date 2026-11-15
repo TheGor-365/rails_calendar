@@ -4,7 +4,8 @@
 module AccountAuthentication
   extend ActiveSupport::Concern
 
-  OWNER_SESSION_LIFETIME = 8.hours
+  # Live duration is fixed at login and never renewed by ordinary requests.
+  # Development-only opt-in is described in RcLocalSessionPolicy.
 
   included do
     helper_method :current_user, :owner_signed_in?, :client_signed_in?
@@ -41,7 +42,7 @@ module AccountAuthentication
     token = SecureRandom.hex(32)
     user.user_sessions.create!(
       token_digest: Digest::SHA256.hexdigest(token),
-      expires_at: OWNER_SESSION_LIFETIME.from_now
+      expires_at: RcLocalSessionPolicy.session_lifetime.from_now
     )
     session[:owner_session_token] = token
     @current_user = user
