@@ -1,0 +1,55 @@
+<div class="container wa-services my-4 my-sm-5" id="owner-services">
+  <header class="rc-page-hero mb-4">
+    <p class="eyebrow"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.eyebrow") %></p>
+    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol"><i class="bi bi-boxes" aria-hidden="true"></i></span><h1 class="page-title"><%= t("owner_services.title") %></h1></div>
+    <p class="rc-hint"><%= t("owner_services.intro") %></p>
+    <div class="wa-services__actions">
+      <%= link_to rc_icon_label("person-badge", t("owner_setup.practice_title")), owner_practice_path, class: "rc-action rc-action--quiet" %>
+      <% if @snapshot && @eligible_capabilities.any? %>
+        <%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--primary" %>
+      <% end %>
+    </div>
+  </header>
+  <section class="surface-panel wa-services__notice mb-4">
+    <i class="bi bi-shield-lock" aria-hidden="true"></i>
+    <div><strong><%= t("owner_services.private_title") %></strong><p><%= t("owner_services.private_help") %></p></div>
+  </section>
+  <% if @snapshot.nil? %>
+    <section class="surface-panel wa-services__empty">
+      <h2><%= t("owner_services.need_profile") %></h2>
+      <p><%= t("owner_services.need_profile_help") %></p>
+      <%= link_to rc_icon_label("arrow-right", t("owner_setup.start_setup")), owner_setup_path, class: "rc-action rc-action--primary" %>
+    </section>
+  <% else %>
+    <p class="rc-hint"><%= t("owner_services.snapshot_version", version: @snapshot.version) %> · <%= t("owner_services.count", count: @offerings.size) %></p>
+    <% if @profile.onboarding_state != "approved" || @profile.professional_capability_corrections.exists? %>
+      <p class="rc-notice rc-notice--neutral"><%= t("owner_services.pending_context") %></p>
+    <% end %>
+    <% if @offerings.empty? %>
+      <section class="surface-panel wa-services__empty">
+        <h2><%= t("owner_services.empty") %></h2>
+        <p><%= t("owner_services.empty_help") %></p>
+        <% if @eligible_capabilities.any? %><%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--primary" %><% end %>
+      </section>
+    <% else %>
+      <div class="wa-services__cards">
+        <% @offerings.each do |offering| %>
+          <% latest = offering.draft_version || offering.approved_version || offering.published_version %>
+          <article class="surface-panel wa-services__card">
+            <div class="wa-services__card-heading"><span aria-hidden="true"><i class="bi bi-tools"></i></span>
+              <div><h2><%= link_to latest.title, owner_service_path(offering) %></h2>
+                <small><%= t("owner_services.snapshot_version", version: latest.professional_context_snapshot.version) %> · <%= owner_capability_title(latest.source_capability_domain, latest.professional_capability.delivery_mode) %></small></div>
+            </div>
+            <p><%= truncate(latest.summary, length: 230) %></p>
+            <div class="wa-services__badges">
+              <% if offering.draft_version %><span class="wa-services__state wa-services__state--draft"><%= t("owner_services.draft_version", version: offering.draft_version.version) %></span><% end %>
+              <% if offering.approved_version %><span class="wa-services__state wa-services__state--approved"><%= t("owner_services.approved_version", version: offering.approved_version.version) %></span><% end %>
+              <% if offering.published_version %><span class="wa-services__state wa-services__state--enabled"><%= t("owner_services.enabled_version", version: offering.published_version.version) %></span><% end %>
+            </div>
+            <%= link_to rc_icon_label("arrow-up-right", t("owner_services.open")), owner_service_path(offering), class: "rc-action rc-action--quiet rc-action--small" %>
+          </article>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

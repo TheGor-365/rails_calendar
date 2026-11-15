@@ -1,0 +1,40 @@
+<div class="wa-services__fields">
+  <% if creating %>
+    <div class="rc-field">
+      <%= label_tag "offering-capability", t("owner_services.capability"), class: "rc-field-label" %>
+      <%= select_tag "service_offering[professional_capability_id]",
+          options_for_select(capabilities.map { |cap|
+            ["#{owner_capability_title(cap.domain, cap.delivery_mode)} · #{t("owner_services.modes.#{OwnerServices::Catalogue.delivery_mode_for(cap)}")}", cap.id]
+          }, values["professional_capability_id"]),
+          include_blank: t("owner_services.choose_capability"), required: true, id: "offering-capability", class: "rc-input" %>
+      <p class="rc-hint"><%= t("owner_services.capability_hint") %></p>
+    </div>
+  <% else %>
+    <p class="rc-hint"><%= t("owner_services.source_locked", domain: owner_capability_title(draft.source_capability_domain, draft.professional_capability.delivery_mode), version: draft.professional_context_snapshot.version) %></p>
+  <% end %>
+  <div class="rc-field">
+    <%= label_tag "offering-category", t("owner_services.category"), class: "rc-field-label" %>
+    <%= select_tag "service_offering[project_category]",
+        options_for_select(ProjectIntake::TYPES.map { |kind| [rc_intake_type(kind), kind] }, values["project_category"]),
+        required: true, id: "offering-category", class: "rc-input" %>
+  </div>
+  <div class="rc-field">
+    <%= label_tag "offering-title", t("owner_services.name"), class: "rc-field-label" %>
+    <%= text_field_tag "service_offering[title]", values["title"], id: "offering-title",
+        required: true, minlength: 5, maxlength: 120, class: "rc-input" %>
+  </div>
+  <% [
+       ["summary", t("owner_services.summary"), 1000],
+       ["included_scope", t("owner_services.included_scope"), 1600],
+       ["excluded_scope", t("owner_services.excluded_scope"), 1600],
+       ["requirements_prompt", t("owner_services.requirements_prompt"), 600]
+     ].each do |key, label, limit| %>
+    <div class="rc-field">
+      <%= label_tag "offering-#{key}", label, class: "rc-field-label" %>
+      <%= text_area_tag "service_offering[#{key}]", values[key], id: "offering-#{key}",
+          rows: key == "summary" ? 3 : 4, maxlength: limit, required: key != "requirements_prompt",
+          class: "rc-input rc-input--area",
+          data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
+    </div>
+  <% end %>
+</div>

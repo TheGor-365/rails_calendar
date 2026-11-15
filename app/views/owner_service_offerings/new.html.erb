@@ -1,0 +1,20 @@
+<div class="container wa-services my-4 my-sm-5" id="owner-service-new">
+  <header class="rc-page-hero mb-4">
+    <p class="eyebrow"><%= t("owner_services.eyebrow") %></p>
+    <h1 class="page-title"><%= t("owner_services.new_title") %></h1>
+    <p class="rc-hint"><%= t("owner_services.draft_help") %></p>
+    <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path, class: "rc-action rc-action--quiet" %>
+  </header>
+  <% if @error %><p class="rc-notice rc-notice--error" role="alert"><%= @error %></p><% end %>
+  <% if @snapshot && @eligible_capabilities.any? %>
+    <section class="surface-panel wa-services__panel">
+      <h2><%= t("owner_services.draft_form_title") %></h2>
+      <%= form_with url: owner_services_path, method: :post, html: { class: "rc-form" } do %>
+        <%= render "fields", values: @form_values || {}, creating: true, capabilities: @eligible_capabilities %>
+        <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %><%= rc_icon_label("floppy", t("owner_services.create_draft")) %><% end %>
+      <% end %>
+    </section>
+  <% else %>
+    <p class="rc-notice rc-notice--neutral"><%= t("owner_services.need_profile_help") %></p>
+  <% end %>
+</div>
