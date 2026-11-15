@@ -72,7 +72,7 @@ class OwnerIntakeUnreadTest < ActionDispatch::IntegrationTest
 
     OwnerIntakeInbox.mark_seen!(owner: @owner, intake: @request_a,
                                displayed_messages: [@a_first, newer])
-    assert_not_includes OwnerIntakeInbox.unread_for(owner: @owner).pluck(:id), @request_a.id
+    refute_includes OwnerIntakeInbox.unread_for(owner: @owner).pluck(:id), @request_a.id
 
     OwnerIntakeInbox.mark_seen!(owner: @owner, intake: @request_a, displayed_messages: [@a_first])
     record = OwnerIntakeReadState.find_by!(owner_user: @owner, project_intake: @request_a)
@@ -122,7 +122,7 @@ class OwnerIntakeUnreadTest < ActionDispatch::IntegrationTest
     owner_created.intake_messages.create!(role: "client", body: "Legacy demo input")
     @request_b.intake_messages.create!(role: "assistant", body: "No client reply")
     assert_equal 2, OwnerIntakeInbox.unread_for(owner: @owner).count
-    assert_not_includes OwnerIntakeInbox.unread_for(owner: @owner).pluck(:id), owner_created.id
+    refute_includes OwnerIntakeInbox.unread_for(owner: @owner).pluck(:id), owner_created.id
 
     assert_not OwnerIntakeInbox.mark_seen!(owner: @owner, intake: owner_created,
                                           displayed_messages: owner_created.intake_messages.to_a)
@@ -134,7 +134,7 @@ class OwnerIntakeUnreadTest < ActionDispatch::IntegrationTest
       I18n.with_locale(locale) do
         assert I18n.exists?("intake.unread_count")
         assert I18n.exists?("intake.unread_new")
-        assert_not_match(/Translation missing/, I18n.t("intake.unread_count", count: 2))
+        refute_match(/Translation missing/, I18n.t("intake.unread_count", count: 2))
       end
     end
   end
