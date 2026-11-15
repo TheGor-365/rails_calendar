@@ -23,7 +23,7 @@ class OwnerServiceFinalizationBrowserTest < ApplicationSystemTestCase
     visit owner_services_path
     assert_current_path owner_services_path
     assert_selector ".wa-services__card", count: 2
-    assert_selector ".wa-services__card-heading .bi", count: 2
+    assert_selector ".wa-services__card-heading > span > .bi", count: 2
     assert_selector ".wa-services__card-footer", count: 2
     assert_selector ".wa-services__state--draft", count: 2
     assert_selector ".wa-services__card-actions a.wa-services__open", count: 2
