@@ -44,7 +44,18 @@ class ClientRequestClarificationsSystemTest < ApplicationSystemTestCase
     fill_in "Your clarification", with: "Please test the fictional sign-up form with a keyboard."
     click_button "Send clarification"
     assert_current_path client_request_path(@intake)
+    assert_selector "#intake-current .wa-context__latest-body",
+      text: "Please test the fictional sign-up form with a keyboard."
+    assert_selector ".wa-client-request__conversation .wa-context__history:not([open])", visible: :all
+    find(".wa-client-request__conversation details.wa-context__history > summary").click
     assert_selector "#client-request-conversation li", count: 3
+    fill_in "Search displayed history", with: "keyboard"
+    assert_selector "#client-request-conversation li:not([hidden])", count: 1
+    find(".wa-context__sort-label .rc-select-trigger[role='combobox']").click
+    find(".rc-select-menu:not([hidden]) [role='option']", text: "Newest first").click
+    assert_selector "#client-request-conversation li:not([hidden])", count: 1
+    fill_in "Search displayed history", with: ""
+    assert_selector "#client-request-conversation li:not([hidden])", count: 3
     assert_text "Please test the fictional sign-up form with a keyboard."
 
     visit client_home_path

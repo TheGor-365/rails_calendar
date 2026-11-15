@@ -1,0 +1,61 @@
+<%# Stored facts only: this presentation block never infers AI results, contracts or scope acceptance. %>
+<section class="surface-panel wa-context mb-4" id="intake-current"
+         aria-labelledby="intake-current-title">
+  <div class="wa-context__heading">
+    <span class="wa-context__heading-icon" aria-hidden="true"><i class="bi bi-pin-angle-fill"></i></span>
+    <div>
+      <p class="eyebrow"><%= t("intake_context.current_eyebrow") %></p>
+      <h2 id="intake-current-title"><%= t("intake_context.current_title") %></h2>
+      <p class="rc-hint"><%= t("intake_context.current_help") %></p>
+    </div>
+  </div>
+  <div class="wa-context__grid">
+    <div class="wa-context__latest" aria-labelledby="intake-latest-client">
+      <div class="wa-context__record-head">
+        <span class="wa-context__actor-icon wa-context__actor-icon--client" aria-hidden="true">
+          <i class="bi bi-person-fill"></i>
+        </span>
+        <div>
+          <h3 id="intake-latest-client">
+            <%= t(intake.client_user_id.present? ? "intake_context.latest_client" : "intake_context.latest_demo") %>
+          </h3>
+          <p class="rc-hint mb-0"><%= t("intake_context.saved_source") %></p>
+        </div>
+      </div>
+      <% if latest_message %>
+        <p class="wa-context__latest-body"><%= latest_message.body %></p>
+        <time datetime="<%= latest_message.created_at.iso8601 %>">
+          <%= latest_message.created_at.utc.strftime("%Y-%m-%d %H:%M UTC") %>
+        </time>
+      <% else %>
+        <p class="rc-hint"><%= t("intake_context.no_client_message") %></p>
+      <% end %>
+    </div>
+    <div class="wa-context__facts" aria-label="<%= t("intake_context.record_facts") %>">
+      <div class="wa-context__fact">
+        <span><i class="bi bi-circle-half" aria-hidden="true"></i><%= t("intake_context.status") %></span>
+        <strong><%= rc_intake_status(intake.status) %></strong>
+      </div>
+      <div class="wa-context__fact">
+        <span><i class="bi bi-file-earmark-check" aria-hidden="true"></i><%= t("intake_context.spec") %></span>
+        <% if visible_spec %>
+          <strong>
+            <%= t("intake_context.version", version: visible_spec.version) %> ·
+            <%= t(visible_spec.approved? ? "intake_context.approved" : "intake_context.draft") %>
+          </strong>
+          <a href="#<%= perspective == "owner" ? "intake-spec" : "client-request-spec" %>"
+             class="rc-text-link"><%= t("intake_context.open_spec") %></a>
+        <% else %>
+          <strong><%= t("intake_context.no_published_spec") %></strong>
+        <% end %>
+      </div>
+      <div class="wa-context__fact">
+        <span><i class="bi bi-chat-square-text" aria-hidden="true"></i><%= t("intake_context.messages") %></span>
+        <strong><%= message_total %></strong>
+      </div>
+      <p class="wa-context__disclaimer"><i class="bi bi-shield-lock" aria-hidden="true"></i>
+        <%= t("intake_context.no_contract") %>
+      </p>
+    </div>
+  </div>
+</section>

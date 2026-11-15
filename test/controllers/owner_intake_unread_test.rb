@@ -129,6 +129,34 @@ class OwnerIntakeUnreadTest < ActionDispatch::IntegrationTest
     assert_equal 0, OwnerIntakeReadState.count
   end
 
+  test "latest client turn is visible outside a collapsed history even past the 20-message window" do
+    24.times do |i|
+      @request_a.intake_messages.create!(role: "assistant", body: "Synthetic older context #{i}")
+    end
+    latest = @request_a.intake_messages.create!(
+      role: "client", body: "Synthetic current clarification survives 20-message history window."
+    )
+
+    sign_in(@owner)
+    get project_intake_path(@request_a)
+    assert_response :success
+    assert_select "#intake-current .wa-context__latest-body", text: /current clarification/
+    assert_select "#intake-conversation li", count: 20
+    assert_select "#intake-interview details.wa-context__history:not([open])", count: 1
+    assert_equal latest.id,
+      OwnerIntakeReadState.find_by!(owner_user: @owner, project_intake: @request_a).last_seen_client_message_id
+    assert_equal 1, OwnerIntakeInbox.unread_for(owner: @owner).count, "Other request remains unread"
+  end
+
+  test "legacy owner reply endpoint cannot impersonate a verified client" do
+    sign_in(@owner)
+    assert_no_difference "IntakeMessage.count" do
+      post reply_project_intake_path(@request_a), params: { answer: "Not a client-authored clarification" }
+    end
+    assert_response :forbidden
+    assert_equal 1, OwnerIntakeInbox.unread_for(owner: @owner).where(id: @request_a.id).count
+  end
+
   test "unread indicator labels exist in each locale" do
     %i[en ru hy es].each do |locale|
       I18n.with_locale(locale) do
