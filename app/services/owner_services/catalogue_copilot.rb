@@ -192,7 +192,7 @@ module OwnerServices
     private
 
     def source_items
-      workspace.service_offerings.includes(:draft_version, :approved_version, :published_version)
+      workspace.service_offerings.includes(:versions, :approved_version, :published_version)
         .order(:position, :id).map do |offering|
         version = offering.draft_version || offering.approved_version || offering.published_version
         next unless version

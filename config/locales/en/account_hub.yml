@@ -70,3 +70,5 @@ en:
     avatar_uploaded: "Avatar saved"
     avatar_invalid: "Upload failed. Check format and size."
     avatar_alt: "Owner avatar"
+    catalogue_copilot: "Catalogue AI assistant"
+    catalogue_copilot_desc: "Review service copy and categories with AI"
