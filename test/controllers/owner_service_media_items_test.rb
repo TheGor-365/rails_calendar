@@ -51,6 +51,10 @@ class OwnerServiceMediaItemsTest < ActionDispatch::IntegrationTest
     assert_includes response.headers["Cache-Control"], "no-store"
     assert_equal "nosniff", response.headers["X-Content-Type-Options"]
 
+    get owner_services_path
+    assert_select ".wa-services__cover-pending", count: 1
+    assert_select "img.wa-services__card-banner[src=?]", owner_service_media_file_path(@offer, item)
+
     post approve_owner_service_media_path(@offer, item)
     assert_redirected_to owner_service_path(@offer, anchor: "offering-media")
     assert item.reload.approved?
