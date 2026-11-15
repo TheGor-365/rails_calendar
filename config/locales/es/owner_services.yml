@@ -70,3 +70,8 @@ es:
       direct: "Experiencia"
       conditional: "Evaluación previa"
       evaluate_first: "Evaluar primero"
+    auto_sync_action: "Generar desde perfil"
+    auto_sync_help: "Basado en intereses y capacidades aprobadas. No borra cambios ni publica automáticamente."
+    auto_sync_result: "Creados %{created}, nuevas revisiones %{revised}, pospuestos %{deferred}."
+    auto_sync_blocked: "No se pueden generar servicios. Revisa el perfil y los borradores."
+    auto_source: "Generado desde perfil v%{version}"

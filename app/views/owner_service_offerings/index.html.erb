@@ -5,6 +5,10 @@
     <p class="rc-hint"><%= t("owner_services.intro") %></p>
     <div class="wa-services__actions">
       <%= link_to rc_icon_label("person-badge", t("owner_setup.practice_title")), owner_practice_path, class: "rc-action rc-action--quiet" %>
+      <% if @snapshot && @eligible_capabilities.any? && @profile.onboarding_state == "approved" && @profile.professional_capability_corrections.none? %>
+        <%= button_to rc_icon_label("arrow-repeat", t("owner_services.auto_sync_action")), sync_owner_services_path,
+              method: :post, class: "rc-action rc-action--primary" %>
+      <% end %>
       <% if @snapshot && @eligible_capabilities.any? %>
         <%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--primary" %>
       <% end %>
@@ -29,6 +33,7 @@
       <section class="surface-panel wa-services__empty">
         <h2><%= t("owner_services.empty") %></h2>
         <p><%= t("owner_services.empty_help") %></p>
+        <p class="rc-hint"><%= t("owner_services.auto_sync_help") %></p>
         <% if @eligible_capabilities.any? %><%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--primary" %><% end %>
       </section>
     <% else %>
@@ -42,6 +47,12 @@
             </div>
             <p><%= truncate(latest.summary, length: 230) %></p>
             <div class="wa-services__badges">
+              <% if offering.key.start_with?("auto-") %>
+                <span class="wa-services__state wa-services__state--draft">
+                  <i class="bi bi-stars" aria-hidden="true"></i>
+                  <%= t("owner_services.auto_source", version: latest.professional_context_snapshot.version) %>
+                </span>
+              <% end %>
               <% if offering.draft_version %><span class="wa-services__state wa-services__state--draft"><%= t("owner_services.draft_version", version: offering.draft_version.version) %></span><% end %>
               <% if offering.approved_version %><span class="wa-services__state wa-services__state--approved"><%= t("owner_services.approved_version", version: offering.approved_version.version) %></span><% end %>
               <% if offering.published_version %><span class="wa-services__state wa-services__state--enabled"><%= t("owner_services.enabled_version", version: offering.published_version.version) %></span><% end %>

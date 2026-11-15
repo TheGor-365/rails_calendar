@@ -95,7 +95,7 @@ module OwnerServices
           next unless capability
 
           fields = proposed_copy(rule, capability)
-          key = "auto-#{interest}"
+          key = "auto-#{interest.tr("_", "-")}"
           offering = @workspace.service_offerings.find_by(key: key)
 
           if offering.nil?

@@ -9,6 +9,15 @@ class OwnerServiceOfferingsController < ApplicationController
     ).order(:position, :id)
   end
 
+  def sync
+    result = OwnerServices::AutoCatalogue.new(workspace: @workspace).sync!
+    redirect_to owner_services_path,
+                notice: t("owner_services.auto_sync_result", created: result.created,
+                          revised: result.revised, deferred: result.deferred)
+  rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid
+    redirect_to owner_services_path, alert: t("owner_services.auto_sync_blocked")
+  end
+
   def new
     @form_values = { "project_category" => "rails_bugfix" }
   end

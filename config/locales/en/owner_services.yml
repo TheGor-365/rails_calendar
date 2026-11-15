@@ -70,3 +70,8 @@ en:
       direct: "Practiced"
       conditional: "Review required"
       evaluate_first: "Evaluate first"
+    auto_sync_action: "Generate from profile"
+    auto_sync_help: "Based on approved interests and skills. Repeating preserves edits and never publishes automatically."
+    auto_sync_result: "Created %{created}, new revisions %{revised}, deferred %{deferred}."
+    auto_sync_blocked: "Could not generate services; review your profile, capabilities and drafts."
+    auto_source: "Generated from profile v%{version}"
