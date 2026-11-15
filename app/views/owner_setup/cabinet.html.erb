@@ -42,8 +42,8 @@
       <div class="ws-account-feature">
         <div class="ws-account-feature-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></div>
         <div class="ws-account-feature-copy">
-          <h3><%= @snapshot ? @snapshot.payload.fetch("headline") : t("account_hub.profile_not_approved") %></h3>
-          <p><%= @snapshot ? truncate(@snapshot.payload.fetch("private_summary"), length: 270) : t("account_hub.setup_explanation") %></p>
+          <h3><%= @snapshot&.payload&.dig("headline").presence || t("account_hub.profile_not_approved") %></h3>
+          <p><%= @snapshot&.payload&.dig("private_summary").present? ? truncate(@snapshot.payload["private_summary"], length: 270) : t("account_hub.setup_explanation") %></p>
           <div class="ws-account-feature-foot">
             <span class="ws-account-status"><i class="bi bi-database-lock" aria-hidden="true"></i><%= t("account_hub.stored_private") %></span>
             <span class="ws-account-muted"><%= t("account_hub.version_count", count: @version_count) %></span>
