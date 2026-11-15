@@ -24,6 +24,17 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
     assert_select "textarea[name='project_intake[goal]'][data-controller='wa-autogrow']", count: 1
   end
 
+  test "new owner request UI labels resolve in all four locales" do
+    %i[en ru hy es].each do |locale|
+      I18n.with_locale(locale) do
+        %w[meta_label jump_label brief brief_help next_heading next_interview next_draft next_published next_milestones messages_help filter_label filter_all no_messages].each do |key|
+          assert I18n.exists?("intake.owner_view.#{key}"), "Missing #{locale} intake.owner_view.#{key}"
+          assert_no_match(/Translation missing/i, I18n.t("intake.owner_view.#{key}").to_s)
+        end
+      end
+    end
+  end
+
   test "consent and server validations prevent accidental data collection" do
     sign_in
     assert_no_difference "ProjectIntake.count" do
@@ -54,6 +65,17 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
     get project_intake_url(intake)
     assert_response :success
     assert_select "#intake-conversation li", count: 1
+    assert_select "#intake-brief .wa-owner-intake__prose", count: 1
+    assert_select ".wa-owner-intake__meta[aria-label='Request type and workflow state']", count: 1
+    assert_select "nav.wa-owner-intake__jump[aria-label='Request sections']", count: 1
+    assert_select "#intake-brief h2", text: "Request brief"
+    assert_select ".wa-owner-intake__next strong", text: "Current review position"
+    assert_select "#intake-interview .wa-owner-intake__filters[aria-label='Message role filter']", count: 1
+    assert_select "#intake-interview button", text: "All messages", count: 1
+    assert_select "#intake-interview .wa-owner-intake__filters button[type=button]", count: 3
+    assert_select "#intake-conversation li[data-wa-intake-thread-role='assistant']", count: 1
+    assert_select "nav.wa-owner-intake__jump a[href='#intake-interview']", count: 1
+    assert_select "#intake-review", count: 1
     assert_select "textarea[name='answer'][data-controller='wa-autogrow']", count: 1
 
     post reply_project_intake_url(intake),
@@ -74,6 +96,9 @@ class ProjectIntakeFlowTest < ActionDispatch::IntegrationTest
     get project_intake_url(intake)
     assert_response :success
     assert_select "section[aria-label='Technical specification'] h2", text: "Draft technical specification"
+    assert_select "#intake-spec .wa-owner-intake__spec-grid .wa-spec-section", minimum: 1
+    assert_select "#intake-spec .wa-owner-intake__spec-state", text: /Internal draft/
+    assert_select "#intake-spec a[href]", count: 0
     assert_select "ol li", minimum: 1
 
     post approve_spec_admin_project_intake_url(intake)

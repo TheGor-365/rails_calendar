@@ -24,3 +24,7 @@ application.register("wa-autogrow", WaAutogrowController)
 // Local, no-network UX filter for versioned specification review.
 import WaSpecReviewController from "./wa_spec_review_controller"
 application.register("wa-spec-review", WaSpecReviewController)
+
+// Read-only role filter for the owner intake conversation.
+import WaIntakeThreadController from "./wa_intake_thread_controller"
+application.register("wa-intake-thread", WaIntakeThreadController)
