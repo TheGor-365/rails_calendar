@@ -21,8 +21,20 @@ export default class extends Controller {
   }
 
   activate(event) {
-    const anchor = event.currentTarget.getAttribute("href")
-    if (anchor) this.highlight(anchor.slice(1))
+    const hash = event.currentTarget.getAttribute("href")
+    if (!hash?.startsWith("#")) return
+    const anchor = hash.slice(1)
+    const section = document.getElementById(anchor)
+    if (!section || !this.element.contains(section)) return
+    event.preventDefault()
+
+    // Turbo may handle in-page links without leaving the fragment in the
+    // address bar. Keep native back/forward and shareable section URLs.
+    if (window.location.hash !== hash) {
+      window.history.pushState(window.history.state, "", hash)
+    }
+    section.scrollIntoView({ block: "start", behavior: "auto" })
+    this.highlight(anchor)
   }
 
   update() {
