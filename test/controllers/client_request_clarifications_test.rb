@@ -166,7 +166,7 @@ class ClientRequestClarificationsTest < ActionDispatch::IntegrationTest
            reply_label reply_placeholder reply_send reply_saved reply_duplicate reply_invalid_request
            reply_required reply_too_long reply_limit].each do |key|
           assert I18n.exists?("client_requests.#{key}"), "Missing #{locale}.client_requests.#{key}"
-          assert_not_match(/Translation missing/i, I18n.t("client_requests.#{key}", remaining: 4).to_s)
+          refute_match(/Translation missing/i, I18n.t("client_requests.#{key}", remaining: 4).to_s)
         end
       end
     end
