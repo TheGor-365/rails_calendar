@@ -61,6 +61,11 @@
           <% latest = offering.draft_version || offering.approved_version || offering.published_version %>
           <% icon, state, kind = service_offering_state(offering) %>
           <article class="surface-panel wa-services__card">
+            <% if (cover = @media_cover_by_offering_id[offering.id]) %>
+              <%= image_tag owner_service_media_file_path(offering, cover),
+                    alt: cover.caption.presence || t("owner_services.media_image_alt"),
+                    loading: "lazy", class: "wa-services__card-banner" %>
+            <% end %>
             <header class="wa-services__card-heading">
               <span aria-hidden="true"><i class="bi <%= service_offering_icon(offering) %>"></i></span>
               <div>

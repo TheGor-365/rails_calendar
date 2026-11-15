@@ -45,6 +45,8 @@ class OwnerServiceMediaBrowserTest < ApplicationSystemTestCase
     click_button "Approve media"
     assert_text "Reviewed"
     assert_equal false, offering.reload.media_items.first.ai_access_allowed
+    visit owner_services_path
+    assert_selector ".wa-services__card-banner", count: 1
 
     [390, 320].each do |width|
       page.driver.browser.manage.window.resize_to(width, 932)

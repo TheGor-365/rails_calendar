@@ -54,6 +54,8 @@ class OwnerServiceMediaItemsTest < ActionDispatch::IntegrationTest
     post approve_owner_service_media_path(@offer, item)
     assert_redirected_to owner_service_path(@offer, anchor: "offering-media")
     assert item.reload.approved?
+    get owner_services_path
+    assert_select "img.wa-services__card-banner[src=?]", owner_service_media_file_path(@offer, item)
     assert_nil @offer.reload.approved_version
     assert_nil @offer.published_version
 

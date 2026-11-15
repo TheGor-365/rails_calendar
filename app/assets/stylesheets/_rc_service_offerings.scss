@@ -236,3 +236,9 @@
 @media(prefers-reduced-motion:reduce) {
   .wa-services__media-item { transition: none; }
 }
+
+.wa-services__card-banner {
+  width: 100%; aspect-ratio: 16 / 8; display: block; object-fit: cover;
+  border: 1px solid var(--ws-border); border-radius: 10px; margin: 0 0 .83rem;
+  background: var(--ws-canvas);
+}
