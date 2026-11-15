@@ -10,11 +10,9 @@
       </div>
     </div>
     <div class="ws-account-hero-symbol ws-account-avatar-frame" id="owner-avatar"
-      <%= 'data-controller="wa-avatar-editor"' if local_owner_avatar_enabled? %>
-      <% if local_owner_avatar_enabled? %>
-        data-wa-avatar-editor-success-value="<%= t("account_hub.avatar_crop_ready") %>"
-        data-wa-avatar-editor-failure-value="<%= t("account_hub.avatar_crop_failed") %>"
-      <% end %>>
+         data-controller="wa-avatar-editor"
+         data-wa-avatar-editor-success-value="<%= t("account_hub.avatar_crop_ready") %>"
+         data-wa-avatar-editor-failure-value="<%= t("account_hub.avatar_crop_failed") %>">
       <% if (avatar = local_owner_avatar_attachment(current_user)) %>
         <%= image_tag owner_avatar_file_path(avatar), class: "ws-account-avatar",
               alt: t("account_hub.avatar_alt"), loading: "lazy",
