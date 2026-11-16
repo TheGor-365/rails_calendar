@@ -9,6 +9,41 @@
                 owner_cabinet_path, class: "rc-action rc-action--quiet" %>
   </header>
 
+  <% if @navigation_result %>
+    <section class="surface-panel wa-ai-nav-results" aria-labelledby="wa-ai-nav-heading">
+      <div class="wa-ai-page__heading">
+        <span class="wa-ai-page__icon"><i class="bi bi-signpost-split" aria-hidden="true"></i></span>
+        <div>
+          <p class="eyebrow"><%= t("owner_ai_assistant.navigate_label") %></p>
+          <h2 id="wa-ai-nav-heading"><%= @navigation_result.status == :not_found ?
+                t("owner_ai_assistant.navigation_no_matches") : t("owner_ai_assistant.navigation_results") %></h2>
+        </div>
+      </div>
+      <%= form_with url: navigate_owner_ai_path, method: :post, class: "wa-ai-nav-results__form" do %>
+        <%= label_tag "wa-ai-nav-query", t("owner_ai_assistant.navigate_label"), class: "rc-field-label" %>
+        <div class="wa-ai-nav-results__input">
+          <%= text_field_tag :command, params[:nav_query], id: "wa-ai-nav-query", class: "rc-input",
+                maxlength: 120, required: true, placeholder: t("owner_ai_assistant.navigate_placeholder") %>
+          <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+            <%= rc_icon_label("search", t("owner_ai_assistant.navigation_search")) %>
+          <% end %>
+        </div>
+      <% end %>
+      <% if @navigation_result.candidates.any? %>
+        <p class="rc-hint"><%= t("owner_ai_assistant.navigation_select_hint") %></p>
+        <nav class="wa-ai-nav-results__links" aria-label="<%= t("owner_ai_assistant.navigation_results") %>">
+          <% @navigation_result.candidates.each do |page| %>
+            <%= link_to page.path, class: "rc-action rc-action--quiet wa-ai-nav-results__link" do %>
+              <%= rc_icon_label("arrow-up-right", page.label) %>
+            <% end %>
+          <% end %>
+        </nav>
+      <% else %>
+        <p class="rc-hint"><%= t("owner_ai_assistant.navigation_examples") %></p>
+      <% end %>
+    </section>
+  <% end %>
+
   <div class="wa-ai-page__layout">
     <section class="surface-panel wa-ai-page__compose" aria-labelledby="wa-ai-compose-heading">
       <div class="wa-ai-page__heading">
