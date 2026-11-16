@@ -80,8 +80,8 @@ class OwnerAiConversationTest < ActiveSupport::TestCase
     assert_raises(OwnerAiConversation::Closed) do
       expired.append_owner_message!(body: "Expired prompt", request_id: SecureRandom.uuid)
     end
-    assert_not conversation.destroy
-    assert conversation.persisted?
+    assert_raises(ActiveRecord::DeleteRestrictionError) { conversation.destroy! }
+    assert conversation.reload.persisted?
   end
 
   test "cannot attach foreign parent message or foreign and client cost ledgers" do
