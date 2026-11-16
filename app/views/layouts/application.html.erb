@@ -32,5 +32,6 @@
       <%= yield %>
     </main>
     <%= render "layouts/mobile_nav" %>
+    <%= render "shared/owner_ai_launcher" if owner_signed_in? %>
   </body>
 </html>
