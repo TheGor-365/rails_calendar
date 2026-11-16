@@ -11,6 +11,14 @@
         <small><%= t("owner_ai_assistant.private_desc") %></small>
       </div>
     </header>
+    <%= link_to owner_ai_assistant_path, class: "wa-ai-dock__workspace-link" do %>
+      <span class="wa-ai-dock__workspace-symbol"><i class="bi bi-columns-gap" aria-hidden="true"></i></span>
+      <span class="wa-ai-dock__workspace-copy">
+        <strong><%= t("owner_ai_assistant.full_page") %></strong>
+        <small><%= t("owner_ai_assistant.workspace_link_hint") %></small>
+      </span>
+      <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+    <% end %>
     <%= form_with url: create_owner_ai_draft_path, method: :post, class: "wa-ai-dock__form" do %>
       <div class="rc-field">
         <%= label_tag "wa-dock-operation", t("owner_ai_assistant.operation"), class: "rc-field-label" %>
@@ -44,7 +52,6 @@
       <small><%= t("owner_ai_assistant.navigate_hint") %></small>
     <% end %>
     <nav class="wa-ai-dock__links" aria-label="<%= t("owner_ai_assistant.navigation") %>">
-      <%= link_to t("owner_ai_assistant.full_page"), owner_ai_assistant_path %>
       <%= link_to t("owner_ai_assistant.open_services"), owner_services_path %>
       <%= link_to t("owner_ai_assistant.open_cabinet"), owner_cabinet_path %>
     </nav>

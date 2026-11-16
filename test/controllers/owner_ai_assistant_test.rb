@@ -39,6 +39,33 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "AI Workspace is discoverable in owner navigation and dock, never client header" do
+    assert_no_difference("AiSpendEntry.count") do
+      login(@owner)
+      get owner_cabinet_path
+      assert_response :success
+      assert_select ".rc-nav-group a.wa-ai-nav-entry[href=?]", owner_ai_assistant_path, count: 1
+      assert_select ".app-nav a.wa-ai-header-shortcut[href=?]", owner_ai_assistant_path, count: 1
+      assert_select "#owner-ai-dock a.wa-ai-dock__workspace-link[href=?]", owner_ai_assistant_path, count: 1
+      get owner_ai_assistant_path
+      assert_response :success
+      assert_select ".rc-nav-group a.wa-ai-nav-entry[aria-current='page']", count: 1
+      assert_select "nav.wa-ai-page__wayfinder a[href='#wa-ai-compose-heading']", count: 1
+      assert_select "nav.wa-ai-page__wayfinder a[href='#owner-ai-knowledge']", count: 1
+      assert_select "nav.wa-ai-page__wayfinder a[href='#owner-ai-draft-library']", count: 1
+      assert_select "#owner-ai-knowledge .wa-ai-knowledge__item", count: 4
+      assert_select "#owner-ai-knowledge .wa-ai-knowledge__item--profile", count: 1
+      assert_select "#owner-ai-knowledge .wa-ai-knowledge__item--documents", count: 1
+      delete sign_out_path
+      login(@client)
+      get client_cabinet_path
+      assert_response :success
+      assert_select ".rc-nav-group a.wa-ai-nav-entry", count: 0
+      assert_select ".app-nav a.wa-ai-header-shortcut", count: 0
+      assert_select "#owner-ai-dock", count: 0
+    end
+  end
+
   test "invalid operation or missing explicit paid consent cannot reserve provider spend" do
     login(@owner)
     assert_no_difference("AiSpendEntry.count") do
