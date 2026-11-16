@@ -40,8 +40,14 @@ class CreateOwnerAiConversationStorage < ActiveRecord::Migration[8.1]
     add_index :owner_ai_messages, [:owner_ai_conversation_id, :request_id],
               unique: true, name: "idx_owner_ai_messages_unique_request"
     add_index :owner_ai_messages, :parent_message_id, name: "idx_owner_ai_messages_parent"
-    add_foreign_key :owner_ai_messages, :owner_ai_messages, column: :parent_message_id,
-                    name: "fk_owner_ai_messages_parent"
+    # The composite FK prevents an AI message from linking a parent in another
+    # owner's conversation even if an unsafe direct SQL update bypasses validations.
+    add_index :owner_ai_messages, [:id, :owner_ai_conversation_id], unique: true,
+              name: "idx_owner_ai_messages_parent_scope_target"
+    add_foreign_key :owner_ai_messages, :owner_ai_messages,
+                    column: [:parent_message_id, :owner_ai_conversation_id],
+                    primary_key: [:id, :owner_ai_conversation_id],
+                    name: "fk_owner_ai_messages_parent_scoped"
 
     add_check_constraint :owner_ai_messages, "sequence > 0",
                          name: "chk_owner_ai_message_sequence"
