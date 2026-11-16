@@ -32,6 +32,11 @@ class OwnerAiLauncherBrowserTest < ApplicationSystemTestCase
       assert_selector ".wa-ai-dock__panel", visible: true
       bounds = page.evaluate_script("({page: document.documentElement.scrollWidth, viewport: innerWidth})")
       assert_operator bounds["page"], :<=, bounds["viewport"] + 1
+      geometry = page.evaluate_script("(() => { const trigger = document.querySelector('#owner-ai-dock summary'); const dock = document.querySelector('#owner-ai-dock .wa-ai-dock__panel'); const t=trigger.getBoundingClientRect(); const p=dock.getBoundingClientRect(); return { triggerWidth: t.width, panelLeft: p.left, panelRight: p.right, viewportWidth: innerWidth, pagePadding: parseFloat(getComputedStyle(document.querySelector('#main-content')).paddingBottom) }; })()")
+      assert_operator geometry["triggerWidth"], :<=, 54
+      assert_operator geometry["panelLeft"], :>=, 0
+      assert_operator geometry["panelRight"], :<=, geometry["viewportWidth"] + 1
+      assert_operator geometry["pagePadding"], :>=, 140
       find("#owner-ai-dock summary").click
     end
     visit owner_services_path
