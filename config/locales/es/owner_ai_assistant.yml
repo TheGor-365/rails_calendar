@@ -70,3 +70,6 @@ es:
     navigate_button: "Ir"
     navigate_hint: "Sin coste, solo páginas autorizadas."
     unknown_destination: "No se encontró un destino seguro. Pruebe con “open services” o “open cabinet”."
+    context_action: "Redactar con IA"
+    context_selected: "Servicio seleccionado: %{title}. Usted escribe la tarea; el contenido del servicio no se envía automáticamente."
+    refine_consent: "Autorizo enviar la nueva tarea, el borrador anterior generado por IA y los datos públicos aprobados de mi perfil a Grok para una revisión de pago (reserva hasta $0.10)."
