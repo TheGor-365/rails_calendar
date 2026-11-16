@@ -27,9 +27,9 @@ for cmd in pg_dump pg_restore; do
 done
 
 # No SQL writes. Auth is via the local socket; do not pass credentials on command line.
-db_info="$(PGOPTIONS='-c default_transaction_read_only=on' psql -X -w -h "$SOCKET" -p 5432 -U "$DB_USER" -d "$EXPECTED_DB" -v ON_ERROR_STOP=1 -Atc "SELECT current_database() || '|' || current_user || '|' || current_setting('server_version') || '|' || (inet_server_addr() IS NULL)")" || die "Cannot connect to the exact local preview DB via socket without interactive credentials."
+db_info="$(PGOPTIONS='-c default_transaction_read_only=on' psql -X -w -h "$SOCKET" -p 5432 -U "$DB_USER" -d "$EXPECTED_DB" -v ON_ERROR_STOP=1 -Atc "SELECT current_database() || '|' || current_user || '|' || current_setting('server_version') || '|' || CASE WHEN inet_server_addr() IS NULL THEN 'socket' ELSE 'tcp' END")" || die "Cannot connect to the exact local preview DB via socket without interactive credentials."
 IFS='|' read -r db_name server_role server_version socket_only <<< "$db_info"
-[[ "$db_name" == "$EXPECTED_DB" && "$socket_only" == t && "$server_version" == 16.* ]] || die "Database identity / local socket / PG16 mismatch."
+[[ "$db_name" == "$EXPECTED_DB" && "$socket_only" == socket && "$server_version" == 16.* ]] || die "Database identity / local socket / PG16 mismatch."
 
 printf 'PASS: preview-only DB=%s role=%s PostgreSQL=%s, local Unix socket\n' "$db_name" "$server_role" "$server_version"
 printf 'Read-only row counts (not a content export):\n'
