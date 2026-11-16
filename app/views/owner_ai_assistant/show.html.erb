@@ -1,0 +1,100 @@
+<div class="container ws-owner-page wa-ai-page my-4 my-sm-5" id="owner-ai-assistant">
+  <header class="ws-owner-hero wa-ai-page__hero">
+    <div class="ws-owner-hero-copy">
+      <p class="eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_ai_assistant.eyebrow") %></p>
+      <h1 class="page-title"><%= t("owner_ai_assistant.title") %></h1>
+      <p class="rc-muted"><%= t("owner_ai_assistant.intro") %></p>
+    </div>
+    <%= link_to rc_icon_label("arrow-left", t("owner_ai_assistant.open_cabinet")),
+                owner_cabinet_path, class: "rc-action rc-action--quiet" %>
+  </header>
+
+  <div class="wa-ai-page__layout">
+    <section class="surface-panel wa-ai-page__compose" aria-labelledby="wa-ai-compose-heading">
+      <div class="wa-ai-page__heading">
+        <span class="wa-ai-page__icon"><i class="bi bi-pencil-square" aria-hidden="true"></i></span>
+        <div>
+          <p class="eyebrow"><%= t("owner_ai_assistant.step_one") %></p>
+          <h2 id="wa-ai-compose-heading"><%= t("owner_ai_assistant.compose_heading") %></h2>
+        </div>
+      </div>
+      <% if @ai_enabled && @profile&.approved_snapshot && @profile.onboarding_state == "approved" %>
+        <%= form_with url: create_owner_ai_draft_path, method: :post, class: "rc-form wa-ai-page__form" do %>
+          <div class="rc-field">
+            <%= label_tag "wa-ai-operation", t("owner_ai_assistant.operation"), class: "rc-field-label" %>
+            <%= select_tag :operation, options_for_select(OwnerAi::OperationRegistry.keys.map { |key|
+                  [t("owner_ai_assistant.operation_#{key}"), key]
+                }, @operation), id: "wa-ai-operation", class: "rc-input" %>
+          </div>
+          <div class="rc-field">
+            <%= label_tag "wa-ai-brief", t("owner_ai_assistant.brief"), class: "rc-field-label" %>
+            <%= text_area_tag :brief, nil, id: "wa-ai-brief", class: "rc-input rc-input--area",
+                  rows: 5, minlength: 12, maxlength: 1200, required: true,
+                  placeholder: t("owner_ai_assistant.placeholder") %>
+            <p class="rc-hint"><%= t("owner_ai_assistant.brief_hint") %></p>
+          </div>
+          <label class="wa-ai-page__consent">
+            <%= check_box_tag :paid_consent, "1", false, required: true %>
+            <span><%= t("owner_ai_assistant.consent") %></span>
+          </label>
+          <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+            <%= rc_icon_label("stars", t("owner_ai_assistant.generate")) %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="rc-empty-state" role="status">
+          <p><%= t("owner_ai_assistant.disabled") %></p>
+          <%= link_to t("owner_ai_assistant.open_cabinet"), owner_cabinet_path,
+                      class: "rc-action rc-action--quiet" %>
+        </div>
+      <% end %>
+    </section>
+
+    <aside class="surface-panel wa-ai-page__scope" aria-labelledby="wa-ai-scope">
+      <div class="wa-ai-page__heading">
+        <span class="wa-ai-page__icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
+        <div>
+          <p class="eyebrow"><%= t("owner_ai_assistant.control") %></p>
+          <h2 id="wa-ai-scope"><%= t("owner_ai_assistant.data_heading") %></h2>
+        </div>
+      </div>
+      <p><%= t("owner_ai_assistant.data_policy") %></p>
+      <p><%= t("owner_ai_assistant.manual_only") %></p>
+      <p><%= t("owner_ai_assistant.cost_policy", cap: format("$%.2f", @spend[:cap_ticks].to_f / AiSpendLedger::USD_TICKS)) %></p>
+      <%= link_to rc_icon_label("receipt", t("owner_ai_assistant.spending")), owner_ai_activity_path,
+                  class: "rc-action rc-action--quiet rc-action--small" %>
+    </aside>
+  </div>
+
+  <section class="surface-panel wa-ai-page__result" aria-labelledby="wa-ai-result-heading">
+    <div class="wa-ai-page__heading">
+      <span class="wa-ai-page__icon"><i class="bi bi-file-earmark-text" aria-hidden="true"></i></span>
+      <div>
+        <p class="eyebrow"><%= t("owner_ai_assistant.step_two") %></p>
+        <h2 id="wa-ai-result-heading"><%= t("owner_ai_assistant.result_heading") %></h2>
+      </div>
+    </div>
+    <% if @entry %>
+      <p class="wa-ai-page__status"><i class="bi bi-lock" aria-hidden="true"></i> <%= t("owner_ai_assistant.draft_only") %></p>
+      <h3><%= @entry.result["heading"] %></h3>
+      <p class="wa-ai-page__draft"><%= @entry.result["draft"] %></p>
+      <% if Array(@entry.result["questions"]).any? %>
+        <h3><%= t("owner_ai_assistant.questions") %></h3>
+        <ul class="wa-ai-page__list">
+          <% @entry.result["questions"].each do |item| %><li><%= item %></li><% end %>
+        </ul>
+      <% end %>
+      <% if Array(@entry.result["cautions"]).any? %>
+        <h3><%= t("owner_ai_assistant.cautions") %></h3>
+        <ul class="wa-ai-page__list">
+          <% @entry.result["cautions"].each do |item| %><li><%= item %></li><% end %>
+        </ul>
+      <% end %>
+      <p class="wa-ai-page__next"><strong><%= t("owner_ai_assistant.next") %></strong> <%= @entry.result["next_step"] %></p>
+    <% else %>
+      <div class="rc-empty-state">
+        <p><%= t("owner_ai_assistant.no_draft") %></p>
+      </div>
+    <% end %>
+  </section>
+</div>
