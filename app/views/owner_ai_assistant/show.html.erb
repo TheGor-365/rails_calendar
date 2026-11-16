@@ -105,41 +105,6 @@
     </aside>
   </div>
 
-  <section class="surface-panel wa-ai-draft-library" id="owner-ai-draft-library"
-           aria-labelledby="wa-ai-library-title">
-    <div class="wa-ai-page__heading">
-      <span class="wa-ai-page__icon"><i class="bi bi-journal-text" aria-hidden="true"></i></span>
-      <div>
-        <p class="eyebrow"><%= t("owner_ai_assistant.library_step") %></p>
-        <h2 id="wa-ai-library-title"><%= t("owner_ai_assistant.library_title") %></h2>
-      </div>
-    </div>
-    <p class="rc-muted"><%= t("owner_ai_assistant.library_help") %></p>
-    <% if @draft_history.any? %>
-      <div class="wa-ai-draft-library__grid">
-        <% @draft_history.each do |record| %>
-          <article class="wa-ai-draft-library__item">
-            <div class="wa-ai-draft-library__meta">
-              <span class="wa-ai-page__status">
-                <i class="bi bi-lock" aria-hidden="true"></i>
-                <%= t("owner_ai_assistant.operation_#{record.result["purpose"]}",
-                        default: t("owner_ai_assistant.library_unspecified")) %>
-              </span>
-              <time datetime="<%= record.created_at.iso8601 %>"><%= l(record.created_at, format: :short) %></time>
-            </div>
-            <h3><%= record.result["heading"] %></h3>
-            <p><%= truncate(record.result["draft"].to_s, length: 165) %></p>
-            <%= link_to rc_icon_label("arrow-up-right", t("owner_ai_assistant.library_open")),
-                  owner_ai_assistant_path(entry_id: record.id, operation: record.result["purpose"]),
-                  class: "rc-action rc-action--quiet rc-action--small" %>
-          </article>
-        <% end %>
-      </div>
-    <% else %>
-      <p class="rc-hint"><%= t("owner_ai_assistant.library_empty") %></p>
-    <% end %>
-  </section>
-
   <section class="surface-panel wa-ai-page__result" aria-labelledby="wa-ai-result-heading">
     <div class="wa-ai-page__heading">
       <span class="wa-ai-page__icon"><i class="bi bi-file-earmark-text" aria-hidden="true"></i></span>
@@ -275,4 +240,39 @@
       <% end %>
     </section>
   <% end %>
+  <section class="surface-panel wa-ai-draft-library" id="owner-ai-draft-library"
+           aria-labelledby="wa-ai-library-title">
+    <div class="wa-ai-page__heading">
+      <span class="wa-ai-page__icon"><i class="bi bi-journal-text" aria-hidden="true"></i></span>
+      <div>
+        <p class="eyebrow"><%= t("owner_ai_assistant.library_step") %></p>
+        <h2 id="wa-ai-library-title"><%= t("owner_ai_assistant.library_title") %></h2>
+      </div>
+    </div>
+    <p class="rc-muted"><%= t("owner_ai_assistant.library_help") %></p>
+    <% if @draft_history.any? %>
+      <div class="wa-ai-draft-library__grid">
+        <% @draft_history.each do |record| %>
+          <article class="wa-ai-draft-library__item">
+            <div class="wa-ai-draft-library__meta">
+              <span class="wa-ai-page__status">
+                <i class="bi bi-lock" aria-hidden="true"></i>
+                <%= t("owner_ai_assistant.operation_#{record.result["purpose"]}",
+                        default: t("owner_ai_assistant.library_unspecified")) %>
+              </span>
+              <time datetime="<%= record.created_at.iso8601 %>"><%= l(record.created_at, format: :short) %></time>
+            </div>
+            <h3><%= record.result["heading"] %></h3>
+            <p><%= truncate(record.result["draft"].to_s, length: 165) %></p>
+            <%= link_to rc_icon_label("arrow-up-right", t("owner_ai_assistant.library_open")),
+                  owner_ai_assistant_path(entry_id: record.id, operation: record.result["purpose"]),
+                  class: "rc-action rc-action--quiet rc-action--small" %>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="rc-hint"><%= t("owner_ai_assistant.library_empty") %></p>
+    <% end %>
+  </section>
+
 </div>
