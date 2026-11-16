@@ -9,6 +9,9 @@ module OwnerAi
       "capabilities" => /(?:навык|компетен|skills|capabilit|competenc)/i,
       "interview" => /(?:интервью|знакомств|interview|onboarding)/i,
       "spending" => /(?:расход|бюджет|spend|costs?|gastos)/i,
+      "calendar" => /(?:календар|calendar|calendario)/i,
+      "today" => /(?:сегодня|today|hoy)/i,
+      "consultations" => /(?:консультац|consultations?|consultas)/i,
       "workspace" => /(?:рабоч.*област|рабоч.*простран|главн|workspace|dashboard|inicio)/i,
       "assistant" => /(?:помощник|ассистент|assistant|ayudante)/i
     }.freeze
