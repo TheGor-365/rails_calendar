@@ -240,6 +240,54 @@
       <% end %>
     </section>
   <% end %>
+  <section class="surface-panel wa-ai-knowledge" id="owner-ai-knowledge"
+           aria-labelledby="wa-ai-knowledge-title">
+    <div class="wa-ai-page__heading">
+      <span class="wa-ai-page__icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span>
+      <div>
+        <p class="eyebrow"><%= t("owner_ai_assistant.knowledge_step") %></p>
+        <h2 id="wa-ai-knowledge-title"><%= t("owner_ai_assistant.knowledge_title") %></h2>
+      </div>
+    </div>
+    <p class="rc-muted"><%= t("owner_ai_assistant.knowledge_help") %></p>
+    <div class="wa-ai-knowledge__grid">
+      <article class="wa-ai-knowledge__item">
+        <div class="wa-ai-knowledge__icon"><i class="bi bi-person-check" aria-hidden="true"></i></div>
+        <h3><%= t("owner_ai_assistant.knowledge_profile_title") %></h3>
+        <p class="wa-ai-knowledge__state">
+          <%= @knowledge.approved_public_facts? ?
+                t("owner_ai_assistant.knowledge_profile_ready", version: @knowledge.profile_version) :
+                t("owner_ai_assistant.knowledge_profile_missing") %>
+        </p>
+        <p><%= t("owner_ai_assistant.knowledge_profile_scope") %></p>
+        <%= link_to rc_icon_label("arrow-up-right", t("owner_ai_assistant.knowledge_profile_link")),
+                    owner_practice_path, class: "rc-action rc-action--quiet rc-action--small" %>
+      </article>
+      <article class="wa-ai-knowledge__item">
+        <div class="wa-ai-knowledge__icon"><i class="bi bi-collection" aria-hidden="true"></i></div>
+        <h3><%= t("owner_ai_assistant.knowledge_services_title") %></h3>
+        <p class="wa-ai-knowledge__state"><%= t("owner_ai_assistant.knowledge_services_count",
+                  total: @knowledge.private_service_count,
+                  approved: @knowledge.approved_service_count) %></p>
+        <p><%= t("owner_ai_assistant.knowledge_services_scope") %></p>
+        <%= link_to rc_icon_label("arrow-up-right", t("owner_ai_assistant.knowledge_services_link")),
+                    owner_services_path, class: "rc-action rc-action--quiet rc-action--small" %>
+      </article>
+      <article class="wa-ai-knowledge__item">
+        <div class="wa-ai-knowledge__icon"><i class="bi bi-chat-left-dots" aria-hidden="true"></i></div>
+        <h3><%= t("owner_ai_assistant.knowledge_faq_title") %></h3>
+        <p class="wa-ai-knowledge__state"><%= t("owner_ai_assistant.knowledge_not_collected") %></p>
+        <p><%= t("owner_ai_assistant.knowledge_faq_scope") %></p>
+      </article>
+      <article class="wa-ai-knowledge__item">
+        <div class="wa-ai-knowledge__icon"><i class="bi bi-file-earmark-lock" aria-hidden="true"></i></div>
+        <h3><%= t("owner_ai_assistant.knowledge_documents_title") %></h3>
+        <p class="wa-ai-knowledge__state"><%= t("owner_ai_assistant.knowledge_not_connected") %></p>
+        <p><%= t("owner_ai_assistant.knowledge_documents_scope") %></p>
+      </article>
+    </div>
+  </section>
+
   <section class="surface-panel wa-ai-draft-library" id="owner-ai-draft-library"
            aria-labelledby="wa-ai-library-title">
     <div class="wa-ai-page__heading">

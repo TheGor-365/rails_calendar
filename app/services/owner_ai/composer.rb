@@ -61,7 +61,18 @@ module OwnerAi
         turn = parent.result.fetch("turn", 1).to_i + 1
         raise Unavailable, "Start a new draft after four turns" unless turn.between?(2, 4)
       end
-      source = snapshot.payload.is_a?(Hash) ? snapshot.payload.slice("headline", "public_summary") : {}
+      # Approved profile compiler stores the owner-approved shareable public
+      # summary as public_summary_draft. Composer previously looked for the
+      # legacy public_summary key and silently omitted this owner-approved fact.
+      source = if snapshot.payload.is_a?(Hash)
+        {
+          "headline" => snapshot.payload["headline"],
+          "public_summary" => snapshot.payload["public_summary_draft"].presence ||
+            snapshot.payload["public_summary"]
+        }.compact
+      else
+        {}
+      end
       payload = JSON.generate(
         "purpose" => operation.to_s,
         "task" => text,

@@ -19,6 +19,7 @@ class OwnerAiAssistantController < ApplicationController
       end
     end
     @draft_history = owner_entries.order(created_at: :desc, id: :desc).limit(12)
+    @knowledge = OwnerAi::KnowledgeReadiness.new(workspace: @workspace)
     @spend = AiSpendLedger.spend_summary
     @ai_enabled = OwnerIntelligence::Grok.enabled?
     @draft_offerings = @workspace.service_offerings.includes(:versions).order(:position, :id)

@@ -101,12 +101,54 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "knowledge inventory is scoped, read-only, and never exposes private profile summary" do
+    catalogue = OwnerServices::Catalogue.new(workspace: @workspace)
+    catalogue.create_draft!(service_fields(@profile.professional_capabilities.first,
+      title: "Synthetic owner-only knowledge service"))
+    another = OwnerServices::Catalogue.new(workspace: @foreign_workspace)
+    another.create_draft!(service_fields(@foreign_profile.professional_capabilities.first,
+      title: "FOREIGN_PRIVATE_KNOWLEDGE_NEVER_VISIBLE"))
+
+    readiness = OwnerAi::KnowledgeReadiness.new(workspace: @workspace)
+    assert_equal 1, readiness.private_service_count
+    assert_equal 0, readiness.approved_service_count
+    refute readiness.approved_public_facts?
+    refute readiness.service_catalogue_available_to_composer?
+    refute readiness.documents_available_to_ai?
+    refute readiness.faq_and_prices_available_to_client_ai?
+
+    @profile.professional_context_snapshots.create!(
+      version: 2, digest: Digest::SHA256.hexdigest("synthetic-public-facts-ready"),
+      payload: {
+        "headline" => "Approved fictional Rails professional",
+        "public_summary_draft" => "Approved shareable fictional services statement",
+        "private_summary" => "OWNER_PRIVATE_NOT_FOR_KNOWLEDGE_UI"
+      }, approved_at: Time.current
+    )
+    assert OwnerAi::KnowledgeReadiness.new(workspace: @workspace).approved_public_facts?
+
+    assert_no_difference("AiSpendEntry.count") do
+      login(@client)
+      get owner_ai_assistant_path
+      assert_redirected_to sign_in_path
+      delete sign_out_path
+      login(@owner)
+      get owner_ai_assistant_path
+      assert_response :success
+      assert_select "#owner-ai-knowledge"
+      assert_select ".wa-ai-knowledge__item", count: 4
+      assert_select "#owner-ai-knowledge", text: /OWNER_PRIVATE_NOT_FOR_KNOWLEDGE_UI/, count: 0
+      assert_select "#owner-ai-knowledge", text: /FOREIGN_PRIVATE_KNOWLEDGE_NEVER_VISIBLE/, count: 0
+      assert_select "#owner-ai-knowledge", text: /1.*0/
+    end
+  end
+
   test "explicitly consented draft uses bounded provider schema, ledger and no automatic apply" do
     @profile.professional_context_snapshots.create!(
       version: 2, digest: Digest::SHA256.hexdigest("approved-owner-v2"),
       payload: {
         "headline" => "Fictional Rails freelancer",
-        "public_summary" => "Small Ruby on Rails tasks only",
+        "public_summary_draft" => "Small Ruby on Rails tasks only",
         "private_summary" => "NEVER_SEND_PRIVATE_CONTEXT"
       }, approved_at: Time.current
     )

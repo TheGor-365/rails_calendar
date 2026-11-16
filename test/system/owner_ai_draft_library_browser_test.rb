@@ -29,6 +29,8 @@ class OwnerAiDraftLibraryBrowserTest < ApplicationSystemTestCase
     visit owner_ai_assistant_path
 
     assert_selector "#owner-ai-draft-library"
+    assert_selector "#owner-ai-knowledge"
+    assert_selector ".wa-ai-knowledge__item", count: 4
     assert_text "A saved synthetic Rails draft"
     [390, 320].each do |width|
       page.driver.browser.manage.window.resize_to(width, 900)
