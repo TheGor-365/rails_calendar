@@ -42,7 +42,10 @@ class OwnerAiAssistantController < ApplicationController
     entry = OwnerAi::Composer.new(workspace: @workspace).generate!(
       operation: operation, brief: params[:brief], parent: parent
     )
-    redirect_to owner_ai_assistant_path(entry_id: entry.id, operation: operation),
+    context = @workspace.service_offerings.find_by(id: params[:offering_id])
+    destination = { entry_id: entry.id, operation: operation }
+    destination[:offering_id] = context.id if context&.draft_version
+    redirect_to owner_ai_assistant_path(destination),
                 notice: t("owner_ai_assistant.draft_ready")
   rescue OwnerAi::Composer::Unavailable
     redirect_to owner_ai_assistant_path(operation: operation),
