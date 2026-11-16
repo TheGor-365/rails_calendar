@@ -72,8 +72,12 @@
 .wa-ai-page__next { background: #f5faf8; border: 1px solid var(--ws-border); border-radius: 12px; padding: .9rem; font-size: .85rem; }
 @media (max-width: 767.98px) {
   .wa-ai-page__layout { grid-template-columns: minmax(0, 1fr); }
-  .wa-ai-dock { right: .8rem; bottom: 5.6rem; }
-  .wa-ai-dock__panel { width: min(365px, calc(100vw - 1.6rem)); max-height: min(68vh, 540px); }
+  // Keep scrollable page actions clear of the fixed floating control and mobile dock.
+  body.wa-ai-enabled #main-content { padding-bottom: 10rem !important; }
+  .wa-ai-dock { right: .7rem; bottom: calc(5.65rem + env(safe-area-inset-bottom, 0px)); }
+  .wa-ai-dock__trigger { min-width: 46px; width: 46px; height: 46px; padding: 0; justify-content: center; }
+  .wa-ai-dock__trigger span { display: none; }
+  .wa-ai-dock__panel { width: min(350px, calc(100vw - 1.4rem)); max-height: min(68dvh, 520px); }
   .wa-ai-page .rc-action { white-space: normal; }
 }
 @media print { .wa-ai-dock { display: none !important; } }
