@@ -50,14 +50,18 @@ class OwnerAiRefinementApplyTest < ActionDispatch::IntegrationTest
     assert_equal "services", OwnerAi::Navigator.resolve("услуги")
     assert_equal "services", OwnerAi::Navigator.resolve("услуг")
     assert_equal "services", OwnerAi::Navigator.resolve("усл")
+    assert_equal "services", OwnerAi::Navigator.resolve("ус")
     assert_equal "services", OwnerAi::Navigator.resolve("слуг")
     assert_equal "services", OwnerAi::Navigator.resolve("мои услуги")
+    assert_equal "services", OwnerAi::Navigator.resolve("мне нужны мои услуги")
+    assert_equal "services", OwnerAi::Navigator.resolve("серв")
     assert_equal "services", OwnerAi::Navigator.resolve("покажи мне каталог услуг")
     assert_equal "cabinet", OwnerAi::Navigator.resolve("кабин")
     assert_equal "practice", OwnerAi::Navigator.resolve("практика")
     assert_equal "calendar", OwnerAi::Navigator.resolve("кален")
     assert_equal "today", OwnerAi::Navigator.resolve("сегoдня".tr("o", "о"))
     assert_equal "catalogue_ai", OwnerAi::Navigator.resolve("ИИ каталог")
+    assert_equal :ambiguous, OwnerAi::Navigator.search("ИИ").status
     assert_equal "service_new", OwnerAi::Navigator.resolve("новая услуга")
     assert_equal "public_services", OwnerAi::Navigator.resolve("витрина")
     assert_nil OwnerAi::Navigator.resolve("https://example.com")
@@ -67,7 +71,7 @@ class OwnerAiRefinementApplyTest < ActionDispatch::IntegrationTest
 
     login(@owner)
     assert_no_difference("AiSpendEntry.count") do
-      %w[услуги услуг усл слуг].each do |word|
+      %w[услуги услуг усл ус слуг].each do |word|
         post navigate_owner_ai_path, params: { command: word }
         assert_redirected_to owner_services_path
       end
