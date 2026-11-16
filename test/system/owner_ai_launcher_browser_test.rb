@@ -20,6 +20,9 @@ class OwnerAiLauncherBrowserTest < ApplicationSystemTestCase
     assert_selector ".wa-ai-dock__panel", visible: true
     assert_selector "textarea#wa-dock-brief", visible: true
     assert_selector "input[name=paid_consent]", visible: true
+    find("#owner-ai-dock summary").send_keys(:escape)
+    assert_no_selector ".wa-ai-dock__panel", visible: true
+    find("#owner-ai-dock summary").click
     find("#owner-ai-dock summary").click
     assert_no_selector ".wa-ai-dock__panel", visible: true
 
