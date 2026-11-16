@@ -1766,3 +1766,6 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
 // Owner AI copilot: the reusable White Atlas review workspace.
 @import 'rc_owner_ai_workspace';
+
+// Scoped global owner-only AI launcher and draft review.
+@import 'rc_owner_ai_assistant';
