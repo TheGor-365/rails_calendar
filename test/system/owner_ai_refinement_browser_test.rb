@@ -32,7 +32,7 @@ class OwnerAiRefinementBrowserTest < ApplicationSystemTestCase
     visit owner_ai_assistant_path(entry_id: entry.id, offering_id: offering.id)
     assert_selector ".wa-ai-apply__comparison"
     assert_selector ".wa-ai-conversation__turn", count: 1
-    assert_text draft.excluded_scope
+    assert_text draft.summary
 
     [390, 320].each do |width|
       page.driver.browser.manage.window.resize_to(width, 900)
