@@ -8,6 +8,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 DB="rails_calendar_mvp_preview_20261112"
 ROLE="${RC_BACKUP_DB_USER:-$(id -un)}"
 SOCKET="/var/run/postgresql"
+# Pin client tools to the source server major. pg_wrapper can select a newer
+# pg_dump with -h while pg_restore -l remains the older local cluster version.
+PG_BIN="/usr/lib/postgresql/16/bin"
 PORT=5432
 PORT_APP=3012
 
@@ -17,8 +20,13 @@ die() { printf 'STOP: %s\n' "$1" >&2; exit 1; }
 [[ "${RC_CONFIRM_WRITERS_STOPPED:-}" == YES ]] || die "Stop preview Rails AND all workers, then explicitly set RC_CONFIRM_WRITERS_STOPPED=YES."
 [[ "${RC_CONFIRM_ISOLATED_RESTORE:-}" == YES ]] || die "You must explicitly confirm creation of a NEW scratch restore DB with RC_CONFIRM_ISOLATED_RESTORE=YES."
 
-for cmd in ss pg_dump pg_restore psql createdb tar sha256sum diff df du stat date mktemp find awk; do
+for cmd in ss tar sha256sum diff df du stat date mktemp find awk; do
   command -v "$cmd" >/dev/null || die "Missing required command: $cmd"
+done
+for cmd in pg_dump pg_restore psql createdb; do
+  [[ -x "$PG_BIN/$cmd" ]] || die "PostgreSQL 16 client missing: $cmd; no archive created."
+  version="$("$PG_BIN/$cmd" --version)"
+  [[ "$version" == *"(PostgreSQL) 16."* ]] || die "Incorrect pinned version for $cmd: $version"
 done
 [[ -S "$SOCKET/.s.PGSQL.$PORT" ]] || die "Local PostgreSQL socket not found."
 [[ -d "$ROOT/storage" && ! -L "$ROOT/storage" ]] || die "Private storage directory missing or symlinked."
@@ -33,7 +41,7 @@ bash "$ROOT/script/rc0551f_c21_backup_preflight.sh"
 
 read_query() {
   PGOPTIONS='-c default_transaction_read_only=on' \
-    psql -X -w -h "$SOCKET" -p "$PORT" -U "$ROLE" -d "$1" \
+    "$PG_BIN/psql" -X -w -h "$SOCKET" -p "$PORT" -U "$ROLE" -d "$1" \
     -v ON_ERROR_STOP=1 -Atc "$2"
 }
 others="$(read_query "$DB" "SELECT count(*) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid()")"
@@ -60,9 +68,9 @@ chmod 700 "$backup"
 restore_db="rails_calendar_rc0551f_c21_restore_${stamp}_$RANDOM"
 printf 'Backup directory created under owner-private local backups.\n'
 
-pg_dump -w -Fc --no-owner --no-acl \
+"$PG_BIN/pg_dump" -w -Fc --no-owner --no-acl \
   -h "$SOCKET" -p "$PORT" -U "$ROLE" -f "$backup/preview.pgcustom" "$DB"
-pg_restore -l "$backup/preview.pgcustom" >/dev/null || die "Archive validation failed; source unchanged."
+"$PG_BIN/pg_restore" -l "$backup/preview.pgcustom" >/dev/null || die "Archive validation failed; source unchanged."
 
 tar -C "$ROOT" -cf "$backup/storage.tar" -- storage
 tar -tf "$backup/storage.tar" >/dev/null || die "Storage archive validation failed."
@@ -83,9 +91,9 @@ printf 'PASS: isolated private media extraction and byte comparison.\n'
 if read_query "$DB" "SELECT 1 FROM pg_database WHERE datname = '$restore_db'" | grep -q .; then
   die "Scratch DB name collision. Backup preserved; no restore performed."
 fi
-createdb -w -h "$SOCKET" -p "$PORT" -U "$ROLE" -T template0 "$restore_db"
+"$PG_BIN/createdb" -w -h "$SOCKET" -p "$PORT" -U "$ROLE" -T template0 "$restore_db"
 printf 'Created new isolated scratch database; preview unchanged.\n'
-pg_restore -w --exit-on-error --no-owner --no-acl \
+"$PG_BIN/pg_restore" -w --exit-on-error --no-owner --no-acl \
   -h "$SOCKET" -p "$PORT" -U "$ROLE" -d "$restore_db" "$backup/preview.pgcustom"
 
 tables=(
