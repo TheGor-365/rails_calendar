@@ -185,6 +185,17 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
   end
 
   test "cabinet practice capabilities and catalogue provide owner contextual AI entrypoints" do
+    # Use a complete, separate synthetic approved snapshot: practice UI requires
+    # headline/private/public summaries; the basic catalogue fixture omits them.
+    @profile.professional_context_snapshots.create!(
+      version: 2, digest: Digest::SHA256.hexdigest("context-entrypoints-#{@owner.id}"),
+      payload: {
+        "headline" => "Fictional Rails consultant",
+        "private_summary" => "Private synthetic owner career history for test screens.",
+        "public_summary_draft" => "Synthetic Rails services with prior review.",
+        "capabilities" => [], "desired_services" => [], "interview_answers" => {}
+      }, approved_at: Time.current
+    )
     login(@owner)
     assert_no_difference("AiSpendEntry.count") do
       get owner_cabinet_path
