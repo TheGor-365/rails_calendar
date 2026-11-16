@@ -142,4 +142,36 @@
   .wa-ai-nav-results__input > * { width: 100%; }
 }
 
+
+// RC055.1f C1 — readonly private AI draft library (White Atlas).
+.wa-ai-draft-library {
+  margin: 1rem 0;
+  padding: clamp(1rem, 2.2vw, 1.5rem);
+  min-width: 0;
+}
+.wa-ai-draft-library__grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem;
+  margin-top: 1rem;
+}
+.wa-ai-draft-library__item {
+  min-width: 0; display: flex; flex-direction: column; gap: .55rem;
+  padding: .9rem 1rem; border: 1px solid var(--ws-border);
+  border-radius: 14px; background: var(--ws-paper);
+}
+.wa-ai-draft-library__meta {
+  display: flex; flex-wrap: wrap; gap: .45rem .8rem;
+  align-items: center; justify-content: space-between;
+  font-size: .72rem; color: var(--ws-muted);
+}
+.wa-ai-draft-library__item h3 { margin: 0; font-size: .93rem; font-weight: 790; overflow-wrap: anywhere; }
+.wa-ai-draft-library__item p {
+  margin: 0; flex: 1; color: var(--ws-muted); font-size: .84rem;
+  line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.wa-ai-draft-library__item .rc-action { width: fit-content; margin-top: .4rem; }
+@media (max-width: 575.98px) {
+  .wa-ai-draft-library__grid { grid-template-columns: minmax(0, 1fr); }
+  .wa-ai-draft-library__item { padding: .8rem; }
+}
+
 @media print { .wa-ai-dock { display: none !important; } }
