@@ -101,6 +101,66 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "explicitly consented draft uses bounded provider schema, ledger and no automatic apply" do
+    @profile.professional_context_snapshots.create!(
+      version: 2, digest: Digest::SHA256.hexdigest("approved-owner-v2"),
+      payload: {
+        "headline" => "Fictional Rails freelancer",
+        "public_summary" => "Small Ruby on Rails tasks only",
+        "private_summary" => "NEVER_SEND_PRIVATE_CONTEXT"
+      }, approved_at: Time.current
+    )
+    response = Struct.new(:code, :body).new("200", JSON.generate(
+      status: "completed", id: "provider-synthetic-1",
+      output: [{ type: "message", content: [{ type: "output_text", text: JSON.generate(
+        heading: "An example Rails service",
+        draft: "Investigate one fictional Rails issue and prepare a bounded change with test evidence.",
+        questions: ["What is the smallest reproduction?"], cautions: ["No fixed delivery promise."],
+        next_step: "Owner checks the brief and deliverables."
+      ) }] }],
+      usage: { input_tokens: 120, output_tokens: 180, total_tokens: 300, cost_in_usd_ticks: 120_000 }
+    ))
+    seen_payload = []
+    fake_http = Object.new
+    fake_http.define_singleton_method(:request) do |request|
+      seen_payload << JSON.parse(request.body)
+      response
+    end
+    network_stub = lambda { |*_args, **_kwargs, &block| block.call(fake_http) }
+    old_key = ENV["XAI_API_KEY"]
+    ENV["XAI_API_KEY"] = "xai-fictitious-test-value-never-for-network"
+    login(@owner)
+    assert_difference("AiSpendEntry.count", 1) do
+      assert_no_difference("ServiceOfferingVersion.count") do
+        OwnerIntelligence::Grok.stub(:enabled?, true) do
+          IntakeAiQuota.stub(:reserve_call!, true) do
+            Net::HTTP.stub(:start, network_stub) do
+              post create_owner_ai_draft_path, params: {
+                operation: "service_copy",
+                brief: "Draft a short fictional Ruby on Rails bugfix service for a small project.",
+                paid_consent: "1"
+              }
+            end
+          end
+        end
+      end
+    end
+    entry = @profile.ai_spend_entries.order(id: :desc).first
+    assert_redirected_to owner_ai_assistant_path(entry_id: entry.id, operation: "service_copy")
+    assert_equal "settled", entry.status
+    assert_equal "owner_ai_composer_v1", entry.operation
+    assert_equal 120_000, entry.charged_ticks
+    assert_equal 1, seen_payload.length
+    assert_equal [], seen_payload.first["tools"]
+    source_text = seen_payload.first.fetch("input").last.fetch("content")
+    assert_includes source_text, "Small Ruby on Rails tasks only"
+    refute_includes source_text, "NEVER_SEND_PRIVATE_CONTEXT"
+    assert_equal "service_copy", entry.result["purpose"]
+    assert_equal 2, entry.result["profile_version"]
+  ensure
+    ENV["XAI_API_KEY"] = old_key
+  end
+
   private
 
   def login(user)
