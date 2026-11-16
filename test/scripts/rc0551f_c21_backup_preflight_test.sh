@@ -26,4 +26,13 @@ if grep -Eq '^[[:space:]]*(createdb|dropdb|pg_dump[[:space:]]+.*-f|pg_restore[[:
   exit 1
 fi
 
+# Regression: boolean output coerced by SQL string concatenation is "true"/"false",
+# not the bare PostgreSQL boolean display "t"/"f". Use an explicit label.
+grep -Fq "CASE WHEN inet_server_addr() IS NULL THEN 'socket' ELSE 'tcp' END" "$target"
+grep -Fq '"$socket_only" == socket' "$target"
+if grep -Fq '"$socket_only" == t' "$target"; then
+  echo 'FAIL: implicit boolean-to-text socket mismatch must not return.' >&2
+  exit 1
+fi
+
 echo 'RC055.1f C2.1 read-only backup preflight shell and production-deny checks: PASS'
