@@ -4,11 +4,25 @@ class OwnerAiAssistantController < ApplicationController
 
   def show
     @operation = OwnerAi::OperationRegistry.fetch(params[:operation]) ? params[:operation] : "service_copy"
-    @entry = @profile&.ai_spend_entries&.where(
-      operation: OwnerAi::Composer::VERSION, status: "settled"
-    )&.find_by(id: params[:entry_id])
+    @entry = owner_entries.find_by(id: params[:entry_id]) if params[:entry_id].present?
+    @thread = []
+    if @entry
+      previous = @entry
+      4.times do
+        break unless previous
+        @thread.unshift(previous)
+        parent_id = previous.result.is_a?(Hash) && previous.result["parent_entry_id"]
+        previous = parent_id.present? ? owner_entries.find_by(id: parent_id) : nil
+      end
+    end
     @spend = AiSpendLedger.spend_summary
     @ai_enabled = OwnerIntelligence::Grok.enabled?
+    @draft_offerings = @workspace.service_offerings.includes(:versions).order(:position, :id)
+      .select { |offering| offering.draft_version.present? }
+    if @entry && @entry.result["purpose"] == "service_copy"
+      @selected_offering = @draft_offerings.find { |offering| offering.id.to_s == params[:offering_id].to_s }
+      @selected_draft = @selected_offering&.draft_version
+    end
   end
 
   def create
@@ -18,8 +32,14 @@ class OwnerAiAssistantController < ApplicationController
     return redirect_to owner_ai_assistant_path(operation: operation),
                        alert: t("owner_ai_assistant.consent_required") unless params[:paid_consent] == "1"
 
+    parent = nil
+    if params[:parent_entry_id].present?
+      parent = owner_entries.find_by(id: params[:parent_entry_id])
+      return redirect_to owner_ai_assistant_path(operation: operation),
+                         alert: t("owner_ai_assistant.invalid_parent") unless parent
+    end
     entry = OwnerAi::Composer.new(workspace: @workspace).generate!(
-      operation: operation, brief: params[:brief]
+      operation: operation, brief: params[:brief], parent: parent
     )
     redirect_to owner_ai_assistant_path(entry_id: entry.id, operation: operation),
                 notice: t("owner_ai_assistant.draft_ready")
@@ -28,7 +48,45 @@ class OwnerAiAssistantController < ApplicationController
                 alert: t("owner_ai_assistant.unavailable")
   end
 
+  def apply
+    entry = owner_entries.find_by(id: params[:entry_id])
+    offering = @workspace.service_offerings.find_by(id: params[:offering_id])
+    OwnerAi::DraftApplier.new(workspace: @workspace).apply!(
+      entry: entry, offering_id: params[:offering_id],
+      base_version: params[:base_version], base_digest: params[:base_digest],
+      summary: params[:summary], confirmed: params[:confirmed] == "1"
+    )
+    redirect_to owner_service_path(offering), notice: t("owner_ai_assistant.applied_to_draft")
+  rescue OwnerAi::DraftApplier::Conflict
+    redirect_to owner_ai_assistant_path(entry_id: params[:entry_id], offering_id: params[:offering_id]),
+                alert: t("owner_ai_assistant.apply_conflict")
+  end
+
+  def navigate
+    destination = OwnerAi::Navigator.resolve(params[:command])
+    routes = {
+      "workspace" => workspace_path,
+      "cabinet" => owner_cabinet_path,
+      "services" => owner_services_path,
+      "catalogue_ai" => owner_catalogue_ai_path,
+      "capabilities" => owner_capabilities_path,
+      "interview" => owner_setup_path,
+      "spending" => owner_ai_activity_path,
+      "assistant" => owner_ai_assistant_path
+    }.freeze
+    if destination && routes.key?(destination)
+      redirect_to routes.fetch(destination)
+    else
+      redirect_to owner_ai_assistant_path, alert: t("owner_ai_assistant.unknown_destination")
+    end
+  end
+
   private
+
+  def owner_entries
+    @profile ? @profile.ai_spend_entries.where(operation: OwnerAi::Composer::VERSION, status: "settled") :
+      AiSpendEntry.none
+  end
 
   def require_owner!
     redirect_to sign_in_path, alert: t("owner_setup.owner_only") unless owner_signed_in?
