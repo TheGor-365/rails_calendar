@@ -42,6 +42,8 @@ Rails.application.routes.draw do
   # RC055.1f: owner-only, consented and reviewable AI draft generator.
   get "/workspace/assistant", to: "owner_ai_assistant#show", as: :owner_ai_assistant
   post "/workspace/assistant/drafts", to: "owner_ai_assistant#create", as: :create_owner_ai_draft
+  post "/workspace/assistant/navigate", to: "owner_ai_assistant#navigate", as: :navigate_owner_ai
+  post "/workspace/assistant/drafts/:entry_id/apply", to: "owner_ai_assistant#apply", as: :apply_owner_ai_draft
 
   # RC055.1: private owner-controlled service offering revisions.
   get "/workspace/services", to: "owner_service_offerings#index", as: :owner_services
