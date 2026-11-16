@@ -22,6 +22,11 @@
       <% if owner_signed_in? %>
         <%= link_to rc_icon_label("grid-1x2", t("nav.workspace")), workspace_path, class: "rc-nav-link #{'active' if request.path == workspace_path}" %>
         <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-nav-link #{'active' if request.path == owner_cabinet_path || controller_path == 'owner_setup'}" %>
+        <%= link_to owner_ai_assistant_path,
+                    class: "rc-nav-link wa-ai-nav-entry #{'active' if request.path == owner_ai_assistant_path}",
+                    aria: { current: ("page" if request.path == owner_ai_assistant_path) } do %>
+          <%= rc_icon_label("stars", t("owner_ai_assistant.nav_label")) %>
+        <% end %>
       <% end %>
       <%= link_to root_path,
                   class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",
@@ -56,6 +61,14 @@
 
     <div class="ms-auto d-flex align-items-center gap-2">
       <%= render "shared/locale_switcher" %>
+      <% if owner_signed_in? %>
+        <%= link_to owner_ai_assistant_path,
+                    class: "rc-action rc-action--soft wa-ai-header-shortcut",
+                    aria: { label: t("owner_ai_assistant.nav_label"),
+                            current: ("page" if request.path == owner_ai_assistant_path) } do %>
+          <%= rc_icon_label("stars", t("owner_ai_assistant.mobile_nav_label")) %>
+        <% end %>
+      <% end %>
       <%= link_to services_path, class: "ws-header-services", aria: { label: t("nav.open_services") } do %>
         <%= rc_icon_label("grid-1x2", t("nav.services")) %>
       <% end %>
