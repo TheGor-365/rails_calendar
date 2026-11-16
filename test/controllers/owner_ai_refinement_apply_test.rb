@@ -56,6 +56,8 @@ class OwnerAiRefinementApplyTest < ActionDispatch::IntegrationTest
     assert_equal "services", OwnerAi::Navigator.resolve("мне нужны мои услуги")
     assert_equal "services", OwnerAi::Navigator.resolve("серв")
     assert_equal "services", OwnerAi::Navigator.resolve("покажи мне каталог услуг")
+    assert_equal "assistant", OwnerAi::Navigator.resolve("AI Workspace")
+    assert_equal "assistant", OwnerAi::Navigator.resolve("ИИ студия")
     assert_equal "cabinet", OwnerAi::Navigator.resolve("кабин")
     assert_equal "practice", OwnerAi::Navigator.resolve("практика")
     assert_equal "calendar", OwnerAi::Navigator.resolve("кален")
