@@ -56,3 +56,11 @@ A new guarded operator script `script/rc0551f_c21_backup_and_verify.sh` is now p
 - The script does not include Rails secret keys, active credentials, or external object stores and cannot certify full disaster recovery unless those independently retained keys and any other private storage backends are covered. A local restored SQL+storage copy is necessary but not sufficient proof of app-level recovery.
 
 **Actual backup and isolated restoration have NOT yet been run by the user. C2.1 migrations remain BLOCKED.**
+
+
+## 8. Owner's real backup attempt: PG archive version mismatch (17.11.2026)
+Owner confirmed that Puma PID 26428 was the Rails Calendar preview on 127.0.0.1:3012, gracefully stopped it with TERM, and `ss` and the Sidekiq/Solid Queue/Resque/delayed-job scan returned no matching active process. First real backup run (PR #76 at `b33df3d`) passed read-only PG16.11/socket/table/storage preflight, created a new owner-private directory, and **stopped after pg_dump but before media tar or SQL restore** with `pg_restore: error: unsupported version (1.16) in file header`. A preliminary archive exists but is NOT validated or approved. Do not delete/overwrite this partial archive, do not upload it, and do not mark migration gate PASS.
+
+Source-backed root cause: pg_dump custom archive version 1.16 is written by PostgreSQL 17+ clients; pg_restore PostgreSQL 16 expects up to archive 1.15. Debian/Ubuntu `pg_wrapper` can select a newer pg_dump when `-h /var/run/postgresql` is passed, even if `pg_dump --version` without a host appeared to be 16; `pg_restore -l` can use the local PG16 cluster's older restore utility. **Resolution:** both the diagnostic and backup scripts now call `/usr/lib/postgresql/16/bin/{pg_dump,pg_restore,psql,createdb}` via the fixed `PG_BIN` directory, validating actual pinned version 16 before any archival write. Exact-shell regression tests enforce both the binary paths and the prior production/consent refusals.
+
+This edit does not itself create a backup or restore. Next owner reruns only after the exact new HEAD CI is green, preserving the already stopped Rails and worker processes. Another run allocates a separate timestamped private archive. Do not bypass any guard or manually delete the first partial archive. Confirm final `PASS: isolated database RESTORE` and `PASS: MEDIA ARCHIVE` before C2.1 migrations.
