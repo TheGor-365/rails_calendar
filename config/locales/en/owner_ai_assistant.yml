@@ -70,3 +70,6 @@ en:
     navigate_button: "Navigate"
     navigate_hint: "Free; only allowed owner pages."
     unknown_destination: "I could not match a safe page. Try “open services” or “open cabinet”."
+    context_action: "Draft copy with AI"
+    context_selected: "Selected service: %{title}. You enter the task; existing service content is not sent automatically."
+    refine_consent: "I consent to sending the new task, the previous AI-generated draft and approved public profile facts to Grok for one billable refinement (up to $0.10 reserved)."
