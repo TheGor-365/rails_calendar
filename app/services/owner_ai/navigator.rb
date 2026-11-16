@@ -206,6 +206,10 @@ module OwnerAi
             160
           elsif phrase.length == 2 && words.include?(phrase)
             92
+          elsif phrase.length == 2 && words.length == 1 && candidate.start_with?(phrase)
+            90
+          elsif phrase.length == 2 && words.any? { |word| word.start_with?(phrase) }
+            74
           elsif candidate.start_with?(phrase) && phrase.length >= 3 &&
               (words.length == 1 || query_words.length >= 2)
             135
