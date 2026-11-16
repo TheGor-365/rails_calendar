@@ -4,6 +4,9 @@ class OwnerAiAssistantController < ApplicationController
 
   def show
     @operation = OwnerAi::OperationRegistry.fetch(params[:operation]) ? params[:operation] : "service_copy"
+    @navigation_result = if params[:nav_query].is_a?(String) && params[:nav_query].present?
+      OwnerAi::Navigator.search(params[:nav_query], workspace: @workspace, admin: admin_signed_in?)
+    end
     @entry = owner_entries.find_by(id: params[:entry_id]) if params[:entry_id].present?
     @thread = []
     if @entry
@@ -67,24 +70,17 @@ class OwnerAiAssistantController < ApplicationController
   end
 
   def navigate
-    destination = OwnerAi::Navigator.resolve(params[:command])
-    routes = {
-      "workspace" => workspace_path,
-      "cabinet" => owner_cabinet_path,
-      "services" => owner_services_path,
-      "catalogue_ai" => owner_catalogue_ai_path,
-      "capabilities" => owner_capabilities_path,
-      "interview" => owner_setup_path,
-      "spending" => owner_ai_activity_path,
-      "assistant" => owner_ai_assistant_path,
-      "calendar" => root_path,
-      "today" => calendar_day_path(date: Time.zone.today.iso8601),
-      "consultations" => consultations_path
-    }.freeze
-    if destination && routes.key?(destination)
-      redirect_to routes.fetch(destination)
+    query = params[:command].is_a?(String) ? params[:command].strip : ""
+    result = OwnerAi::Navigator.search(query, workspace: @workspace, admin: admin_signed_in?)
+    case result.status
+    when :match
+      redirect_to result.target.path
+    when :ambiguous
+      redirect_to owner_ai_assistant_path(nav_query: query),
+                  notice: t("owner_ai_assistant.navigation_choose")
     else
-      redirect_to owner_ai_assistant_path, alert: t("owner_ai_assistant.unknown_destination")
+      redirect_to owner_ai_assistant_path(nav_query: query),
+                  alert: t("owner_ai_assistant.unknown_destination")
     end
   end
 
