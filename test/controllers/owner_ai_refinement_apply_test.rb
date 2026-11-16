@@ -82,7 +82,7 @@ class OwnerAiRefinementApplyTest < ActionDispatch::IntegrationTest
       post navigate_owner_ai_path, params: { command: "новая услуга" }
       assert_redirected_to new_owner_service_path
       post navigate_owner_ai_path, params: { command: "https://evil.example" }
-      assert_redirected_to owner_ai_assistant_path(nav_query: "https://evil.example")
+      assert_redirected_to owner_ai_assistant_path
     end
   end
 
