@@ -20,6 +20,12 @@ if env -u RAILS_ENV DATABASE_URL='postgresql://example.invalid/prod' bash "$targ
 fi
 grep -q 'STOP: DATABASE_URL is set' "$tmp/url.out"
 
+# --version via pg_wrapper may differ from actual pg_dump -h invocation;
+# pin directly to the PG16 bin directory even for this read-only preflight.
+grep -Fq 'PG_BIN="/usr/lib/postgresql/16/bin"' "$target"
+grep -Fq '"$PG_BIN/$cmd" --version' "$target"
+grep -Fq '"$PG_BIN/psql" -X' "$target"
+
 # Structural prohibition. Psql read-only queries are deliberate.
 if grep -Eq '^[[:space:]]*(createdb|dropdb|pg_dump[[:space:]]+.*-f|pg_restore[[:space:]]+.*-d|bin/rails[[:space:]]+db:)' "$target"; then
   echo 'FAIL: unexpected backup/migration or restore command in read-only preflight.' >&2
