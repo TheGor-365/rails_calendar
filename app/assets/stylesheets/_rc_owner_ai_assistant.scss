@@ -294,6 +294,30 @@
 .wa-ai-page__wayfinder-link--external .bi { color: var(--ws-teal); }
 .wa-ai-page :is(#wa-ai-compose-heading,#owner-ai-knowledge,#owner-ai-draft-library) { scroll-margin-top: 1.5rem; }
 
+/* First-screen composition follows the same editorial system, not default form cards. */
+.wa-ai-page__compose {
+  position: relative; overflow: hidden;
+  background: linear-gradient(178deg, var(--ws-paper) 55%, var(--ws-canvas) 100%);
+  border-radius: 20px;
+}
+.wa-ai-page__compose::before {
+  content: ""; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--ws-teal) 0%, var(--ws-teal-wash) 82%);
+  pointer-events: none;
+}
+.wa-ai-page__scope {
+  background: var(--ws-canvas); border-radius: 20px;
+}
+.wa-ai-page__form .rc-field { min-width: 0; }
+.wa-ai-page__form .rc-input { border-radius: 12px; }
+.wa-ai-page__form textarea { line-height: 1.6; }
+.wa-ai-page__result { border-radius: 20px; }
+.wa-ai-draft-library { border-radius: 20px; }
+.wa-ai-draft-library__item {
+  border-radius: 15px; background: linear-gradient(155deg, var(--ws-paper), var(--ws-canvas));
+}
+.wa-ai-draft-library__item:focus-within { border-color: var(--ws-teal); }
+
 /* Asymmetric knowledge editorial board: one leading source, two reviews, one locked rail. */
 .wa-ai-knowledge {
   padding: clamp(1rem, 2.8vw, 1.75rem);
