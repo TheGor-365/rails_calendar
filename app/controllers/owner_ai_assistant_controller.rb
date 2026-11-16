@@ -71,6 +71,9 @@ class OwnerAiAssistantController < ApplicationController
 
   def navigate
     query = params[:command].is_a?(String) ? params[:command].strip : ""
+    if query.blank? || query.length > 120 || query.match?(%r{https?://|www\.|[/\\]|[<>]}i)
+      return redirect_to owner_ai_assistant_path, alert: t("owner_ai_assistant.unknown_destination")
+    end
     result = OwnerAi::Navigator.search(query, workspace: @workspace, admin: admin_signed_in?)
     case result.status
     when :match
