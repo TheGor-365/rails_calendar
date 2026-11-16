@@ -41,3 +41,18 @@ Only after the preflight confirms exact DB identity and the application is **sto
 1. Verify current C2b at mobile 390/320 and inspect floating AI panel without running a paid request; desktop three screenshots already show the new hero, board, and empty history.
 2. Check out this read-only-preflight PR after CI green; run `git status -sb`, `bash script/rc0551f_c21_backup_preflight.sh`; share only sanitized diagnostic status/summary, no secrets/media.
 3. If PASS, perform consistent new SQL+storage snapshot and isolated restore. Do not migrate yet.
+
+
+## 7. Verified owner preflight and operator-controlled backup script (17.11.2026)
+**Real owner terminal evidence:** local exact PR76 predecessor `454f96b` on clean branch, `bash script/rc0551f_c21_backup_preflight.sh` **PASS**. Exact DB `rails_calendar_mvp_preview_20261112`, role `gor`, PG16.11 (Ubuntu 24.04), local Unix socket, 27,504,044 KB disk free in home, 11 private storage files / 16,600,239 bytes. SQL row counts: users 2; workspaces 1; professional_profiles 1; project_intakes 2; service_offerings 9; service_offering_versions 9; ai_spend_entries 3; active_storage_blobs 10; active_storage_attachments 10. No archive nor restore existed at this time.
+
+A new guarded operator script `script/rc0551f_c21_backup_and_verify.sh` is now part of the same Draft PR:
+- **Precondition:** owner personally stops preview Puma/Rails at TCP 3012 and all associated background workers/other writers; no file uploads/AI. Script checks listener and PG active sessions before snapshot. Never runs it automatically.
+- It requires explicit `RC_CONFIRM_WRITERS_STOPPED=YES RC_CONFIRM_ISOLATED_RESTORE=YES`, development Rails env, NO `DATABASE_URL`, exact PG16 local socket and preview DB, owner role with `CREATEDB`, no storage symlinks, sufficient space.
+- Creates NEW owner-private mode 0700 timestamped path under `$HOME/.local/share/rails-calendar/backups`. PG16 `pg_dump -Fc`, tar entire local `storage/`, sha256 digests, isolated private file extraction and byte comparison. Creates NEW uniquely named scratch database, `pg_restore --exit-on-error`, and checks all nine domain-table row counts. Preserves both archive and scratch DB even on failure; no overwrite/drop/delete/cleanup. Existing preview DB and storage are never the write target.
+- **Operator invocation only after exact HEAD CI success:**
+  `RC_CONFIRM_WRITERS_STOPPED=YES RC_CONFIRM_ISOLATED_RESTORE=YES bash script/rc0551f_c21_backup_and_verify.sh`.
+  On any `STOP`, do not bypass the guard; report sanitized error (not private paths/file names). If it succeeds, store checksum + archive manifest privately and restart preview only after snapshot completes.
+- The script does not include Rails secret keys, active credentials, or external object stores and cannot certify full disaster recovery unless those independently retained keys and any other private storage backends are covered. A local restored SQL+storage copy is necessary but not sufficient proof of app-level recovery.
+
+**Actual backup and isolated restoration have NOT yet been run by the user. C2.1 migrations remain BLOCKED.**
