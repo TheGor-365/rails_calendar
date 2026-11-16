@@ -123,4 +123,23 @@
   .wa-ai-conversation__turn { padding: .8rem; }
 }
 
+
+/* RC055.1f-B: role-scoped navigational suggestions, not a generic modal. */
+.wa-ai-nav-results {
+  margin: 0 0 1rem;
+  padding: clamp(1rem, 2.4vw, 1.5rem);
+  border: 1px solid var(--ws-border);
+  border-radius: 18px;
+  box-shadow: var(--ws-shadow);
+  min-width: 0;
+}
+.wa-ai-nav-results__form { display: grid; gap: .4rem; }
+.wa-ai-nav-results__input { display: flex; flex-wrap: wrap; gap: .5rem; }
+.wa-ai-nav-results__input .rc-input { min-width: 160px; flex: 1 1 200px; }
+.wa-ai-nav-results__links { display: flex; flex-wrap: wrap; gap: .5rem; }
+.wa-ai-nav-results__link { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 359.98px) {
+  .wa-ai-nav-results__input > * { width: 100%; }
+}
+
 @media print { .wa-ai-dock { display: none !important; } }
