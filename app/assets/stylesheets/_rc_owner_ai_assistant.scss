@@ -426,7 +426,8 @@
 }
 @media (max-width: 767.98px) {
   .app-nav .wa-ai-header-shortcut {
-    display: inline-flex; min-height: 42px; padding: .5rem .65rem;
+    display: inline-flex; margin-left: auto; flex: 0 0 auto;
+    min-height: 44px; padding: .5rem .65rem;
     color: var(--ws-teal-deep); border-color: var(--ws-border);
     background: var(--ws-teal-wash); font-size: .76rem;
   }
