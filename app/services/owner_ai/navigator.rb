@@ -111,6 +111,7 @@ module OwnerAi
       отведи веди меня пожалуйста хочу хочу_на нужно хочу_в
       зайди зайти запусти запустить иди по покажи_мне
       мне мой мою мои мое этот эту это страницу страница раздел раздела
+      в во на к ко по для с со о об из и или где там тут нужно нужны надо хочу
       вкладку вкладка здесь туда где находится веди
       open show go goto take please me my the to a an page screen
       find navigate view display access abrir abre ir mostrar pagina página
@@ -203,6 +204,8 @@ module OwnerAi
 
           if candidate == phrase
             160
+          elsif phrase.length == 2 && words.include?(phrase)
+            92
           elsif candidate.start_with?(phrase) && phrase.length >= 3 &&
               (words.length == 1 || query_words.length >= 2)
             135
