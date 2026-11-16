@@ -6,6 +6,11 @@
     <div class="wa-services__actions">
       <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path,
             class: "rc-action rc-action--soft" %>
+      <% if @draft %>
+        <%= link_to rc_icon_label("pencil-square", t("owner_ai_assistant.context_action")),
+                    owner_ai_assistant_path(operation: "service_copy", offering_id: @offering.id),
+                    class: "rc-action rc-action--soft" %>
+      <% end %>
       <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path, class: "rc-action rc-action--quiet" %>
     </div>
   </header>
