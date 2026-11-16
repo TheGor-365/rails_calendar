@@ -19,3 +19,11 @@ Owner inspected `/workspace/assistant` desktop and mobile in Chromium. Desktop l
 
 ## Production / release gates
 Draft #72 remains unmerged; no Railway deployment. Require exact-HEAD Rails+Chrome+Security success, local bundle/yarn build, owner screenshots at desktop 1440 and mobile 390/320, privacy/ACL/expense review. Later migrations require DB + Active Storage snapshot backup/restore and explicit owner approval.
+
+## Navigation UX correction — owner screenshot 16.11.2026
+- **Reported failure:** typing the bare word `услуги` into floating assistant quick navigation returned the red warning asking to type `открой услуги`. Owner requires short words, fragments, synonyms, natural phrases, and access to every authorized page without memorizing commands.
+- **New free deterministic implementation:** the owner page index covers workspace, cabinet/profile, private services, new service, AI audit, practice, capabilities, interview and review, AI spending, assistant, calendar/month, day/hour, consultations/new, public service showcase, and admin inbox only when independently admin-authorized. Current owner-owned service detail pages are additionally indexed by title/key/id, never other tenants' services. Route helpers are explicit safe GET destinations.
+- Normalize Unicode, case, punctuation and ё/е; ignore conversational fillers; rank exact matches above word prefixes, interior fragments, known synonyms, and bounded one/two-character typo distances. Works for `услуги`, `услуг`, `усл`, `ус`, `слуг`, `серв`, `кабин`, `кален`, `мои услуги` and `мне нужны мои услуги`. Two-letter `ИИ` yields explicit choices rather than guessing.
+- If matching several owned services or pages, redirect to a private, accessible White Atlas search-results panel with clickable authorized destinations. No arbitrary URL, no model tools or requests, no new DB data/migrations and zero AI spend. Revalidate account ownership on each POST/GET.
+- Keep floating panel's structure and scoped White Atlas responsive layout. Change placeholder to show short words rather than a fixed imperative command, with RU/EN/HY/ES labels.
+- **Status:** code committed to Draft PR #72; exact HEAD CI and mobile visual acceptance required. Existing owner client screenshots showed previous behavior, so no claim the update is already on their local browser.
