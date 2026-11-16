@@ -21,7 +21,7 @@ fi
 grep -q 'STOP: DATABASE_URL is set' "$tmp/url.out"
 
 # Structural prohibition. Psql read-only queries are deliberate.
-if grep -Eq '(^|[[:space:]])(createdb|dropdb|pg_dump[[:space:]]+.*-f|pg_restore[[:space:]]+.*-d|bin/rails[[:space:]]+db:)' "$target"; then
+if grep -Eq '^[[:space:]]*(createdb|dropdb|pg_dump[[:space:]]+.*-f|pg_restore[[:space:]]+.*-d|bin/rails[[:space:]]+db:)' "$target"; then
   echo 'FAIL: unexpected backup/migration or restore command in read-only preflight.' >&2
   exit 1
 fi
