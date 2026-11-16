@@ -189,7 +189,8 @@ module OwnerAi
 
       def normalize(value)
         text = value.is_a?(String) ? value : ""
-        text.unicode_normalize(:nfkd).gsub(/\p{Mn}/, "").downcase.tr("ё", "е")
+        # NFKC keeps Cyrillic й (unlike NFKD + dropping all combining marks).
+        text.unicode_normalize(:nfkc).downcase.tr("ёáéíóúüñ", "еaeiouun")
           .gsub(/[^\p{L}\p{N}]+/u, " ").strip.gsub(/\s+/, " ")
       end
 
