@@ -32,6 +32,17 @@
         <%= rc_icon_label("stars", t("owner_ai_assistant.generate")) %>
       <% end %>
     <% end %>
+    <%= form_with url: navigate_owner_ai_path, method: :post, class: "wa-ai-dock__navigation" do %>
+      <div class="rc-field">
+        <%= label_tag "wa-dock-command", t("owner_ai_assistant.navigate_label"), class: "rc-field-label" %>
+        <%= text_field_tag :command, nil, id: "wa-dock-command", class: "rc-input",
+              maxlength: 120, required: true, placeholder: t("owner_ai_assistant.navigate_placeholder") %>
+      </div>
+      <%= button_tag type: "submit", class: "rc-action rc-action--quiet rc-action--small" do %>
+        <%= rc_icon_label("signpost-split", t("owner_ai_assistant.navigate_button")) %>
+      <% end %>
+      <small><%= t("owner_ai_assistant.navigate_hint") %></small>
+    <% end %>
     <nav class="wa-ai-dock__links" aria-label="<%= t("owner_ai_assistant.navigation") %>">
       <%= link_to t("owner_ai_assistant.full_page"), owner_ai_assistant_path %>
       <%= link_to t("owner_ai_assistant.open_services"), owner_services_path %>
