@@ -76,7 +76,10 @@ class OwnerAiAssistantController < ApplicationController
       "capabilities" => owner_capabilities_path,
       "interview" => owner_setup_path,
       "spending" => owner_ai_activity_path,
-      "assistant" => owner_ai_assistant_path
+      "assistant" => owner_ai_assistant_path,
+      "calendar" => root_path,
+      "today" => calendar_day_path(date: Time.zone.today.iso8601),
+      "consultations" => consultations_path
     }.freeze
     if destination && routes.key?(destination)
       redirect_to routes.fetch(destination)
