@@ -31,12 +31,16 @@ if env -u RAILS_ENV DATABASE_URL='postgresql://invalid.example/production' RC_CO
 fi
 grep -Fq 'DATABASE_URL is set' "$tmp/database_url"
 
+# Regression: Ubuntu pg_wrapper must not select PG17+ pg_dump with a PG16 restore.
+grep -Fq 'PG_BIN="/usr/lib/postgresql/16/bin"' "$SCRIPT"
+grep -Fq '"$PG_BIN/pg_restore" -l "$backup/preview.pgcustom"' "$SCRIPT"
+grep -Fq '"$PG_BIN/psql" -X' "$SCRIPT"
 # Structural invariants for this small operator tool.
-grep -Fq 'pg_dump -w -Fc' "$SCRIPT"
-grep -Fq 'pg_restore -w --exit-on-error --no-owner --no-acl' "$SCRIPT"
+grep -Fq '"$PG_BIN/pg_dump" -w -Fc' "$SCRIPT"
+grep -Fq '"$PG_BIN/pg_restore" -w --exit-on-error --no-owner --no-acl' "$SCRIPT"
 grep -Fq 'diff -qr "$ROOT/storage" "$backup/restored_storage/storage"' "$SCRIPT"
 grep -Fq 'sha256sum -c SHA256SUMS' "$SCRIPT"
-grep -Fq 'createdb -w -h "$SOCKET" -p "$PORT" -U "$ROLE" -T template0 "$restore_db"' "$SCRIPT"
+grep -Fq '"$PG_BIN/createdb" -w -h "$SOCKET" -p "$PORT" -U "$ROLE" -T template0 "$restore_db"' "$SCRIPT"
 if grep -Eq '(^|[[:space:]])(dropdb|rm[[:space:]]+-rf[[:space:]]+["$]|db:reset|db:drop|--clean)' "$SCRIPT"; then
   echo 'FAIL: destructive database/file action in archive script' >&2
   exit 1
