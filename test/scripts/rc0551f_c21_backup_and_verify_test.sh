@@ -13,7 +13,7 @@ if env -u RC_CONFIRM_WRITERS_STOPPED -u RC_CONFIRM_ISOLATED_RESTORE bash "$SCRIP
 fi
 grep -Fq 'RC_CONFIRM_WRITERS_STOPPED=YES' "$tmp/unconfirmed"
 
-if env RC_CONFIRM_WRITERS_STOPPED=YES -u RC_CONFIRM_ISOLATED_RESTORE bash "$SCRIPT" >"$tmp/restore" 2>&1; then
+if env -u RC_CONFIRM_ISOLATED_RESTORE RC_CONFIRM_WRITERS_STOPPED=YES bash "$SCRIPT" >"$tmp/restore" 2>&1; then
   echo 'FAIL: archive must require isolated restore confirmation' >&2
   exit 1
 fi
