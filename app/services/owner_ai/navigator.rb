@@ -64,7 +64,8 @@ module OwnerAi
       "assistant" => {
         path: :owner_ai_assistant_path,
         aliases: ["помощник", "ии помощник", "ассистент", "чат", "ии чат", "генератор", "генерация текстов",
-                  "assistant", "ai assistant", "copilot", "chat", "asistente", "օգնական"]
+                  "assistant", "ai assistant", "ai workspace", "ии студия", "студия ии", "центр ии", "рабочая область ии",
+                  "copilot", "chat", "asistente", "օգնական"]
       },
       "calendar" => {
         path: :root_path,
