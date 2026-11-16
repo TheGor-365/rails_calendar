@@ -55,9 +55,9 @@ required_bytes="$((4 * db_bytes + 3 * storage_bytes + 268435456))"
 [[ "$free_bytes" -ge "$required_bytes" ]] || die "Not enough free space for dump, media, and isolated restore."
 
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
-backup="$(mktemp -d "$backup_root/rc0551f_c21_{stamp}_XXXXXXXX")"
+backup="$(mktemp -d "$backup_root/rc0551f_c21_${stamp}_XXXXXXXX")"
 chmod 700 "$backup"
-restore_db="rails_calendar_rc0551f_c21_restore_{stamp}_$RANDOM"
+restore_db="rails_calendar_rc0551f_c21_restore_${stamp}_$RANDOM"
 printf 'Backup directory created under owner-private local backups.\n'
 
 pg_dump -w -Fc --no-owner --no-acl \
