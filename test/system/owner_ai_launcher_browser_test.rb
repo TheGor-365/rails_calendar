@@ -46,4 +46,31 @@ class OwnerAiLauncherBrowserTest < ApplicationSystemTestCase
   ensure
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
+  test "bare service stem navigates from floating owner panel without AI consent or model call" do
+    owner = make_test_owner("ai-navigation-stem-browser@example.test")
+    approved_profile_for(owner)
+    visit sign_in_path
+    fill_in "Email address", with: owner.email
+    fill_in "Password", with: PASSWORD
+    click_button "Sign in"
+    assert_current_path workspace_path
+
+    visit owner_ai_assistant_path
+    find("#owner-ai-dock summary").click
+    within(".wa-ai-dock__navigation") do
+      fill_in "wa-dock-command", with: "услуг"
+      click_button "Navigate"
+    end
+    assert_current_path owner_services_path
+    assert_selector "#owner-services"
+
+    find("#owner-ai-dock summary").click
+    within(".wa-ai-dock__navigation") do
+      fill_in "wa-dock-command", with: "кабин"
+      click_button "Navigate"
+    end
+    assert_current_path owner_cabinet_path
+  end
+
+
 end

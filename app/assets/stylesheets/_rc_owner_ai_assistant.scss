@@ -80,4 +80,66 @@
   .wa-ai-dock__panel { width: min(350px, calc(100vw - 1.4rem)); max-height: min(68dvh, 520px); }
   .wa-ai-page .rc-action { white-space: normal; }
 }
+
+// RC055.1f Slice B: conversation revision, free navigation, reviewed single-field apply.
+// Extend existing White Atlas surfaces only. No global typography/element overrides.
+.wa-ai-dock__navigation {
+  display: grid; gap: .45rem; border-top: 1px solid var(--ws-border);
+  padding-top: .75rem; min-width: 0;
+}
+.wa-ai-dock__navigation .rc-field { margin: 0; min-width: 0; }
+.wa-ai-dock__navigation .rc-input { width: 100%; font-size: .84rem; }
+.wa-ai-dock__navigation .rc-action { width: fit-content; min-height: 39px; }
+.wa-ai-dock__navigation small { font-size: .71rem; color: var(--ws-muted); line-height: 1.45; }
+.wa-ai-conversation__history { display: grid; gap: .7rem; margin: .85rem 0 1.1rem; }
+.wa-ai-conversation__turn {
+  min-width: 0; padding: .85rem 1rem; border: 1px solid var(--ws-border);
+  border-radius: 15px; background: var(--ws-canvas);
+}
+.wa-ai-conversation__turn:last-child { border-color: #bddfd4; background: #f7fcfa; }
+.wa-ai-conversation__turn .wa-ai-page__draft { margin: .5rem 0 0; font-size: .86rem; }
+.wa-ai-conversation__turn h3 { margin: .65rem 0 .4rem; }
+.wa-ai-conversation__form { margin-top: 1rem; }
+.wa-ai-conversation__form .rc-field { margin-bottom: .7rem; }
+.wa-ai-conversation__form .rc-action { margin-top: .75rem; min-height: 43px; }
+.wa-ai-apply__picker { display: flex; align-items: flex-end; flex-wrap: wrap; gap: .8rem; margin: 1rem 0; }
+.wa-ai-apply__picker .rc-field { flex: 1 1 240px; margin: 0; }
+.wa-ai-apply__picker .rc-input { width: 100%; }
+.wa-ai-apply__picker .rc-action { min-height: 43px; }
+.wa-ai-apply__comparison { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .85rem; margin: 1rem 0; }
+.wa-ai-apply__comparison > div {
+  min-width: 0; padding: 1rem; border: 1px solid var(--ws-border); border-radius: 14px;
+  background: #f8fbfa;
+}
+.wa-ai-apply__comparison > div:last-child { background: var(--ws-teal-wash); }
+.wa-ai-apply__comparison h3 { margin: 0 0 .6rem; font-size: .83rem; }
+.wa-ai-apply__comparison p { margin: 0; font-size: .88rem; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.wa-ai-apply__form .rc-field { margin: 1rem 0; }
+.wa-ai-apply__form textarea { min-height: 140px; }
+.wa-ai-apply__form .rc-action { margin-top: .75rem; min-height: 43px; }
+@media (max-width: 575.98px) {
+  .wa-ai-apply__comparison { grid-template-columns: minmax(0,1fr); }
+  .wa-ai-apply__picker .rc-action { width: 100%; }
+  .wa-ai-conversation__turn { padding: .8rem; }
+}
+
+
+/* RC055.1f-B: role-scoped navigational suggestions, not a generic modal. */
+.wa-ai-nav-results {
+  margin: 0 0 1rem;
+  padding: clamp(1rem, 2.4vw, 1.5rem);
+  border: 1px solid var(--ws-border);
+  border-radius: 18px;
+  box-shadow: var(--ws-shadow);
+  min-width: 0;
+}
+.wa-ai-nav-results__form { display: grid; gap: .4rem; }
+.wa-ai-nav-results__input { display: flex; flex-wrap: wrap; gap: .5rem; }
+.wa-ai-nav-results__input .rc-input { min-width: 160px; flex: 1 1 200px; }
+.wa-ai-nav-results__links { display: flex; flex-wrap: wrap; gap: .5rem; }
+.wa-ai-nav-results__link { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 359.98px) {
+  .wa-ai-nav-results__input > * { width: 100%; }
+}
+
 @media print { .wa-ai-dock { display: none !important; } }

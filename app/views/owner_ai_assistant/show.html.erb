@@ -9,6 +9,41 @@
                 owner_cabinet_path, class: "rc-action rc-action--quiet" %>
   </header>
 
+  <% if @navigation_result %>
+    <section class="surface-panel wa-ai-nav-results" aria-labelledby="wa-ai-nav-heading">
+      <div class="wa-ai-page__heading">
+        <span class="wa-ai-page__icon"><i class="bi bi-signpost-split" aria-hidden="true"></i></span>
+        <div>
+          <p class="eyebrow"><%= t("owner_ai_assistant.navigate_label") %></p>
+          <h2 id="wa-ai-nav-heading"><%= @navigation_result.status == :not_found ?
+                t("owner_ai_assistant.navigation_no_matches") : t("owner_ai_assistant.navigation_results") %></h2>
+        </div>
+      </div>
+      <%= form_with url: navigate_owner_ai_path, method: :post, class: "wa-ai-nav-results__form" do %>
+        <%= label_tag "wa-ai-nav-query", t("owner_ai_assistant.navigate_label"), class: "rc-field-label" %>
+        <div class="wa-ai-nav-results__input">
+          <%= text_field_tag :command, params[:nav_query], id: "wa-ai-nav-query", class: "rc-input",
+                maxlength: 120, required: true, placeholder: t("owner_ai_assistant.navigate_placeholder") %>
+          <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+            <%= rc_icon_label("search", t("owner_ai_assistant.navigation_search")) %>
+          <% end %>
+        </div>
+      <% end %>
+      <% if @navigation_result.candidates.any? %>
+        <p class="rc-hint"><%= t("owner_ai_assistant.navigation_select_hint") %></p>
+        <nav class="wa-ai-nav-results__links" aria-label="<%= t("owner_ai_assistant.navigation_results") %>">
+          <% @navigation_result.candidates.each do |page| %>
+            <%= link_to page.path, class: "rc-action rc-action--quiet wa-ai-nav-results__link" do %>
+              <%= rc_icon_label("arrow-up-right", page.label) %>
+            <% end %>
+          <% end %>
+        </nav>
+      <% else %>
+        <p class="rc-hint"><%= t("owner_ai_assistant.navigation_examples") %></p>
+      <% end %>
+    </section>
+  <% end %>
+
   <div class="wa-ai-page__layout">
     <section class="surface-panel wa-ai-page__compose" aria-labelledby="wa-ai-compose-heading">
       <div class="wa-ai-page__heading">
@@ -20,6 +55,10 @@
       </div>
       <% if @ai_enabled && @profile&.approved_snapshot && @profile.onboarding_state == "approved" %>
         <%= form_with url: create_owner_ai_draft_path, method: :post, class: "rc-form wa-ai-page__form" do %>
+          <% if @context_offering %>
+            <%= hidden_field_tag :offering_id, @context_offering.id %>
+            <p class="rc-hint wa-ai-page__context"><%= t("owner_ai_assistant.context_selected", title: @context_offering.draft_version.title) %></p>
+          <% end %>
           <div class="rc-field">
             <%= label_tag "wa-ai-operation", t("owner_ai_assistant.operation"), class: "rc-field-label" %>
             <%= select_tag :operation, options_for_select(OwnerAi::OperationRegistry.keys.map { |key|
@@ -97,4 +136,108 @@
       </div>
     <% end %>
   </section>
+  <% if @entry %>
+    <section class="surface-panel wa-ai-page__result wa-ai-conversation" aria-labelledby="wa-ai-dialog-heading">
+      <div class="wa-ai-page__heading">
+        <span class="wa-ai-page__icon"><i class="bi bi-chat-square-text" aria-hidden="true"></i></span>
+        <div>
+          <p class="eyebrow"><%= t("owner_ai_assistant.dialogue_step") %></p>
+          <h2 id="wa-ai-dialog-heading"><%= t("owner_ai_assistant.dialogue_title") %></h2>
+        </div>
+      </div>
+      <p class="rc-muted"><%= t("owner_ai_assistant.dialogue_help") %></p>
+      <div class="wa-ai-conversation__history">
+        <% @thread.each_with_index do |turn, index| %>
+          <article class="wa-ai-conversation__turn">
+            <span class="wa-ai-page__status"><%= t("owner_ai_assistant.turn_number", number: index + 1) %></span>
+            <h3><%= turn.result["heading"] %></h3>
+            <p class="wa-ai-page__draft"><%= turn.result["draft"] %></p>
+          </article>
+        <% end %>
+      </div>
+      <% if @entry.result.fetch("turn", 1).to_i < 4 && @ai_enabled %>
+        <%= form_with url: create_owner_ai_draft_path, method: :post, class: "rc-form wa-ai-conversation__form" do %>
+          <%= hidden_field_tag :operation, @entry.result["purpose"] %>
+          <%= hidden_field_tag :parent_entry_id, @entry.id %>
+          <div class="rc-field">
+            <%= label_tag "wa-ai-refinement", t("owner_ai_assistant.refine_label"), class: "rc-field-label" %>
+            <%= text_area_tag :brief, nil, id: "wa-ai-refinement", class: "rc-input rc-input--area", minlength: 12,
+                  maxlength: 1200, rows: 3, required: true,
+                  placeholder: t("owner_ai_assistant.refine_placeholder") %>
+          </div>
+          <label class="wa-ai-page__consent">
+            <%= check_box_tag :paid_consent, "1", false, required: true %>
+            <span><%= t("owner_ai_assistant.refine_consent") %></span>
+          </label>
+          <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+            <%= rc_icon_label("arrow-repeat", t("owner_ai_assistant.refine_button")) %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <p class="rc-hint"><%= t("owner_ai_assistant.refine_limit") %></p>
+      <% end %>
+    </section>
+  <% end %>
+
+  <% if @entry && @entry.result["purpose"] == "service_copy" %>
+    <section class="surface-panel wa-ai-page__result wa-ai-apply" aria-labelledby="wa-ai-apply-heading">
+      <div class="wa-ai-page__heading">
+        <span class="wa-ai-page__icon"><i class="bi bi-intersect" aria-hidden="true"></i></span>
+        <div>
+          <p class="eyebrow"><%= t("owner_ai_assistant.apply_step") %></p>
+          <h2 id="wa-ai-apply-heading"><%= t("owner_ai_assistant.apply_title") %></h2>
+        </div>
+      </div>
+      <p class="rc-muted"><%= t("owner_ai_assistant.apply_help") %></p>
+      <% if @draft_offerings.any? %>
+        <%= form_with url: owner_ai_assistant_path, method: :get, class: "wa-ai-apply__picker" do %>
+          <%= hidden_field_tag :entry_id, @entry.id %>
+          <div class="rc-field">
+            <%= label_tag "wa-ai-offering", t("owner_ai_assistant.choose_draft"), class: "rc-field-label" %>
+            <%= select_tag :offering_id,
+                  options_for_select([[t("owner_ai_assistant.choose_placeholder"), ""]] +
+                    @draft_offerings.map { |offering| [offering.draft_version.title, offering.id] },
+                    @selected_offering&.id), id: "wa-ai-offering", class: "rc-input", required: true %>
+          </div>
+          <%= button_tag t("owner_ai_assistant.preview"), class: "rc-action rc-action--quiet", type: "submit" %>
+        <% end %>
+        <% if @selected_draft %>
+          <div class="wa-ai-apply__comparison" aria-label="<%= t("owner_ai_assistant.compare") %>">
+            <div>
+              <h3><%= t("owner_ai_assistant.current_text") %></h3>
+              <p><%= @selected_draft.summary %></p>
+            </div>
+            <div>
+              <h3><%= t("owner_ai_assistant.proposed_text") %></h3>
+              <p><%= @entry.result["draft"] %></p>
+            </div>
+          </div>
+          <%= form_with url: apply_owner_ai_draft_path(@entry), method: :post, class: "rc-form wa-ai-apply__form" do %>
+            <%= hidden_field_tag :offering_id, @selected_offering.id %>
+            <%= hidden_field_tag :base_version, @selected_draft.version %>
+            <%= hidden_field_tag :base_digest, @selected_draft.digest %>
+            <div class="rc-field">
+              <%= label_tag "wa-ai-summary", t("owner_ai_assistant.edit_before_apply"), class: "rc-field-label" %>
+              <%= text_area_tag :summary, @entry.result["draft"], id: "wa-ai-summary", class: "rc-input rc-input--area",
+                    minlength: 25, maxlength: 1000, rows: 5, required: true %>
+              <p class="rc-hint"><%= t("owner_ai_assistant.apply_limits") %></p>
+            </div>
+            <label class="wa-ai-page__consent">
+              <%= check_box_tag :confirmed, "1", false, required: true %>
+              <span><%= t("owner_ai_assistant.apply_confirmation") %></span>
+            </label>
+            <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+              <%= rc_icon_label("check2-square", t("owner_ai_assistant.apply_button")) %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="rc-empty-state">
+          <p><%= t("owner_ai_assistant.no_editable_drafts") %></p>
+          <%= link_to t("owner_ai_assistant.open_services"), owner_services_path,
+                      class: "rc-action rc-action--quiet" %>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
 </div>
