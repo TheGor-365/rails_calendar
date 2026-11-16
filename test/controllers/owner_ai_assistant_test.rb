@@ -161,7 +161,77 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     ENV["XAI_API_KEY"] = old_key
   end
 
+  test "owner sees only their saved AI draft history and review GET never bills" do
+    owner_entry = create_saved_draft(@profile, "Owner private synthetic AI draft")
+    foreign_entry = create_saved_draft(@foreign_profile, "FOREIGN_PRIVATE_DRAFT_NOT_VISIBLE")
+    assert_no_difference("AiSpendEntry.count") do
+      login(@owner)
+      get owner_ai_assistant_path
+      assert_response :success
+      assert_select "#owner-ai-draft-library"
+      assert_select "#owner-ai-draft-library a[href=?]",
+                    owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy"), count: 1
+      assert_select "#owner-ai-draft-library", text: /FOREIGN_PRIVATE_DRAFT_NOT_VISIBLE/, count: 0
+
+      get owner_ai_assistant_path(entry_id: foreign_entry.id)
+      assert_response :success
+      assert_select ".wa-ai-page__draft", count: 0
+      assert_select "#owner-ai-draft-library a[href=?]",
+                    owner_ai_assistant_path(entry_id: foreign_entry.id, operation: "service_copy"), count: 0
+
+      get owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy")
+      assert_select ".wa-ai-page__draft", text: /Owner private synthetic AI draft/
+    end
+  end
+
+  test "cabinet practice capabilities and catalogue provide owner contextual AI entrypoints" do
+    # Use a complete, separate synthetic approved snapshot: practice UI requires
+    # headline/private/public summaries; the basic catalogue fixture omits them.
+    @profile.professional_context_snapshots.create!(
+      version: 2, digest: Digest::SHA256.hexdigest("context-entrypoints-#{@owner.id}"),
+      payload: {
+        "headline" => "Fictional Rails consultant",
+        "private_summary" => "Private synthetic owner career history for test screens.",
+        "public_summary_draft" => "Synthetic Rails services with prior review.",
+        "capabilities" => [], "desired_services" => [], "interview_answers" => {}
+      }, approved_at: Time.current
+    )
+    login(@owner)
+    assert_no_difference("AiSpendEntry.count") do
+      get owner_cabinet_path
+      assert_response :success
+      assert_select "a.ws-account-tool[href=?]", owner_ai_assistant_path
+
+      get owner_practice_path
+      assert_response :success
+      assert_select "a[href=?]", owner_ai_assistant_path(operation: "client_reply")
+
+      get owner_capabilities_path
+      assert_response :success
+      assert_select "a[href=?]", owner_ai_assistant_path(operation: "intake_questions")
+
+      get owner_services_path
+      assert_response :success
+      assert_select "a[href=?]", owner_ai_assistant_path(operation: "service_copy")
+    end
+  end
+
   private
+
+  def create_saved_draft(profile, draft)
+    AiSpendEntry.create!(
+      professional_profile: profile, operation: OwnerAi::Composer::VERSION,
+      model: OwnerAi::Composer::MODEL,
+      request_digest: Digest::SHA256.hexdigest("#{profile.id}-#{draft}"),
+      status: "settled", reserved_ticks: 10_000, charged_ticks: 10_000,
+      result: {
+        "heading" => draft, "draft" => "#{draft}. A complete synthetic Rails service description.",
+        "questions" => [], "cautions" => [], "next_step" => "Manual owner review.",
+        "purpose" => "service_copy", "profile_version" => 1, "turn" => 1
+      }, resolved_at: Time.current
+    )
+  end
+
 
   def login(user)
     post account_session_path, params: { email: user.email, password: PASSWORD }

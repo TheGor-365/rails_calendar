@@ -6,6 +6,8 @@
       <p class="rc-muted"><%= t("owner_services.intro") %></p>
     </div>
     <div class="wa-services__actions">
+      <%= link_to rc_icon_label("pencil-square", t("owner_ai_assistant.context_catalogue")),
+            owner_ai_assistant_path(operation: "service_copy"), class: "rc-action rc-action--soft" %>
       <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path,
             class: "rc-action rc-action--soft" %>
       <%= link_to rc_icon_label("person-badge", t("owner_setup.practice_title")), owner_practice_path, class: "rc-action rc-action--quiet" %>

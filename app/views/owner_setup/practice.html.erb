@@ -11,6 +11,8 @@
       </div>
     </div>
     <div class="ws-owner-hero-actions">
+      <%= link_to rc_icon_label("stars", t("owner_ai_assistant.context_practice")),
+            owner_ai_assistant_path(operation: "client_reply"), class: "rc-action rc-action--soft" %>
       <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("boxes", t("owner_services.title")), owner_services_path, class: "rc-action rc-action--primary" %>
       <%= link_to rc_icon_label("sliders", t("capability_review.edit_link")), owner_capabilities_path, class: "rc-action rc-action--primary" %>

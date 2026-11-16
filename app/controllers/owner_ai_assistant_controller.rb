@@ -18,6 +18,7 @@ class OwnerAiAssistantController < ApplicationController
         previous = parent_id.present? ? owner_entries.find_by(id: parent_id) : nil
       end
     end
+    @draft_history = owner_entries.order(created_at: :desc, id: :desc).limit(12)
     @spend = AiSpendLedger.spend_summary
     @ai_enabled = OwnerIntelligence::Grok.enabled?
     @draft_offerings = @workspace.service_offerings.includes(:versions).order(:position, :id)
