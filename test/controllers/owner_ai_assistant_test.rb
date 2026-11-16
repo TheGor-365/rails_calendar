@@ -31,7 +31,8 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
       assert_select "#owner-ai-assistant"
       assert_select "#owner-ai-dock"
       assert_select "summary[aria-label]"
-      assert_select "form[action=?]", create_owner_ai_draft_path, count: 2
+      assert_select "form[action=?]", create_owner_ai_draft_path,
+                  count: OwnerIntelligence::Grok.enabled? ? 2 : 1
       get owner_cabinet_path
       assert_response :success
       assert_select "#owner-ai-dock"
@@ -78,7 +79,8 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".wa-ai-page__draft", text: /fictional service draft/
     assert_select "script", text: /alert\('bad'\)/, count: 0
-    assert_select "form[action=?]", create_owner_ai_draft_path, count: 2
+    assert_select "form[action=?]", create_owner_ai_draft_path,
+                  count: OwnerIntelligence::Grok.enabled? ? 2 : 1
   end
 
   test "operation registry rejects forged keys and output validation rejects malformed schema" do
