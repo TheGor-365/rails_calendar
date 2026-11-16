@@ -20,6 +20,10 @@
       </div>
       <% if @ai_enabled && @profile&.approved_snapshot && @profile.onboarding_state == "approved" %>
         <%= form_with url: create_owner_ai_draft_path, method: :post, class: "rc-form wa-ai-page__form" do %>
+          <% if @context_offering %>
+            <%= hidden_field_tag :offering_id, @context_offering.id %>
+            <p class="rc-hint wa-ai-page__context"><%= t("owner_ai_assistant.context_selected", title: @context_offering.draft_version.title) %></p>
+          <% end %>
           <div class="rc-field">
             <%= label_tag "wa-ai-operation", t("owner_ai_assistant.operation"), class: "rc-field-label" %>
             <%= select_tag :operation, options_for_select(OwnerAi::OperationRegistry.keys.map { |key|
