@@ -90,7 +90,7 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
       "draft" => "A bounded fictional service description with no promises.",
       "questions" => [], "cautions" => [], "next_step" => "Owner must review."
     }
-    assert_nil composer.send(:validate_result!, safe)
+    assert composer.send(:validate_result!, safe)
     assert_raises(OwnerAi::Composer::Unavailable) do
       composer.send(:validate_result!, safe.merge("tool_call" => "approve"))
     end
