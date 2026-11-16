@@ -36,3 +36,7 @@ application.register("wa-section-nav", WaSectionNavController)
 // Owner avatar: square center-crop in the browser before the private upload.
 import WaAvatarEditorController from "./wa_avatar_editor_controller"
 application.register("wa-avatar-editor", WaAvatarEditorController)
+
+// Global owner-only AI assistant; native details remains usable without JS.
+import WaAiDockController from "./wa_ai_dock_controller"
+application.register("wa-ai-dock", WaAiDockController)

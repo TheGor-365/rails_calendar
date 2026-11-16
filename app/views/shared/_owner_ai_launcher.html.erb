@@ -1,0 +1,41 @@
+<details class="wa-ai-dock" id="owner-ai-dock" data-controller="wa-ai-dock">
+  <summary class="wa-ai-dock__trigger" aria-label="<%= t("owner_ai_assistant.open") %>">
+    <i class="bi bi-stars" aria-hidden="true"></i>
+    <span><%= t("owner_ai_assistant.short_title") %></span>
+  </summary>
+  <div class="wa-ai-dock__panel" aria-label="<%= t("owner_ai_assistant.title") %>">
+    <header class="wa-ai-dock__heading">
+      <span class="wa-ai-dock__symbol" aria-hidden="true"><i class="bi bi-stars"></i></span>
+      <div>
+        <strong><%= t("owner_ai_assistant.title") %></strong>
+        <small><%= t("owner_ai_assistant.private_desc") %></small>
+      </div>
+    </header>
+    <%= form_with url: create_owner_ai_draft_path, method: :post, class: "wa-ai-dock__form" do %>
+      <div class="rc-field">
+        <%= label_tag "wa-dock-operation", t("owner_ai_assistant.operation"), class: "rc-field-label" %>
+        <%= select_tag :operation, options_for_select(OwnerAi::OperationRegistry.keys.map { |key|
+              [t("owner_ai_assistant.operation_#{key}"), key]
+            }), id: "wa-dock-operation", class: "rc-input" %>
+      </div>
+      <div class="rc-field">
+        <%= label_tag "wa-dock-brief", t("owner_ai_assistant.brief"), class: "rc-field-label" %>
+        <%= text_area_tag :brief, nil, id: "wa-dock-brief", class: "rc-input rc-input--area",
+              rows: 3, minlength: 12, maxlength: 1200, required: true,
+              placeholder: t("owner_ai_assistant.placeholder") %>
+      </div>
+      <label class="wa-ai-dock__consent">
+        <%= check_box_tag :paid_consent, "1", false, required: true %>
+        <span><%= t("owner_ai_assistant.consent") %></span>
+      </label>
+      <%= button_tag type: "submit", class: "rc-action rc-action--primary wa-ai-dock__submit" do %>
+        <%= rc_icon_label("stars", t("owner_ai_assistant.generate")) %>
+      <% end %>
+    <% end %>
+    <nav class="wa-ai-dock__links" aria-label="<%= t("owner_ai_assistant.navigation") %>">
+      <%= link_to t("owner_ai_assistant.full_page"), owner_ai_assistant_path %>
+      <%= link_to t("owner_ai_assistant.open_services"), owner_services_path %>
+      <%= link_to t("owner_ai_assistant.open_cabinet"), owner_cabinet_path %>
+    </nav>
+  </div>
+</details>
