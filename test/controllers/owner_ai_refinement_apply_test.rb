@@ -45,6 +45,84 @@ class OwnerAiRefinementApplyTest < ActionDispatch::IntegrationTest
     end
   end
 
+
+  test "navigation accepts bare words stems synonyms typo and contextual page names without AI" do
+    assert_equal "services", OwnerAi::Navigator.resolve("услуги")
+    assert_equal "services", OwnerAi::Navigator.resolve("услуг")
+    assert_equal "services", OwnerAi::Navigator.resolve("усл")
+    assert_equal "services", OwnerAi::Navigator.resolve("слуг")
+    assert_equal "services", OwnerAi::Navigator.resolve("мои услуги")
+    assert_equal "services", OwnerAi::Navigator.resolve("покажи мне каталог услуг")
+    assert_equal "cabinet", OwnerAi::Navigator.resolve("кабин")
+    assert_equal "practice", OwnerAi::Navigator.resolve("практика")
+    assert_equal "calendar", OwnerAi::Navigator.resolve("кален")
+    assert_equal "today", OwnerAi::Navigator.resolve("сегoдня".tr("o", "о"))
+    assert_equal "catalogue_ai", OwnerAi::Navigator.resolve("ИИ каталог")
+    assert_equal "service_new", OwnerAi::Navigator.resolve("новая услуга")
+    assert_equal "public_services", OwnerAi::Navigator.resolve("витрина")
+    assert_nil OwnerAi::Navigator.resolve("https://example.com")
+    assert_nil OwnerAi::Navigator.resolve("/admin/secret")
+    assert_nil OwnerAi::Navigator.resolve("")
+    assert_nil OwnerAi::Navigator.resolve("x")
+
+    login(@owner)
+    assert_no_difference("AiSpendEntry.count") do
+      %w[услуги услуг усл слуг].each do |word|
+        post navigate_owner_ai_path, params: { command: word }
+        assert_redirected_to owner_services_path
+      end
+      post navigate_owner_ai_path, params: { command: "кабин" }
+      assert_redirected_to owner_cabinet_path
+      post navigate_owner_ai_path, params: { command: "практика" }
+      assert_redirected_to owner_practice_path
+      post navigate_owner_ai_path, params: { command: "новая услуга" }
+      assert_redirected_to new_owner_service_path
+      post navigate_owner_ai_path, params: { command: "https://evil.example" }
+      assert_redirected_to owner_ai_assistant_path(nav_query: "https://evil.example")
+    end
+  end
+
+  test "ambiguous matching offers choices only for pages in the current owner workspace" do
+    first = @catalogue.create_draft!(service_fields(@caps.first,
+      title: "Rails API integration for fictional customers"))
+    second = @catalogue.create_draft!(service_fields(@caps.first,
+      title: "Rails data cleanup for fictional customers"))
+    foreign_catalogue = OwnerServices::Catalogue.new(workspace: @other_workspace)
+    foreign_caps = @other_profile.professional_capabilities
+    foreign_catalogue.create_draft!(service_fields(foreign_caps.first,
+      title: "Rails secret for another workspace"))
+    result = OwnerAi::Navigator.search("Rails", workspace: @workspace)
+    assert_equal :ambiguous, result.status
+    assert result.candidates.any? { |candidate| candidate.key == "service:#{first.id}" }
+    assert result.candidates.any? { |candidate| candidate.key == "service:#{second.id}" }
+    assert result.candidates.none? { |candidate| candidate.label.include?("Rails secret") }
+
+    login(@owner)
+    assert_no_difference("AiSpendEntry.count") do
+      post navigate_owner_ai_path, params: { command: "Rails" }
+      assert_redirected_to owner_ai_assistant_path(nav_query: "Rails")
+      follow_redirect!
+      assert_response :success
+      assert_select ".wa-ai-nav-results__links a", minimum: 2
+      assert_select ".wa-ai-nav-results__links a[href=?]", owner_service_path(first)
+      assert_select ".wa-ai-nav-results__links a[href=?]", owner_service_path(second)
+      assert_select ".wa-ai-nav-results", text: /Rails secret/, count: 0
+
+      post navigate_owner_ai_path, params: { command: "Rails API integ" }
+      assert_redirected_to owner_service_path(first)
+    end
+  end
+
+  test "client and unauthenticated sessions cannot use word-fragment owner navigation" do
+    assert_no_difference("AiSpendEntry.count") do
+      post navigate_owner_ai_path, params: { command: "услуг" }
+      assert_redirected_to sign_in_path
+      login(@client)
+      post navigate_owner_ai_path, params: { command: "услуг" }
+      assert_redirected_to sign_in_path
+    end
+  end
+
   test "reviewed apply changes one draft summary and preserves every boundary" do
     old_draft = @offering.draft_version
     before = old_draft.attributes.slice("title", "included_scope", "excluded_scope",
