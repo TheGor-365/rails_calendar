@@ -18,7 +18,8 @@ class OwnerAiAssistantController < ApplicationController
     @spend = AiSpendLedger.spend_summary
     @ai_enabled = OwnerIntelligence::Grok.enabled?
     @draft_offerings = @workspace.service_offerings.includes(:versions).order(:position, :id)
-      .select { |offering| offering.draft_version.present? }
+      .select { |offering| offering.draft_version&.professional_context_snapshot_id == @profile&.approved_snapshot&.id }
+    @context_offering = @draft_offerings.find { |offering| offering.id.to_s == params[:offering_id].to_s }
     if @entry && @entry.result["purpose"] == "service_copy"
       @selected_offering = @draft_offerings.find { |offering| offering.id.to_s == params[:offering_id].to_s }
       @selected_draft = @selected_offering&.draft_version
