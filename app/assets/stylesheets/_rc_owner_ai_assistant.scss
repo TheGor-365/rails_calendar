@@ -174,4 +174,34 @@
   .wa-ai-draft-library__item { padding: .8rem; }
 }
 
+
+/* RC055.1f C2.0: explicit AI knowledge-source inventory. Never a public card. */
+.wa-ai-knowledge { margin: 1rem 0; padding: clamp(1rem, 2.2vw, 1.5rem); min-width: 0; }
+.wa-ai-knowledge__grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem; margin-top: 1rem;
+}
+.wa-ai-knowledge__item {
+  min-width: 0; display: flex; flex-direction: column; align-items: flex-start;
+  gap: .5rem; padding: 1rem; border: 1px solid var(--ws-border);
+  border-radius: 14px; background: var(--ws-paper);
+}
+.wa-ai-knowledge__icon {
+  display: grid; place-items: center; width: 36px; height: 36px;
+  background: var(--ws-teal-wash); color: var(--ws-teal);
+  border-radius: 11px; font-size: 1.1rem;
+}
+.wa-ai-knowledge__item h3 {
+  font-size: .94rem; font-weight: 800; margin: .15rem 0 0; overflow-wrap: anywhere;
+}
+.wa-ai-knowledge__item p { margin: 0; font-size: .83rem; line-height: 1.55; color: var(--ws-muted); overflow-wrap: anywhere; }
+.wa-ai-knowledge__item .wa-ai-knowledge__state {
+  color: var(--ws-ink); font-weight: 740;
+}
+.wa-ai-knowledge__item .rc-action { margin-top: auto; max-width: 100%; white-space: normal; }
+@media (max-width: 575.98px) {
+  .wa-ai-knowledge__grid { grid-template-columns: minmax(0, 1fr); }
+  .wa-ai-knowledge__item { padding: .85rem; }
+}
+
 @media print { .wa-ai-dock { display: none !important; } }
