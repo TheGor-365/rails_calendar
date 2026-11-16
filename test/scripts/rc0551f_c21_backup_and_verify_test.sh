@@ -7,13 +7,13 @@ bash -n "$SCRIPT"
 tmp="$(mktemp -d)"
 trap 'rm -rf -- "$tmp"' EXIT
 
-if env -u RC_CONFIRM_WRITERS_STOPPED -u RC_CONFIRM_ISOLATED_RESTORE bash "$SCRIPT" >"$tmp/unconfirmed" 2>&1; then
+if env -u DATABASE_URL -u RC_CONFIRM_WRITERS_STOPPED -u RC_CONFIRM_ISOLATED_RESTORE RAILS_ENV=development bash "$SCRIPT" >"$tmp/unconfirmed" 2>&1; then
   echo 'FAIL: archive must require explicit app/writer stop confirmation' >&2
   exit 1
 fi
 grep -Fq 'RC_CONFIRM_WRITERS_STOPPED=YES' "$tmp/unconfirmed"
 
-if env -u RC_CONFIRM_ISOLATED_RESTORE RC_CONFIRM_WRITERS_STOPPED=YES bash "$SCRIPT" >"$tmp/restore" 2>&1; then
+if env -u DATABASE_URL -u RC_CONFIRM_ISOLATED_RESTORE RAILS_ENV=development RC_CONFIRM_WRITERS_STOPPED=YES bash "$SCRIPT" >"$tmp/restore" 2>&1; then
   echo 'FAIL: archive must require isolated restore confirmation' >&2
   exit 1
 fi
