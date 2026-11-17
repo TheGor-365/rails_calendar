@@ -32,14 +32,11 @@ class OwnerAiConversationsController < ApplicationController
     intent = params[:intent].presence || "note"
     unless body.length.between?(1, 1200) && request_id.match?(UUID_PATTERN) &&
            %w[note ai].include?(intent)
-      return redirect_to owner_ai_conversation_path(@conversation),
-                         alert: t("owner_ai_conversations.invalid_message")
+      return render_message_error("owner_ai_conversations.invalid_message")
     end
     if intent == "ai"
-      return redirect_to owner_ai_conversation_path(@conversation),
-                         alert: t("owner_ai_conversations.consent_required") unless params[:paid_consent] == "1"
-      return redirect_to owner_ai_conversation_path(@conversation),
-                         alert: t("owner_ai_conversations.ai_disabled") unless OwnerIntelligence::Grok.enabled?
+      return render_message_error("owner_ai_conversations.consent_required") unless params[:paid_consent] == "1"
+      return render_message_error("owner_ai_conversations.ai_disabled") unless OwnerIntelligence::Grok.enabled?
     end
 
     outcome = nil
@@ -151,5 +148,18 @@ class OwnerAiConversationsController < ApplicationController
     @active_conversations = @workspace.owner_ai_conversations.where(state: "active").recent_first
     @archived_conversations = @workspace.owner_ai_conversations.where(state: "archived").recent_first
     @ai_enabled = OwnerIntelligence::Grok.enabled?
+  end
+
+  # Keep the owner's unsent prompt and UUID when consent/config validation fails.
+  # Redirecting here would silently erase the text before a paid request begins.
+  def render_message_error(translation_key)
+    @draft_body = params[:body].is_a?(String) ? params[:body] : ""
+    submitted_id = params[:request_id].is_a?(String) ? params[:request_id] : ""
+    @draft_request_id = submitted_id.match?(UUID_PATTERN) ? submitted_id : SecureRandom.uuid
+    @draft_paid_consent = params[:paid_consent] == "1"
+    @messages = @conversation.owner_ai_messages.includes(:ai_spend_entry).in_order
+    load_lists
+    flash.now[:alert] = t(translation_key)
+    render :index, status: :unprocessable_entity
   end
 end
