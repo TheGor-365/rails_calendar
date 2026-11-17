@@ -2,6 +2,8 @@ class User < ApplicationRecord
   has_secure_password
   # Local pilot: append-only revisions of the owner's avatar, never public blobs.
   has_many_attached :owner_avatars
+  # Client uploads are separately scoped from private owner avatars.
+  has_many_attached :client_avatars
   has_many :user_sessions, dependent: :destroy
   has_one :owner_workspace, class_name: "Workspace", foreign_key: :owner_user_id, inverse_of: :owner_user, dependent: :restrict_with_exception
   has_many :client_project_intakes, class_name: "ProjectIntake", foreign_key: :client_user_id, inverse_of: :client_user, dependent: :restrict_with_exception
