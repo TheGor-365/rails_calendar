@@ -127,14 +127,14 @@
         <% else %>
           <%= form_with url: owner_ai_conversation_messages_path(@conversation), method: :post,
                 class: "wa-threads__composer rc-form" do %>
-            <%= hidden_field_tag :request_id, SecureRandom.uuid %>
+            <%= hidden_field_tag :request_id, (@draft_request_id.presence || SecureRandom.uuid) %>
             <%= label_tag "wa-thread-body", t("owner_ai_conversations.message_label"), class: "rc-field-label" %>
-            <%= text_area_tag :body, nil, id: "wa-thread-body", class: "rc-input rc-input--area",
+            <%= text_area_tag :body, @draft_body, id: "wa-thread-body", class: "rc-input rc-input--area",
                   rows: 4, maxlength: 1200, required: true,
                   placeholder: t("owner_ai_conversations.message_placeholder") %>
             <p class="rc-hint"><%= t("owner_ai_conversations.composer_note") %></p>
             <div class="rc-field">
-              <%= check_box_tag :paid_consent, "1", false, id: "wa-thread-paid-consent" %>
+              <%= check_box_tag :paid_consent, "1", @draft_paid_consent == true, id: "wa-thread-paid-consent" %>
               <%= label_tag "wa-thread-paid-consent", t("owner_ai_conversations.paid_consent_label"), class: "rc-field-label" %>
             </div>
             <p class="rc-hint"><%= t("owner_ai_conversations.paid_budget_notice") %></p>
