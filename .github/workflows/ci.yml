@@ -79,7 +79,11 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: browser
         with:
-          chrome-version: stable
+          # TEMP: Capybara 3.40 sends origin='*' in Storage.clearDataForOrigin
+          # during session reset. Chrome 158 rejects the wildcard URI; all
+          # 46 browser tests fail before UI assertions. Keep the last
+          # previously passing isolated CI browser until a compatible fix.
+          chrome-version: '157.0.8103.78'
           install-chromedriver: true
 
       - name: Configure matching ChromeDriver

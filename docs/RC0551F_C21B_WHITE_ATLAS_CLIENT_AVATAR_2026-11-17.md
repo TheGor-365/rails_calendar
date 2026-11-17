@@ -19,3 +19,16 @@ screenshots for conversations and both avatar editors; guest/client/owner IDOR,
 keyboard Escape, crop/fallback, reload persistence, and no horizontal scroll.
 Local review database: `rails_calendar_rc0551f_c21b_review_20261117`.
 Do not migrate `rails_calendar_mvp_preview_20261112` or alter backups.
+
+## 17 Nov exact-SHA QA incident
+
+- First PR #80 SHA `e200df6`: model/controller tests and JS/CSS build passed.
+- Browser job with Chrome 158.0.8127.36: 46/46 setup errors at
+  `Capybara::Selenium::Driver::ChromeDriver#reset!`, because Chrome rejects
+  wildcard origin in CDP `Storage.clearDataForOrigin`. No UI assertions ran.
+- Temporary CI-only baseline pins Chrome/ChromeDriver 157.0.8103.78 to
+  restore meaningful automated acceptance. Follow up with modern driver
+  compatibility work; never count this as a Chrome 158 compatibility pass.
+- Security Audit separately failed: `yarn audit` reports high
+  `sass > @parcel/watcher > picomatch` ReDoS, currently no patch offered by
+  the registry audit. Ruby audit/Brakeman passed. Do not suppress JS audit.
