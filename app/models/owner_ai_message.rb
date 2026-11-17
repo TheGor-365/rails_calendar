@@ -68,7 +68,7 @@ class OwnerAiMessage < ApplicationRecord
     profile = owner_ai_conversation.workspace&.professional_profile
     unless profile && ai_spend_entry.professional_profile_id == profile.id &&
            ai_spend_entry.project_intake_id.nil? &&
-           ai_spend_entry.operation == OwnerAi::Composer::VERSION
+           [OwnerAi::Composer::VERSION, OwnerAi::ConversationResponder::VERSION].include?(ai_spend_entry.operation)
       errors.add(:ai_spend_entry, "must belong to this owner's AI composer")
     end
   end
