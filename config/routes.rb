@@ -53,6 +53,7 @@ Rails.application.routes.draw do
   post "/workspace/assistant/conversations", to: "owner_ai_conversations#create"
   get "/workspace/assistant/conversations/:id", to: "owner_ai_conversations#show", as: :owner_ai_conversation
   post "/workspace/assistant/conversations/:id/messages", to: "owner_ai_conversations#add_message", as: :owner_ai_conversation_messages
+  patch "/workspace/assistant/conversations/:id/title", to: "owner_ai_conversations#rename", as: :rename_owner_ai_conversation
   post "/workspace/assistant/conversations/:id/archive", to: "owner_ai_conversations#archive", as: :archive_owner_ai_conversation
 
   # RC055.1: private owner-controlled service offering revisions.
