@@ -53,7 +53,7 @@ class OwnerAiConversationsController < ApplicationController
           (intent == "ai") == is_paid_turn ? :replay : :conflict
       elsif @conversation.archived?
         outcome = :archived
-      elsif intent == "ai" && @conversation.owner_ai_messages.exists?(role: "assistant", state: "pending")
+      elsif intent == "ai" && @conversation.owner_ai_messages.exists?(role: "assistant", state: %w[pending uncertain])
         outcome = :busy
       else
         next_sequence = @conversation.owner_ai_messages.maximum(:sequence).to_i + 1
