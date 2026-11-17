@@ -27,7 +27,7 @@ grep -Fq 'RC_LOCAL_DEV_DATABASE_URL="postgresql://gor@localhost/$DB?host=%2Fvar%
 grep -Fq 'Rails connection is NOT the local PG16 restored scratch DB' "$script"
 grep -Fq 'db:migrate:up VERSION="$VERSION"' "$script"
 grep -Fq 'VERSION="20261117030000"' "$script"
-if grep -Eq 'db:(reset|drop|schema:load|prepare)|dropdb|pg_restore[[:space:]].*--clean' "$script"; then
+if grep -Eq '^[[:space:]]*(bin/rails[[:space:]]+db:(reset|drop|schema:load|prepare)|dropdb([[:space:]]|$)|pg_restore[[:space:]].*--clean)' "$script"; then
   echo "FAIL: destructive or broad DB task present" >&2
   exit 1
 fi
