@@ -19,9 +19,6 @@
         <div class="wa-threads__drawer-body">
           <h2><%= t("owner_ai_conversations.new_heading") %></h2>
           <%= form_with url: owner_ai_conversations_path, method: :post, class: "wa-threads__new-form rc-form" do %>
-            <%= label_tag "wa-thread-title", t("owner_ai_conversations.title_label"), class: "rc-field-label" %>
-            <%= text_field_tag :title, nil, id: "wa-thread-title", maxlength: 100,
-                  class: "rc-input", placeholder: t("owner_ai_conversations.default_title") %>
             <%= button_tag rc_icon_label("plus-lg", t("owner_ai_conversations.create")), type: "submit", class: "rc-action rc-action--primary" %>
           <% end %>
           <nav aria-label="<%= t('owner_ai_conversations.active_heading') %>">
@@ -72,6 +69,16 @@
           <div>
             <p class="eyebrow"><%= @conversation.archived? ? t("owner_ai_conversations.archive_heading") : t("owner_ai_conversations.active_heading") %></p>
             <h2><%= @conversation.title %></h2>
+            <% unless @conversation.archived? %>
+              <%= form_with url: rename_owner_ai_conversation_path(@conversation), method: :patch,
+                    class: "rc-form" do %>
+                <%= label_tag "wa-thread-rename", t("owner_ai_conversations.rename_label"), class: "rc-field-label" %>
+                <%= text_field_tag :title, @conversation.title, id: "wa-thread-rename", maxlength: 100,
+                      class: "rc-input", required: true %>
+                <%= button_tag rc_icon_label("pencil", t("owner_ai_conversations.rename")), type: "submit",
+                      class: "rc-action rc-action--quiet rc-action--small" %>
+              <% end %>
+            <% end %>
           </div>
           <% unless @conversation.archived? %>
             <%= button_to rc_icon_label("archive", t("owner_ai_conversations.archive")), archive_owner_ai_conversation_path(@conversation),
@@ -89,7 +96,23 @@
                   <span><%= t("owner_ai_conversations.states.#{message.state}") %></span>
                   <time datetime="<%= message.created_at.iso8601 %>"><%= message.created_at.strftime("%d.%m.%Y %H:%M") %></time>
                 </div>
-                <p class="wa-threads__message-body"><%= message.body %></p>
+                <% if message.assistant_message? && message.state != "settled" %>
+                  <p class="rc-hint" role="status"><%= t("owner_ai_conversations.no_ai_reply") %></p>
+                <% else %>
+                  <p class="wa-threads__message-body"><%= message.body %></p>
+                <% end %>
+                <% if message.assistant_message? && message.state == "settled" && message.ai_spend_entry %>
+                  <% entry = message.ai_spend_entry %>
+                  <p class="rc-hint"><%= t("owner_ai_conversations.billed",
+                        amount: number_with_precision(entry.charged_ticks.to_f / AiSpendLedger::USD_TICKS, precision: 6)) %></p>
+                  <% actions = entry.result.is_a?(Hash) ? entry.result["suggested_actions"] : nil %>
+                  <% if actions.is_a?(Array) && actions.any? %>
+                    <p class="rc-hint"><%= t("owner_ai_conversations.suggestions") %></p>
+                    <ul class="wa-threads__suggestions">
+                      <% actions.each do |action| %><li><%= action %></li><% end %>
+                    </ul>
+                  <% end %>
+                <% end %>
               </li>
             <% end %>
           </ol>
@@ -110,7 +133,19 @@
                   rows: 4, maxlength: 1200, required: true,
                   placeholder: t("owner_ai_conversations.message_placeholder") %>
             <p class="rc-hint"><%= t("owner_ai_conversations.composer_note") %></p>
-            <%= button_tag rc_icon_label("journal-check", t("owner_ai_conversations.save_message")), type: "submit", class: "rc-action rc-action--primary" %>
+            <div class="rc-field">
+              <%= check_box_tag :paid_consent, "1", false, id: "wa-thread-paid-consent" %>
+              <%= label_tag "wa-thread-paid-consent", t("owner_ai_conversations.paid_consent_label"), class: "rc-field-label" %>
+            </div>
+            <p class="rc-hint"><%= t("owner_ai_conversations.paid_budget_notice") %></p>
+            <%= button_tag rc_icon_label("journal-check", t("owner_ai_conversations.save_message")),
+                  type: "submit", name: "intent", value: "note", class: "rc-action rc-action--quiet" %>
+            <% if @ai_enabled %>
+              <%= button_tag rc_icon_label("stars", t("owner_ai_conversations.ask_ai")),
+                    type: "submit", name: "intent", value: "ai", class: "rc-action rc-action--primary" %>
+            <% else %>
+              <p class="rc-hint" role="status"><%= t("owner_ai_conversations.ai_disabled") %></p>
+            <% end %>
           <% end %>
         <% end %>
       <% else %>
