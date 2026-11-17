@@ -44,7 +44,7 @@ es:
     ai_disabled: "Grok no está configurado o activado. Las notas privadas gratuitas siguen disponibles."
     ai_ready: "Respuesta real de Grok y coste guardados."
     ai_failed: "No hay respuesta confirmada. Revisa el estado y los gastos; no reintentes cargos inciertos."
-    ai_busy: "Se está procesando otro turno de IA. No se ha repetido la llamada."
+    ai_busy: "Hay una solicitud pendiente o con un cargo incierto. Se bloquean nuevos turnos de pago hasta su conciliación."
     replayed: "El formulario ya se procesó, sin llamada ni cargo duplicados."
     no_ai_reply: "No existe una respuesta confirmada; consulta el estado anterior."
     billed: "Coste xAI confirmado: $%{amount}"
