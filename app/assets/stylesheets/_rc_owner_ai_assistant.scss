@@ -458,3 +458,57 @@
 }
 
 @media print { .wa-ai-dock { display: none !important; } }
+
+
+// RC055.1f C2.1b — persistent owner-only threads; White Atlas tokens.
+.wa-threads { max-width: 1280px; color: var(--ws-ink); }
+.wa-threads__masthead { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.wa-threads__privacy { display: flex; align-items: flex-start; gap: .55rem; padding: .75rem 1rem; color: var(--ws-muted);
+  border-block: 1px solid var(--ws-border); font-size: .82rem; line-height: 1.6; }
+.wa-threads__privacy .bi { color: var(--ws-teal); }
+.wa-threads__layout { display: grid; grid-template-columns: minmax(225px, 290px) minmax(0,1fr); gap: 1.15rem; align-items: start; }
+.wa-threads__sidebar, .wa-threads__main { min-width: 0; background: var(--ws-paper); border: 1px solid var(--ws-border);
+  border-radius: 18px; box-shadow: var(--ws-shadow); }
+.wa-threads__sidebar { overflow: hidden; }
+.wa-threads__drawer-label { padding: .95rem 1.1rem; cursor: pointer; font-weight: 750; font-size: .9rem; color: var(--ws-ink); }
+.wa-threads__drawer-label:focus-visible { outline: 2px solid var(--ws-teal); outline-offset: -3px; }
+.wa-threads__drawer-body { display: grid; gap: 1.2rem; padding: .1rem 1rem 1.15rem; }
+.wa-threads__drawer-body h2 { font-size: 1.04rem; font-weight: 800; margin: 0; }
+.wa-threads__drawer-body h3 { font-size: .72rem; font-weight: 800; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--ws-muted); margin: 0 0 .5rem; }
+.wa-threads__new-form { display: grid; gap: .55rem; }
+.wa-threads__new-form .rc-action { justify-self: start; }
+.wa-threads__items { margin: 0; padding: 0; list-style: none; max-height: 23rem; overflow-y: auto; }
+.wa-threads__item { display: grid; gap: .22rem; padding: .72rem .75rem; border-left: 3px solid transparent; border-bottom: 1px solid var(--ws-border);
+  color: var(--ws-ink); text-decoration: none; overflow-wrap: anywhere; font-size: .84rem; line-height: 1.4; }
+.wa-threads__item:hover, .wa-threads__item--selected { background: var(--ws-teal-wash); color: var(--ws-teal-deep); }
+.wa-threads__item--selected { border-left-color: var(--ws-teal); font-weight: 730; }
+.wa-threads__item time { font-size: .7rem; font-weight: 400; color: var(--ws-muted); }
+.wa-threads__main { padding: clamp(1rem, 2.5vw, 1.6rem); }
+.wa-threads__thread-header { display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: .7rem;
+  padding-bottom: 1rem; border-bottom: 1px solid var(--ws-border); }
+.wa-threads__thread-header .eyebrow { margin: 0 0 .3rem; }
+.wa-threads__thread-header h2 { font-weight: 810; font-size: clamp(1.1rem, 2.1vw, 1.6rem); margin: 0; overflow-wrap: anywhere; }
+.wa-threads__messages { display: flex; flex-direction: column; align-items: flex-start; gap: .9rem;
+  margin: 1.1rem 0; padding: 0; list-style: none; max-height: min(64vh, 670px); overflow-y: auto; }
+.wa-threads__message { min-width: 0; max-width: min(91%, 70ch); padding: .85rem 1rem; border: 1px solid var(--ws-border);
+  border-radius: 16px 16px 16px 4px; background: var(--ws-canvas); }
+.wa-threads__message--owner { align-self: flex-end; border-color: #b6dbd2; border-radius: 16px 16px 4px 16px; background: var(--ws-teal-wash); }
+.wa-threads__message-meta { display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; font-size: .7rem; color: var(--ws-muted); }
+.wa-threads__message-body { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; margin: .65rem 0 0; font-size: .9rem; }
+.wa-threads__composer { border-top: 1px solid var(--ws-border); padding-top: 1.1rem; }
+.wa-threads__composer textarea { width: 100%; min-height: 110px; }
+.wa-threads__composer .rc-action { margin-top: .5rem; }
+.wa-threads__locked { display: flex; gap: .5rem; align-items: center; padding: .9rem 1rem;
+  background: var(--ws-teal-wash); border-radius: 12px; color: var(--ws-teal-deep); font-size: .85rem; }
+.wa-threads__empty { padding: clamp(1.5rem, 4vw, 3rem); text-align: center; line-height: 1.6; color: var(--ws-muted); }
+.wa-threads__empty h2 { color: var(--ws-ink); font-size: 1.15rem; }
+@media (max-width: 767.98px) {
+  .wa-threads__layout { grid-template-columns: minmax(0,1fr); }
+  .wa-threads__sidebar { width: 100%; }
+  .wa-threads__drawer-body { gap: 1rem; }
+  .wa-threads__message { max-width: 96%; }
+  .wa-threads__thread-header .rc-action { white-space: normal; }
+  .wa-threads__main { padding-bottom: 1.5rem; }
+}
+

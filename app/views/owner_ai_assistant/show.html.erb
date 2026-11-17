@@ -30,6 +30,11 @@
     <% end %>
   </nav>
 
+  <p class="wa-ai-page__thread-entry">
+    <%= link_to rc_icon_label("chat-square-text", t("owner_ai_conversations.title")),
+                owner_ai_conversations_path, class: "rc-action rc-action--quiet" %>
+  </p>
+
   <% if @navigation_result %>
     <section class="surface-panel wa-ai-nav-results" aria-labelledby="wa-ai-nav-heading">
       <div class="wa-ai-page__heading">

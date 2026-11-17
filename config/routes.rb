@@ -45,6 +45,13 @@ Rails.application.routes.draw do
   post "/workspace/assistant/navigate", to: "owner_ai_assistant#navigate", as: :navigate_owner_ai
   post "/workspace/assistant/drafts/:entry_id/apply", to: "owner_ai_assistant#apply", as: :apply_owner_ai_draft
 
+  # RC055.1f C2.1b: durable private owner notes only; no paid AI request.
+  get "/workspace/assistant/conversations", to: "owner_ai_conversations#index", as: :owner_ai_conversations
+  post "/workspace/assistant/conversations", to: "owner_ai_conversations#create"
+  get "/workspace/assistant/conversations/:id", to: "owner_ai_conversations#show", as: :owner_ai_conversation
+  post "/workspace/assistant/conversations/:id/messages", to: "owner_ai_conversations#add_message", as: :owner_ai_conversation_messages
+  post "/workspace/assistant/conversations/:id/archive", to: "owner_ai_conversations#archive", as: :archive_owner_ai_conversation
+
   # RC055.1: private owner-controlled service offering revisions.
   get "/workspace/services", to: "owner_service_offerings#index", as: :owner_services
   get "/workspace/services/ai", to: "owner_catalogue_ai#index", as: :owner_catalogue_ai

@@ -1,0 +1,124 @@
+<main class="container ws-owner-page wa-threads my-4 my-sm-5" id="owner-ai-conversations">
+  <header class="ws-owner-hero wa-threads__masthead">
+    <div class="ws-owner-hero-copy">
+      <p class="eyebrow"><%= t("owner_ai_conversations.eyebrow") %></p>
+      <h1 class="page-title"><%= t("owner_ai_conversations.title") %></h1>
+      <p class="rc-muted"><%= t("owner_ai_conversations.intro") %></p>
+    </div>
+    <%= link_to t("owner_ai_conversations.back"), owner_ai_assistant_path, class: "rc-action rc-action--quiet" %>
+  </header>
+  <p class="wa-threads__privacy" role="note">
+    <i class="bi bi-shield-lock" aria-hidden="true"></i>
+    <%= t("owner_ai_conversations.privacy") %>
+  </p>
+
+  <div class="wa-threads__layout">
+    <aside class="wa-threads__sidebar" aria-label="<%= t('owner_ai_conversations.conversation_list') %>">
+      <details class="wa-threads__drawer" open>
+        <summary class="wa-threads__drawer-label"><%= t("owner_ai_conversations.conversation_list") %></summary>
+        <div class="wa-threads__drawer-body">
+          <h2><%= t("owner_ai_conversations.new_heading") %></h2>
+          <%= form_with url: owner_ai_conversations_path, method: :post, class: "wa-threads__new-form" do %>
+            <%= label_tag "wa-thread-title", t("owner_ai_conversations.title_label"), class: "rc-field-label" %>
+            <%= text_field_tag :title, nil, id: "wa-thread-title", maxlength: 100,
+                  class: "rc-input", placeholder: t("owner_ai_conversations.default_title") %>
+            <%= button_tag t("owner_ai_conversations.create"), type: "submit", class: "rc-action rc-action--primary" %>
+          <% end %>
+          <nav aria-label="<%= t('owner_ai_conversations.active_heading') %>">
+            <h3><%= t("owner_ai_conversations.active_heading") %></h3>
+            <% if @active_conversations.any? %>
+              <ul class="wa-threads__items">
+                <% @active_conversations.each do |thread| %>
+                  <li>
+                    <%= link_to owner_ai_conversation_path(thread),
+                          class: "wa-threads__item #{'wa-threads__item--selected' if thread == @conversation}",
+                          aria: (thread == @conversation ? { current: "page" } : {}) do %>
+                      <span><%= thread.title %></span>
+                      <time datetime="<%= thread.updated_at.iso8601 %>"><%= thread.updated_at.strftime("%d.%m.%Y") %></time>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="rc-hint"><%= t("owner_ai_conversations.no_active") %></p>
+            <% end %>
+          </nav>
+          <nav aria-label="<%= t('owner_ai_conversations.archive_heading') %>">
+            <h3><%= t("owner_ai_conversations.archive_heading") %></h3>
+            <% if @archived_conversations.any? %>
+              <ul class="wa-threads__items">
+                <% @archived_conversations.each do |thread| %>
+                  <li>
+                    <%= link_to owner_ai_conversation_path(thread),
+                          class: "wa-threads__item #{'wa-threads__item--selected' if thread == @conversation}",
+                          aria: (thread == @conversation ? { current: "page" } : {}) do %>
+                      <span><%= thread.title %></span>
+                      <time datetime="<%= thread.updated_at.iso8601 %>"><%= thread.updated_at.strftime("%d.%m.%Y") %></time>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="rc-hint"><%= t("owner_ai_conversations.no_archived") %></p>
+            <% end %>
+          </nav>
+        </div>
+      </details>
+    </aside>
+
+    <section class="wa-threads__main" aria-label="<%= t('owner_ai_conversations.thread_region') %>">
+      <% if @conversation %>
+        <header class="wa-threads__thread-header">
+          <div>
+            <p class="eyebrow"><%= @conversation.archived? ? t("owner_ai_conversations.archive_heading") : t("owner_ai_conversations.active_heading") %></p>
+            <h2><%= @conversation.title %></h2>
+          </div>
+          <% unless @conversation.archived? %>
+            <%= button_to t("owner_ai_conversations.archive"), archive_owner_ai_conversation_path(@conversation),
+                  method: :post, class: "rc-action rc-action--quiet rc-action--small",
+                  form: { data: { turbo_confirm: t("owner_ai_conversations.archive_confirm") } } %>
+          <% end %>
+        </header>
+
+        <% if @messages.any? %>
+          <ol class="wa-threads__messages" aria-label="<%= t('owner_ai_conversations.messages_heading') %>">
+            <% @messages.each do |message| %>
+              <li class="wa-threads__message <%= 'wa-threads__message--owner' if message.owner_message? %>">
+                <div class="wa-threads__message-meta">
+                  <strong><%= t("owner_ai_conversations.roles.#{message.role}") %></strong>
+                  <span><%= t("owner_ai_conversations.states.#{message.state}") %></span>
+                  <time datetime="<%= message.created_at.iso8601 %>"><%= message.created_at.strftime("%d.%m.%Y %H:%M") %></time>
+                </div>
+                <p class="wa-threads__message-body"><%= message.body %></p>
+              </li>
+            <% end %>
+          </ol>
+        <% else %>
+          <div class="wa-threads__empty" role="status"><%= t("owner_ai_conversations.no_messages") %></div>
+        <% end %>
+
+        <% if @conversation.archived? %>
+          <p class="wa-threads__locked" role="note"><i class="bi bi-lock" aria-hidden="true"></i>
+            <%= t("owner_ai_conversations.archived_read_only") %>
+          </p>
+        <% else %>
+          <%= form_with url: owner_ai_conversation_messages_path(@conversation), method: :post,
+                class: "wa-threads__composer" do %>
+            <%= hidden_field_tag :request_id, SecureRandom.uuid %>
+            <%= label_tag "wa-thread-body", t("owner_ai_conversations.message_label"), class: "rc-field-label" %>
+            <%= text_area_tag :body, nil, id: "wa-thread-body", class: "rc-input rc-input--area",
+                  rows: 4, maxlength: 1200, required: true,
+                  placeholder: t("owner_ai_conversations.message_placeholder") %>
+            <p class="rc-hint"><%= t("owner_ai_conversations.composer_note") %></p>
+            <%= button_tag t("owner_ai_conversations.save_message"), type: "submit", class: "rc-action rc-action--primary" %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="wa-threads__empty" role="status">
+          <h2><%= t("owner_ai_conversations.empty_heading") %></h2>
+          <p><%= t("owner_ai_conversations.empty_description") %></p>
+        </div>
+      <% end %>
+    </section>
+  </div>
+</main>
