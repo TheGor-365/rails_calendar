@@ -153,12 +153,19 @@ class OwnerAiConversationsTest < ActionDispatch::IntegrationTest
     assert_no_difference("OwnerAiMessage.count") do
       assert_no_difference("AiSpendEntry.count") do
         post owner_ai_conversation_messages_path(thread), params: payload
-        assert_redirected_to owner_ai_conversation_path(thread)
+        assert_response :unprocessable_entity
+        assert_select "textarea#wa-thread-body", text: /Diagnose a fictional Rails 422/
+        assert_select "input[name='request_id'][value=?]", payload.fetch(:request_id)
+        assert_select "#wa-thread-paid-consent[checked]", count: 0
       end
     end
     OwnerIntelligence::Grok.stub(:enabled?, false) do
       assert_no_difference("OwnerAiMessage.count") do
         post owner_ai_conversation_messages_path(thread), params: payload.merge(paid_consent: "1")
+        assert_response :unprocessable_entity
+        assert_select "textarea#wa-thread-body", text: /Diagnose a fictional Rails 422/
+        assert_select "input[name='request_id'][value=?]", payload.fetch(:request_id)
+        assert_select "#wa-thread-paid-consent[checked]", count: 1
       end
     end
     assert_equal 0, thread.owner_ai_messages.count
