@@ -44,7 +44,7 @@ en:
     ai_disabled: "Grok is not configured or enabled. Free private notes remain available."
     ai_ready: "Real Grok reply and billed cost saved."
     ai_failed: "No confirmed AI reply. Check the message status and spend ledger; never retry an uncertain charge."
-    ai_busy: "An earlier AI turn is still pending. No duplicate call was made."
+    ai_busy: "A prior AI request is pending or has uncertain billing. New paid turns are blocked until reconciliation."
     replayed: "This form was already processed; no second call or charge."
     no_ai_reply: "No verified model answer is available; see status above."
     billed: "Confirmed xAI charge: $%{amount}"
