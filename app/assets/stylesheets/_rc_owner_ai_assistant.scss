@@ -512,3 +512,15 @@
   .wa-threads__main { padding-bottom: 1.5rem; }
 }
 
+
+// White Atlas C2.1b: existing generic primitives supply a styled fallback
+// until Sass is built for the current Git HEAD.
+.wa-threads__sidebar.surface-panel { padding: 0; }
+.wa-threads__main.surface-panel { padding: clamp(1rem, 2.5vw, 1.6rem); }
+.wa-threads__empty.rc-empty-state { display: flex; flex-direction: column; align-items: center; gap: .65rem; }
+.wa-threads__empty.rc-empty-state h2, .wa-threads__empty.rc-empty-state p { margin: 0; }
+.wa-threads__new-form.rc-form, .wa-threads__composer.rc-form { width: 100%; }
+@media (max-width: 359.98px) {
+  .wa-threads__masthead .rc-action { max-width: 100%; white-space: normal; }
+  .wa-threads__privacy { padding-inline: .65rem; }
+}

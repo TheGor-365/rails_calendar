@@ -21,6 +21,9 @@ Rails.application.routes.draw do
   get "/register/privacy", to: "client_registrations#privacy", as: :client_registration_privacy
   get "/client", to: "client_home#show", as: :client_home
   get "/client/cabinet", to: "client_home#show", as: :client_cabinet
+  # Private local-only client photo; no public Active Storage routes.
+  post "/client/avatar", to: "client_avatars#create", as: :client_avatars
+  get "/client/avatar/:attachment_id", to: "client_avatars#file", as: :client_avatar_file
   # Verified-client, local-only, fictional request handoff pilot.
   get "/client/requests/new", to: "client_requests#new", as: :new_client_request
   post "/client/requests", to: "client_requests#create", as: :client_requests
