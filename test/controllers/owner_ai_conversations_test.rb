@@ -280,6 +280,13 @@ class OwnerAiConversationsTest < ActionDispatch::IntegrationTest
     assert_equal "uncertain", thread.owner_ai_messages.find_by!(role: "assistant").state
     entry = AiSpendEntry.find_by!(operation: OwnerAi::ConversationResponder::VERSION)
     assert_equal "uncertain", entry.status
+    assert_no_difference("AiSpendEntry.count") do
+      assert_no_difference("OwnerAiMessage.count") do
+        OwnerIntelligence::Grok.stub(:enabled?, true) do
+          post owner_ai_conversation_messages_path(thread), params: payload.merge(request_id: SecureRandom.uuid)
+        end
+      end
+    end
     get owner_ai_conversation_path(thread)
     assert_response :success
     assert_select ".wa-threads__message-body", text: /Explain why/, count: 1
