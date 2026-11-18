@@ -6,23 +6,65 @@ class ClientRequestsController < ApplicationController
   before_action :set_owned_request!, only: %i[show review reply]
 
   def new
+    load_published_services
     @intake = current_user.client_project_intakes.new
+    @selected_service_version_ids = []
   end
 
   def create
+    load_published_services
+    @selected_service_version_ids = Array(params[:service_version_ids]).reject(&:blank?).map(&:to_s)
     @intake = current_user.client_project_intakes.new(request_params)
+    ids = @selected_service_version_ids
+    valid_ids = ids.size <= 6 && ids.uniq.size == ids.size && ids.all? { |id| id.match?(/\A[1-9]\d*\z/) }
+    versions = if valid_ids && ids.any?
+      ServiceOfferingVersion.joins(:service_offering)
+        .where(id: ids)
+        .where("service_offerings.published_version_id = service_offering_versions.id")
+        .includes(:service_offering).to_a
+    else
+      []
+    end
+
+    if !valid_ids || versions.size != ids.size || versions.map { |v| v.service_offering.workspace_id }.uniq.size > 1
+      @intake.errors.add(:base, I18n.t("client_requests.invalid_services"))
+    else
+      chosen_ws = versions.first&.service_offering&.workspace
+      if chosen_ws.nil?
+        public_workspace_ids = @public_offerings.map(&:workspace_id).uniq
+        requested_ws = params[:selected_workspace_id].to_s
+        chosen_ws = if public_workspace_ids.size == 1
+          Workspace.find_by(id: public_workspace_ids.first)
+        elsif public_workspace_ids.size > 1 && requested_ws.match?(/\A[1-9]\d*\z/) &&
+              public_workspace_ids.include?(requested_ws.to_i)
+          Workspace.find_by(id: requested_ws)
+        end
+        if public_workspace_ids.size > 1 && chosen_ws.nil?
+          @intake.errors.add(:base, I18n.t("client_requests.choose_specialist"))
+        end
+      end
+      @intake.workspace = chosen_ws
+      if versions.any?
+        @intake.project_type = versions.first.project_category if @intake.project_type.blank?
+        @intake.title = versions.first.title.truncate(120) if @intake.title.blank?
+        @intake.goal = I18n.t("client_requests.initial_goal",
+                              services: versions.map(&:title).join("; ").truncate(800)) if @intake.goal.blank?
+      end
+    end
+
     @intake.title = @intake.title.to_s.strip
     @intake.goal = @intake.goal.to_s.strip
     @intake.demo_consent_at = Time.current if params[:demo_consent] == "1"
     @intake.valid?
     @intake.errors.add(:base, I18n.t("client_requests.consent_required")) unless params[:demo_consent] == "1"
     @intake.errors.add(:goal, I18n.t("client_requests.goal_limit")) if @intake.goal.length > 1200
-    if @intake.errors.any?
-      return render :new, status: :unprocessable_entity
-    end
+    return render :new, status: :unprocessable_entity if @intake.errors.any?
 
     ProjectIntake.transaction do
       @intake.save!
+      versions.each do |version|
+        @intake.intake_service_selections.create!(service_offering_version: version)
+      end
       @intake.intake_messages.create!(role: "client", body: @intake.goal)
       @intake.intake_messages.create!(role: "assistant", body: I18n.t("client_requests.received_prompt"))
     end
@@ -107,6 +149,14 @@ class ClientRequestsController < ApplicationController
   end
 
   private
+
+  def load_published_services
+    # One authoritative published pointer; no draft or unpublished versions.
+    @public_offerings = ServiceOffering.where.not(published_version_id: nil)
+      .includes(:published_version).order(:workspace_id, :position, :id).to_a
+    @public_workspaces = Workspace.where(id: @public_offerings.map(&:workspace_id).uniq)
+      .includes(:owner_user).order(:id).to_a
+  end
 
   def load_details
     @spec = @intake.published_spec
