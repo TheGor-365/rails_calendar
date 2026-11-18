@@ -31,7 +31,7 @@ export default class extends Controller {
     let error = ""
     if (files.length > 3) {
       error = this.fileErrorValue
-    } else if (ai && files.some(file => [".pdf", ".webp"].some(ext => file.name.toLowerCase().endsWith(ext)))) {
+    } else if (ai && files.some(file => ![".png", ".jpg", ".jpeg", ".txt", ".csv", ".md", ".markdown", ".log", ".json", ".rb", ".py", ".js", ".ts", ".yml", ".yaml", ".xml", ".css", ".scss", ".sql", ".sh"].some(ext => file.name.toLowerCase().endsWith(ext)))) {
       error = this.fileErrorValue
     } else if (ai && (!this.hasConsentTarget || !this.consentTarget.checked)) {
       error = this.consentErrorValue
