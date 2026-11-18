@@ -463,6 +463,81 @@ class OwnerAiConversationsTest < ActionDispatch::IntegrationTest
                                  original_filename: "synthetic.png")
   end
 
+
+  test "first free note names conversation; ellipsis supports JSON rename, archive and reversible trash" do
+    thread = @workspace.owner_ai_conversations.create!(title: "New conversation")
+    login(@owner)
+    post owner_ai_conversation_messages_path(thread), params: {
+      body: "Synthetic issue tracker", intent: "note", request_id: SecureRandom.uuid
+    }
+    assert_equal "Synthetic issue tracker", thread.reload.title
+    get owner_ai_conversation_path(thread)
+    assert_response :success
+    assert_select ".wa-threads__title-editor", count: 1
+    assert_select ".wa-threads__more", count: 1
+    assert_select "form[action=?]", remove_owner_ai_conversation_path(thread), count: 1
+
+    patch rename_owner_ai_conversation_path(thread),
+          params: { title: "Revised synthetic tracker" }, as: :json
+    assert_response :success
+    assert_equal "Revised synthetic tracker", response.parsed_body.fetch("title")
+    assert_equal "Revised synthetic tracker", thread.reload.title
+
+    post archive_owner_ai_conversation_path(thread)
+    assert thread.reload.archived?
+    post restore_owner_ai_conversation_path(thread)
+    assert thread.reload.active?
+    assert_difference("OwnerAiMessage.count", 0) do
+      delete remove_owner_ai_conversation_path(thread)
+    end
+    assert thread.reload.removed?
+    assert_equal 1, thread.owner_ai_messages.count
+    get owner_ai_conversations_path
+    assert_response :success
+    assert_select ".wa-threads__trash", count: 1
+    post restore_owner_ai_conversation_path(thread)
+    assert thread.reload.active?
+  end
+
+  test "markdown is accepted as private text and a ZIP can be saved without AI extraction" do
+    thread = @workspace.owner_ai_conversations.create!(title: "New conversation")
+    login(@owner)
+    text = Tempfile.new(["sample", ".md"])
+    text.write("# Fictional release notes\\nA synthetic change only.")
+    text.flush
+    markdown = Rack::Test::UploadedFile.new(text.path, "text/markdown", true,
+                                            original_filename: "notes.md")
+    zip = Tempfile.new(["sample", ".zip"])
+    zip.binmode
+    zip.write("PK\\x05\\x06".b + ("\\x00".b * 18))
+    zip.flush
+    archive = Rack::Test::UploadedFile.new(zip.path, "application/zip", true,
+                                           original_filename: "synthetic.zip")
+    assert_difference("OwnerAiMessage.count", 1) do
+      post owner_ai_conversation_messages_path(thread), params: {
+        body: "Synthetic Markdown and ZIP archive", request_id: SecureRandom.uuid,
+        intent: "note", files: [markdown, archive]
+      }
+    end
+    assert_redirected_to owner_ai_conversation_path(thread)
+    message = thread.owner_ai_messages.last
+    assert_equal %w[notes.md synthetic.zip], message.files.blobs.map { |blob| blob.filename.to_s }
+    get owner_ai_conversation_path(thread)
+    assert_select ".wa-threads__file-link", count: 2
+    assert_no_difference("AiSpendEntry.count") do
+      post owner_ai_conversation_messages_path(thread), params: {
+        body: "Do not send a stored ZIP to the provider",
+        request_id: SecureRandom.uuid, intent: "ai", paid_consent: "1",
+        files: [Rack::Test::UploadedFile.new(zip.path, "application/zip", true,
+                                              original_filename: "synthetic.zip")]
+      }
+      assert_response :unprocessable_entity
+    end
+  ensure
+    text&.close! rescue nil
+    zip&.close! rescue nil
+  end
+
   def mock_chat_response(title, answer, actions = [])
     Struct.new(:code, :body).new("200", JSON.generate(
       status: "completed", id: "mock-chat-#{SecureRandom.hex(4)}",
