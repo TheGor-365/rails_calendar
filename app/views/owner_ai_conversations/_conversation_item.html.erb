@@ -1,0 +1,54 @@
+<li class="wa-threads__list-row"
+    data-controller="wa-thread-title"
+    data-wa-thread-title-url-value="<%= rename_owner_ai_conversation_path(thread) %>"
+    data-wa-thread-title-conversation-id-value="<%= thread.id %>">
+  <div class="wa-threads__list-entry">
+    <%= link_to owner_ai_conversation_path(thread),
+          class: "wa-threads__item #{'wa-threads__item--selected' if thread == @conversation}",
+          aria: (thread == @conversation ? { current: "page" } : {}),
+          data: { wa_thread_title_target: "link" } do %>
+      <span data-wa-thread-title-target="label"><%= thread.title %></span>
+      <time datetime="<%= thread.updated_at.iso8601 %>"><%= thread.updated_at.strftime("%d.%m.%Y") %></time>
+    <% end %>
+    <% unless thread.removed? %>
+      <form action="<%= rename_owner_ai_conversation_path(thread) %>" method="post"
+            class="wa-threads__title-editor" data-wa-thread-title-target="form" hidden>
+        <input type="hidden" name="_method" value="patch">
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <input name="title" maxlength="100" required class="rc-input"
+               value="<%= thread.title %>" aria-label="<%= t('owner_ai_conversations.rename_label') %>"
+               data-wa-thread-title-target="input"
+               data-action="blur->wa-thread-title#save keydown->wa-thread-title#key" />
+      </form>
+    <% end %>
+    <details class="wa-threads__more">
+      <summary aria-label="<%= t('owner_ai_conversations.more_actions') %>" title="<%= t('owner_ai_conversations.more_actions') %>">
+        <i class="bi bi-three-dots" aria-hidden="true"></i>
+      </summary>
+      <div class="wa-threads__menu">
+        <% if thread.active? %>
+          <button type="button" class="wa-threads__menu-action" data-action="wa-thread-title#edit">
+            <i class="bi bi-pencil" aria-hidden="true"></i><%= t("owner_ai_conversations.rename") %>
+          </button>
+          <%= button_to archive_owner_ai_conversation_path(thread), method: :post,
+                class: "wa-threads__menu-action" do %>
+            <i class="bi bi-archive" aria-hidden="true"></i><%= t("owner_ai_conversations.archive") %>
+          <% end %>
+        <% else %>
+          <%= button_to restore_owner_ai_conversation_path(thread), method: :post,
+                class: "wa-threads__menu-action" do %>
+            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i><%= t("owner_ai_conversations.restore") %>
+          <% end %>
+        <% end %>
+        <% unless thread.removed? %>
+          <%= button_to remove_owner_ai_conversation_path(thread), method: :delete,
+                class: "wa-threads__menu-action wa-threads__menu-action--danger",
+                form: { data: { turbo_confirm: t("owner_ai_conversations.remove_confirm") } } do %>
+            <i class="bi bi-trash" aria-hidden="true"></i><%= t("owner_ai_conversations.remove") %>
+          <% end %>
+        <% end %>
+      </div>
+    </details>
+  </div>
+  <p class="wa-threads__rename-error" role="alert" data-wa-thread-title-target="error" hidden></p>
+</li>
