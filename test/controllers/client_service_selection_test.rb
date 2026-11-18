@@ -63,7 +63,7 @@ class ClientServiceSelectionTest < ActionDispatch::IntegrationTest
     login(@client)
     assert_difference("ProjectIntake.count", 1) do
       post client_requests_path, params: {
-        demo_consent: "1",
+        demo_consent: "1", selected_workspace_id: @workspace.id,
         project_intake: {
           title: "Synthetic custom automation", project_type: "website",
           goal: "Invented business needs a custom online form without fixed services."
@@ -73,12 +73,12 @@ class ClientServiceSelectionTest < ActionDispatch::IntegrationTest
     intake = @client.client_project_intakes.order(:id).last
     assert_equal 0, intake.intake_service_selections.count
     assert_equal @client.id, intake.client_user_id
-    assert_nil intake.workspace_id unless @workspace && @foreign_workspace.nil?
+    assert_equal @workspace.id, intake.workspace_id
   end
 
   test "reject unpublished, stale, missing and cross-workspace versions without saving" do
     draft = OwnerServices::Catalogue.new(workspace: @workspace).create_draft!(
-      service_fields(@workspace.professional_profile.professional_capabilities.first,
+      service_fields(@workspace.professional_profile.professional_capabilities.find_by!(domain: "react"),
                      title: "Private fictional Rails draft")
     )
     stale_id = draft.latest_version.id
