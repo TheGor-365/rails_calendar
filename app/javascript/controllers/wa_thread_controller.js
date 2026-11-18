@@ -31,6 +31,16 @@ export default class extends Controller {
     let error = ""
     if (files.length > 3) {
       error = this.fileErrorValue
+    } else if (files.some(file => {
+      const extension = "." + (file.name.split(".").pop() || "").toLowerCase()
+      const image = [".png", ".jpg", ".jpeg", ".webp"].includes(extension)
+      const pdf = extension === ".pdf"
+      const archive = [".zip", ".7z", ".rar", ".tar", ".gz", ".docx", ".xlsx", ".pptx"].includes(extension)
+      const cap = image ? 2 * 1024 * 1024 : pdf ? 10 * 1024 * 1024 :
+        archive ? 15 * 1024 * 1024 : ai ? 24 * 1024 : 2 * 1024 * 1024
+      return file.size <= 0 || file.size > cap
+    })) {
+      error = this.fileErrorValue
     } else if (ai && files.some(file => ![".png", ".jpg", ".jpeg", ".txt", ".csv", ".md", ".markdown", ".log", ".json", ".rb", ".py", ".js", ".ts", ".yml", ".yaml", ".xml", ".css", ".scss", ".sql", ".sh"].some(ext => file.name.toLowerCase().endsWith(ext)))) {
       error = this.fileErrorValue
     } else if (ai && (!this.hasConsentTarget || !this.consentTarget.checked)) {
