@@ -1,5 +1,17 @@
 hy:
   owner_ai_assistant:
+    consent_short: "Համաձայն եմ Grok-ի մեկ վճարովի հարցմանը"
+    cost_more: "Ծախսեր և տվյալներ"
+    my_conversations: "Իմ զրույցները"
+    find_with_ai: "Գտնել AI-ով"
+    find_categories: "Որոնման կատեգորիաներ (պլանավորված)"
+    find_files: "Ֆայլեր"
+    find_pages: "Էջեր"
+    find_info: "Տվյալներ"
+    find_dates: "Ամսաթվեր"
+    find_tasks: "Առաջադրանքներ"
+    find_archives: "Արխիվ"
+    find_scope_note: "Այժմ աշխատում է միայն էջերի որոնումը։ Մնացածը կավելացվի հետո։"
     open: "Բացել AI օգնականը"
     short_title: "AI օգնական"
     title: "Սեփականատիրոջ AI օգնական"
