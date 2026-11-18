@@ -1,0 +1,89 @@
+<div class="container my-4 my-sm-5">
+  <header class="rc-page-hero mb-4"><div class="rc-page-hero__content">
+    <p class="eyebrow"><%= t("e2.owner_eyebrow") %></p>
+    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-send"></i></span>
+      <h1 class="page-title"><%= t("e2.owner_title") %></h1></div>
+    <p class="rc-muted"><%= t("e2.owner_hint") %></p>
+  </div></header>
+
+  <% if (url = flash[:issued_invitation_url]).present? %>
+    <section class="surface-panel p-3 p-sm-4 mb-4" aria-label="<%= t('e2.copy_title') %>">
+      <h2 class="h5"><%= t("e2.copy_title") %></h2>
+      <p class="rc-hint"><%= t("e2.copy_once") %></p>
+      <div data-controller="wa-copy">
+        <label for="e2-invite-link" class="rc-field-label"><%= t("e2.link_label") %></label>
+        <input id="e2-invite-link" type="url" class="rc-input mb-2" readonly
+               value="<%= url %>" data-wa-copy-target="input" />
+        <button type="button" class="rc-action rc-action--primary" data-action="click->wa-copy#copy">
+          <%= rc_icon_label("clipboard", t("e2.copy_action")) %>
+        </button>
+        <span class="rc-hint" data-wa-copy-target="status" role="status"></span>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="surface-panel p-3 p-sm-4 mb-4">
+    <h2 class="h5"><%= t("e2.new_title") %></h2>
+    <p class="rc-hint"><%= t("e2.demo_warning") %></p>
+    <% if @invitation&.errors&.any? %>
+      <p class="rc-notice rc-notice--error" role="alert"><%= @invitation.errors.full_messages.to_sentence %></p>
+    <% end %>
+    <%= form_with url: owner_invitations_path, method: :post, html: { class: "rc-form" } do %>
+      <div class="rc-field mb-3">
+        <%= label_tag "proposal_seed_title", t("e2.seed_title"), class: "rc-field-label" %>
+        <%= text_field_tag "proposal[seed_title]", @invitation&.seed_title, id: "proposal_seed_title",
+              class: "rc-input", maxlength: 120, required: true %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= label_tag "proposal_seed_project_type", t("e2.seed_type"), class: "rc-field-label" %>
+        <%= select_tag "proposal[seed_project_type]",
+              options_for_select(ProjectIntake::TYPES.map { |type| [rc_intake_type(type), type] },
+                                 @invitation&.seed_project_type),
+              id: "proposal_seed_project_type", class: "rc-input" %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= label_tag "proposal_seed_goal", t("e2.seed_goal"), class: "rc-field-label" %>
+        <%= text_area_tag "proposal[seed_goal]", @invitation&.seed_goal,
+              id: "proposal_seed_goal", class: "rc-input rc-input--area", rows: 5,
+              minlength: 10, maxlength: 1200, required: true,
+              data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
+      </div>
+      <fieldset class="rc-field mb-3">
+        <legend class="rc-field-label"><%= t("e2.services") %></legend>
+        <% @offerings.each do |offering| %>
+          <label class="d-flex gap-2 align-items-start mb-2">
+            <%= check_box_tag "service_version_ids[]", offering.published_version_id,
+                  @invitation&.service_version_ids&.include?(offering.published_version_id) || false %>
+            <span><%= offering.published_version.title %></span>
+          </label>
+        <% end %>
+        <p class="rc-hint"><%= t("e2.services_hint") %></p>
+      </fieldset>
+      <button type="submit" class="rc-action rc-action--primary">
+        <%= rc_icon_label("link-45deg", t("e2.issue_action")) %>
+      </button>
+    <% end %>
+  </section>
+
+  <section class="surface-panel p-3 p-sm-4">
+    <h2 class="h5"><%= t("e2.sent_title") %></h2>
+    <% if @invitations.any? %>
+      <ul class="rc-record-list">
+        <% @invitations.each do |invite| %>
+          <li class="rc-record d-flex flex-wrap justify-content-between gap-3">
+            <div><strong><%= invite.seed_title %></strong>
+              <p class="rc-hint mb-0"><%= t("e2.state_#{invite.state}") %> ·
+                <time datetime="<%= invite.expires_at.iso8601 %>"><%= l(invite.expires_at, format: :short) %></time></p>
+            </div>
+            <% if invite.claimed_at.nil? && invite.revoked_at.nil? && invite.expires_at.future? %>
+              <%= button_to t("e2.revoke_action"), revoke_owner_invitation_path(invite),
+                    method: :post, class: "rc-action rc-action--quiet rc-action--small" %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="rc-empty-state"><p><%= t("e2.none_yet") %></p></div>
+    <% end %>
+  </section>
+</div>
