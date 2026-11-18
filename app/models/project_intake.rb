@@ -4,7 +4,10 @@ class ProjectIntake < ApplicationRecord
   MAX_CLIENT_MESSAGES = 8
 
   belongs_to :client_user, class_name: "User", optional: true, inverse_of: :client_project_intakes
+  belongs_to :workspace, optional: true
   has_many :intake_messages, dependent: :restrict_with_exception
+  has_many :intake_service_selections, dependent: :restrict_with_exception
+  has_many :selected_service_offering_versions, through: :intake_service_selections, source: :service_offering_version
   has_many :owner_intake_read_states, dependent: :restrict_with_exception
   has_many :intake_answers, dependent: :restrict_with_exception
   has_many :intake_spec_versions, dependent: :restrict_with_exception
