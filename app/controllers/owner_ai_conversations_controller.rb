@@ -2,16 +2,27 @@
 class OwnerAiConversationsController < ApplicationController
   before_action :require_owner!
   before_action :load_workspace
-  before_action :load_conversation, only: %i[show add_message rename archive]
+  before_action :load_conversation, only: %i[show add_message rename archive file]
   before_action :load_lists, only: %i[index show]
 
   UUID_PATTERN = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
+  MAX_FILES = 3
+  FILE_TYPES = {
+    "image/jpeg" => %w[.jpg .jpeg],
+    "image/png" => %w[.png],
+    "image/webp" => %w[.webp],
+    "text/plain" => %w[.txt],
+    "text/csv" => %w[.csv],
+    "application/pdf" => %w[.pdf]
+  }.freeze
+  # AI accepts PNG/JPEG images and small UTF-8 text/CSV; PDF/WebP stored as notes only.
+  AI_FILE_TYPES = %w[image/jpeg image/png text/plain text/csv].freeze
 
   def index
   end
 
   def show
-    @messages = @conversation.owner_ai_messages.includes(:ai_spend_entry).in_order
+    @messages = @conversation.owner_ai_messages.includes(:ai_spend_entry, files_attachments: :blob).in_order
     render :index
   end
 
@@ -34,6 +45,8 @@ class OwnerAiConversationsController < ApplicationController
            %w[note ai].include?(intent)
       return render_message_error("owner_ai_conversations.invalid_message")
     end
+    uploads = Array(params[:files]).reject(&:blank?)
+    return render_message_error("owner_ai_conversations.invalid_file") unless valid_files?(uploads, intent: intent)
     if intent == "ai"
       return render_message_error("owner_ai_conversations.consent_required") unless params[:paid_consent] == "1"
       return render_message_error("owner_ai_conversations.ai_disabled") unless OwnerIntelligence::Grok.enabled?
@@ -58,6 +71,7 @@ class OwnerAiConversationsController < ApplicationController
           role: "owner", state: intent == "ai" ? "pending" : "draft",
           sequence: next_sequence, request_id: request_id, body: body
         )
+        owner_message.files.attach(uploads) if uploads.any?
         if intent == "ai"
           assistant_message = @conversation.owner_ai_messages.create!(
             role: "assistant", state: "pending", sequence: next_sequence + 1,
@@ -106,6 +120,28 @@ class OwnerAiConversationsController < ApplicationController
     redirect_to owner_ai_conversation_path(@conversation), alert: t("owner_ai_conversations.save_failed")
   end
 
+  # Only the authenticated Owner can fetch private attached bytes; never expose
+  # Active Storage signed/public blob URLs or accept a filename path parameter.
+  def file
+    message = @conversation.owner_ai_messages.find_by(id: params[:message_id], role: "owner")
+    return head :not_found unless message
+
+    attachment = message.files_attachments.find_by(id: params[:attachment_id])
+    return head :not_found unless attachment
+
+    blob = attachment.blob
+    return head :not_found unless FILE_TYPES.key?(blob.content_type)
+
+    response.headers["Cache-Control"] = "private, no-store"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    image = blob.content_type.start_with?("image/")
+    send_data blob.download, type: blob.content_type,
+              disposition: image ? "inline" : "attachment",
+              filename: blob.filename.to_s
+  rescue ActiveStorage::FileNotFoundError
+    head :not_found
+  end
+
   def rename
     title = params[:title].is_a?(String) ? params[:title].strip : ""
     unless title.length.between?(1, 100)
@@ -130,6 +166,27 @@ class OwnerAiConversationsController < ApplicationController
   end
 
   private
+
+  def valid_files?(uploads, intent:)
+    return false if uploads.length > MAX_FILES
+
+    uploads.all? do |upload|
+      next false unless upload.respond_to?(:tempfile) &&
+        upload.respond_to?(:original_filename) && upload.size.positive?
+      mime = upload.content_type.to_s.downcase
+      extension = File.extname(upload.original_filename.to_s).downcase
+      next false unless FILE_TYPES.fetch(mime, []).include?(extension)
+      next false if intent == "ai" && !AI_FILE_TYPES.include?(mime)
+      bytes_limit = case mime
+      when "image/jpeg", "image/png", "image/webp" then 2.megabytes
+      when "application/pdf" then 3.megabytes
+      else 24.kilobytes
+      end
+      next false if upload.size > bytes_limit
+      sniffed = Marcel::MimeType.for(upload.tempfile, name: upload.original_filename)
+      (sniffed == mime || (mime == "text/csv" && sniffed == "text/plain"))
+    end
+  end
 
   def require_owner!
     redirect_to sign_in_path, alert: t("owner_setup.owner_only") unless owner_signed_in?
@@ -157,7 +214,7 @@ class OwnerAiConversationsController < ApplicationController
     submitted_id = params[:request_id].is_a?(String) ? params[:request_id] : ""
     @draft_request_id = submitted_id.match?(UUID_PATTERN) ? submitted_id : SecureRandom.uuid
     @draft_paid_consent = params[:paid_consent] == "1"
-    @messages = @conversation.owner_ai_messages.includes(:ai_spend_entry).in_order
+    @messages = @conversation.owner_ai_messages.includes(:ai_spend_entry, files_attachments: :blob).in_order
     load_lists
     flash.now[:alert] = t(translation_key)
     render :index, status: :unprocessable_entity
