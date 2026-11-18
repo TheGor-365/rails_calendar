@@ -78,6 +78,9 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_equal 0, intake.client_message_count
     assert_equal @client.id, invitation.reload.claimed_by_user_id
     assert_equal intake.id, invitation.project_intake_id
+    get client_invitation_preview_path
+    assert_response :success
+    assert_select "a[href=?]", edit_client_request_path(intake)
 
     assert_no_difference("ProjectIntake.count") do
       post claim_client_invitation_path, params: { demo_consent: "1" }
