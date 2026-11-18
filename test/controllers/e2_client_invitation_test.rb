@@ -83,15 +83,22 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
       post claim_client_invitation_path, params: { demo_consent: "1" }
       assert_redirected_to edit_client_request_path(intake)
     end
+    assert_no_difference("IntakeMessage.count") do
+      post submit_client_request_path(intake)
+      assert_response :unprocessable_entity
+    end
     patch client_request_path(intake), params: {
       project_intake: {
         title: "Client revised the test task", project_type: "rails_bugfix",
         goal: "Client now requests a synthetic form with two named acceptance scenarios."
-      }
+      },
+      fact_review: { title: "confirmed", project_type: "confirmed", goal: "unknown" }
     }
     assert_redirected_to edit_client_request_path(intake)
     assert_equal "Client revised the test task", intake.reload.title
     assert_equal @seed, invitation.reload.seed_goal
+    assert_equal "unknown", invitation.fact_state("goal")
+    assert_equal "confirmed", invitation.fact_state("title")
 
     assert_difference("IntakeMessage.count", 2) do
       post submit_client_request_path(intake)
