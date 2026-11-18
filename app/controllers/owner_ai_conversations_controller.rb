@@ -30,6 +30,9 @@ class OwnerAiConversationsController < ApplicationController
   AI_FILE_TYPES = %w[image/jpeg image/png text/plain text/markdown text/csv application/json].freeze
 
   def index
+    if (latest = @active_conversations.first)
+      return redirect_to owner_ai_conversation_path(latest)
+    end
   end
 
   def show
@@ -73,7 +76,7 @@ class OwnerAiConversationsController < ApplicationController
         is_paid_turn = @conversation.owner_ai_messages.exists?(parent_message_id: existing.id, role: "assistant")
         outcome = existing.owner_message? && existing.body == body &&
           (intent == "ai") == is_paid_turn ? :replay : :conflict
-      elsif @conversation.archived?
+      elsif !@conversation.active?
         outcome = :archived
       elsif intent == "ai" && @conversation.owner_ai_messages.exists?(role: "assistant", state: %w[pending uncertain])
         outcome = :busy
@@ -174,7 +177,7 @@ class OwnerAiConversationsController < ApplicationController
 
   def archive
     @conversation.archive!
-    redirect_to owner_ai_conversations_path, notice: t("owner_ai_conversations.archived")
+    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.archived")
   end
 
   def restore
