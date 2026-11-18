@@ -560,6 +560,9 @@
 .wa-threads__file-selection:empty { display: none; }
 .wa-threads__attachments button[hidden] { display: none !important; }
 .wa-threads__attachments .rc-hint { flex: 1 0 100%; margin: .1rem 0 0; }
+.wa-threads__inline-error { font-size: .78rem; color: var(--rc-error); padding: .55rem .65rem; border-left: 3px solid var(--rc-error); background: #fff8f8; }
+.wa-threads__inline-error[hidden] { display: none !important; }
+.wa-threads__thread-header + .wa-threads__composer { border-top: 0; padding-top: .9rem; }
 .wa-threads__working {
   display: flex; align-items: center; gap: .65rem;
   padding: .65rem .8rem; border: 1px solid var(--ws-border);
