@@ -512,3 +512,21 @@ textarea[data-controller~="wa-autogrow"] { resize: vertical; min-height: 6rem; m
   .wa-detail-shell__link { gap: .34rem; padding: .47rem .45rem; font-size: .71rem; }
   .wa-detail-shell__link i { flex-basis: .9rem; font-size: .91rem; }
 }
+
+
+// E1 (local fictional pilot): published service multi-select before a shared intake.
+.wa-client-form__services { padding: clamp(1rem, 2vw, 1.5rem); min-width: 0; }
+.wa-client-form__service-choices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .65rem; }
+.wa-client-form__service-choice { display: flex; align-items: flex-start; gap: .65rem; min-width: 0; padding: .8rem; border: 1px solid var(--ws-border); border-radius: 12px; cursor: pointer; color: var(--ws-ink); background: var(--ws-paper); }
+.wa-client-form__service-choice:has(input:checked) { border-color: var(--ws-teal); background: var(--ws-teal-wash); }
+.wa-client-form__service-choice:focus-within { outline: 2px solid var(--ws-teal); outline-offset: 2px; }
+.wa-client-form__service-choice input { flex: 0 0 17px; height: 17px; margin-top: .16rem; accent-color: var(--ws-teal); }
+.wa-client-form__service-choice span { display: grid; gap: .35rem; min-width: 0; }
+.wa-client-form__service-choice strong { font-size: .85rem; overflow-wrap: anywhere; }
+.wa-client-form__service-choice small { font-size: .72rem; color: var(--ws-muted); line-height: 1.5; overflow-wrap: anywhere; }
+.wa-client-request__services { padding: .7rem 0; }
+.wa-client-request__services > strong { font-size: .8rem; }
+.wa-client-request__services ul { margin: .5rem 0; padding-left: 1.3rem; font-size: .84rem; }
+.wa-client-request__services li { padding: .24rem 0; }
+.wa-client-request__services small { display: inline-block; color: var(--ws-muted); margin-left: .35rem; }
+@media (max-width: 620px) { .wa-client-form__service-choices { grid-template-columns: 1fr; } }
