@@ -93,3 +93,59 @@ jobs:
 
       - name: Run browser system tests
         run: bin/rails test:system
+
+  # Railway uses PostgreSQL 18, while the existing test job exercises PG15.
+  # Validate a clean PG18 migration path without touching Railway/production data.
+  postgres18-schema:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 12
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ruby_calendar_pg18_compat
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      RC_LOCAL_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/ruby_calendar_pg18_compat
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Verify fresh Rails migrations on Railway PostgreSQL major
+        run: |
+          bin/rails db:migrate
+          bin/rails db:abort_if_pending_migrations
+          bin/rails runner '
+            db = ActiveRecord::Base.connection
+            major = db.select_value("SHOW server_version_num").to_i / 10_000
+            abort("Expected PostgreSQL 18, got #{major}") unless major == 18
+            required = %w[
+              users workspaces professional_profiles ai_spend_entries
+              owner_ai_conversations owner_ai_messages
+              service_offerings service_offering_versions
+              active_storage_blobs active_storage_attachments
+            ]
+            absent = required.reject { |name| db.data_source_exists?(name) }
+            abort("Missing schema tables: #{absent.join(", ")}") if absent.any?
+            puts "PG18_NEW_DATABASE_MIGRATIONS_PASS"
+          '
