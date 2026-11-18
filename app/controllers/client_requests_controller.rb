@@ -26,8 +26,9 @@ class ClientRequestsController < ApplicationController
       []
     end
 
+    service_error = nil
     if !valid_ids || versions.size != ids.size || versions.map { |v| v.service_offering.workspace_id }.uniq.size > 1
-      @intake.errors.add(:base, I18n.t("client_requests.invalid_services"))
+      service_error = "client_requests.invalid_services"
     else
       chosen_ws = versions.first&.service_offering&.workspace
       if chosen_ws.nil?
@@ -40,7 +41,7 @@ class ClientRequestsController < ApplicationController
           Workspace.find_by(id: requested_ws)
         end
         if public_workspace_ids.size > 1 && chosen_ws.nil?
-          @intake.errors.add(:base, I18n.t("client_requests.choose_specialist"))
+          service_error = "client_requests.choose_specialist"
         end
       end
       @intake.workspace = chosen_ws
@@ -56,6 +57,7 @@ class ClientRequestsController < ApplicationController
     @intake.goal = @intake.goal.to_s.strip
     @intake.demo_consent_at = Time.current if params[:demo_consent] == "1"
     @intake.valid?
+    @intake.errors.add(:base, I18n.t(service_error)) if service_error
     @intake.errors.add(:base, I18n.t("client_requests.consent_required")) unless params[:demo_consent] == "1"
     @intake.errors.add(:goal, I18n.t("client_requests.goal_limit")) if @intake.goal.length > 1200
     return render :new, status: :unprocessable_entity if @intake.errors.any?
@@ -159,6 +161,7 @@ class ClientRequestsController < ApplicationController
   end
 
   def load_details
+    @selected_service_versions = @intake.selected_service_offering_versions.order(:id).to_a
     @spec = @intake.published_spec
     @milestones = @spec ? @intake.project_milestones.where(intake_spec_version_id: @spec.id).order(:position) : []
     @message_total = @intake.intake_messages.count
