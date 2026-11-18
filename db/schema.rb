@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_233000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -183,9 +183,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_030000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["workspace_id", "updated_at"], name: "idx_owner_ai_conversations_recency"
-    t.check_constraint "(state::text = 'archived'::text) = (archived_at IS NOT NULL)", name: "chk_owner_ai_conversation_archive"
+    t.check_constraint "(state::text = 'active'::text) = (archived_at IS NULL)", name: "chk_owner_ai_conversation_archive"
     t.check_constraint "scope::text = 'owner_general'::text", name: "chk_owner_ai_conversation_scope"
-    t.check_constraint "state::text = ANY (ARRAY['active'::character varying, 'archived'::character varying]::text[])", name: "chk_owner_ai_conversation_state"
+    t.check_constraint "state::text = ANY (ARRAY['active'::character varying, 'archived'::character varying, 'removed'::character varying]::text[])", name: "chk_owner_ai_conversation_state"
   end
 
   create_table "owner_ai_messages", force: :cascade do |t|
