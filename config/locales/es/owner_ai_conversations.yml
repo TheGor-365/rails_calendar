@@ -23,6 +23,8 @@ es:
     message_label: "Tu texto"
     message_placeholder: "Pregunta a Grok o guarda una nota privada."
     composer_note: "1–1200 caracteres. Guardar texto es gratis; Preguntar a IA transmite una conversación limitada y autorizada."
+    clear_files: "Quitar archivos seleccionados"
+    private_image_alt: "Captura adjunta privada"
     attach_files: "Adjuntar archivos"
     file_list: "Archivos privados adjuntos"
     files_notice: "Hasta 3 archivos. PNG/JPEG: 2 MB; TXT/CSV: 24 KB. PDF/WebP solo para notas privadas. Las imágenes y el texto se envían a Grok únicamente con consentimiento explícito por solicitud."
