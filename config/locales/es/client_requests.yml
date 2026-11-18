@@ -1,5 +1,15 @@
 es:
   client_requests:
+    choose_services_title: "Elige servicios (opcional)"
+    choose_services_help: "Selecciona varios servicios publicados o describe una tarea distinta. Se conserva la versión exacta de cada servicio."
+    no_published_services: "No hay servicios publicados en esta prueba local. Puedes describir una tarea ficticia."
+    no_service_hint: "Para una tarea personalizada no selecciones servicios. Si eliges uno, el título y el resumen inicial se rellenarán automáticamente."
+    service_revision: "Versión del servicio v%{version}"
+    invalid_services: "El servicio seleccionado cambió, dejó de publicarse o pertenece a otro especialista."
+    choose_specialist: "Elige un especialista"
+    specialist_label: "Especialista n.º %{id}"
+    initial_goal: "Solicitud de prueba para: %{services}. Los requisitos y criterios de aceptación están pendientes de confirmar."
+    selected_services_heading: "Servicios publicados seleccionados"
     eyebrow: "ESPACIO DEL CLIENTE / PILOTO LOCAL"
     new_title: "Crear una solicitud de prueba"
     new_hint: "El cliente verificado puede enviar una solicitud ficticia al propietario. No es un pedido real."
