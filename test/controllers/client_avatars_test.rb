@@ -72,6 +72,17 @@ class ClientAvatarsTest < ActionDispatch::IntegrationTest
     assert_equal 0, @other_client.client_avatars_attachments.count
   end
 
+  test "missing private client avatar file returns 404 without deleting metadata" do
+    login(@client)
+    post client_avatars_path, params: { avatar: { file: image_upload } }
+    attachment = @client.client_avatars_attachments.last
+    attachment.blob.service.delete(attachment.blob.key)
+
+    get client_avatar_file_path(attachment)
+    assert_response :not_found
+    assert_equal 1, @client.client_avatars_attachments.count
+  end
+
   test "bad extension, MIME and oversized images do not persist" do
     login(@client)
     assert_no_difference("ActiveStorage::Attachment.count") do
