@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_18_233000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_234500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -158,6 +158,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_233000) do
     t.index ["project_intake_id", "client_submission_key"], name: "idx_intake_messages_client_submission_unique", unique: true, where: "(client_submission_key IS NOT NULL)"
     t.index ["project_intake_id", "created_at", "id"], name: "idx_intake_conversation_order"
     t.index ["project_intake_id"], name: "index_intake_messages_on_project_intake_id"
+  end
+
+  create_table "intake_service_selections", force: :cascade do |t|
+    t.bigint "project_intake_id", null: false
+    t.bigint "service_offering_version_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_intake_id", "service_offering_version_id"], name: "idx_intake_service_selection_unique", unique: true
+    t.index ["project_intake_id"], name: "index_intake_service_selections_on_project_intake_id"
+    t.index ["service_offering_version_id"], name: "index_intake_service_selections_on_version_id"
   end
 
   create_table "intake_spec_versions", force: :cascade do |t|
@@ -318,7 +328,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_233000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "client_user_id"
+    t.bigint "workspace_id"
     t.index ["client_user_id"], name: "index_project_intakes_on_client_user_id"
+    t.index ["workspace_id"], name: "index_project_intakes_on_workspace_id"
   end
 
   create_table "project_milestones", force: :cascade do |t|
@@ -471,6 +483,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_233000) do
   add_foreign_key "intake_answer_revisions", "intake_answers"
   add_foreign_key "intake_answers", "project_intakes"
   add_foreign_key "intake_messages", "project_intakes"
+  add_foreign_key "intake_service_selections", "project_intakes"
+  add_foreign_key "intake_service_selections", "service_offering_versions"
   add_foreign_key "intake_spec_versions", "project_intakes"
   add_foreign_key "owner_ai_conversations", "workspaces"
   add_foreign_key "owner_ai_messages", "ai_spend_entries"
@@ -486,6 +500,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_233000) do
   add_foreign_key "professional_context_snapshots", "professional_profiles"
   add_foreign_key "professional_profiles", "workspaces"
   add_foreign_key "project_intakes", "users", column: "client_user_id"
+  add_foreign_key "project_intakes", "workspaces"
   add_foreign_key "project_milestones", "intake_spec_versions"
   add_foreign_key "project_milestones", "project_intakes"
   add_foreign_key "service_offering_media_items", "service_offering_versions"
