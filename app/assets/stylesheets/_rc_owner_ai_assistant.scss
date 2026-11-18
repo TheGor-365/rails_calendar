@@ -647,3 +647,9 @@
   .wa-threads__paid-consent { align-items: flex-start; }
   .wa-ai-dock__navigation .rc-action { width: 100%; }
 }
+
+.wa-threads__intro-compact { display: flex; align-items: center; gap: .65rem; padding: .7rem .2rem; color: var(--ws-muted); font-size: .82rem; line-height: 1.5; }
+.wa-threads__intro-compact .bi { color: var(--ws-teal); font-size: 1rem; }
+.wa-threads__intro-compact p { margin: 0; }
+.wa-threads__sidebar.surface-panel { overflow: visible; }
+.wa-threads__list-entry .wa-threads__more > summary:focus-visible { outline: 2px solid var(--ws-teal); outline-offset: 2px; }
