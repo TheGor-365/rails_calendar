@@ -1,6 +1,6 @@
 # Shared database-backed throttles. Never store raw IP addresses in this table.
 class SignupRateWindow < ApplicationRecord
-  PURPOSES = %w[request_ip request_email verify_ip verify_email].freeze
+  PURPOSES = %w[request_ip request_email verify_ip verify_email invite_preview_ip].freeze
 
   def self.blocked?(purpose:, identifier:, seconds:, limit:)
     raise ArgumentError unless PURPOSES.include?(purpose) && [60, 600, 3600].include?(seconds) && limit.between?(1, 40)
