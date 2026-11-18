@@ -7,6 +7,7 @@ class ProjectIntake < ApplicationRecord
   belongs_to :workspace, optional: true
   has_many :intake_messages, dependent: :restrict_with_exception
   has_many :intake_service_selections, dependent: :restrict_with_exception
+  has_one :client_request_invitation, dependent: :restrict_with_exception
   has_many :selected_service_offering_versions, through: :intake_service_selections, source: :service_offering_version
   has_many :owner_intake_read_states, dependent: :restrict_with_exception
   has_many :intake_answers, dependent: :restrict_with_exception
