@@ -6,6 +6,8 @@ class OwnerAiMessage < ApplicationRecord
   belongs_to :owner_ai_conversation, inverse_of: :owner_ai_messages
   belongs_to :parent_message, class_name: "OwnerAiMessage", optional: true
   belongs_to :ai_spend_entry, optional: true
+  # Existing Active Storage tables: no schema change or public signed file routes.
+  has_many_attached :files
 
   ROLES = %w[owner assistant].freeze
   STATES = %w[draft pending settled failed uncertain].freeze
