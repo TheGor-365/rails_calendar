@@ -40,3 +40,7 @@ application.register("wa-avatar-editor", WaAvatarEditorController)
 // Global owner-only AI assistant; native details remains usable without JS.
 import WaAiDockController from "./wa_ai_dock_controller"
 application.register("wa-ai-dock", WaAiDockController)
+
+// In-frame owner AI dialogue, progress and attachment selection.
+import WaThreadController from "./wa_thread_controller"
+application.register("wa-thread", WaThreadController)
