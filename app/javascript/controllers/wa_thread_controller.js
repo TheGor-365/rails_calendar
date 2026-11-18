@@ -3,15 +3,22 @@ import { Controller } from "@hotwired/stimulus"
 // Small progressive enhancement: Turbo keeps the page stationary while the
 // provider replies. It never triggers network requests, retries, or AI calls.
 export default class extends Controller {
-  static targets = ["files", "fileNames", "loading"]
+  static targets = ["files", "fileNames", "loading", "clear"]
 
   filesChanged() {
     if (!this.hasFilesTarget || !this.hasFileNamesTarget) return
     const files = Array.from(this.filesTarget.files || [])
     this.fileNamesTarget.textContent = files.map(file => file.name).join(" · ")
+    if (this.hasClearTarget) this.clearTarget.hidden = files.length === 0
     if (files.length > 3) {
       this.fileNamesTarget.textContent += " — maximum 3 files"
     }
+  }
+
+  clearFiles() {
+    if (!this.hasFilesTarget) return
+    this.filesTarget.value = ""
+    this.filesChanged()
   }
 
   submitStart(event) {
