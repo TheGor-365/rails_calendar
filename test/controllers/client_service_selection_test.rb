@@ -15,6 +15,7 @@ class ClientServiceSelectionTest < ActionDispatch::IntegrationTest
     @workspace, _profile, _snapshot, caps = approved_profile_for(@owner)
     @offering = published_offering(@workspace, caps.first, "Fix a synthetic Rails form")
     @version = @offering.published_version
+    @second_offering = published_offering(@workspace, caps.last, "Improve synthetic frontend screens")
     @foreign_owner = make_test_owner("e1-other-#{SecureRandom.hex(4)}@example.test")
     @foreign_workspace, _other_profile, _other_snapshot, other_caps = approved_profile_for(@foreign_owner)
     @foreign_offering = published_offering(@foreign_workspace, other_caps.first, "Other synthetic Rails task")
@@ -57,6 +58,24 @@ class ClientServiceSelectionTest < ActionDispatch::IntegrationTest
     login(@foreign_client)
     get client_request_path(intake)
     assert_response :not_found
+  end
+
+  test "several published versions from the same owner are persisted in one request" do
+    login(@client)
+    ids = [@version.id, @second_offering.published_version_id]
+    assert_difference("IntakeServiceSelection.count", 2) do
+      post client_requests_path, params: {
+        demo_consent: "1", service_version_ids: ids.map(&:to_s),
+        project_intake: { title: "", project_type: "", goal: "" }
+      }
+    end
+    intake = @client.client_project_intakes.order(:id).last
+    assert_redirected_to client_request_path(intake)
+    assert_equal ids.sort, intake.selected_service_offering_versions.pluck(:id).sort
+    assert_equal @workspace.id, intake.workspace_id
+    # Historical proof must survive a later catalogue unpublish.
+    @second_offering.update!(published_version: nil)
+    assert_equal ids.sort, intake.reload.selected_service_offering_versions.pluck(:id).sort
   end
 
   test "custom request without selected services is still possible" do
