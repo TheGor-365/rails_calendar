@@ -211,7 +211,7 @@ class OwnerAiConversationsController < ApplicationController
            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
            "application/vnd.openxmlformats-officedocument.presentationml.presentation" then 15.megabytes
-      else 24.kilobytes
+      else intent == "ai" ? 24.kilobytes : 2.megabytes
       end
       next false if upload.size > bytes_limit
       sniffed = Marcel::MimeType.for(upload.tempfile, name: upload.original_filename)
