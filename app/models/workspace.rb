@@ -2,6 +2,7 @@ class Workspace < ApplicationRecord
   belongs_to :owner_user, class_name: "User"
   has_one :professional_profile, dependent: :restrict_with_exception
   has_many :service_offerings, dependent: :restrict_with_exception
+  has_many :client_request_invitations, dependent: :restrict_with_exception
   has_many :owner_ai_conversations, dependent: :restrict_with_exception
 
   validates :name, presence: true, length: { maximum: 120 }
