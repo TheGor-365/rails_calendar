@@ -64,7 +64,7 @@
       <% if @conversation %>
         <header class="wa-threads__thread-header">
           <div>
-            <p class="eyebrow"><%= @conversation.archived? ? t("owner_ai_conversations.archive_heading") : t("owner_ai_conversations.active_heading") %></p>
+            <p class="eyebrow"><%= @conversation.removed? ? t("owner_ai_conversations.trash_heading") : (@conversation.archived? ? t("owner_ai_conversations.archive_heading") : t("owner_ai_conversations.active_heading")) %></p>
             <h2 data-wa-thread-title-current-id="<%= @conversation.id %>"><%= @conversation.title %></h2>
           </div>
         </header>
@@ -176,9 +176,8 @@
           <% end %>
         <% end %>
       <% else %>
-        <div class="wa-threads__empty rc-empty-state" role="status">
-          <span class="rc-empty-state__icon" aria-hidden="true"><i class="bi bi-chat-square-dots"></i></span>
-          <h2><%= t("owner_ai_conversations.empty_heading") %></h2>
+        <div class="wa-threads__intro-compact" role="status">
+          <i class="bi bi-chat-square-text" aria-hidden="true"></i>
           <p><%= t("owner_ai_conversations.empty_description") %></p>
         </div>
       <% end %>
