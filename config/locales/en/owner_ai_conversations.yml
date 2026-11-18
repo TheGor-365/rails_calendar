@@ -23,6 +23,8 @@ en:
     message_label: "Your text"
     message_placeholder: "Ask Grok a question, or save a private note."
     composer_note: "1–1200 characters. Save text is free; Ask AI sends the question and limited authorized dialogue to Grok."
+    clear_files: "Clear selected files"
+    private_image_alt: "Private attached screenshot"
     attach_files: "Attach files"
     file_list: "Private attachments"
     files_notice: "Up to 3 files. PNG/JPEG (2 MB), TXT/CSV (24 KB), PDF/WebP (private note only). Only images and small text from a paid AI turn are sent to xAI with consent."
