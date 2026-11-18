@@ -22,9 +22,14 @@
         <%= link_to t("e2.open_request"), client_request_path(@invitation.project_intake),
               class: "rc-action rc-action--primary" %>
       <% elsif client_signed_in? %>
-        <%= button_to claim_client_invitation_path, method: :post, class: "rc-action rc-action--primary" do %>
-          <%= check_box_tag :demo_consent, "1", false, required: true %>
-          <%= t("e2.claim_action") %>
+        <%= form_with url: claim_client_invitation_path, method: :post, html: { class: "rc-form" } do %>
+          <div class="rc-field mb-3">
+            <%= check_box_tag :demo_consent, "1", false, required: true %>
+            <%= label_tag :demo_consent, t("e2.demo_warning") %>
+          </div>
+          <button type="submit" class="rc-action rc-action--primary">
+            <%= rc_icon_label("check2-circle", t("e2.claim_action")) %>
+          </button>
         <% end %>
       <% else %>
         <div class="d-flex flex-wrap gap-2">
