@@ -419,7 +419,7 @@ class OwnerAiConversationsTest < ActionDispatch::IntegrationTest
     input = sent.first.fetch("input").last.fetch("content")
     assert_equal "input_text", input.first.fetch("type")
     assert_equal "input_image", input.last.fetch("type")
-    assert_match(/\\Adata:image\\/png;base64,/, input.last.fetch("image_url"))
+    assert input.last.fetch("image_url").start_with?("data:image/png;base64,")
     assert_equal false, sent.first.fetch("store")
     assert_equal 1, thread.owner_ai_messages.find_by!(role: "owner").files.count
     assert_equal "settled", thread.owner_ai_messages.find_by!(role: "assistant").state
