@@ -1,5 +1,17 @@
 ru:
   owner_ai_assistant:
+    consent_short: "Согласен на один платный запрос Grok"
+    cost_more: "Подробнее о расходах и данных"
+    my_conversations: "Мои беседы"
+    find_with_ai: "Найти с ИИ"
+    find_categories: "Категории поиска (в разработке)"
+    find_files: "Файлы"
+    find_pages: "Страницы"
+    find_info: "Информация"
+    find_dates: "Даты"
+    find_tasks: "Задачи"
+    find_archives: "Архив"
+    find_scope_note: "Сейчас работает поиск страниц. Файлы, задачи и проекты подключим отдельно."
     open: "Открыть ИИ-помощника"
     short_title: "ИИ-помощник"
     title: "ИИ-помощник владельца"
