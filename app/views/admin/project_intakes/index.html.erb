@@ -16,7 +16,7 @@
             <span class="wa-inbox-record__new"><span class="wa-unread-dot" aria-hidden="true"></span><%= t("intake.unread_new") %></span>
           <% end %>
         </h2>
-        <p class="rc-muted"><%= rc_intake_type(intake.project_type) %> · <%= rc_intake_status(intake.status) %><% if intake.client_user_id.present? %> · <%= t("client_requests.origin_client") %><% end %> · <%= rc_local_datetime(intake.created_at, format: :rc_date_time) + " UTC" %></p>
+        <p class="rc-muted"><%= rc_intake_type(intake.project_type) %> · <%= rc_intake_status(intake.status) %><% if intake.client_user_id.present? %> · <%= t("client_requests.origin_client") %><% end %><% if (invitation = intake.client_request_invitation) %> · <%= t("e2.state_#{invitation.state}") %><% end %> · <%= rc_local_datetime(intake.created_at, format: :rc_date_time) + " UTC" %></p>
       </li>
     <% end %>
   </ul>
