@@ -145,7 +145,10 @@
         <% else %>
           <%= form_with url: owner_ai_conversation_messages_path(@conversation), method: :post,
                 multipart: true, class: "wa-threads__composer rc-form",
-                data: { controller: "wa-thread", action: "turbo:submit-start->wa-thread#submitStart turbo:submit-end->wa-thread#submitEnd" } do %>
+                data: { controller: "wa-thread",
+                        action: "submit->wa-thread#guard turbo:submit-start->wa-thread#submitStart turbo:submit-end->wa-thread#submitEnd",
+                        wa_thread_consent_error_value: t("owner_ai_conversations.consent_required"),
+                        wa_thread_file_error_value: t("owner_ai_conversations.invalid_file") } do %>
             <%= hidden_field_tag :request_id, (@draft_request_id.presence || SecureRandom.uuid) %>
             <%= label_tag "wa-thread-body", t("owner_ai_conversations.message_label"), class: "rc-field-label" %>
             <%= text_area_tag :body, @draft_body, id: "wa-thread-body", class: "rc-input rc-input--area",
@@ -168,10 +171,12 @@
               <p class="rc-hint"><%= t("owner_ai_conversations.files_notice") %></p>
             </div>
             <div class="rc-field">
-              <%= check_box_tag :paid_consent, "1", @draft_paid_consent == true, id: "wa-thread-paid-consent" %>
+              <%= check_box_tag :paid_consent, "1", @draft_paid_consent == true,
+                    id: "wa-thread-paid-consent", data: { wa_thread_target: "consent" } %>
               <%= label_tag "wa-thread-paid-consent", t("owner_ai_conversations.paid_consent_label"), class: "rc-field-label" %>
             </div>
             <p class="rc-hint"><%= t("owner_ai_conversations.paid_budget_notice") %></p>
+            <p class="wa-threads__inline-error" data-wa-thread-target="error" role="alert" hidden></p>
             <p class="wa-threads__working" data-wa-thread-target="loading" role="status" hidden>
               <span class="wa-threads__working-dot" aria-hidden="true"></span>
               <%= t("owner_ai_conversations.waiting_for_ai") %>
