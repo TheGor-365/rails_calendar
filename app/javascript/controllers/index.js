@@ -48,3 +48,9 @@ application.register("wa-thread", WaThreadController)
 // Per-thread auto-title override; only the user's explicit edits are saved.
 import WaThreadTitleController from "./wa_thread_title_controller"
 application.register("wa-thread-title", WaThreadTitleController)
+
+// E2 fragment-only invite token and private owner copy control.
+import WaInvitationLinkController from "./wa_invitation_link_controller"
+application.register("wa-invitation-link", WaInvitationLinkController)
+import WaCopyController from "./wa_copy_controller"
+application.register("wa-copy", WaCopyController)
