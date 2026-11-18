@@ -17,7 +17,7 @@ module OwnerAi
     MAX_IMAGE_BYTES = 2.megabytes
     MAX_TEXT_BYTES = 24.kilobytes
     SUPPORTED_IMAGES = %w[image/jpeg image/png].freeze
-    SUPPORTED_TEXT = %w[text/plain text/csv].freeze
+    SUPPORTED_TEXT = %w[text/plain text/markdown text/csv application/json].freeze
     SCHEMA = {
       type: "object", additionalProperties: false,
       properties: {
