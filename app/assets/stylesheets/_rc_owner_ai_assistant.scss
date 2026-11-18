@@ -529,6 +529,7 @@
 // C2.1d — in-place Turbo updates and evidence uploads in the existing White Atlas.
 #wa-thread-workspace { display: block; min-width: 0; }
 .wa-threads__file-list { list-style: none; margin: .65rem 0 0; padding: 0; display: grid; gap: .4rem; }
+.wa-threads__file-preview { display: block; max-width: min(320px,100%); max-height: 210px; object-fit: contain; border: 1px solid var(--ws-border); border-radius: 12px; background: var(--ws-paper); margin-bottom: .4rem; }
 .wa-threads__file-link {
   display: inline-flex; max-width: 100%; align-items: center; gap: .4rem;
   padding: .45rem .55rem; background: var(--ws-paper);
@@ -557,6 +558,7 @@
 }
 .wa-threads__file-selection { max-width: 100%; min-height: 0; font-size: .74rem; color: var(--ws-ink); overflow-wrap: anywhere; }
 .wa-threads__file-selection:empty { display: none; }
+.wa-threads__attachments button[hidden] { display: none !important; }
 .wa-threads__attachments .rc-hint { flex: 1 0 100%; margin: .1rem 0 0; }
 .wa-threads__working {
   display: flex; align-items: center; gap: .65rem;
