@@ -11,13 +11,12 @@ class CreateClientRequestInvitations < ActiveRecord::Migration[8.1]
       t.datetime :revoked_at
       t.datetime :claimed_at
       t.references :claimed_by_user, foreign_key: { to_table: :users }
-      t.references :project_intake, foreign_key: true
+      t.references :project_intake, foreign_key: true, index: { unique: true }
       t.datetime :submitted_at
       t.timestamps
     end
 
     add_index :client_request_invitations, :token_digest, unique: true
-    add_index :client_request_invitations, :project_intake_id, unique: true
     add_index :client_request_invitations, [:workspace_id, :created_at]
     add_check_constraint :client_request_invitations,
       "char_length(token_digest) = 64", name: "chk_client_invite_digest_length"
