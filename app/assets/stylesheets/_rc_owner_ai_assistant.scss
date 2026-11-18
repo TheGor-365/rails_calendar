@@ -585,3 +585,65 @@
   .wa-threads__file-link { max-width: 100%; }
   .wa-threads__message { max-width: 100%; }
 }
+
+
+// C2.1e — minimal conversation controls and compact dock, White Atlas only.
+.wa-threads__list-row { position: relative; list-style: none; }
+.wa-threads__list-entry { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; }
+.wa-threads__list-entry .wa-threads__item { min-width: 0; }
+.wa-threads__list-entry .wa-threads__item[hidden] { display: none; }
+.wa-threads__list-entry .wa-threads__title-editor { min-width: 0; padding: .3rem .55rem; }
+.wa-threads__title-editor[hidden] { display: none !important; }
+.wa-threads__title-editor .rc-input { font-size: .82rem; padding: .15rem .2rem; min-height: 32px; }
+.wa-threads__more { position: relative; }
+.wa-threads__more summary { display: grid; place-items: center; width: 35px; height: 35px; cursor: pointer; color: var(--ws-muted); border-radius: 10px; list-style: none; }
+.wa-threads__more summary::-webkit-details-marker { display: none; }
+.wa-threads__more summary:hover, .wa-threads__more[open] summary { color: var(--ws-teal-deep); background: var(--ws-teal-wash); }
+.wa-threads__menu {
+  position: absolute; z-index: 15; right: 0; top: 100%; width: min(190px, 70vw);
+  display: grid; gap: .12rem; padding: .3rem; border: 1px solid var(--ws-border);
+  border-radius: 12px; background: var(--ws-paper); box-shadow: var(--ws-shadow-up);
+}
+.wa-threads__menu form { margin: 0; }
+.wa-threads__menu-action {
+  width: 100%; display: flex; align-items: center; gap: .5rem; text-align: start;
+  padding: .55rem .6rem; background: transparent; color: var(--ws-ink);
+  border: 0; border-radius: 8px; font-size: .78rem; cursor: pointer;
+}
+.wa-threads__menu-action:hover { background: var(--ws-teal-wash); color: var(--ws-teal-deep); }
+.wa-threads__menu-action--danger { color: var(--rc-error); }
+.wa-threads__rename-error { font-size: .71rem; color: var(--rc-error); padding: .1rem .55rem; }
+.wa-threads__rename-error[hidden] { display: none !important; }
+.wa-threads__trash { border-top: 1px solid var(--ws-border); padding-top: .5rem; }
+.wa-threads__trash > summary { cursor: pointer; font-size: .72rem; font-weight: 700; color: var(--ws-muted); }
+.wa-threads__thread-header { padding-bottom: .75rem; }
+.wa-threads__paid-consent { display: flex; align-items: center; gap: .5rem; margin-bottom: .3rem !important; }
+.wa-threads__paid-consent label { margin: 0; font-size: .75rem; letter-spacing: 0; font-weight: 590; line-height: 1.45; }
+.wa-threads__paid-consent input { flex: 0 0 16px; margin: 0; }
+.wa-threads__cost-info { margin: .1rem 0 .45rem; font-size: .73rem; }
+.wa-threads__cost-info > summary { cursor: pointer; color: var(--ws-muted); }
+.wa-threads__cost-info p { margin: .45rem 0; }
+.wa-ai-dock__heading small, .wa-ai-dock__workspace-copy small { display: none; }
+.wa-ai-dock__heading { align-items: center; }
+.wa-ai-dock__consent--compact { padding: .45rem .65rem; align-items: center; }
+.wa-ai-dock__consent--compact input { margin: 0; }
+.wa-ai-dock__cost-details { color: var(--ws-muted); font-size: .7rem; }
+.wa-ai-dock__cost-details > summary { cursor: pointer; }
+.wa-ai-dock__cost-details p { margin: .4rem 0; }
+.wa-ai-dock__find { border-top: 1px solid var(--ws-border); padding-top: .7rem; }
+.wa-ai-dock__find > summary { display: flex; align-items: center; gap: .45rem; cursor: pointer; font-size: .79rem; color: var(--ws-teal-deep); font-weight: 760; }
+.wa-ai-dock__find-body { padding-top: .7rem; }
+.wa-ai-dock__find-categories { display: flex; flex-wrap: wrap; gap: .35rem; }
+.wa-ai-dock__find-categories span { display: inline-flex; gap: .28rem; align-items: center; padding: .3rem .4rem; border: 1px solid var(--ws-border); border-radius: 9px; font-size: .69rem; color: var(--ws-muted); }
+.wa-ai-dock__find-categories .bi { color: var(--ws-teal); }
+.wa-ai-dock__find-body .rc-hint { margin: .6rem 0; font-size: .69rem; }
+.wa-ai-dock__navigation { display: flex; gap: .4rem; flex-wrap: wrap; }
+.wa-ai-dock__navigation .rc-input { min-width: 170px; flex: 1; }
+.wa-ai-dock__navigation .rc-action { flex: 0 0 auto; }
+.wa-ai-dock__links { padding-top: .7rem; }
+.wa-ai-dock__links a { display: inline-flex; align-items: center; gap: .45rem; font-size: .79rem; }
+@media (max-width: 575.98px) {
+  .wa-threads__menu { right: 0; }
+  .wa-threads__paid-consent { align-items: flex-start; }
+  .wa-ai-dock__navigation .rc-action { width: 100%; }
+}
