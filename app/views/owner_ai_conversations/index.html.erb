@@ -12,6 +12,7 @@
     <%= t("owner_ai_conversations.privacy") %>
   </p>
 
+  <%= turbo_frame_tag "wa-thread-workspace", data: { turbo_action: "advance" } do %>
   <div class="wa-threads__layout">
     <aside class="wa-threads__sidebar surface-panel" aria-label="<%= t('owner_ai_conversations.conversation_list') %>">
       <details class="wa-threads__drawer" open>
@@ -101,6 +102,20 @@
                 <% else %>
                   <p class="wa-threads__message-body"><%= message.body %></p>
                 <% end %>
+                <% if message.owner_message? && message.files.attached? %>
+                  <ul class="wa-threads__file-list" aria-label="<%= t('owner_ai_conversations.file_list') %>">
+                    <% message.files_attachments.each do |attachment| %>
+                      <li>
+                        <%= link_to owner_ai_conversation_file_path(@conversation, message, attachment),
+                              target: "_blank", rel: "noopener noreferrer", class: "wa-threads__file-link" do %>
+                          <i class="bi bi-paperclip" aria-hidden="true"></i>
+                          <span><%= attachment.blob.filename.to_s %></span>
+                          <small><%= number_to_human_size(attachment.blob.byte_size) %></small>
+                        <% end %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
                 <% if message.assistant_message? && message.state == "settled" && message.ai_spend_entry %>
                   <% entry = message.ai_spend_entry %>
                   <p class="rc-hint"><%= t("owner_ai_conversations.billed",
@@ -116,8 +131,6 @@
               </li>
             <% end %>
           </ol>
-        <% else %>
-          <div class="wa-threads__empty" role="status"><%= t("owner_ai_conversations.no_messages") %></div>
         <% end %>
 
         <% if @conversation.archived? %>
@@ -126,18 +139,34 @@
           </p>
         <% else %>
           <%= form_with url: owner_ai_conversation_messages_path(@conversation), method: :post,
-                class: "wa-threads__composer rc-form" do %>
+                multipart: true, class: "wa-threads__composer rc-form",
+                data: { controller: "wa-thread", action: "turbo:submit-start->wa-thread#submitStart turbo:submit-end->wa-thread#submitEnd" } do %>
             <%= hidden_field_tag :request_id, (@draft_request_id.presence || SecureRandom.uuid) %>
             <%= label_tag "wa-thread-body", t("owner_ai_conversations.message_label"), class: "rc-field-label" %>
             <%= text_area_tag :body, @draft_body, id: "wa-thread-body", class: "rc-input rc-input--area",
                   rows: 4, maxlength: 1200, required: true,
                   placeholder: t("owner_ai_conversations.message_placeholder") %>
             <p class="rc-hint"><%= t("owner_ai_conversations.composer_note") %></p>
+            <div class="wa-threads__attachments">
+              <%= label_tag "wa-thread-files", class: "wa-threads__file-trigger" do %>
+                <i class="bi bi-paperclip" aria-hidden="true"></i>
+                <%= t("owner_ai_conversations.attach_files") %>
+              <% end %>
+              <%= file_field_tag "files[]", id: "wa-thread-files", multiple: true,
+                    accept: ".png,.jpg,.jpeg,.webp,.txt,.csv,.pdf",
+                    class: "wa-threads__file-input", data: { wa_thread_target: "files", action: "change->wa-thread#filesChanged" } %>
+              <output class="wa-threads__file-selection" data-wa-thread-target="fileNames" aria-live="polite"></output>
+              <p class="rc-hint"><%= t("owner_ai_conversations.files_notice") %></p>
+            </div>
             <div class="rc-field">
               <%= check_box_tag :paid_consent, "1", @draft_paid_consent == true, id: "wa-thread-paid-consent" %>
               <%= label_tag "wa-thread-paid-consent", t("owner_ai_conversations.paid_consent_label"), class: "rc-field-label" %>
             </div>
             <p class="rc-hint"><%= t("owner_ai_conversations.paid_budget_notice") %></p>
+            <p class="wa-threads__working" data-wa-thread-target="loading" role="status" hidden>
+              <span class="wa-threads__working-dot" aria-hidden="true"></span>
+              <%= t("owner_ai_conversations.waiting_for_ai") %>
+            </p>
             <%= button_tag rc_icon_label("journal-check", t("owner_ai_conversations.save_message")),
                   type: "submit", name: "intent", value: "note", class: "rc-action rc-action--quiet" %>
             <% if @ai_enabled %>
@@ -157,4 +186,5 @@
       <% end %>
     </section>
   </div>
+  <% end %>
 </main>
