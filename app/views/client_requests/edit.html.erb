@@ -1,0 +1,47 @@
+<div class="container wa-client-form my-4 my-sm-5">
+  <header class="rc-page-hero mb-4"><div class="rc-page-hero__content">
+    <p class="eyebrow"><%= t("e2.guest_eyebrow") %></p>
+    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-pencil-square"></i></span>
+      <h1 class="page-title"><%= t("e2.edit_title") %></h1></div>
+    <p class="rc-muted"><%= t("e2.edit_hint") %></p>
+  </div></header>
+
+  <section class="surface-panel p-3 p-sm-4 mb-3">
+    <h2 class="h5"><%= t("e2.owner_seed_title") %></h2>
+    <p class="rc-hint"><%= t("e2.owner_seed_warning") %></p>
+    <p><strong><%= @invitation.seed_title %></strong></p>
+    <p class="wa-prose"><%= @invitation.seed_goal %></p>
+  </section>
+
+  <section class="surface-panel p-3 p-sm-4 mb-3">
+    <% if @intake.errors.any? %>
+      <p class="rc-notice rc-notice--error" role="alert"><%= @intake.errors.full_messages.to_sentence %></p>
+    <% end %>
+    <%= form_with model: @intake, url: client_request_path(@intake), method: :patch,
+                  html: { class: "rc-form" } do |f| %>
+      <div class="rc-field mb-3">
+        <%= f.label :title, t("intake.field_title"), class: "rc-field-label" %>
+        <%= f.text_field :title, class: "rc-input", maxlength: 120, required: true %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= f.label :project_type, t("intake.field_type"), class: "rc-field-label" %>
+        <%= f.select :project_type,
+             ProjectIntake::TYPES.map { |type| [rc_intake_type(type), type] }, {}, class: "rc-input" %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= f.label :goal, t("intake.field_goal"), class: "rc-field-label" %>
+        <%= f.text_area :goal, class: "rc-input rc-input--area", rows: 5,
+              minlength: 10, maxlength: 1200, required: true,
+              data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
+      </div>
+      <p class="rc-hint"><%= t("e2.demo_warning") %></p>
+      <button type="submit" class="rc-action rc-action--soft"><%= rc_icon_label("floppy", t("e2.save_draft")) %></button>
+    <% end %>
+  </section>
+  <section class="surface-panel p-3 p-sm-4">
+    <h2 class="h5"><%= t("e2.submit_title") %></h2>
+    <p class="rc-hint"><%= t("e2.submit_hint") %></p>
+    <%= button_to rc_icon_label("send", t("e2.submit_action")),
+        submit_client_request_path(@intake), method: :post, class: "rc-action rc-action--primary" %>
+  </section>
+</div>
