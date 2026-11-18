@@ -28,11 +28,23 @@ Rails.application.routes.draw do
   get "/client/requests/new", to: "client_requests#new", as: :new_client_request
   post "/client/requests", to: "client_requests#create", as: :client_requests
   get "/client/requests/:id", to: "client_requests#show", as: :client_request
+  get "/client/requests/:id/edit", to: "client_requests#edit", as: :edit_client_request
+  patch "/client/requests/:id", to: "client_requests#update"
+  post "/client/requests/:id/submit", to: "client_requests#submit", as: :submit_client_request
+
+  # E2: fragment-token landing, filtered POST preview and verified-client claim.
+  get "/invite", to: "client_invitations#landing", as: :client_invitation
+  post "/invite/preview", to: "client_invitations#preview"
+  get "/invite/preview", to: "client_invitations#show", as: :client_invitation_preview
+  post "/invite/claim", to: "client_invitations#claim", as: :claim_client_invitation
   post "/client/requests/:id/reply", to: "client_requests#reply", as: :reply_client_request
   post "/client/requests/:id/review", to: "client_requests#review", as: :review_client_request
 
   # Private owner entry, never a public client cabinet.
   get "/workspace", to: "workspace#home", as: :workspace
+  get "/workspace/invitations", to: "owner_invitations#index", as: :owner_invitations
+  post "/workspace/invitations", to: "owner_invitations#create"
+  post "/workspace/invitations/:id/revoke", to: "owner_invitations#revoke", as: :revoke_owner_invitation
 
   # RC052: owner-only professional intelligence, AI review and immutable approval.
   get "/workspace/setup", to: "owner_setup#show", as: :owner_setup
