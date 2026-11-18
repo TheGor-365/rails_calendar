@@ -42,6 +42,18 @@
       <span class="wa-client-request__section-icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
       <h2 id="client-request-description"><%= t("client_requests.description_title") %></h2>
     </div>
+    <% if @selected_service_versions.any? %>
+      <div class="wa-client-request__services">
+        <strong><%= t("client_requests.selected_services_heading") %></strong>
+        <ul>
+          <% @selected_service_versions.each do |version| %>
+            <li><%= version.title %>
+              <small><%= t("client_requests.service_revision", version: version.version) %></small>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
     <details class="wa-context__original" <%= "open" if @intake.goal.length <= 360 %>>
       <summary><i class="bi bi-journal-text" aria-hidden="true"></i><%= t("intake_context.original_toggle") %></summary>
       <div class="wa-client-request__description wa-prose"><%= @intake.goal %></div>
