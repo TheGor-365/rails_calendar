@@ -27,7 +27,7 @@
             <% if @active_conversations.any? %>
               <ul class="wa-threads__items">
                 <% @active_conversations.each do |thread| %>
-                  <%= render "conversation_item", thread: thread %>             </li>
+                  <%= render "conversation_item", thread: thread %>
                 <% end %>
               </ul>
             <% else %>
@@ -39,7 +39,7 @@
             <% if @archived_conversations.any? %>
               <ul class="wa-threads__items">
                 <% @archived_conversations.each do |thread| %>
-                  <%= render "conversation_item", thread: thread %>             </li>
+                  <%= render "conversation_item", thread: thread %>
                 <% end %>
               </ul>
             <% else %>
