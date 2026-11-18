@@ -27,14 +27,7 @@
             <% if @active_conversations.any? %>
               <ul class="wa-threads__items">
                 <% @active_conversations.each do |thread| %>
-                  <li>
-                    <%= link_to owner_ai_conversation_path(thread),
-                          class: "wa-threads__item #{'wa-threads__item--selected' if thread == @conversation}",
-                          aria: (thread == @conversation ? { current: "page" } : {}) do %>
-                      <span><%= thread.title %></span>
-                      <time datetime="<%= thread.updated_at.iso8601 %>"><%= thread.updated_at.strftime("%d.%m.%Y") %></time>
-                    <% end %>
-                  </li>
+                  <%= render "conversation_item", thread: thread %>             </li>
                 <% end %>
               </ul>
             <% else %>
@@ -46,20 +39,23 @@
             <% if @archived_conversations.any? %>
               <ul class="wa-threads__items">
                 <% @archived_conversations.each do |thread| %>
-                  <li>
-                    <%= link_to owner_ai_conversation_path(thread),
-                          class: "wa-threads__item #{'wa-threads__item--selected' if thread == @conversation}",
-                          aria: (thread == @conversation ? { current: "page" } : {}) do %>
-                      <span><%= thread.title %></span>
-                      <time datetime="<%= thread.updated_at.iso8601 %>"><%= thread.updated_at.strftime("%d.%m.%Y") %></time>
-                    <% end %>
-                  </li>
+                  <%= render "conversation_item", thread: thread %>             </li>
                 <% end %>
               </ul>
             <% else %>
               <p class="rc-hint"><%= t("owner_ai_conversations.no_archived") %></p>
             <% end %>
           </nav>
+          <% if @removed_conversations.any? %>
+            <details class="wa-threads__trash">
+              <summary><%= t("owner_ai_conversations.trash_heading") %> (<%= @removed_conversations.size %>)</summary>
+              <ul class="wa-threads__items">
+                <% @removed_conversations.each do |thread| %>
+                  <%= render "conversation_item", thread: thread %>
+                <% end %>
+              </ul>
+            </details>
+          <% end %>
         </div>
       </details>
     </aside>
@@ -69,23 +65,8 @@
         <header class="wa-threads__thread-header">
           <div>
             <p class="eyebrow"><%= @conversation.archived? ? t("owner_ai_conversations.archive_heading") : t("owner_ai_conversations.active_heading") %></p>
-            <h2><%= @conversation.title %></h2>
-            <% unless @conversation.archived? %>
-              <%= form_with url: rename_owner_ai_conversation_path(@conversation), method: :patch,
-                    class: "rc-form" do %>
-                <%= label_tag "wa-thread-rename", t("owner_ai_conversations.rename_label"), class: "rc-field-label" %>
-                <%= text_field_tag :title, @conversation.title, id: "wa-thread-rename", maxlength: 100,
-                      class: "rc-input", required: true %>
-                <%= button_tag rc_icon_label("pencil", t("owner_ai_conversations.rename")), type: "submit",
-                      class: "rc-action rc-action--quiet rc-action--small" %>
-              <% end %>
-            <% end %>
+            <h2 data-wa-thread-title-current-id="<%= @conversation.id %>"><%= @conversation.title %></h2>
           </div>
-          <% unless @conversation.archived? %>
-            <%= button_to rc_icon_label("archive", t("owner_ai_conversations.archive")), archive_owner_ai_conversation_path(@conversation),
-                  method: :post, class: "rc-action rc-action--quiet rc-action--small",
-                  form: { data: { turbo_confirm: t("owner_ai_conversations.archive_confirm") } } %>
-          <% end %>
         </header>
 
         <% if @messages.any? %>
@@ -138,7 +119,7 @@
           </ol>
         <% end %>
 
-        <% if @conversation.archived? %>
+        <% if !@conversation.active? %>
           <p class="wa-threads__locked" role="note"><i class="bi bi-lock" aria-hidden="true"></i>
             <%= t("owner_ai_conversations.archived_read_only") %>
           </p>
@@ -154,14 +135,14 @@
             <%= text_area_tag :body, @draft_body, id: "wa-thread-body", class: "rc-input rc-input--area",
                   rows: 4, maxlength: 1200, required: true,
                   placeholder: t("owner_ai_conversations.message_placeholder") %>
-            <p class="rc-hint"><%= t("owner_ai_conversations.composer_note") %></p>
+
             <div class="wa-threads__attachments">
               <%= label_tag "wa-thread-files", class: "wa-threads__file-trigger" do %>
                 <i class="bi bi-paperclip" aria-hidden="true"></i>
                 <%= t("owner_ai_conversations.attach_files") %>
               <% end %>
               <%= file_field_tag "files[]", id: "wa-thread-files", multiple: true,
-                    accept: ".png,.jpg,.jpeg,.webp,.txt,.csv,.pdf",
+                    accept: ".png,.jpg,.jpeg,.webp,.txt,.csv,.md,.markdown,.log,.json,.rb,.py,.js,.ts,.yml,.yaml,.xml,.css,.scss,.sql,.sh,.pdf,.zip,.7z,.rar,.tar,.gz,.docx,.xlsx,.pptx",
                     class: "wa-threads__file-input", data: { wa_thread_target: "files", action: "change->wa-thread#filesChanged" } %>
               <output class="wa-threads__file-selection" data-wa-thread-target="fileNames" aria-live="polite"></output>
               <button type="button" class="rc-action rc-action--quiet rc-action--small"
@@ -170,12 +151,15 @@
               </button>
               <p class="rc-hint"><%= t("owner_ai_conversations.files_notice") %></p>
             </div>
-            <div class="rc-field">
+            <div class="rc-field wa-threads__paid-consent">
               <%= check_box_tag :paid_consent, "1", @draft_paid_consent == true,
                     id: "wa-thread-paid-consent", data: { wa_thread_target: "consent" } %>
               <%= label_tag "wa-thread-paid-consent", t("owner_ai_conversations.paid_consent_label"), class: "rc-field-label" %>
             </div>
-            <p class="rc-hint"><%= t("owner_ai_conversations.paid_budget_notice") %></p>
+            <details class="wa-threads__cost-info">
+              <summary><%= t("owner_ai_conversations.paid_details") %></summary>
+              <p class="rc-hint"><%= t("owner_ai_conversations.paid_budget_notice") %></p>
+            </details>
             <p class="wa-threads__inline-error" data-wa-thread-target="error" role="alert" hidden></p>
             <p class="wa-threads__working" data-wa-thread-target="loading" role="status" hidden>
               <span class="wa-threads__working-dot" aria-hidden="true"></span>
