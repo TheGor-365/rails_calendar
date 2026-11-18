@@ -52,6 +52,7 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
       assert_operator bounds["page"], :<=, bounds["viewport"] + 1
     end
 
+    page.driver.browser.manage.window.resize_to(1440, 900)
     click_button "Sign out"
     visit invitation_url
     assert_current_path client_invitation_preview_path, wait: 10
@@ -65,6 +66,7 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
       assert_operator bounds["page"], :<=, bounds["viewport"] + 1
     end
 
+    page.driver.browser.manage.window.resize_to(1440, 900)
     visit sign_in_path
     fill_in "Email address", with: client.email
     fill_in "Password", with: PASSWORD
