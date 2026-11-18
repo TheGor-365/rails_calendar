@@ -1,0 +1,39 @@
+<div class="container my-4 my-sm-5">
+  <header class="rc-page-hero mb-4"><div class="rc-page-hero__content">
+    <p class="eyebrow"><%= t("e2.guest_eyebrow") %></p>
+    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+      <h1 class="page-title"><%= t("e2.preview_title") %></h1></div>
+  </div></header>
+  <section class="surface-panel p-3 p-sm-4">
+    <% if @invitation.nil? || %i[invalid expired revoked already_claimed services_changed].include?(@state) ||
+          (@invitation.claimed_at.present? && (!client_signed_in? || @invitation.claimed_by_user_id != current_user.id)) %>
+      <p class="rc-notice rc-notice--error" role="status"><%= t("e2.state_#{@state || :invalid}") %></p>
+      <%= link_to t("e2.back_public"), services_path, class: "rc-action rc-action--quiet" %>
+    <% else %>
+      <p class="rc-hint"><%= t("e2.preview_public") %></p>
+      <p><%= t("e2.preview_category", category: rc_intake_type(@invitation.seed_project_type)) %></p>
+      <% versions = @invitation.published_versions %>
+      <% if versions.any? %>
+        <h2 class="h6"><%= t("e2.services") %></h2>
+        <ul><% versions.each do |version| %><li><%= version.title %></li><% end %></ul>
+      <% end %>
+      <p class="rc-notice"><%= t("e2.not_agreement") %></p>
+      <% if @invitation.claimed_by_user_id == current_user&.id && @invitation.project_intake %>
+        <%= link_to t("e2.open_request"), client_request_path(@invitation.project_intake),
+              class: "rc-action rc-action--primary" %>
+      <% elsif client_signed_in? %>
+        <%= button_to claim_client_invitation_path, method: :post, class: "rc-action rc-action--primary" do %>
+          <%= check_box_tag :demo_consent, "1", false, required: true %>
+          <%= t("e2.claim_action") %>
+        <% end %>
+      <% else %>
+        <div class="d-flex flex-wrap gap-2">
+          <%= link_to t("e2.sign_in"), sign_in_path, class: "rc-action rc-action--primary" %>
+          <% if ClientSignupAvailability.enabled? %>
+            <%= link_to t("e2.register"), client_registration_path, class: "rc-action rc-action--soft" %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+</div>
