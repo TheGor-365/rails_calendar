@@ -12,8 +12,15 @@ class AddSafeRemovalToOwnerAiConversations < ActiveRecord::Migration[8.1]
   end
 
   def down
-    # The historical constraint would reject tombstones. Explicitly block
-    # irreversible data loss; operators must restore removed rows first.
-    raise ActiveRecord::IrreversibleMigration, "Restore all removed conversations before a rollback"
+    count = select_value("SELECT count(*) FROM owner_ai_conversations WHERE state = 'removed'").to_i
+    raise ActiveRecord::IrreversibleMigration, "Restore #{count} removed threads first" if count.positive?
+
+    remove_check_constraint :owner_ai_conversations, name: "chk_owner_ai_conversation_state"
+    remove_check_constraint :owner_ai_conversations, name: "chk_owner_ai_conversation_archive"
+    add_check_constraint :owner_ai_conversations, "state IN ('active', 'archived')",
+                         name: "chk_owner_ai_conversation_state"
+    add_check_constraint :owner_ai_conversations,
+                         "(state = 'archived') = (archived_at IS NOT NULL)",
+                         name: "chk_owner_ai_conversation_archive"
   end
 end
