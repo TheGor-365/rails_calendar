@@ -2,7 +2,7 @@
 class OwnerAiConversationsController < ApplicationController
   before_action :require_owner!
   before_action :load_workspace
-  before_action :load_conversation, only: %i[show add_message rename archive file]
+  before_action :load_conversation, only: %i[show add_message rename archive restore remove file]
   before_action :load_lists, only: %i[index show]
 
   UUID_PATTERN = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
@@ -11,12 +11,23 @@ class OwnerAiConversationsController < ApplicationController
     "image/jpeg" => %w[.jpg .jpeg],
     "image/png" => %w[.png],
     "image/webp" => %w[.webp],
-    "text/plain" => %w[.txt],
+    "text/plain" => %w[.txt .md .markdown .log .csv .json .rb .py .js .ts .yml .yaml .xml .css .scss .sql .sh],
+    "text/markdown" => %w[.md .markdown],
     "text/csv" => %w[.csv],
-    "application/pdf" => %w[.pdf]
+    "application/json" => %w[.json],
+    "application/pdf" => %w[.pdf],
+    "application/zip" => %w[.zip .docx .xlsx .pptx],
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => %w[.docx],
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => %w[.xlsx],
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation" => %w[.pptx],
+    "application/x-7z-compressed" => %w[.7z],
+    "application/x-rar-compressed" => %w[.rar],
+    "application/vnd.rar" => %w[.rar],
+    "application/gzip" => %w[.gz],
+    "application/x-tar" => %w[.tar]
   }.freeze
-  # AI accepts PNG/JPEG images and small UTF-8 text/CSV; PDF/WebP stored as notes only.
-  AI_FILE_TYPES = %w[image/jpeg image/png text/plain text/csv].freeze
+  # Stored files are never executed. Model sees only explicitly consented image/text.
+  AI_FILE_TYPES = %w[image/jpeg image/png text/plain text/markdown text/csv application/json].freeze
 
   def index
   end
@@ -41,11 +52,12 @@ class OwnerAiConversationsController < ApplicationController
     body = params[:body].is_a?(String) ? params[:body].strip : ""
     request_id = params[:request_id].is_a?(String) ? params[:request_id] : ""
     intent = params[:intent].presence || "note"
+    uploads = Array(params[:files]).reject(&:blank?)
+    body = t("owner_ai_conversations.file_only_message") if intent == "note" && body.blank? && uploads.any?
     unless body.length.between?(1, 1200) && request_id.match?(UUID_PATTERN) &&
            %w[note ai].include?(intent)
       return render_message_error("owner_ai_conversations.invalid_message")
     end
-    uploads = Array(params[:files]).reject(&:blank?)
     return render_message_error("owner_ai_conversations.invalid_file") unless valid_files?(uploads, intent: intent)
     if intent == "ai"
       return render_message_error("owner_ai_conversations.consent_required") unless params[:paid_consent] == "1"
@@ -77,12 +89,15 @@ class OwnerAiConversationsController < ApplicationController
             role: "assistant", state: "pending", sequence: next_sequence + 1,
             parent_message: owner_message, body: "-"
           )
-          defaults = I18n.available_locales.map do |locale|
-            I18n.t("owner_ai_conversations.default_title", locale: locale)
-          end
-          if next_sequence == 1 && defaults.include?(@conversation.title)
-            @conversation.update!(title: body.truncate(80, omission: "…"))
-          end
+        end
+        defaults = I18n.available_locales.map do |locale|
+          I18n.t("owner_ai_conversations.default_title", locale: locale)
+        end
+        if next_sequence == 1 && defaults.include?(@conversation.title)
+          auto_name = body.truncate(80, omission: "…")
+          auto_name = uploads.first.original_filename.truncate(80) if intent == "note" &&
+            body == t("owner_ai_conversations.file_only_message") && uploads.any?
+          @conversation.update!(title: auto_name)
         end
         @conversation.touch
         outcome = :created
@@ -134,35 +149,43 @@ class OwnerAiConversationsController < ApplicationController
 
     response.headers["Cache-Control"] = "private, no-store"
     response.headers["X-Content-Type-Options"] = "nosniff"
-    image = blob.content_type.start_with?("image/")
-    send_data blob.download, type: blob.content_type,
+    image = blob.content_type.in?(%w[image/png image/jpeg image/webp])
+    send_data blob.download, type: image ? blob.content_type : "application/octet-stream",
               disposition: image ? "inline" : "attachment",
               filename: blob.filename.to_s
   rescue ActiveStorage::FileNotFoundError
     head :not_found
   end
 
+  # Optimistic in-place rename used by Stimulus; still works via HTML form fallback.
   def rename
     title = params[:title].is_a?(String) ? params[:title].strip : ""
-    unless title.length.between?(1, 100)
+    if !title.length.between?(1, 100) || @conversation.removed? || @conversation.archived?
+      return render json: { error: t("owner_ai_conversations.invalid_title") },
+                    status: :unprocessable_entity if request.format.json?
       return redirect_to owner_ai_conversation_path(@conversation),
                          alert: t("owner_ai_conversations.invalid_title")
     end
-    updated = false
-    @conversation.with_lock do
-      unless @conversation.archived?
-        @conversation.update!(title: title)
-        updated = true
-      end
-    end
-    redirect_to owner_ai_conversation_path(@conversation),
-                (updated ? { notice: t("owner_ai_conversations.renamed") } :
-                           { alert: t("owner_ai_conversations.read_only") })
+    @conversation.with_lock { @conversation.update!(title: title) }
+    return render json: { title: @conversation.title } if request.format.json?
+
+    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.renamed")
   end
 
   def archive
     @conversation.archive!
-    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.archived")
+    redirect_to owner_ai_conversations_path, notice: t("owner_ai_conversations.archived")
+  end
+
+  def restore
+    @conversation.restore!
+    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.restored")
+  end
+
+  # 'Delete' is reversible: hide from normal lists, preserve evidence and charges.
+  def remove
+    @conversation.remove!
+    redirect_to owner_ai_conversations_path, notice: t("owner_ai_conversations.removed")
   end
 
   private
@@ -179,12 +202,20 @@ class OwnerAiConversationsController < ApplicationController
       next false if intent == "ai" && !AI_FILE_TYPES.include?(mime)
       bytes_limit = case mime
       when "image/jpeg", "image/png", "image/webp" then 2.megabytes
-      when "application/pdf" then 3.megabytes
+      when "application/pdf" then 10.megabytes
+      when "application/zip", "application/x-7z-compressed", "application/x-rar-compressed",
+           "application/vnd.rar", "application/gzip", "application/x-tar",
+           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+           "application/vnd.openxmlformats-officedocument.presentationml.presentation" then 15.megabytes
       else 24.kilobytes
       end
       next false if upload.size > bytes_limit
       sniffed = Marcel::MimeType.for(upload.tempfile, name: upload.original_filename)
-      (sniffed == mime || (mime == "text/csv" && sniffed == "text/plain"))
+      sniffed == mime ||
+        (mime.in?(%w[text/markdown text/csv application/json]) && sniffed == "text/plain") ||
+        (mime == "text/plain" && sniffed.in?(%w[text/markdown text/csv application/json])) ||
+        (mime.start_with?("application/vnd.openxmlformats") && sniffed == "application/zip")
     end
   end
 
@@ -204,6 +235,7 @@ class OwnerAiConversationsController < ApplicationController
   def load_lists
     @active_conversations = @workspace.owner_ai_conversations.where(state: "active").recent_first
     @archived_conversations = @workspace.owner_ai_conversations.where(state: "archived").recent_first
+    @removed_conversations = @workspace.owner_ai_conversations.where(state: "removed").recent_first
     @ai_enabled = OwnerIntelligence::Grok.enabled?
   end
 
