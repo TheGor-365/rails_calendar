@@ -5,9 +5,11 @@ class WorkspaceController < ApplicationController
   def home
     @upcoming = Consultation.where("end_time > ?", Time.current).order(:start_time, :id).limit(5)
     @upcoming_count = Consultation.where("end_time > ?", Time.current).count
-    @intake_count = ProjectIntake.count
-    @review_count = ProjectIntake.where(status: "draft_spec").count
-    @recent_intakes = ProjectIntake.order(created_at: :desc, id: :desc).limit(5)
+    owned = ProjectIntake.where(workspace_id: current_user.owner_workspace&.id)
+    owned = owned.or(ProjectIntake.where(workspace_id: nil)) if User.where(role: "owner").count == 1
+    @intake_count = owned.count
+    @review_count = owned.where(status: "draft_spec").count
+    @recent_intakes = owned.order(created_at: :desc, id: :desc).limit(5)
     @practice_profile = current_user.owner_workspace&.professional_profile
   end
 
