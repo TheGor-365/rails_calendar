@@ -49,6 +49,18 @@
       <div><h2 id="intake-brief-heading"><%= t("intake.owner_view.brief") %></h2>
       <p class="rc-hint mb-0"><%= t("intake.owner_view.brief_help") %></p></div>
     </div>
+    <% if (invite = @intake.client_request_invitation) %>
+      <p class="rc-status-pill rc-status-pill--muted"><%= t("e2.state_#{invite.state}") %></p>
+      <details class="wa-context__original mb-3">
+        <summary><%= t("e2.owner_seed_title") %></summary>
+        <p class="rc-hint"><%= t("e2.owner_seed_warning") %></p>
+        <p class="wa-owner-intake__prose"><%= invite.seed_goal %></p>
+        <% if invite.seed_goal != @intake.goal %>
+          <p class="rc-hint"><%= t("e2.edit_title") %></p>
+          <p class="wa-owner-intake__prose"><%= @intake.goal %></p>
+        <% end %>
+      </details>
+    <% end %>
     <details class="wa-context__original" <%= "open" if @intake.goal.length <= 360 %>>
       <summary><i class="bi bi-journal-text" aria-hidden="true"></i><%= t("intake_context.original_toggle") %></summary>
       <div class="wa-owner-intake__brief">
