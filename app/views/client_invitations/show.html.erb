@@ -19,7 +19,8 @@
       <% end %>
       <p class="rc-notice"><%= t("e2.not_agreement") %></p>
       <% if @invitation.claimed_by_user_id == current_user&.id && @invitation.project_intake %>
-        <%= link_to t("e2.open_request"), client_request_path(@invitation.project_intake),
+        <%= link_to t("e2.open_request"),
+              (@invitation.submitted_at.present? ? client_request_path(@invitation.project_intake) : edit_client_request_path(@invitation.project_intake)),
               class: "rc-action rc-action--primary" %>
       <% elsif client_signed_in? %>
         <%= form_with url: claim_client_invitation_path, method: :post, html: { class: "rc-form" } do %>
