@@ -106,6 +106,11 @@
                   <ul class="wa-threads__file-list" aria-label="<%= t('owner_ai_conversations.file_list') %>">
                     <% message.files_attachments.each do |attachment| %>
                       <li>
+                        <% if attachment.blob.content_type.start_with?("image/") %>
+                          <%= image_tag owner_ai_conversation_file_path(@conversation, message, attachment),
+                                alt: t("owner_ai_conversations.private_image_alt"),
+                                class: "wa-threads__file-preview", loading: "lazy" %>
+                        <% end %>
                         <%= link_to owner_ai_conversation_file_path(@conversation, message, attachment),
                               target: "_blank", rel: "noopener noreferrer", class: "wa-threads__file-link" do %>
                           <i class="bi bi-paperclip" aria-hidden="true"></i>
@@ -156,6 +161,10 @@
                     accept: ".png,.jpg,.jpeg,.webp,.txt,.csv,.pdf",
                     class: "wa-threads__file-input", data: { wa_thread_target: "files", action: "change->wa-thread#filesChanged" } %>
               <output class="wa-threads__file-selection" data-wa-thread-target="fileNames" aria-live="polite"></output>
+              <button type="button" class="rc-action rc-action--quiet rc-action--small"
+                      data-wa-thread-target="clear" data-action="wa-thread#clearFiles" hidden>
+                <%= t("owner_ai_conversations.clear_files") %>
+              </button>
               <p class="rc-hint"><%= t("owner_ai_conversations.files_notice") %></p>
             </div>
             <div class="rc-field">
