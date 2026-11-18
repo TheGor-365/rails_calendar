@@ -84,6 +84,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_000500) do
     t.string "seed_project_type", limit: 32, null: false
     t.text "seed_goal", null: false
     t.jsonb "service_version_ids", default: [], null: false
+    t.jsonb "client_fact_reviews", default: {}, null: false
     t.datetime "expires_at", null: false
     t.datetime "revoked_at"
     t.datetime "claimed_at"
