@@ -93,8 +93,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_000500) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["claimed_by_user_id"], name: "index_client_request_invitations_on_claimed_by_user_id"
-    t.index ["project_intake_id"], name: "index_client_request_invitations_on_project_intake_id"
-    t.index ["project_intake_id"], name: "index_client_request_invitations_on_project_intake_id_unique", unique: true
+    t.index ["project_intake_id"], name: "index_client_request_invitations_on_project_intake_id", unique: true
     t.index ["token_digest"], name: "index_client_request_invitations_on_token_digest", unique: true
     t.index ["workspace_id", "created_at"], name: "index_client_request_invitations_on_workspace_id_and_created_at"
     t.index ["workspace_id"], name: "index_client_request_invitations_on_workspace_id"
