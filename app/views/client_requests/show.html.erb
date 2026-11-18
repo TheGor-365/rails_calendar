@@ -19,6 +19,22 @@
     </div>
   </header>
 
+  <% if @invitation %>
+    <section class="surface-panel p-3 p-sm-4 mb-3" aria-label="<%= t('e2.owner_seed_title') %>">
+      <h2 class="h5"><%= t("e2.owner_seed_title") %></h2>
+      <p class="rc-hint"><%= t("e2.owner_seed_warning") %></p>
+      <details><summary><%= t("e2.owner_seed_title") %></summary>
+        <p class="wa-prose"><%= @invitation.seed_goal %></p>
+      </details>
+      <% if @invitation.submitted_at.nil? %>
+        <%= link_to rc_icon_label("pencil-square", t("e2.edit_title")),
+              edit_client_request_path(@intake), class: "rc-action rc-action--primary mt-2" %>
+      <% else %>
+        <p class="rc-notice rc-notice--success mb-0"><%= t("e2.state_submitted") %></p>
+      <% end %>
+    </section>
+  <% end %>
+
   <% client_nav_sections = [
     ["intake-current", "pin-angle", t("intake_context.current_title")],
     ["client-request-description", "card-text", t("client_requests.description_title")],
