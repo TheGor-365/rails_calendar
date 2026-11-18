@@ -26,7 +26,7 @@ class ClientInvitationsController < ApplicationController
       return render :show, status: :not_found
     end
     if invite.claimed_at.present? && (!client_signed_in? || invite.claimed_by_user_id != current_user.id)
-      @state = :claimed
+      @state = :already_claimed
       return render :show, status: :gone
     end
     if invite.revoked_at.present? || (invite.claimed_at.nil? && invite.expires_at <= Time.current)
@@ -34,7 +34,7 @@ class ClientInvitationsController < ApplicationController
       return render :show, status: :gone
     end
     cookies.encrypted[:rc_e2_invitation_id] = {
-      value: invite.id.to_s, expires: invite.expires_at,
+      value: invite.id.to_s, expires: (invite.claimed_at.present? ? 7.days.from_now : invite.expires_at),
       httponly: true, same_site: :lax, secure: Rails.env.production?
     }
     redirect_to client_invitation_preview_path, status: :see_other
@@ -43,7 +43,11 @@ class ClientInvitationsController < ApplicationController
   def show
     @invitation = invited_from_cookie
     @state = @invitation&.state || :invalid
-    if @state == :revoked || @state == :expired
+    if @invitation&.claimed_at.present? &&
+       (!client_signed_in? || @invitation.claimed_by_user_id != current_user.id)
+      @state = :already_claimed
+    end
+    if %i[revoked expired already_claimed].include?(@state)
       render :show, status: :gone
     elsif @state == :invalid
       render :show, status: :not_found
@@ -58,7 +62,8 @@ class ClientInvitationsController < ApplicationController
 
     result = OwnerInvitations::Claim.call(invitation: @invitation, client: current_user)
     if result.is_a?(ProjectIntake)
-      redirect_to edit_client_request_path(result), status: :see_other,
+      destination = @invitation.reload.submitted_at.present? ? client_request_path(result) : edit_client_request_path(result)
+      redirect_to destination, status: :see_other,
                   notice: I18n.t("e2.claimed_notice")
     else
       @state = result
