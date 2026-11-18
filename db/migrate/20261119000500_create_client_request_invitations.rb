@@ -7,6 +7,7 @@ class CreateClientRequestInvitations < ActiveRecord::Migration[8.1]
       t.string :seed_project_type, limit: 32, null: false
       t.text :seed_goal, null: false
       t.jsonb :service_version_ids, null: false, default: []
+      t.jsonb :client_fact_reviews, null: false, default: {}
       t.datetime :expires_at, null: false
       t.datetime :revoked_at
       t.datetime :claimed_at
