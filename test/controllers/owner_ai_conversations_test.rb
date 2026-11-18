@@ -1,4 +1,6 @@
 require "test_helper"
+require "tempfile"
+require "base64"
 require_relative "../support/owner_service_catalogue_test_data"
 
 class OwnerAiConversationsTest < ActionDispatch::IntegrationTest
@@ -334,6 +336,131 @@ class OwnerAiConversationsTest < ActionDispatch::IntegrationTest
     login(@client)
     patch rename_owner_ai_conversation_path(thread), params: { title: "Client injection" }
     assert_redirected_to sign_in_path
+  end
+
+
+  test "Turbo frame provides inline navigation and no oversized empty-state panel" do
+    thread = @workspace.owner_ai_conversations.create!(title: "New conversation")
+    login(@owner)
+    get owner_ai_conversation_path(thread), headers: { "Turbo-Frame" => "wa-thread-workspace" }
+    assert_response :success
+    assert_select "turbo-frame#wa-thread-workspace", count: 1
+    assert_select ".wa-threads__empty", count: 0
+    assert_select "form[enctype='multipart/form-data']", count: 1
+    assert_select "input[type='file'][name='files[]']", count: 1
+  end
+
+  test "private PNG note is visible to owner only and bytes are guarded" do
+    thread = @workspace.owner_ai_conversations.create!(title: "Screenshots")
+    login(@owner)
+    png = tiny_test_png_upload
+    assert_difference("ActiveStorage::Attachment.count", 1) do
+      post owner_ai_conversation_messages_path(thread), params: {
+        request_id: SecureRandom.uuid, intent: "note",
+        body: "Private test screenshot", files: [png]
+      }
+    end
+    message = thread.owner_ai_messages.first
+    attachment = message.files_attachments.first
+    assert attachment
+    get owner_ai_conversation_file_path(thread, message, attachment)
+    assert_response :success
+    assert_equal "image/png", response.media_type
+    assert_includes response.headers["Cache-Control"], "no-store"
+    assert_equal "nosniff", response.headers["X-Content-Type-Options"]
+    get owner_ai_conversation_path(thread)
+    assert_select ".wa-threads__file-link", count: 1
+
+    delete sign_out_path
+    login(@client)
+    get owner_ai_conversation_file_path(thread, message, attachment)
+    assert_redirected_to sign_in_path
+    delete sign_out_path
+    login(@foreign)
+    get owner_ai_conversation_file_path(thread, message, attachment)
+    assert_response :not_found
+  ensure
+    png&.tempfile&.close! rescue nil
+  end
+
+  test "consented image is sent to Grok in same turn, never as a public URL" do
+    thread = @workspace.owner_ai_conversations.create!(title: "New conversation")
+    fake_http = Object.new
+    sent = []
+    fake_http.define_singleton_method(:request) do |request|
+      sent << JSON.parse(request.body)
+      Struct.new(:code, :body).new("200", JSON.generate(
+        status: "completed", output: [{
+          type: "message", content: [{
+            type: "output_text", text: JSON.generate(
+              title: "Screenshot check", answer: "Only safe hypotheses.", suggested_actions: []
+            )
+          }]
+        }], usage: { input_tokens: 160, output_tokens: 60,
+                     total_tokens: 220, cost_in_usd_ticks: 126_000 }
+      ))
+    end
+    png = tiny_test_png_upload
+    previous_key = ENV["XAI_API_KEY"]
+    ENV["XAI_API_KEY"] = "xai-fictional-test-only-not-a-real-token"
+    login(@owner)
+    OwnerIntelligence::Grok.stub(:enabled?, true) do
+      IntakeAiQuota.stub(:reserve_call!, true) do
+        Net::HTTP.stub(:start, ->(*_args, **_kwargs, &block) { block.call(fake_http) }) do
+          post owner_ai_conversation_messages_path(thread), params: {
+            request_id: SecureRandom.uuid, intent: "ai", paid_consent: "1",
+            body: "Explain only what is visible in the synthetic PNG.", files: [png]
+          }
+        end
+      end
+    end
+    assert_redirected_to owner_ai_conversation_path(thread)
+    assert_equal 1, sent.size
+    input = sent.first.fetch("input").last.fetch("content")
+    assert_equal "input_text", input.first.fetch("type")
+    assert_equal "input_image", input.last.fetch("type")
+    assert_match(/\\Adata:image\\/png;base64,/, input.last.fetch("image_url"))
+    assert_equal false, sent.first.fetch("store")
+    assert_equal 1, thread.owner_ai_messages.find_by!(role: "owner").files.count
+    assert_equal "settled", thread.owner_ai_messages.find_by!(role: "assistant").state
+  ensure
+    previous_key.nil? ? ENV.delete("XAI_API_KEY") : ENV["XAI_API_KEY"] = previous_key
+    png&.tempfile&.close! rescue nil
+  end
+
+  test "reject disallowed file before creation or provider spend" do
+    thread = @workspace.owner_ai_conversations.create!(title: "Unsafe file")
+    login(@owner)
+    temp = Tempfile.new(["attack", ".html"])
+    temp.write("<script>alert(1)</script>")
+    temp.flush
+    upload = Rack::Test::UploadedFile.new(temp.path, "text/html", true,
+                                           original_filename: "attack.html")
+    assert_no_difference("OwnerAiMessage.count") do
+      assert_no_difference("ActiveStorage::Attachment.count") do
+        assert_no_difference("AiSpendEntry.count") do
+          post owner_ai_conversation_messages_path(thread), params: {
+            request_id: SecureRandom.uuid, intent: "ai", paid_consent: "1",
+            body: "Please run this html", files: [upload]
+          }
+          assert_response :unprocessable_entity
+          assert_select "textarea#wa-thread-body", text: /Please run this html/
+        end
+      end
+    end
+  ensure
+    temp&.close! rescue nil
+  end
+
+  def tiny_test_png_upload
+    png = Tempfile.new(["owner-chat-", ".png"])
+    png.binmode
+    png.write(Base64.strict_decode64(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScL/nwAAAABJRU5ErkJggg=="
+    ))
+    png.flush
+    Rack::Test::UploadedFile.new(png.path, "image/png", true,
+                                 original_filename: "synthetic.png")
   end
 
   def mock_chat_response(title, answer, actions = [])
