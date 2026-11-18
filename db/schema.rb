@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_18_234500) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_000500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_234500) do
     t.check_constraint "(project_intake_id IS NOT NULL) <> (professional_profile_id IS NOT NULL)", name: "chk_ai_spend_exactly_one_subject"
     t.check_constraint "reserved_ticks >= 0 AND (charged_ticks IS NULL OR charged_ticks >= 0)", name: "chk_ai_spend_ticks_nonnegative"
     t.check_constraint "status::text = ANY (ARRAY['reserved'::character varying::text, 'settled'::character varying::text, 'uncertain'::character varying::text, 'cancelled'::character varying::text])", name: "chk_ai_spend_status"
+  end
+
+  create_table "client_request_invitations", force: :cascade do |t|
+    t.bigint "workspace_id", null: false
+    t.string "token_digest", limit: 64, null: false
+    t.string "seed_title", limit: 120, null: false
+    t.string "seed_project_type", limit: 32, null: false
+    t.text "seed_goal", null: false
+    t.jsonb "service_version_ids", default: [], null: false
+    t.datetime "expires_at", null: false
+    t.datetime "revoked_at"
+    t.datetime "claimed_at"
+    t.bigint "claimed_by_user_id"
+    t.bigint "project_intake_id"
+    t.datetime "submitted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["claimed_by_user_id"], name: "index_client_request_invitations_on_claimed_by_user_id"
+    t.index ["project_intake_id"], name: "index_client_request_invitations_on_project_intake_id"
+    t.index ["project_intake_id"], name: "index_client_request_invitations_on_project_intake_id_unique", unique: true
+    t.index ["token_digest"], name: "index_client_request_invitations_on_token_digest", unique: true
+    t.index ["workspace_id", "created_at"], name: "index_client_request_invitations_on_workspace_id_and_created_at"
+    t.index ["workspace_id"], name: "index_client_request_invitations_on_workspace_id"
+    t.check_constraint "char_length(token_digest::text) = 64", name: "chk_client_invite_digest_length"
+    t.check_constraint "claimed_at IS NULL AND claimed_by_user_id IS NULL AND project_intake_id IS NULL OR claimed_at IS NOT NULL AND claimed_by_user_id IS NOT NULL AND project_intake_id IS NOT NULL", name: "chk_client_invite_claim_triplet"
   end
 
   create_table "client_signup_challenges", force: :cascade do |t|
@@ -480,6 +505,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_234500) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ai_spend_entries", "professional_profiles"
   add_foreign_key "ai_spend_entries", "project_intakes"
+  add_foreign_key "client_request_invitations", "project_intakes"
+  add_foreign_key "client_request_invitations", "users", column: "claimed_by_user_id"
+  add_foreign_key "client_request_invitations", "workspaces"
   add_foreign_key "intake_answer_revisions", "intake_answers"
   add_foreign_key "intake_answers", "project_intakes"
   add_foreign_key "intake_messages", "project_intakes"
