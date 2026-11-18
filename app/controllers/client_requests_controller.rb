@@ -3,7 +3,43 @@
 class ClientRequestsController < ApplicationController
   before_action :require_local_pilot!
   before_action :require_verified_client!
-  before_action :set_owned_request!, only: %i[show review reply]
+  before_action :set_owned_request!, only: %i[show review reply edit update submit]
+
+  before_action :set_invitation_draft!, only: %i[edit update submit]
+
+  # E2: an owner-authored seed remains suggested until the verified client
+  # edits and deliberately submits this one canonical ProjectIntake.
+  def edit
+  end
+
+  def update
+    saved = @invitation.with_lock do
+      @invitation.reload.submitted_at.nil? && @intake.update(request_params)
+    end
+    if saved
+      redirect_to edit_client_request_path(@intake), notice: I18n.t("e2.saved_notice"), status: :see_other
+    else
+      @intake.errors.add(:base, "Already submitted") if @invitation.submitted_at.present?
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def submit
+    result = @invitation.with_lock do
+      if @invitation.submitted_at.present?
+        :already
+      elsif @intake.reload.valid? && @intake.goal.length <= 1200
+        @intake.intake_messages.create!(role: "client", body: @intake.goal)
+        @intake.intake_messages.create!(role: "assistant", body: I18n.t("client_requests.received_prompt"))
+        @invitation.update!(submitted_at: Time.current)
+        :submitted
+      else
+        :invalid
+      end
+    end
+    return render :edit, status: :unprocessable_entity if result == :invalid
+    redirect_to client_request_path(@intake), notice: I18n.t("e2.submitted_notice"), status: :see_other
+  end
 
   def new
     load_published_services
@@ -82,6 +118,10 @@ class ClientRequestsController < ApplicationController
   # Local fictional clarification only; not a new offer, contract, spec approval,
   # or invocation of an AI provider. Enforces account ownership in set_owned_request!.
   def reply
+    invitation = @intake.client_request_invitation
+    if invitation && invitation.submitted_at.nil?
+      return redirect_to edit_client_request_path(@intake), status: :see_other
+    end
     raw_key = params[:submission_key]
     token = raw_key.is_a?(String) ? raw_key : ""
     raw_body = params[:reply_body]
@@ -161,6 +201,7 @@ class ClientRequestsController < ApplicationController
   end
 
   def load_details
+    @invitation = @intake.client_request_invitation
     @selected_service_versions = @intake.selected_service_offering_versions.order(:id).to_a
     @spec = @intake.published_spec
     @milestones = @spec ? @intake.project_milestones.where(intake_spec_version_id: @spec.id).order(:position) : []
@@ -177,6 +218,13 @@ class ClientRequestsController < ApplicationController
 
   def require_verified_client!
     redirect_to sign_in_path, alert: I18n.t("client_requests.sign_in_required") unless client_signed_in?
+  end
+
+  def set_invitation_draft!
+    @invitation = ClientRequestInvitation.find_by(project_intake_id: @intake.id,
+                                                    claimed_by_user_id: current_user.id)
+    return head :not_found unless @invitation
+    head :conflict if @invitation.submitted_at.present? && action_name != "submit"
   end
 
   def set_owned_request!
