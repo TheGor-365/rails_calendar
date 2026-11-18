@@ -503,13 +503,13 @@ class OwnerAiConversationsTest < ActionDispatch::IntegrationTest
     thread = @workspace.owner_ai_conversations.create!(title: "New conversation")
     login(@owner)
     text = Tempfile.new(["sample", ".md"])
-    text.write("# Fictional release notes\\nA synthetic change only.")
+    text.write("# Fictional release notes\nA synthetic change only.")
     text.flush
     markdown = Rack::Test::UploadedFile.new(text.path, "text/markdown", true,
                                             original_filename: "notes.md")
     zip = Tempfile.new(["sample", ".zip"])
     zip.binmode
-    zip.write("PK\\x05\\x06".b + ("\\x00".b * 18))
+    zip.write("PK\x05\x06".b + ("\x00".b * 18))
     zip.flush
     archive = Rack::Test::UploadedFile.new(zip.path, "application/zip", true,
                                            original_filename: "synthetic.zip")
