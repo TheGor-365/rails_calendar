@@ -56,6 +56,8 @@ Rails.application.routes.draw do
   get "/workspace/assistant/conversations/:id/messages/:message_id/files/:attachment_id", to: "owner_ai_conversations#file", as: :owner_ai_conversation_file
   patch "/workspace/assistant/conversations/:id/title", to: "owner_ai_conversations#rename", as: :rename_owner_ai_conversation
   post "/workspace/assistant/conversations/:id/archive", to: "owner_ai_conversations#archive", as: :archive_owner_ai_conversation
+  post "/workspace/assistant/conversations/:id/restore", to: "owner_ai_conversations#restore", as: :restore_owner_ai_conversation
+  delete "/workspace/assistant/conversations/:id/remove", to: "owner_ai_conversations#remove", as: :remove_owner_ai_conversation
 
   # RC055.1: private owner-controlled service offering revisions.
   get "/workspace/services", to: "owner_service_offerings#index", as: :owner_services
