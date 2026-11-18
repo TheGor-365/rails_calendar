@@ -13,13 +13,28 @@ class ClientRequestsController < ApplicationController
   end
 
   def update
+    decisions = params[:fact_review]
+    decisions = decisions.is_a?(ActionController::Parameters) ?
+      decisions.permit(*ClientRequestInvitation::FACT_KEYS).to_h : {}
+    unless ClientRequestInvitation::FACT_KEYS.all? { |key|
+      ClientRequestInvitation::FACT_STATES.include?(decisions[key])
+    }
+      @intake.errors.add(:base, I18n.t("e2.review_required"))
+      return render :edit, status: :unprocessable_entity
+    end
+
     saved = @invitation.with_lock do
-      @invitation.reload.submitted_at.nil? && @intake.update(request_params)
+      next false if @invitation.reload.submitted_at.present?
+      @intake.assign_attributes(request_params)
+      next false unless @intake.valid? && @intake.goal.length <= 1200
+      @intake.save!
+      @invitation.update!(client_fact_reviews: decisions)
+      true
     end
     if saved
       redirect_to edit_client_request_path(@intake), notice: I18n.t("e2.saved_notice"), status: :see_other
     else
-      @intake.errors.add(:base, "Already submitted") if @invitation.submitted_at.present?
+      @intake.errors.add(:base, I18n.t("e2.already_submitted")) if @invitation.submitted_at.present?
       render :edit, status: :unprocessable_entity
     end
   end
@@ -28,6 +43,10 @@ class ClientRequestsController < ApplicationController
     result = @invitation.with_lock do
       if @invitation.submitted_at.present?
         :already
+      elsif !ClientRequestInvitation::FACT_KEYS.all? { |key|
+        %w[confirmed unknown].include?(@invitation.fact_state(key))
+      }
+        :unreviewed
       elsif @intake.reload.valid? && @intake.goal.length <= 1200
         @intake.intake_messages.create!(role: "client", body: @intake.goal)
         @intake.intake_messages.create!(role: "assistant", body: I18n.t("client_requests.received_prompt"))
@@ -37,7 +56,10 @@ class ClientRequestsController < ApplicationController
         :invalid
       end
     end
-    return render :edit, status: :unprocessable_entity if result == :invalid
+    if %i[invalid unreviewed].include?(result)
+      @intake.errors.add(:base, I18n.t("e2.review_required")) if result == :unreviewed
+      return render :edit, status: :unprocessable_entity
+    end
     redirect_to client_request_path(@intake), notice: I18n.t("e2.submitted_notice"), status: :see_other
   end
 
