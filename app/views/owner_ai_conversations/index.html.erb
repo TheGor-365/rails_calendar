@@ -133,7 +133,7 @@
             <%= hidden_field_tag :request_id, (@draft_request_id.presence || SecureRandom.uuid) %>
             <%= label_tag "wa-thread-body", t("owner_ai_conversations.message_label"), class: "rc-field-label" %>
             <%= text_area_tag :body, @draft_body, id: "wa-thread-body", class: "rc-input rc-input--area",
-                  rows: 4, maxlength: 1200, required: true,
+                  rows: 4, maxlength: 1200,
                   placeholder: t("owner_ai_conversations.message_placeholder") %>
 
             <div class="wa-threads__attachments">
