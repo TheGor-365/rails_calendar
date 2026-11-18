@@ -155,3 +155,85 @@ jobs:
             abort("Missing schema tables: #{absent.join(", ")}") if absent.any?
             puts "PG18_NEW_DATABASE_MIGRATIONS_PASS"
           '
+
+  # Verify the actual Railway-deployed Git commit's migrations can be upgraded
+  # to this candidate on a throwaway PostgreSQL 18 database, retaining rows.
+  # Never connects to Railway or production.
+  postgres18-upgrade-from-deployed:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 22
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rails_calendar_upgrade_pg18
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      PGHOST: 127.0.0.1
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      RC_LOCAL_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/rails_calendar_upgrade_pg18
+
+    steps:
+      - name: Checkout last deployed Railway commit
+        uses: actions/checkout@v4
+        with:
+          ref: 90d7a817651ba1bffe174d3f800d32988a664169
+          path: railway-baseline
+
+      - name: Checkout candidate HEAD
+        uses: actions/checkout@v4
+        with:
+          path: candidate
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.12'
+          bundler-cache: false
+
+      - name: Migrate Railway baseline and write synthetic preservation fixture
+        working-directory: railway-baseline
+        run: |
+          bundle install
+          bin/rails db:migrate
+          bin/rails runner '
+            sample = ProjectIntake.create!(
+              title: "PG18_UPGRADE_FIXTURE",
+              project_type: "website",
+              goal: "Synthetic fictitious client needs a contact form with Rails validation.",
+              demo_consent_at: Time.current
+            )
+            abort "Baseline synthetic fixture missing" unless sample.persisted?
+            puts "PG18_BASELINE_FIXTURE_PASS"
+          '
+
+      - name: Upgrade the same PG18 database to candidate HEAD
+        working-directory: candidate
+        run: |
+          bundle install
+          bin/rails db:migrate
+          bin/rails db:abort_if_pending_migrations
+          bin/rails runner '
+            db = ActiveRecord::Base.connection
+            abort("Not PG18") unless db.select_value("SHOW server_version_num").to_i / 10_000 == 18
+            sample = ProjectIntake.find_by(title: "PG18_UPGRADE_FIXTURE")
+            abort("Existing request was lost") unless sample &&
+              sample.goal.include?("Synthetic fictitious client")
+            required = %w[workspaces ai_spend_entries service_offerings
+                          owner_ai_conversations owner_ai_messages]
+            missing = required.reject { |table| db.data_source_exists?(table) }
+            abort("Missing upgraded tables: #{missing.join(", ")}") unless missing.empty?
+            puts "PG18_RAILWAY_BASELINE_UPGRADE_AND_DATA_PASS"
+          '
