@@ -3,7 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 // Small progressive enhancement: Turbo keeps the page stationary while the
 // provider replies. It never triggers network requests, retries, or AI calls.
 export default class extends Controller {
-  static targets = ["files", "fileNames", "loading", "clear"]
+  static targets = ["files", "fileNames", "loading", "clear", "consent", "error"]
+  static values = { consentError: String, fileError: String }
 
   filesChanged() {
     if (!this.hasFilesTarget || !this.hasFileNamesTarget) return
@@ -19,6 +20,31 @@ export default class extends Controller {
     if (!this.hasFilesTarget) return
     this.filesTarget.value = ""
     this.filesChanged()
+  }
+
+  // Prevent avoidable validation POSTs so the browser keeps the selected file
+  // and typed draft. Rails independently enforces the same authorization.
+  guard(event) {
+    if (!this.hasErrorTarget) return
+    const files = this.hasFilesTarget ? Array.from(this.filesTarget.files || []) : []
+    const ai = event.submitter?.name === "intent" && event.submitter?.value === "ai"
+    let error = ""
+    if (files.length > 3) {
+      error = this.fileErrorValue
+    } else if (ai && files.some(file => /\\.(pdf|webp)$/i.test(file.name))) {
+      error = this.fileErrorValue
+    } else if (ai && (!this.hasConsentTarget || !this.consentTarget.checked)) {
+      error = this.consentErrorValue
+      if (this.hasConsentTarget) this.consentTarget.focus()
+    }
+    if (error) {
+      event.preventDefault()
+      this.errorTarget.textContent = error
+      this.errorTarget.hidden = false
+    } else {
+      this.errorTarget.textContent = ""
+      this.errorTarget.hidden = true
+    }
   }
 
   submitStart(event) {
