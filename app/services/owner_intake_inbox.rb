@@ -9,7 +9,11 @@ class OwnerIntakeInbox
     def unread_for(owner:)
       return ProjectIntake.none unless owner&.role == "owner"
 
-      ProjectIntake.where.not(client_user_id: nil).where(<<~SQL.squish, owner_id: owner.id)
+      scoped = ProjectIntake.where(workspace_id: owner.owner_workspace&.id)
+      if User.where(role: "owner").count == 1
+        scoped = scoped.or(ProjectIntake.where(workspace_id: nil))
+      end
+      scoped.where.not(client_user_id: nil).where(<<~SQL.squish, owner_id: owner.id)
         EXISTS (
           SELECT 1
           FROM intake_messages AS unread_client_messages
@@ -31,6 +35,8 @@ class OwnerIntakeInbox
     def mark_seen!(owner:, intake:, displayed_messages:)
       raise ArgumentError, "owner account required" unless owner&.role == "owner"
       return false if intake.client_user_id.nil?
+      return false if intake.workspace_id.present? && intake.workspace_id != owner.owner_workspace&.id
+      return false if intake.workspace_id.nil? && User.where(role: "owner").count != 1
 
       latest = Array(displayed_messages)
         .select { |message| message.role == "client" && message.project_intake_id == intake.id }
