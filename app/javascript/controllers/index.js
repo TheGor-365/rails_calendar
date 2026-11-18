@@ -44,3 +44,7 @@ application.register("wa-ai-dock", WaAiDockController)
 // In-frame owner AI dialogue, progress and attachment selection.
 import WaThreadController from "./wa_thread_controller"
 application.register("wa-thread", WaThreadController)
+
+// Per-thread auto-title override; only the user's explicit edits are saved.
+import WaThreadTitleController from "./wa_thread_title_controller"
+application.register("wa-thread-title", WaThreadTitleController)
