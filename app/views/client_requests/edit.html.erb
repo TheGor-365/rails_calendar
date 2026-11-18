@@ -17,22 +17,47 @@
     <% if @intake.errors.any? %>
       <p class="rc-notice rc-notice--error" role="alert"><%= @intake.errors.full_messages.to_sentence %></p>
     <% end %>
+    <p class="rc-hint"><%= t("e2.review_required") %></p>
     <%= form_with model: @intake, url: client_request_path(@intake), method: :patch,
                   html: { class: "rc-form" } do |f| %>
       <div class="rc-field mb-3">
         <%= f.label :title, t("intake.field_title"), class: "rc-field-label" %>
         <%= f.text_field :title, class: "rc-input", maxlength: 120, required: true %>
+        <%= label_tag "fact_review_title", t("e2.fact_review"), class: "rc-field-label mt-2" %>
+        <%= select_tag "fact_review[title]",
+              options_for_select([
+                [t("e2.fact_suggested"), "suggested"],
+                [t("e2.fact_confirmed"), "confirmed"],
+                [t("e2.fact_unknown"), "unknown"]
+              ], @invitation.fact_state("title")),
+              id: "fact_review_title", class: "rc-input" %>
       </div>
       <div class="rc-field mb-3">
         <%= f.label :project_type, t("intake.field_type"), class: "rc-field-label" %>
         <%= f.select :project_type,
              ProjectIntake::TYPES.map { |type| [rc_intake_type(type), type] }, {}, class: "rc-input" %>
+        <%= label_tag "fact_review_project_type", t("e2.fact_review"), class: "rc-field-label mt-2" %>
+        <%= select_tag "fact_review[project_type]",
+              options_for_select([
+                [t("e2.fact_suggested"), "suggested"],
+                [t("e2.fact_confirmed"), "confirmed"],
+                [t("e2.fact_unknown"), "unknown"]
+              ], @invitation.fact_state("project_type")),
+              id: "fact_review_project_type", class: "rc-input" %>
       </div>
       <div class="rc-field mb-3">
         <%= f.label :goal, t("intake.field_goal"), class: "rc-field-label" %>
         <%= f.text_area :goal, class: "rc-input rc-input--area", rows: 5,
               minlength: 10, maxlength: 1200, required: true,
               data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
+        <%= label_tag "fact_review_goal", t("e2.fact_review"), class: "rc-field-label mt-2" %>
+        <%= select_tag "fact_review[goal]",
+              options_for_select([
+                [t("e2.fact_suggested"), "suggested"],
+                [t("e2.fact_confirmed"), "confirmed"],
+                [t("e2.fact_unknown"), "unknown"]
+              ], @invitation.fact_state("goal")),
+              id: "fact_review_goal", class: "rc-input" %>
       </div>
       <p class="rc-hint"><%= t("e2.demo_warning") %></p>
       <button type="submit" class="rc-action rc-action--soft"><%= rc_icon_label("floppy", t("e2.save_draft")) %></button>
