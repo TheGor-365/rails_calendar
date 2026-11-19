@@ -93,6 +93,27 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_redirected_to sign_in_path
   end
 
+  test "only the owner can link an existing private AI record" do
+    login(@owner)
+    post owner_invitations_path, as: :json, params: {
+      proposal: proposal, service_version_ids: []
+    }
+    assert_response :created
+    invitation = ClientRequestInvitation.order(:id).last
+    assert_nil invitation.owner_ai_entry_id
+
+    patch attach_owner_invitation_ai_draft_path(invitation), params: { entry_id: 987_654_321 }
+    assert_response :not_found
+    assert_nil invitation.reload.owner_ai_entry_id
+
+    sign_out
+    login(@owner_b)
+    get owner_invitation_path(invitation)
+    assert_response :not_found
+    patch attach_owner_invitation_ai_draft_path(invitation), params: { entry_id: 987_654_321 }
+    assert_response :not_found
+  end
+
   test "guest sees no extra preview text unless explicitly shared" do
     login(@owner)
     post owner_invitations_path, as: :json, params: {
