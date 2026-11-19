@@ -6,6 +6,7 @@ class ClientRequestInvitation < ApplicationRecord
   FACT_STATES = %w[suggested confirmed unknown].freeze
 
   belongs_to :workspace
+  belongs_to :owner_ai_entry, class_name: "AiSpendEntry", optional: true
   belongs_to :claimed_by_user, class_name: "User", optional: true
   belongs_to :project_intake, optional: true
 
@@ -19,6 +20,8 @@ class ClientRequestInvitation < ApplicationRecord
   validate :valid_fact_reviews
   validate :valid_brief_choices
   validates :brief_notes, length: { maximum: 350 }
+  validates :approved_client_preview, length: { maximum: 1200 }
+  validate :owner_ai_entry_is_scoped
 
   def self.digest_for(raw_token)
     OpenSSL::HMAC.hexdigest("SHA256", Rails.application.secret_key_base, "rc-e2-invitation-v1:#{raw_token}")
@@ -62,6 +65,15 @@ class ClientRequestInvitation < ApplicationRecord
   def valid_brief_choices
     errors.add(:brief_selections, "contains unsupported choices") unless InvitationBriefTaxonomy.valid?(brief_selections)
     errors.add(:brief_decisions, "contains unsupported choices") unless InvitationBriefTaxonomy.valid_decisions?(brief_decisions)
+  end
+
+  def owner_ai_entry_is_scoped
+    return if owner_ai_entry_id.blank?
+    entry = owner_ai_entry
+    valid = entry&.status == "settled" && entry&.operation == OwnerAi::Composer::VERSION &&
+      entry.professional_profile_id == workspace.professional_profile&.id &&
+      entry.result.is_a?(Hash) && OwnerAi::PageActionRegistry.allowed?(:invitation, entry.result["purpose"])
+    errors.add(:owner_ai_entry, "must be an authorized, settled invitation AI draft") unless valid
   end
 
   def service_versions_are_published
