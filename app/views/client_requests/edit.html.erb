@@ -30,8 +30,14 @@
           </div>
         </div>
         <% InvitationBriefTaxonomy.sections.each do |group, options| %>
+          <details class="wa-e2-client-brief__disclosure" <%= "open" if group == "tasks" %>>
+            <summary>
+              <i class="bi <%= InvitationBriefTaxonomy::ICONS.fetch(group) %>" aria-hidden="true"></i>
+              <span><%= t("e2_client_brief.groups.#{group}") %></span>
+              <i class="bi bi-chevron-down wa-e2-client-brief__chevron" aria-hidden="true"></i>
+            </summary>
           <fieldset class="wa-e2-client-brief__section">
-            <legend><i class="bi <%= InvitationBriefTaxonomy::ICONS.fetch(group) %>" aria-hidden="true"></i> <%= t("e2_client_brief.groups.#{group}") %></legend>
+            <legend class="visually-hidden"><%= t("e2_client_brief.groups.#{group}") %></legend>
             <p class="rc-hint"><%= t("e2_client_brief.group_help.#{group}") %></p>
             <div class="wa-e2-client-brief__choices">
               <% options.each do |option| %>
@@ -56,6 +62,7 @@
                   class: "rc-input" %>
             </label>
           </fieldset>
+          </details>
         <% end %>
         <div class="rc-field">
           <%= label_tag "brief_notes", t("e2_client_brief.notes"), class: "rc-field-label" %>
