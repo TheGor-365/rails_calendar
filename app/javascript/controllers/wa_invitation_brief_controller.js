@@ -54,8 +54,8 @@ export default class extends Controller {
     this.goalTarget.focus()
   }
 
-  manualEdit() {
-    this.goalTarget.dataset.waGenerated = "false"
+  manualEdit(event) {
+    if (event.isTrusted) this.goalTarget.dataset.waGenerated = "false"
   }
 
   announce(message) {
