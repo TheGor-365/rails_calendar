@@ -11,6 +11,12 @@
       <%= link_to t("e2.back_public"), services_path, class: "rc-action rc-action--quiet" %>
     <% else %>
       <p class="rc-hint"><%= t("e2.preview_public") %></p>
+      <h2 class="h5"><%= @invitation.seed_title %></h2>
+      <% if @invitation.approved_client_preview.present? %>
+        <section class="wa-e2-client-preview" aria-label="<%= t("e2_handoff.client_view_heading") %>">
+          <p class="wa-invite-owner-artifact__text"><%= @invitation.approved_client_preview %></p>
+        </section>
+      <% end %>
       <p><%= t("e2.preview_category", category: rc_intake_type(@invitation.seed_project_type)) %></p>
       <% versions = @invitation.published_versions %>
       <% if versions.any? %>
