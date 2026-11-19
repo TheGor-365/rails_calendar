@@ -134,6 +134,43 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "reused invitation shows saved AI draft but does not publish client preview or generate again" do
+    login(@owner)
+    issue_invitation
+    source = ClientRequestInvitation.order(:id).last
+    entry = AiSpendEntry.create!(
+      professional_profile: @workspace.professional_profile,
+      operation: OwnerAi::Composer::VERSION, model: "test-only-local",
+      request_digest: Digest::SHA256.hexdigest(SecureRandom.hex(16)),
+      status: "settled", reserved_ticks: 0, charged_ticks: 0,
+      result: {
+        "purpose" => "intake_questions",
+        "heading" => "Questions for a fictional client",
+        "draft" => "Please describe when the contact form stops working.",
+        "questions" => ["What happens when you submit the form?"],
+        "cautions" => ["Do not send private data."],
+        "next_step" => "Review questions before sharing."
+      }
+    )
+    source.update!(owner_ai_entry: entry)
+    assert_no_difference(["AiSpendEntry.count", "ClientRequestInvitation.count"]) do
+      get owner_invitations_path(from_invitation_id: source.id)
+      assert_response :success
+      assert_select ".wa-invite-ai__result:not([hidden])", count: 1
+      assert_select "[data-wa-invitation-ai-target='heading']", text: /Questions for a fictional client/
+      assert_select "[data-wa-invitation-ai-target='draft']", text: /contact form stops working/
+      assert_select "[data-wa-invitation-ai-target='questions'] li", text: /submit the form/
+      assert_select "textarea#proposal_approved_client_preview", text: "", count: 1
+      assert_select "input#proposal_share_preview:not([checked])", count: 1
+      assert_select "input#proposal_owner_ai_entry_id[value=?]", entry.id.to_s
+    end
+    assert_nil source.reload.approved_client_preview
+    sign_out
+    login(@owner_b)
+    get owner_invitations_path(from_invitation_id: source.id)
+    assert_response :not_found
+  end
+
   test "only the owner can link an existing private AI record" do
     login(@owner)
     post owner_invitations_path, as: :json, params: {
