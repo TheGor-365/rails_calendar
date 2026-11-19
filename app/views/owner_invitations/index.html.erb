@@ -131,15 +131,11 @@
             <p class="rc-hint"><%= t("e2_ai.subtitle") %></p></div>
         </div>
         <div class="wa-invite-ai__actions">
-          <% {
-            "intake_questions" => "bi-ui-checks-grid",
-            "client_reply" => "bi-chat-square-text",
-            "plan_outline" => "bi-diagram-3"
-          }.each_with_index do |(operation, icon), index| %>
+          <% OwnerAi::PageActionRegistry.for_page(:invitation).each_with_index do |(operation, definition), index| %>
             <div class="wa-invite-ai__action">
               <label class="wa-invite-ai__select">
                 <input type="radio" name="ai_operation" value="<%= operation %>" <%= "checked" if index.zero? %>>
-                <i class="bi <%= icon %>" aria-hidden="true"></i>
+                <i class="bi <%= definition.fetch(:icon) %>" aria-hidden="true"></i>
                 <strong><%= t("e2_ai.actions.#{operation}.name") %></strong>
               </label>
               <details class="wa-invite-ai__explain">
