@@ -36,7 +36,7 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_equal :invited, invitation.state
     get owner_invitations_path
     assert_response :success
-    assert_select "section.wa-invite-compose form[data-controller='wa-invitation-brief']", count: 1
+    assert_select "section.wa-invite-compose form[data-controller~='wa-invitation-brief']", count: 1
     assert_select "input[data-wa-invitation-brief-target='service'][data-wa-service-search]", minimum: 1
     assert_select "#e2-invite-link", count: 0 # link available only immediately after issue
     sign_out
@@ -46,6 +46,67 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_select "body", text: /#{Regexp.escape(invitation.seed_title)}/, count: 0
     post revoke_owner_invitation_path(invitation)
     assert_response :not_found
+  end
+
+  test "JSON invitation issuance keeps the page and exposes one-time token only once" do
+    login(@owner)
+    assert_difference("ClientRequestInvitation.count", 1) do
+      post owner_invitations_path, as: :json, params: {
+        proposal: proposal.merge(
+          brief_selections: { tasks: ["bugfix"] },
+          approved_client_preview: "Please check when the fictional contact form fails.",
+          share_preview: "1"
+        ), service_version_ids: [@offering.published_version_id]
+      }
+      assert_response :created
+      assert_equal "no-store", response.headers["Cache-Control"]
+    end
+
+    invitation = ClientRequestInvitation.order(:id).last
+    data = response.parsed_body
+    assert_equal invitation.id, data.fetch("invitation_id")
+    assert_match(/token=[0-9a-f]{64}\z/, data.fetch("url"))
+    assert_equal "Please check when the fictional contact form fails.", invitation.approved_client_preview
+
+    get owner_invitation_path(invitation)
+    assert_response :success
+    assert_select ".wa-invite-owner-artifact__text", text: /fictional contact form/
+    get owner_invitation_path(invitation, format: :json)
+    assert_response :success
+    assert_match "attachment", response.headers["Content-Disposition"]
+    export = JSON.parse(response.body)
+    assert_nil export["token"]
+    assert_equal invitation.seed_title, export["title"]
+    assert_equal invitation.approved_client_preview, export["approved_client_preview"]
+
+    sign_out
+    post client_invitation_preview_path, params: { invite_token: URI(data.fetch("url")).fragment.delete_prefix("token=") }
+    assert_redirected_to client_invitation_preview_path
+    get client_invitation_preview_path
+    assert_response :success
+    assert_select "body", text: /Please check when the fictional contact form fails/
+    assert_select "body", text: /Owner's unverified confidential synthetic requirements/, count: 0
+
+    get owner_invitation_path(invitation)
+    assert_redirected_to sign_in_path
+    get owner_invitation_path(invitation, format: :json)
+    assert_redirected_to sign_in_path
+  end
+
+  test "guest sees no extra preview text unless explicitly shared" do
+    login(@owner)
+    post owner_invitations_path, as: :json, params: {
+      proposal: proposal.merge(approved_client_preview: "Owner-only draft should stay private.", share_preview: "0"),
+      service_version_ids: []
+    }
+    assert_response :created
+    assert_nil ClientRequestInvitation.last.approved_client_preview
+    raw = URI(response.parsed_body.fetch("url")).fragment.delete_prefix("token=")
+    sign_out
+    post client_invitation_preview_path, params: { invite_token: raw }
+    get client_invitation_preview_path
+    assert_response :success
+    assert_select "body", text: /Owner-only draft should stay private/, count: 0
   end
 
   test "guest sees public preview only; verified claim leads to one editable canonical intake" do
