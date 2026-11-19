@@ -1115,3 +1115,51 @@
   .wa-invite-issued__actions > .rc-action {flex:1 1 130px;justify-content:center;}
   .wa-invite-page .wa-invite-services {padding:.8rem;}
 }
+
+
+/* E2 saved invitation: one intentional action row, with optional recovery folded away. */
+.wa-invite-artifact-tools {
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
+  gap:1rem;margin-top:1.25rem;padding:1rem 0 .4rem;
+  border-top:1px solid var(--ws-border);
+}
+.wa-invite-artifact-tools__summary {display:flex;gap:.7rem;align-items:center;min-width:0;flex:1 1 245px;}
+.wa-invite-artifact-tools__summary strong {display:block;font-size:.85rem;line-height:1.5;}
+.wa-invite-artifact-tools__summary .rc-hint {margin:.12rem 0 0;line-height:1.5;}
+.wa-invite-artifact-tools__icon {
+  display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;
+  border-radius:12px;color:var(--ws-teal);background:var(--ws-teal-wash);font-size:1rem;
+}
+.wa-invite-artifact-tools__actions {display:flex;justify-content:flex-end;gap:.5rem;flex-wrap:wrap;}
+.wa-invite-artifact-recover {
+  margin-top:.75rem;border:1px solid var(--ws-border);border-radius:13px;
+  background:var(--ws-canvas);overflow:hidden;
+}
+.wa-invite-artifact-recover > summary {
+  list-style:none;display:flex;align-items:center;gap:.65rem;
+  padding:.85rem 1rem;font-size:.8rem;font-weight:760;cursor:pointer;
+  transition:background-color .24s ease;
+}
+.wa-invite-artifact-recover > summary::-webkit-details-marker {display:none;}
+.wa-invite-artifact-recover > summary:hover {background:var(--ws-teal-wash);}
+.wa-invite-artifact-recover > summary > .bi:first-child {color:var(--ws-teal);}
+.wa-invite-artifact-recover__chevron {margin-left:auto;color:var(--ws-muted);transition:transform .25s ease;}
+.wa-invite-artifact-recover[open] .wa-invite-artifact-recover__chevron {transform:rotate(180deg);}
+.wa-invite-artifact-recover__body {
+  padding:1rem;border-top:1px solid var(--ws-border);
+  animation:wa-invite-recover-open .25s ease both;
+}
+.wa-invite-artifact-recover__body .rc-hint {margin:0 0 .75rem;}
+.wa-invite-artifact-recover__form {display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;}
+.wa-invite-artifact-recover__form > .rc-input {min-width:180px;flex:1 1 320px;}
+.wa-invite-artifact-recover__form > .rc-action {flex:0 0 auto;}
+@keyframes wa-invite-recover-open {from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:575.98px) {
+  .wa-invite-artifact-tools__actions {width:100%;justify-content:stretch;}
+  .wa-invite-artifact-tools__actions .rc-action {flex:1 1 125px;justify-content:center;}
+  .wa-invite-artifact-recover__form > .rc-action {width:100%;justify-content:center;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .wa-invite-artifact-recover > summary,.wa-invite-artifact-recover__chevron {transition:none;}
+  .wa-invite-artifact-recover__body {animation:none;}
+}
