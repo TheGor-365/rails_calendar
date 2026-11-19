@@ -30,4 +30,25 @@ class InvitationBriefTaxonomy
           values.uniq == values && values.all? { |value| SECTIONS.fetch(section.to_s).include?(value) }
       end
   end
+  def self.valid_decisions?(decisions)
+    decisions.is_a?(Hash) &&
+      decisions.keys.all? { |section| SECTIONS.key?(section.to_s) } &&
+      decisions.values.all? { |value| DECISIONS.include?(value) }
+  end
+
+  def self.clean_selections(raw)
+    return {} unless raw.respond_to?(:to_unsafe_h) || raw.is_a?(Hash)
+    hash = raw.respond_to?(:to_unsafe_h) ? raw.to_unsafe_h : raw
+    SECTIONS.keys.index_with do |section|
+      Array(hash[section]).map(&:to_s).reject(&:blank?)
+    end.reject { |_section, values| values.empty? }
+  end
+
+  def self.clean_decisions(raw)
+    return {} unless raw.respond_to?(:to_unsafe_h) || raw.is_a?(Hash)
+    hash = raw.respond_to?(:to_unsafe_h) ? raw.to_unsafe_h : raw
+    SECTIONS.keys.index_with { |section| hash[section].to_s }
+      .reject { |_section, decision| decision.blank? || decision == "skip" }
+  end
+
 end
