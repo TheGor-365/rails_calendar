@@ -112,6 +112,83 @@
               minlength: 10, maxlength: 1200, required: true,
               data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize input->wa-invitation-brief#manualEdit", wa_invitation_brief_target: "goal" } %>
       </div>
+      <section class="wa-invite-ai" data-controller="wa-invitation-ai"
+               data-wa-invitation-ai-url-value="<%= owner_invitation_ai_draft_path %>"
+               data-consent-required="<%= t("e2_ai.consent_required") %>"
+               data-generating="<%= t("e2_ai.generating") %>"
+               data-saved="<%= t("e2_ai.saved") %>"
+               data-unavailable="<%= t("e2_ai.unavailable") %>"
+               data-provider-unavailable="<%= t("e2_ai.unavailable") %>"
+               data-unsupported-operation="<%= t("e2_ai.invalid") %>"
+               data-invalid-brief="<%= t("e2_ai.invalid") %>"
+               data-brief-too-long="<%= t("e2_ai.too_long") %>"
+               data-too-long="<%= t("e2_ai.too_long") %>"
+               data-replace-confirm="<%= t("e2_ai.replace_confirm") %>"
+               data-applied="<%= t("e2_ai.applied") %>">
+        <div class="wa-invite-ai__header">
+          <span class="wa-invite-ai__symbol"><i class="bi bi-stars" aria-hidden="true"></i></span>
+          <div><h3><%= t("e2_ai.title") %></h3>
+            <p class="rc-hint"><%= t("e2_ai.subtitle") %></p></div>
+        </div>
+        <div class="wa-invite-ai__actions">
+          <% {
+            "intake_questions" => "bi-ui-checks-grid",
+            "client_reply" => "bi-chat-square-text",
+            "plan_outline" => "bi-diagram-3"
+          }.each_with_index do |(operation, icon), index| %>
+            <div class="wa-invite-ai__action">
+              <label class="wa-invite-ai__select">
+                <input type="radio" name="ai_operation" value="<%= operation %>" <%= "checked" if index.zero? %>>
+                <i class="bi <%= icon %>" aria-hidden="true"></i>
+                <strong><%= t("e2_ai.actions.#{operation}.name") %></strong>
+              </label>
+              <details class="wa-invite-ai__explain">
+                <summary aria-label="<%= t("e2_ai.explain", action: t("e2_ai.actions.#{operation}.name")) %>">
+                  <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                  <span><%= t("e2_ai.what_changes") %></span>
+                </summary>
+                <p><%= t("e2_ai.actions.#{operation}.description") %></p>
+              </details>
+            </div>
+          <% end %>
+        </div>
+        <div class="wa-invite-ai__footer">
+          <label class="wa-invite-ai__consent">
+            <input type="checkbox" data-wa-invitation-ai-target="consent">
+            <span><%= t("e2_ai.paid_consent") %></span>
+          </label>
+          <button type="button" class="rc-action rc-action--primary"
+                  data-wa-invitation-ai-target="generate"
+                  data-action="click->wa-invitation-ai#generate"
+                  <%= "disabled" unless OwnerIntelligence::Grok.enabled? %>>
+            <%= rc_icon_label("stars", t("e2_ai.generate")) %>
+          </button>
+        </div>
+        <% unless OwnerIntelligence::Grok.enabled? %>
+          <p class="rc-hint"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("e2_ai.disabled") %></p>
+        <% end %>
+        <p class="wa-invite-ai__status" role="status" aria-live="polite" data-wa-invitation-ai-target="status"></p>
+        <section class="wa-invite-ai__result" hidden data-wa-invitation-ai-target="result" aria-label="<%= t("e2_ai.result") %>">
+          <div class="wa-invite-ai__result-heading">
+            <i class="bi bi-journal-check" aria-hidden="true"></i>
+            <h4 data-wa-invitation-ai-target="heading"></h4>
+          </div>
+          <p class="wa-invite-ai__draft" data-wa-invitation-ai-target="draft"></p>
+          <ul class="wa-invite-ai__questions" data-wa-invitation-ai-target="questions"></ul>
+          <ul class="wa-invite-ai__cautions" data-wa-invitation-ai-target="cautions"></ul>
+          <p data-wa-invitation-ai-target="nextStep"></p>
+          <div class="wa-invite-ai__result-actions">
+            <a href="#" class="rc-action rc-action--quiet" hidden data-wa-invitation-ai-target="reviewLink">
+              <%= rc_icon_label("journal-text", t("e2_ai.open_saved")) %>
+            </a>
+            <button type="button" class="rc-action rc-action--primary"
+                    data-wa-invitation-ai-target="apply"
+                    data-action="click->wa-invitation-ai#apply">
+              <%= rc_icon_label("check2", t("e2_ai.use_in_form")) %>
+            </button>
+          </div>
+        </section>
+      </section>
       <fieldset class="rc-field mb-3 wa-invite-services">
         <legend class="rc-field-label"><i class="bi bi-grid-1x2" aria-hidden="true"></i> <%= t("e2.services") %></legend>
         <div class="wa-invite-service-grid">
