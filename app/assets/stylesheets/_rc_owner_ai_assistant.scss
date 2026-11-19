@@ -653,3 +653,74 @@
 .wa-threads__intro-compact p { margin: 0; }
 .wa-threads__sidebar.surface-panel { overflow: visible; }
 .wa-threads__list-entry .wa-threads__more > summary:focus-visible { outline: 2px solid var(--ws-teal); outline-offset: 2px; }
+
+
+/* C2.1e/E2 visual QA: calm, content-sized dock with a viewport safety cap.
+   Scroll appears only when content exceeds the available vertical space. */
+.wa-ai-dock {
+  interpolate-size: allow-keywords;
+}
+.wa-ai-dock__panel {
+  height: auto;
+  max-height: calc(100dvh - 6.5rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: auto;
+  align-content: start;
+  transition: height .32s ease, opacity .24s ease, transform .32s cubic-bezier(.2,.7,.2,1);
+}
+.wa-ai-dock:not([open]) .wa-ai-dock__panel {
+  opacity: 0;
+  transform: translateY(10px) scale(.985);
+}
+.wa-ai-dock[open] .wa-ai-dock__panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.wa-ai-dock__heading { align-items: center; }
+.wa-ai-dock__heading > div { flex: 1; min-width: 0; }
+.wa-ai-dock__close {
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--ws-muted);
+  border: 1px solid var(--ws-border);
+  background: var(--ws-paper);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease;
+}
+.wa-ai-dock__close:hover { background: var(--ws-teal-wash); color: var(--ws-teal-deep); }
+.wa-ai-dock__close:focus-visible { outline: 2px solid var(--ws-teal); outline-offset: 2px; }
+.wa-ai-dock__operations { border: 0; margin: 0; padding: 0; min-width: 0; }
+.wa-ai-dock__operation-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .45rem; }
+.wa-ai-dock__operation {
+  display: flex; align-items: flex-start; gap: .45rem; min-width: 0;
+  padding: .66rem .55rem;
+  border: 1px solid var(--ws-border); border-radius: 12px;
+  color: var(--ws-ink); background: var(--ws-paper);
+  font-size: .74rem; font-weight: 700; line-height: 1.35;
+  cursor: pointer;
+  transition: border-color .22s ease, background-color .22s ease, box-shadow .22s ease;
+}
+.wa-ai-dock__operation input { margin-top: .12rem; accent-color: var(--ws-teal); flex: 0 0 auto; }
+.wa-ai-dock__operation > .bi { font-size: 1rem; color: var(--ws-teal); }
+.wa-ai-dock__operation span { min-width: 0; overflow-wrap: anywhere; }
+.wa-ai-dock__operation:has(input:checked) {
+  border-color: var(--ws-teal); background: var(--ws-teal-wash);
+  box-shadow: inset 0 0 0 1px rgba(10,118,109,.1);
+}
+.wa-ai-dock__operation:focus-within { outline: 2px solid var(--ws-teal); outline-offset: 2px; }
+.wa-ai-dock__cost-details > summary, .wa-ai-dock__find > summary { transition: color .2s ease, background-color .2s ease; }
+@media(max-width:767.98px) {
+  .wa-ai-dock__panel { max-height: calc(100dvh - 10rem); }
+}
+@media(max-width:359.98px) {
+  .wa-ai-dock__operation-grid { grid-template-columns: 1fr; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .wa-ai-dock__panel, .wa-ai-dock__operation, .wa-ai-dock__close { transition: none; }
+}
