@@ -17,3 +17,7 @@ es:
     private_hint: "Solo disponible para el propietario."
     no_linked_ai: "Ningún borrador de IA vinculado; consulte el historial privado."
     preview_ready: "Revise el texto y autorice expresamente compartirlo."
+    recover_title: "Borradores privados recientes de IA"
+    recover_hint: "Elija un borrador guardado para esta invitación. Solo es visible para el propietario y no publica contenido para el cliente."
+    recover_action: "Vincular borrador"
+    linked: "Borrador privado vinculado. No se ha cambiado el contenido para el cliente."
