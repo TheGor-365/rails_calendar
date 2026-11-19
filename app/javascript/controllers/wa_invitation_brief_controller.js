@@ -4,8 +4,68 @@ import { Controller } from "@hotwired/stimulus"
 // No provider calls. All selections are composed into existing seed_goal;
 // structured server-side versioning is a separate rollout gate.
 export default class extends Controller {
-  static targets = ["goal", "notes", "status"]
+  static targets = ["goal", "notes", "status", "service"]
   static values = { minimum: { type: Number, default: 10 }, maximum: { type: Number, default: 1200 } }
+
+
+  // Fast local matching against the owner's actual published services, not a
+  // fabricated AI result. A future provider-based suggestion must be explicitly
+  // consented, costed and reviewed before modifying anything.
+  connect() {
+    this.manualServiceIds = new Set()
+    this.refreshSuggestions()
+  }
+
+  manualService(event) {
+    if (!event.isTrusted) return
+    this.manualServiceIds.add(event.currentTarget.value)
+  }
+
+  refreshSuggestions() {
+    if (!this.hasServiceTarget) return
+    const selected = Array.from(this.element.querySelectorAll("[data-wa-brief-choice]:checked"))
+      .map(input => input.value)
+    const title = this.element.querySelector("#proposal_seed_title")?.value || ""
+    const notes = this.hasNotesTarget ? this.notesTarget.value : ""
+    const category = this.element.querySelector("#proposal_seed_project_type")?.value || ""
+
+    // Only specific task keywords count. Broad stack labels (Ruby, Rails, etc.)
+    // must not accidentally select the entire catalogue.
+    const lexicon = {
+      bugfix: ["исправлен", "ошиб", "отлад", "bug", "debug", "fix"],
+      forms: ["форм", "crud", "admin", "админ", "form"],
+      api: ["api", "интеграц", "integration", "rest"],
+      tests: ["тест", "надёж", "test", "quality", "qa"],
+      ui: ["дизайн", "адаптив", "лендинг", "ui/ux", "frontend", "responsive", "website", "сайт"],
+      automation: ["автоматизац", "automation", "workflow"],
+      postgresql: ["postgresql", "баз дан", "database"],
+      bootstrap: ["bootstrap"], stimulus: ["stimulus", "hotwire"],
+      railway: ["railway"], docker: ["docker"], redis: ["redis"]
+    }
+    const freeText = `${title} ${notes}`.toLocaleLowerCase()
+    const scored = this.serviceTargets.map(input => {
+      const service = (input.dataset.waServiceSearch || "").toLocaleLowerCase()
+      let score = 0
+      for (const key of selected) {
+        for (const keyword of (lexicon[key] || [])) {
+          if (service.includes(keyword)) { score += ["bugfix", "forms", "api", "tests", "ui", "automation"].includes(key) ? 5 : 1; break }
+        }
+      }
+      // Title/notes reinforce a known service match, but never authorize a
+      // recommendation solely from generic words such as Rails.
+      if (score > 0) {
+        const significant = freeText.split(/[^\\p{L}\\p{N}]+/u).filter(x => x.length >= 5)
+        if (significant.some(word => service.includes(word))) score += 2
+        if (input.dataset.waServiceCategory === category) score += 1
+      }
+      return { input, score }
+    }).filter(item => item.score >= 5).sort((a, b) => b.score - a.score)
+
+    const suggested = new Set(scored.slice(0, 6).map(item => item.input.value))
+    for (const input of this.serviceTargets) {
+      if (!this.manualServiceIds.has(input.value)) input.checked = suggested.has(input.value)
+    }
+  }
 
   compose(event) {
     event.preventDefault()
