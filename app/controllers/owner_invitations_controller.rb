@@ -24,15 +24,67 @@ class OwnerInvitationsController < ApplicationController
     @invitation.brief_decisions = InvitationBriefTaxonomy.valid_decisions?(decisions) ? decisions : { "invalid" => "invalid" }
     @invitation.brief_notes = raw_proposal[:brief_notes].to_s.strip.slice(0, 351) if raw_proposal.is_a?(ActionController::Parameters)
     @invitation.service_version_ids = ids_valid ? raw_ids.map(&:to_i) : [-1]
+    @invitation.owner_ai_entry_id = raw_proposal[:owner_ai_entry_id].presence if raw_proposal.is_a?(ActionController::Parameters)
+    @invitation.approved_client_preview = raw_proposal[:approved_client_preview].to_s.strip.presence if
+      raw_proposal.is_a?(ActionController::Parameters) && raw_proposal[:share_preview] == "1"
     @invitation.expires_at = ClientRequestInvitation::TTL.from_now
     token = SecureRandom.hex(32) # 256-bit bearer secret, never persisted.
     @invitation.token_digest = ClientRequestInvitation.digest_for(token)
 
     if @invitation.save
-      flash[:issued_invitation_url] = client_invitation_url(anchor: "token=#{token}")
-      redirect_to owner_invitations_path, notice: I18n.t("e2.invitation_issued")
+      # Token is displayed once only. Never include in later GETs or exports.
+      url = client_invitation_url(anchor: "token=#{token}")
+      respond_to do |format|
+        format.json do
+          response.headers["Cache-Control"] = "no-store"
+          response.headers["Referrer-Policy"] = "no-referrer"
+          render json: { invitation_id: @invitation.id, url: url,
+            preview_url: owner_invitation_path(@invitation),
+            export_url: owner_invitation_path(@invitation, format: :json) }, status: :created
+        end
+        format.html do
+          flash[:issued_invitation_url] = url
+          redirect_to owner_invitation_path(@invitation), notice: I18n.t("e2.invitation_issued")
+        end
+      end
     else
-      render :index, status: :unprocessable_entity
+      respond_to do |format|
+        format.json { render json: { errors: @invitation.errors.full_messages }, status: :unprocessable_entity }
+        format.html { render :index, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  # Owner-side review uses only stored IDs, never the once-only bearer token.
+  def show
+    @invitation = current_user.owner_workspace.client_request_invitations
+      .includes(:owner_ai_entry).find_by(id: params[:id])
+    return head :not_found unless @invitation
+
+    response.headers["Cache-Control"] = "private, no-store"
+    response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    @owner_ai_result = @invitation.owner_ai_entry&.result if
+      @invitation.owner_ai_entry&.status == "settled"
+
+    respond_to do |format|
+      format.html
+      format.json do
+        payload = {
+          type: "rails_calendar_invitation_v1",
+          invitation_id: @invitation.id,
+          title: @invitation.seed_title,
+          project_category: @invitation.seed_project_type,
+          owner_hypothesis: @invitation.seed_goal,
+          approved_client_preview: @invitation.approved_client_preview,
+          selected_services: @invitation.published_versions.map(&:title),
+          selected_technologies: @invitation.brief_selections,
+          delegated_decisions: @invitation.brief_decisions,
+          owner_notes: @invitation.brief_notes,
+          ai_draft: @owner_ai_result&.slice("heading", "draft", "questions", "cautions", "next_step")
+        }
+        send_data JSON.pretty_generate(payload), filename: "rails-calendar-invitation-#{@invitation.id}.json",
+          type: "application/json", disposition: "attachment"
+      end
     end
   end
 
