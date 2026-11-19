@@ -32,12 +32,12 @@ class ClientRequestsController < ApplicationController
     selections ||= raw_brief.nil? ? (prior_brief&.selections || {}) : {}
     brief_decisions ||= raw_brief.nil? ? (prior_brief&.decisions || {}) : {}
     unless InvitationBriefTaxonomy.valid?(selections) && InvitationBriefTaxonomy.valid_decisions?(brief_decisions)
-      @intake.errors.add(:base, I18n.t("e2_builder.invalid"))
+      @intake.errors.add(:base, I18n.t("e2_client_brief.invalid"))
       return render :edit, status: :unprocessable_entity
     end
     brief_notes = raw_brief.is_a?(ActionController::Parameters) ? raw_brief[:notes].to_s.strip : prior_brief&.notes.to_s
     if brief_notes.length > 350
-      @intake.errors.add(:base, I18n.t("e2_builder.long_notes"))
+      @intake.errors.add(:base, I18n.t("e2_client_brief.long_notes"))
       return render :edit, status: :unprocessable_entity
     end
 
