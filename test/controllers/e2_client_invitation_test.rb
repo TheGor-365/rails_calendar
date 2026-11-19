@@ -241,6 +241,58 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "invitation page exposes contextual AI controls but no generation on GET" do
+    login(@owner)
+    assert_no_difference("AiSpendEntry.count") do
+      get owner_invitations_path
+      assert_response :success
+      assert_select ".wa-invite-ai[data-controller='wa-invitation-ai']", count: 1
+      assert_select ".wa-invite-ai__action", count: 3
+      assert_select ".wa-invite-ai__result[hidden]", count: 1
+      assert_select ".wa-invite-ai button[data-wa-invitation-ai-target='generate'][disabled]", count: 1
+    end
+  end
+
+  test "AI invitation endpoint rejects missing paid consent and forged purposes without charges" do
+    login(@owner)
+    assert_no_difference("AiSpendEntry.count") do
+      post owner_invitation_ai_draft_path, as: :json, params: {
+        operation: "intake_questions", paid_consent: "0",
+        seed_title: "Synthetic Rails form", seed_goal: @seed
+      }
+      assert_response :unprocessable_entity
+      assert_equal "consent_required", response.parsed_body["error"]
+
+      post owner_invitation_ai_draft_path, as: :json, params: {
+        operation: "delete_records", paid_consent: "1",
+        seed_title: "Synthetic Rails form", seed_goal: @seed
+      }
+      assert_response :unprocessable_entity
+      assert_equal "unsupported_operation", response.parsed_body["error"]
+    end
+  end
+
+  test "client cannot access owner invitation AI and disabled provider does not bill" do
+    login(@client)
+    assert_no_difference("AiSpendEntry.count") do
+      post owner_invitation_ai_draft_path, as: :json, params: {
+        operation: "intake_questions", paid_consent: "1",
+        seed_title: "Synthetic Rails form", seed_goal: @seed
+      }
+      assert_response :redirect
+    end
+    sign_out
+    login(@owner)
+    assert_no_difference("AiSpendEntry.count") do
+      post owner_invitation_ai_draft_path, as: :json, params: {
+        operation: "intake_questions", paid_consent: "1",
+        seed_title: "Synthetic Rails form", seed_goal: @seed
+      }
+      assert_response :service_unavailable
+      assert_equal "provider_unavailable", response.parsed_body["error"]
+    end
+  end
+
   private
 
   def proposal
