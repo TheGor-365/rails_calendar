@@ -21,3 +21,4 @@ es:
     recover_hint: "Elija un borrador guardado para esta invitación. Solo es visible para el propietario y no publica contenido para el cliente."
     recover_action: "Vincular borrador"
     linked: "Borrador privado vinculado. No se ha cambiado el contenido para el cliente."
+    reuse_as_new: "Reutilizar como nueva invitación"
