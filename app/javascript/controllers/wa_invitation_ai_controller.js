@@ -72,6 +72,8 @@ export default class extends Controller {
     }
     this.resultTarget.hidden = false
     this.applyTarget.disabled = !data.draft?.trim()
+    const linkedEntry = this.element.closest("form")?.querySelector("#proposal_owner_ai_entry_id")
+    if (linkedEntry && Number.isInteger(data.id) && data.id > 0) linkedEntry.value = String(data.id)
   }
 
   populate(node, lines) {
@@ -101,6 +103,30 @@ export default class extends Controller {
     input.dispatchEvent(new Event("input", { bubbles: true }))
     this.notify(this.element.dataset.applied || "Added to the form. Review before issuing the invitation.", false)
     input.focus()
+  }
+
+  useClientPreview(event) {
+    event.preventDefault()
+    const form = this.element.closest("form")
+    const field = form?.querySelector("#proposal_approved_client_preview")
+    const check = form?.querySelector("#proposal_share_preview")
+    if (!field || !check) return
+    const heading = this.headingTarget.textContent.trim()
+    const draft = this.draftTarget.textContent.trim()
+    const questions = Array.from(this.questionsTarget.children).map(node => node.textContent.trim())
+    const proposal = [heading, draft, ...questions.map((q, i) => `${i + 1}. ${q}`)].filter(Boolean).join("\n\n")
+    if (proposal.length > 1200) {
+      this.notify(this.element.dataset.tooLong || "Reduce the AI result to 1200 characters first.", true)
+      field.focus()
+      return
+    }
+    if (field.value.trim() && !window.confirm(this.element.dataset.replaceConfirm ||
+        "Replace the client preview with this reviewed AI text?")) return
+    field.value = proposal
+    // A separate explicit checkbox is required before the text is shared.
+    check.checked = false
+    field.focus()
+    this.notify(this.element.dataset.previewReady || "Review this preview and check the sharing confirmation.", false)
   }
 
   notify(message, error) {
