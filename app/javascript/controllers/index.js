@@ -58,3 +58,7 @@ application.register("wa-copy", WaCopyController)
 // E2 local-only structured brief composition; no AI calls.
 import WaInvitationBriefController from "./wa_invitation_brief_controller"
 application.register("wa-invitation-brief", WaInvitationBriefController)
+
+// Owner invitation actions use the existing consented and journalled AI provider.
+import WaInvitationAiController from "./wa_invitation_ai_controller"
+application.register("wa-invitation-ai", WaInvitationAiController)
