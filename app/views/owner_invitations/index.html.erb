@@ -40,7 +40,20 @@
     <% if @invitation&.errors&.any? %>
       <p class="rc-notice rc-notice--error" role="alert"><%= @invitation.errors.full_messages.to_sentence %></p>
     <% end %>
-    <%= form_with url: owner_invitations_path, method: :post, html: { class: "rc-form wa-invite-form" } do %>
+    <%= form_with url: owner_invitations_path, method: :post, html: {
+      class: "rc-form wa-invite-form",
+      data: {
+        controller: "wa-invitation-brief",
+        wa_invitation_brief_minimum_value: 10, wa_invitation_brief_maximum_value: 1200,
+        wa_brief_client_decides: t("e2_builder.client_decides"),
+        wa_brief_owner_decides: t("e2_builder.owner_decides"),
+        wa_brief_notes_label: t("e2_builder.notes"),
+        wa_brief_keep_manual: t("e2_builder.keep_manual"),
+        wa_brief_empty: t("e2_builder.empty"),
+        wa_brief_long: t("e2_builder.long"),
+        wa_brief_composed: t("e2_builder.composed")
+      }
+    } do %>
       <div class="wa-invite-brief-grid">
       <div class="rc-field mb-3">
         <%= label_tag "proposal_seed_title", t("e2.seed_title"), class: "rc-field-label" %>
@@ -55,6 +68,53 @@
               id: "proposal_seed_project_type", class: "rc-input" %>
       </div>
       </div>
+      <section class="wa-invite-builder" aria-labelledby="wa-invite-builder-heading">
+        <div class="wa-invite-field-heading">
+          <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-ui-checks-grid"></i></span>
+          <div>
+            <h3 id="wa-invite-builder-heading"><%= t("e2_builder.title") %></h3>
+            <p class="rc-hint"><%= t("e2_builder.hint") %></p>
+          </div>
+        </div>
+        <% {
+          "tasks" => %w[bugfix forms api tests ui automation],
+          "frontend" => %w[html bootstrap stimulus javascript vite vue],
+          "backend" => %w[ruby rails postgresql redis],
+          "deployment" => %w[railway vps docker github_actions dns_ssl]
+        }.each do |group, options| %>
+          <details class="wa-invite-builder__group" <%= "open" if group == "tasks" %>>
+            <summary><i class="bi <%= { "tasks" => "bi-ui-checks-grid", "frontend" => "bi-window-stack", "backend" => "bi-database", "deployment" => "bi-cloud-arrow-up" }.fetch(group) %>" aria-hidden="true"></i> <%= t("e2_builder.sections.#{group}") %> <i class="bi bi-chevron-down wa-invite-builder__chevron" aria-hidden="true"></i></summary>
+            <fieldset data-wa-brief-section>
+              <legend><%= t("e2_builder.sections.#{group}") %></legend>
+              <div class="wa-invite-builder__choices">
+                <% options.each do |option| %>
+                  <label class="wa-invite-builder__choice">
+                    <%= check_box_tag nil, option, false, data: { wa_brief_choice: true } %>
+                    <span><%= t("e2_builder.options.#{option}") %></span>
+                  </label>
+                <% end %>
+              </div>
+              <label class="wa-invite-builder__decision">
+                <span><%= t("e2_builder.decision_label") %></span>
+                <select class="rc-input" data-wa-brief-decision>
+                  <option value="skip"><%= t("e2_builder.skip") %></option>
+                  <option value="client"><%= t("e2_builder.client_decides") %></option>
+                  <option value="owner"><%= t("e2_builder.owner_decides") %></option>
+                </select>
+              </label>
+            </fieldset>
+          </details>
+        <% end %>
+        <label class="rc-field-label" for="wa-invite-builder-notes"><%= t("e2_builder.notes") %></label>
+        <textarea id="wa-invite-builder-notes" rows="2" maxlength="350" class="rc-input rc-input--area"
+                  data-wa-invitation-brief-target="notes"></textarea>
+        <div class="wa-invite-builder__actions">
+          <button type="button" class="rc-action rc-action--soft" data-action="click->wa-invitation-brief#compose">
+            <%= rc_icon_label("magic", t("e2_builder.assemble")) %>
+          </button>
+          <p class="rc-hint" data-wa-invitation-brief-target="status" role="status" aria-live="polite"></p>
+        </div>
+      </section>
       <div class="rc-field mb-3 wa-invite-goal">
         <div class="wa-invite-field-heading">
           <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
@@ -64,7 +124,7 @@
         <%= text_area_tag "proposal[seed_goal]", @invitation&.seed_goal,
               id: "proposal_seed_goal", class: "rc-input rc-input--area", rows: 5,
               minlength: 10, maxlength: 1200, required: true,
-              data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
+              data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize input->wa-invitation-brief#manualEdit", wa_invitation_brief_target: "goal" } %>
       </div>
       <fieldset class="rc-field mb-3 wa-invite-services">
         <legend class="rc-field-label"><i class="bi bi-grid-1x2" aria-hidden="true"></i> <%= t("e2.services") %></legend>
