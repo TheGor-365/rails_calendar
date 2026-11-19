@@ -26,3 +26,4 @@ es:
     draft_unlinked: "Aún no hay borrador de IA vinculado"
     private_not_shared: "Solo para el propietario. Nada se envía automáticamente al cliente."
     replace_draft: "Cambiar borrador de IA vinculado"
+    saved_ai_reused: "Borrador de IA restaurado sin nueva solicitud de pago. Revíselo y prepare la vista previa para el cliente."
