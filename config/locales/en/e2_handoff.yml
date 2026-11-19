@@ -26,3 +26,4 @@ en:
     draft_unlinked: "No AI draft linked yet"
     private_not_shared: "Owner only. Nothing is sent to the client automatically."
     replace_draft: "Change linked AI draft"
+    saved_ai_reused: "Saved AI draft restored without a new paid request. Review it, then select Prepare client preview."
