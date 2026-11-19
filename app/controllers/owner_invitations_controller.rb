@@ -36,6 +36,60 @@ class OwnerInvitationsController < ApplicationController
     end
   end
 
+  # E2.2: a real, journalled provider draft for this page. No changes are
+  # applied to the invitation, and no cost is incurred without a fresh consent.
+  # Fetch callers render this result in-place for an explicit human review.
+  def ai_draft
+    response.headers["Cache-Control"] = "no-store"
+    operation = params[:operation].to_s
+    allowed = %w[intake_questions client_reply plan_outline]
+    unless allowed.include?(operation)
+      return render json: { error: "unsupported_operation" }, status: :unprocessable_entity
+    end
+    unless params[:paid_consent] == "1"
+      return render json: { error: "consent_required" }, status: :unprocessable_entity
+    end
+
+    title = params[:seed_title].to_s.strip
+    goal = params[:seed_goal].to_s.strip
+    selections = params[:brief_selections]
+    selections = selections.to_unsafe_h if selections.respond_to?(:to_unsafe_h)
+    selections ||= {}
+    unless title.length.between?(5, 120) && goal.length.between?(10, 1200) &&
+           InvitationBriefTaxonomy.valid?(selections)
+      return render json: { error: "invalid_brief" }, status: :unprocessable_entity
+    end
+
+    # Only user-approved form facts are projected into the paid provider call;
+    # never pass session cookies, private files or other clients' content.
+    plain = InvitationBriefTaxonomy.sections.flat_map do |group, allowed_keys|
+      keys = Array(selections[group]) & allowed_keys
+      keys.empty? ? [] : ["#{group}: #{keys.join(", ")}"]
+    end
+    ai_input = [
+      "Fictional preliminary invitation only. Do not claim a contract or promise cost.",
+      "Owner task: #{title}",
+      "Owner's reviewed brief: #{goal}",
+      *plain
+    ].join("\n")
+    if ai_input.length > 1200
+      return render json: { error: "brief_too_long" }, status: :unprocessable_entity
+    end
+
+    entry = OwnerAi::Composer.new(workspace: @workspace).generate!(
+      operation: operation, brief: ai_input
+    )
+    result = entry.result
+    render json: {
+      id: entry.id, heading: result["heading"], draft: result["draft"],
+      questions: result["questions"], cautions: result["cautions"],
+      next_step: result["next_step"],
+      review_url: owner_ai_assistant_path(entry_id: entry.id, operation: operation)
+    }, status: :ok
+  rescue OwnerAi::Composer::Unavailable
+    render json: { error: "provider_unavailable" }, status: :service_unavailable
+  end
+
   def revoke
     invite = current_user.owner_workspace&.client_request_invitations&.find_by(id: params[:id])
     return head :not_found unless invite
