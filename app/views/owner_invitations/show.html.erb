@@ -5,8 +5,13 @@
       <h1 class="page-title"><%= @invitation.seed_title %></h1>
       <p class="rc-hint"><%= t("e2.state_#{@invitation.state}") %></p>
     </div>
-    <%= link_to rc_icon_label("arrow-left", t("e2_handoff.back")), owner_invitations_path,
-                class: "rc-action rc-action--quiet" %>
+    <div class="wa-invite-issued__actions">
+      <%= link_to rc_icon_label("arrow-left", t("e2_handoff.back")), owner_invitations_path,
+                  class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("copy", t("e2_handoff.reuse_as_new")),
+                  owner_invitations_path(from_invitation_id: @invitation.id),
+                  class: "rc-action rc-action--primary" %>
+    </div>
   </header>
 
   <section class="wa-invite-owner-artifact">
