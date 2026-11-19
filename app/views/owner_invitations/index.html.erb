@@ -1,13 +1,19 @@
-<div class="container my-4 my-sm-5">
-  <header class="rc-page-hero mb-4"><div class="rc-page-hero__content">
+<div class="container my-4 my-sm-5 wa-invite-page">
+  <header class="ws-owner-hero wa-invite-hero mb-4"><div class="rc-page-hero__content">
     <p class="eyebrow"><%= t("e2.owner_eyebrow") %></p>
     <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-send"></i></span>
       <h1 class="page-title"><%= t("e2.owner_title") %></h1></div>
     <p class="rc-muted"><%= t("e2.owner_hint") %></p>
-  </div></header>
+    <div class="wa-invite-hero__notes">
+      <span><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("e2.demo_warning") %></span>
+      <span><i class="bi bi-clock-history" aria-hidden="true"></i> <%= t("e2.copy_once") %></span>
+    </div>
+  </div>
+  <span class="wa-invite-hero__decoration" aria-hidden="true"><i class="bi bi-send-check"></i></span>
+  </header>
 
   <% if (url = flash[:issued_invitation_url]).present? %>
-    <section class="surface-panel p-3 p-sm-4 mb-4" aria-label="<%= t('e2.copy_title') %>">
+    <section class="surface-panel p-3 p-sm-4 mb-4 wa-invite-copy" aria-label="<%= t('e2.copy_title') %>">
       <h2 class="h5"><%= t("e2.copy_title") %></h2>
       <p class="rc-hint"><%= t("e2.copy_once") %></p>
       <div data-controller="wa-copy">
@@ -22,13 +28,20 @@
     </section>
   <% end %>
 
-  <section class="surface-panel p-3 p-sm-4 mb-4">
-    <h2 class="h5"><%= t("e2.new_title") %></h2>
-    <p class="rc-hint"><%= t("e2.demo_warning") %></p>
+  <section class="surface-panel p-3 p-sm-4 mb-4 wa-invite-compose">
+    <div class="wa-invite-section-heading">
+      <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-pencil-square"></i></span>
+      <div>
+        <p class="eyebrow">01 / DRAFT</p>
+        <h2 class="h5"><%= t("e2.new_title") %></h2>
+        <p class="rc-hint"><%= t("e2.demo_warning") %></p>
+      </div>
+    </div>
     <% if @invitation&.errors&.any? %>
       <p class="rc-notice rc-notice--error" role="alert"><%= @invitation.errors.full_messages.to_sentence %></p>
     <% end %>
-    <%= form_with url: owner_invitations_path, method: :post, html: { class: "rc-form" } do %>
+    <%= form_with url: owner_invitations_path, method: :post, html: { class: "rc-form wa-invite-form" } do %>
+      <div class="wa-invite-brief-grid">
       <div class="rc-field mb-3">
         <%= label_tag "proposal_seed_title", t("e2.seed_title"), class: "rc-field-label" %>
         <%= text_field_tag "proposal[seed_title]", @invitation&.seed_title, id: "proposal_seed_title",
@@ -41,32 +54,46 @@
                                  @invitation&.seed_project_type),
               id: "proposal_seed_project_type", class: "rc-input" %>
       </div>
-      <div class="rc-field mb-3">
+      </div>
+      <div class="rc-field mb-3 wa-invite-goal">
+        <div class="wa-invite-field-heading">
+          <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
+          <div><strong><%= t("e2.seed_goal") %></strong><small><%= t("e2.owner_hint") %></small></div>
+        </div>
         <%= label_tag "proposal_seed_goal", t("e2.seed_goal"), class: "rc-field-label" %>
         <%= text_area_tag "proposal[seed_goal]", @invitation&.seed_goal,
               id: "proposal_seed_goal", class: "rc-input rc-input--area", rows: 5,
               minlength: 10, maxlength: 1200, required: true,
               data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
       </div>
-      <fieldset class="rc-field mb-3">
-        <legend class="rc-field-label"><%= t("e2.services") %></legend>
+      <fieldset class="rc-field mb-3 wa-invite-services">
+        <legend class="rc-field-label"><i class="bi bi-grid-1x2" aria-hidden="true"></i> <%= t("e2.services") %></legend>
+        <div class="wa-invite-service-grid">
         <% @offerings.each do |offering| %>
-          <label class="d-flex gap-2 align-items-start mb-2">
+          <label class="wa-invite-service-choice">
             <%= check_box_tag "service_version_ids[]", offering.published_version_id,
                   @invitation&.service_version_ids&.include?(offering.published_version_id) || false %>
+            <span class="wa-invite-service-choice__icon" aria-hidden="true"><i class="bi bi-check2-square"></i></span>
             <span><%= offering.published_version.title %></span>
           </label>
         <% end %>
+        </div>
         <p class="rc-hint"><%= t("e2.services_hint") %></p>
       </fieldset>
-      <button type="submit" class="rc-action rc-action--primary">
-        <%= rc_icon_label("link-45deg", t("e2.issue_action")) %>
-      </button>
+      <div class="wa-invite-submit">
+        <span class="rc-hint"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("e2.copy_once") %></span>
+        <button type="submit" class="rc-action rc-action--primary">
+          <%= rc_icon_label("link-45deg", t("e2.issue_action")) %>
+        </button>
+      </div>
     <% end %>
   </section>
 
-  <section class="surface-panel p-3 p-sm-4">
-    <h2 class="h5"><%= t("e2.sent_title") %></h2>
+  <section class="surface-panel p-3 p-sm-4 wa-invite-history">
+    <div class="wa-invite-section-heading">
+      <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-clock-history"></i></span>
+      <div><p class="eyebrow">02 / HISTORY</p><h2 class="h5"><%= t("e2.sent_title") %></h2></div>
+    </div>
     <% if @invitations.any? %>
       <ul class="rc-record-list">
         <% @invitations.each do |invite| %>
@@ -83,7 +110,7 @@
         <% end %>
       </ul>
     <% else %>
-      <div class="rc-empty-state"><p><%= t("e2.none_yet") %></p></div>
+      <div class="rc-empty-state"><i class="bi bi-envelope-paper" aria-hidden="true"></i><p><%= t("e2.none_yet") %></p></div>
     <% end %>
   </section>
 </div>
