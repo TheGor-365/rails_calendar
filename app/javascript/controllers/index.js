@@ -54,3 +54,7 @@ import WaInvitationLinkController from "./wa_invitation_link_controller"
 application.register("wa-invitation-link", WaInvitationLinkController)
 import WaCopyController from "./wa_copy_controller"
 application.register("wa-copy", WaCopyController)
+
+// E2 local-only structured brief composition; no AI calls.
+import WaInvitationBriefController from "./wa_invitation_brief_controller"
+application.register("wa-invitation-brief", WaInvitationBriefController)
