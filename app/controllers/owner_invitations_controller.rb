@@ -13,6 +13,16 @@ class OwnerInvitationsController < ApplicationController
     ids_valid = raw_ids.length <= 6 && raw_ids.uniq.length == raw_ids.length &&
       raw_ids.all? { |id| id.to_s.match?(/\A[1-9]\d*\z/) }
     @invitation = @workspace.client_request_invitations.new(proposal_params)
+    raw_proposal = params[:proposal]
+    raw_selections = raw_proposal.is_a?(ActionController::Parameters) ? raw_proposal[:brief_selections] : nil
+    raw_decisions = raw_proposal.is_a?(ActionController::Parameters) ? raw_proposal[:brief_decisions] : nil
+    selections = raw_selections.respond_to?(:to_unsafe_h) ? raw_selections.to_unsafe_h : raw_selections
+    decisions = raw_decisions.respond_to?(:to_unsafe_h) ? raw_decisions.to_unsafe_h : raw_decisions
+    selections ||= {}
+    decisions ||= {}
+    @invitation.brief_selections = InvitationBriefTaxonomy.valid?(selections) ? selections : { "invalid" => ["invalid"] }
+    @invitation.brief_decisions = InvitationBriefTaxonomy.valid_decisions?(decisions) ? decisions : { "invalid" => "invalid" }
+    @invitation.brief_notes = raw_proposal[:brief_notes].to_s.strip.slice(0, 351) if raw_proposal.is_a?(ActionController::Parameters)
     @invitation.service_version_ids = ids_valid ? raw_ids.map(&:to_i) : [-1]
     @invitation.expires_at = ClientRequestInvitation::TTL.from_now
     token = SecureRandom.hex(32) # 256-bit bearer secret, never persisted.
