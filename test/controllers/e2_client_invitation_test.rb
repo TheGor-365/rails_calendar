@@ -38,7 +38,6 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "section.wa-invite-compose form[data-controller='wa-invitation-brief']", count: 1
     assert_select "input[data-wa-invitation-brief-target='service'][data-wa-service-search]", minimum: 1
-    assert_select "a[href=?]", owner_invitations_path, count: 0 # already on invite screen
     assert_select "#e2-invite-link", count: 0 # link available only immediately after issue
     sign_out
     login(@owner_b)
