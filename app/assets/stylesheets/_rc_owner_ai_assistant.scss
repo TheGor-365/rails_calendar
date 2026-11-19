@@ -939,3 +939,49 @@
   .wa-e2-client-brief__chevron,
   .wa-e2-client-brief__disclosure::details-content { transition: none; }
 }
+
+
+/* E2 visual refinement: separate sections on the page instead of a nested white card. */
+.wa-invite-page .wa-invite-compose,
+.wa-invite-page .wa-invite-history {
+  background: transparent; border: 0; box-shadow: none;
+  padding: 0; border-radius: 0;
+}
+.wa-invite-page .wa-invite-compose > .wa-invite-section-heading,
+.wa-invite-page .wa-invite-history > .wa-invite-section-heading {
+  padding: 0 .2rem; margin-bottom: .8rem;
+}
+.wa-invite-page .wa-invite-compose > .wa-invite-section-heading h2 { margin: 0; }
+.wa-invite-page .wa-invite-form { display: grid; gap: .95rem; }
+.wa-invite-page .wa-invite-form > * { min-width: 0; margin: 0 !important; }
+.wa-invite-page .wa-invite-brief-grid { gap: .9rem; }
+.wa-invite-page .wa-invite-brief-grid > .rc-field {
+  min-width: 0; padding: .8rem; background: var(--ws-paper);
+  border: 1px solid var(--ws-border); border-radius: 14px;
+}
+.wa-invite-page .wa-invite-brief-grid .rc-field { margin: 0 !important; }
+.wa-invite-page .wa-invite-builder,
+.wa-invite-page .wa-invite-goal,
+.wa-invite-page .wa-invite-services {
+  padding: clamp(.9rem,2vw,1.3rem); border: 1px solid var(--ws-border);
+  border-radius: 17px; box-shadow: var(--ws-shadow);
+  background: var(--ws-paper);
+}
+.wa-invite-page .wa-invite-goal { background: var(--ws-paper); }
+.wa-invite-page .wa-invite-builder__actions { justify-content: flex-end; }
+.wa-invite-page .wa-invite-builder__actions > .rc-action { order: 1; margin-left: auto; }
+.wa-invite-page .wa-invite-builder__decision {
+  justify-content: flex-end; margin-top: .4rem;
+}
+.wa-invite-page .wa-invite-builder__decision .rc-input { margin-left: auto; }
+.wa-invite-page .wa-invite-submit { justify-content: flex-end; }
+.wa-invite-page .wa-invite-history > .rc-empty-state,
+.wa-invite-page .wa-invite-history > .rc-record-list {
+  padding: 1.2rem; border: 1px solid var(--ws-border);
+  background: var(--ws-paper); border-radius: 16px; box-shadow: var(--ws-shadow);
+}
+.wa-invite-page .wa-invite-hero { padding: 1.2rem 1.5rem; }
+@media(max-width:575.98px) {
+  .wa-invite-page .wa-invite-builder__actions > .rc-action { width: auto; max-width: 100%; }
+  .wa-invite-page .wa-invite-hero { padding: 1rem; }
+}
