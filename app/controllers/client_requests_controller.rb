@@ -23,12 +23,37 @@ class ClientRequestsController < ApplicationController
       return render :edit, status: :unprocessable_entity
     end
 
+    raw_brief = params[:brief]
+    raw_selections = raw_brief.is_a?(ActionController::Parameters) ? raw_brief[:selections] : nil
+    raw_decisions = raw_brief.is_a?(ActionController::Parameters) ? raw_brief[:decisions] : nil
+    selections = raw_selections.respond_to?(:to_unsafe_h) ? raw_selections.to_unsafe_h : raw_selections
+    brief_decisions = raw_decisions.respond_to?(:to_unsafe_h) ? raw_decisions.to_unsafe_h : raw_decisions
+    selections ||= {}
+    brief_decisions ||= {}
+    unless InvitationBriefTaxonomy.valid?(selections) && InvitationBriefTaxonomy.valid_decisions?(brief_decisions)
+      @intake.errors.add(:base, I18n.t("e2_builder.invalid"))
+      return render :edit, status: :unprocessable_entity
+    end
+    brief_notes = raw_brief.is_a?(ActionController::Parameters) ? raw_brief[:notes].to_s.strip : ""
+    if brief_notes.length > 350
+      @intake.errors.add(:base, I18n.t("e2_builder.long_notes"))
+      return render :edit, status: :unprocessable_entity
+    end
+
     saved = @invitation.with_lock do
       next false if @invitation.reload.submitted_at.present?
       @intake.assign_attributes(request_params)
       next false unless @intake.valid? && @intake.goal.length <= 1200
       @intake.save!
       @invitation.update!(client_fact_reviews: decisions)
+      previous = @intake.intake_brief_revisions.order(version: :desc).first
+      unless previous && previous.selections == selections && previous.decisions == brief_decisions && previous.notes.to_s == brief_notes
+        @intake.intake_brief_revisions.create!(
+          version: (previous&.version || 0) + 1,
+          author_role: "client", selections: selections,
+          decisions: brief_decisions, notes: brief_notes.presence
+        )
+      end
       true
     end
     if saved
