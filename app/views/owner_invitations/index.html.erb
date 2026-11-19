@@ -168,18 +168,18 @@
         <% unless OwnerIntelligence::Grok.enabled? %>
           <p class="rc-hint"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("e2_ai.disabled") %></p>
         <% end %>
-        <p class="wa-invite-ai__status" role="status" aria-live="polite" data-wa-invitation-ai-target="status"></p>
-        <section class="wa-invite-ai__result" hidden data-wa-invitation-ai-target="result" aria-label="<%= t("e2_ai.result") %>">
+        <p class="wa-invite-ai__status" role="status" aria-live="polite" data-wa-invitation-ai-target="status"><%= t("e2_handoff.saved_ai_reused") if @reused_ai_entry.present? %></p>
+        <section class="wa-invite-ai__result" <%= "hidden" unless @reused_ai_entry.present? %> data-wa-invitation-ai-target="result" aria-label="<%= t("e2_ai.result") %>">
           <div class="wa-invite-ai__result-heading">
             <i class="bi bi-journal-check" aria-hidden="true"></i>
-            <h4 data-wa-invitation-ai-target="heading"></h4>
+            <h4 data-wa-invitation-ai-target="heading"><%= @reused_ai_entry&.result&.fetch("heading", nil) %></h4>
           </div>
-          <p class="wa-invite-ai__draft" data-wa-invitation-ai-target="draft"></p>
-          <ul class="wa-invite-ai__questions" data-wa-invitation-ai-target="questions"></ul>
-          <ul class="wa-invite-ai__cautions" data-wa-invitation-ai-target="cautions"></ul>
-          <p data-wa-invitation-ai-target="nextStep"></p>
+          <p class="wa-invite-ai__draft" data-wa-invitation-ai-target="draft"><%= @reused_ai_entry&.result&.fetch("draft", nil) %></p>
+          <ul class="wa-invite-ai__questions" data-wa-invitation-ai-target="questions"><% Array(@reused_ai_entry&.result&.fetch("questions", nil)).each do |question| %><li><%= question %></li><% end %></ul>
+          <ul class="wa-invite-ai__cautions" data-wa-invitation-ai-target="cautions"><% Array(@reused_ai_entry&.result&.fetch("cautions", nil)).each do |caution| %><li><%= caution %></li><% end %></ul>
+          <p data-wa-invitation-ai-target="nextStep"><%= @reused_ai_entry&.result&.fetch("next_step", nil) %></p>
           <div class="wa-invite-ai__result-actions">
-            <a href="#" class="rc-action rc-action--quiet" hidden data-wa-invitation-ai-target="reviewLink">
+            <a href="<%= @reused_ai_entry ? owner_ai_assistant_path(entry_id: @reused_ai_entry.id) : '#' %>" class="rc-action rc-action--quiet" <%= "hidden" unless @reused_ai_entry.present? %> data-wa-invitation-ai-target="reviewLink">
               <%= rc_icon_label("journal-text", t("e2_ai.open_saved")) %>
             </a>
             <button type="button" class="rc-action rc-action--soft" data-action="click->wa-invitation-ai#useClientPreview">
