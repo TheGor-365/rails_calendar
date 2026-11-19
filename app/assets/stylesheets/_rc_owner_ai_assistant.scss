@@ -848,3 +848,22 @@
 @media(prefers-reduced-motion:reduce) {
   .wa-invite-builder__group > summary, .wa-invite-builder__chevron, .wa-invite-builder__choice { transition: none; }
 }
+
+
+/* Supported modern browsers animate intrinsic details-content height.
+   Native <details> remains functional without CSS/JS. */
+.wa-invite-builder__group, .wa-ai-dock__find, .wa-ai-dock__cost-details { interpolate-size: allow-keywords; }
+.wa-invite-builder__group::details-content,
+.wa-ai-dock__find::details-content,
+.wa-ai-dock__cost-details::details-content {
+  block-size: 0; overflow: clip;
+  transition: block-size .28s cubic-bezier(.2,.7,.2,1), content-visibility .28s allow-discrete;
+}
+.wa-invite-builder__group[open]::details-content,
+.wa-ai-dock__find[open]::details-content,
+.wa-ai-dock__cost-details[open]::details-content { block-size: auto; }
+@media(prefers-reduced-motion:reduce) {
+  .wa-invite-builder__group::details-content,
+  .wa-ai-dock__find::details-content,
+  .wa-ai-dock__cost-details::details-content { transition: none; }
+}
