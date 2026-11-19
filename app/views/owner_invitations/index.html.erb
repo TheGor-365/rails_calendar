@@ -36,7 +36,10 @@
     <%= form_with url: owner_invitations_path, method: :post, html: {
       class: "rc-form wa-invite-form",
       data: {
-        controller: "wa-invitation-brief",
+        controller: "wa-invitation-brief wa-invitation-issue",
+        action: "submit->wa-invitation-issue#submit",
+        wa_invitation_issue_error: t("e2_handoff.issue_error"),
+        wa_invitation_issue_issued: t("e2_handoff.issued"),
         wa_invitation_brief_minimum_value: 10, wa_invitation_brief_maximum_value: 1200,
         wa_brief_client_decides: t("e2_builder.client_decides"),
         wa_brief_owner_decides: t("e2_builder.owner_decides"),
@@ -47,6 +50,7 @@
         wa_brief_composed: t("e2_builder.composed")
       }
     } do %>
+      <%= hidden_field_tag "proposal[owner_ai_entry_id]", @invitation&.owner_ai_entry_id, id: "proposal_owner_ai_entry_id" %>
       <div class="wa-invite-brief-grid">
       <div class="rc-field mb-3">
         <%= label_tag "proposal_seed_title", t("e2.seed_title"), class: "rc-field-label" %>
@@ -177,6 +181,9 @@
             <a href="#" class="rc-action rc-action--quiet" hidden data-wa-invitation-ai-target="reviewLink">
               <%= rc_icon_label("journal-text", t("e2_ai.open_saved")) %>
             </a>
+            <button type="button" class="rc-action rc-action--soft" data-action="click->wa-invitation-ai#useClientPreview">
+              <%= rc_icon_label("person-check", t("e2_handoff.use_client_preview")) %>
+            </button>
             <button type="button" class="rc-action rc-action--primary"
                     data-wa-invitation-ai-target="apply"
                     data-action="click->wa-invitation-ai#apply">
@@ -184,6 +191,22 @@
             </button>
           </div>
         </section>
+      </section>
+      <section class="wa-invite-client-preview" aria-labelledby="wa-client-preview-title">
+        <div class="wa-invite-field-heading">
+          <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-eye"></i></span>
+          <div>
+            <h3 id="wa-client-preview-title"><%= t("e2_handoff.client_preview_title") %></h3>
+            <p class="rc-hint"><%= t("e2_handoff.client_preview_hint") %></p>
+          </div>
+        </div>
+        <label for="proposal_approved_client_preview" class="rc-field-label"><%= t("e2_handoff.client_preview_label") %></label>
+        <textarea name="proposal[approved_client_preview]" id="proposal_approved_client_preview"
+                  maxlength="1200" rows="4" class="rc-input rc-input--area"><%= @invitation&.approved_client_preview %></textarea>
+        <label class="wa-invite-client-preview__consent">
+          <input type="checkbox" id="proposal_share_preview" name="proposal[share_preview]" value="1">
+          <span><%= t("e2_handoff.share_consent") %></span>
+        </label>
       </section>
       <fieldset class="rc-field mb-3 wa-invite-services">
         <legend class="rc-field-label"><i class="bi bi-grid-1x2" aria-hidden="true"></i> <%= t("e2.services") %></legend>
@@ -205,10 +228,31 @@
         </div>
       </fieldset>
       <div class="wa-invite-submit">
-        <button type="submit" class="rc-action rc-action--primary">
+        <button type="submit" class="rc-action rc-action--primary" data-wa-invitation-issue-target="submit">
           <%= rc_icon_label("link-45deg", t("e2.issue_action")) %>
         </button>
       </div>
+      <section class="wa-invite-issued" hidden data-wa-invitation-issue-target="result"
+               aria-label="<%= t("e2_handoff.issued") %>">
+        <h3><i class="bi bi-link-45deg" aria-hidden="true"></i> <%= t("e2_handoff.issued") %></h3>
+        <p class="rc-hint"><%= t("e2.copy_once") %></p>
+        <input type="url" readonly class="rc-input" data-wa-invitation-issue-target="link"
+               aria-label="<%= t("e2.link_label") %>">
+        <div class="wa-invite-issued__actions">
+          <button type="button" class="rc-action rc-action--primary"
+                  data-action="click->wa-invitation-issue#copy">
+            <%= rc_icon_label("clipboard", t("e2.copy_action")) %>
+          </button>
+          <a class="rc-action rc-action--quiet" href="#" data-wa-invitation-issue-target="preview">
+            <%= rc_icon_label("eye", t("e2_handoff.owner_preview")) %>
+          </a>
+          <a class="rc-action rc-action--quiet" href="#" data-wa-invitation-issue-target="download">
+            <%= rc_icon_label("download", t("e2_handoff.export")) %>
+          </a>
+        </div>
+      </section>
+      <p role="status" aria-live="polite" class="wa-invite-issued__status"
+         data-wa-invitation-issue-target="status"></p>
     <% end %>
   </section>
 
@@ -224,6 +268,12 @@
             <div><strong><%= invite.seed_title %></strong>
               <p class="rc-hint mb-0"><%= t("e2.state_#{invite.state}") %> ·
                 <time datetime="<%= invite.expires_at.iso8601 %>"><%= l(invite.expires_at, format: :short) %></time></p>
+            </div>
+            <div class="wa-invite-history__actions">
+              <%= link_to rc_icon_label("eye", t("e2_handoff.owner_preview")),
+                  owner_invitation_path(invite), class: "rc-action rc-action--quiet rc-action--small" %>
+              <%= link_to rc_icon_label("download", t("e2_handoff.export")),
+                  owner_invitation_path(invite, format: :json), class: "rc-action rc-action--quiet rc-action--small" %>
             </div>
             <% if invite.claimed_at.nil? && invite.revoked_at.nil? && invite.expires_at.future? %>
               <%= button_to t("e2.revoke_action"), revoke_owner_invitation_path(invite),
