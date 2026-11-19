@@ -44,6 +44,7 @@ Rails.application.routes.draw do
   get "/workspace", to: "workspace#home", as: :workspace
   get "/workspace/invitations", to: "owner_invitations#index", as: :owner_invitations
   post "/workspace/invitations", to: "owner_invitations#create"
+  post "/workspace/invitations/ai_draft", to: "owner_invitations#ai_draft", as: :owner_invitation_ai_draft
   post "/workspace/invitations/:id/revoke", to: "owner_invitations#revoke", as: :revoke_owner_invitation
 
   # RC052: owner-only professional intelligence, AI review and immutable approval.
