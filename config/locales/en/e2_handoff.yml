@@ -22,3 +22,7 @@ en:
     recover_action: "Link selected draft"
     linked: "Private AI draft linked. Client-facing content is unchanged."
     reuse_as_new: "Reuse as new invitation"
+    draft_attached: "AI draft saved and linked"
+    draft_unlinked: "No AI draft linked yet"
+    private_not_shared: "Owner only. Nothing is sent to the client automatically."
+    replace_draft: "Change linked AI draft"
