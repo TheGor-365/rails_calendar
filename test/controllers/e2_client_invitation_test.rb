@@ -82,6 +82,12 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_equal({ "tasks" => %w[bugfix tests], "backend" => ["rails"] }, owner_brief.selections)
     assert_equal({ "deployment" => "client" }, owner_brief.decisions)
     assert_equal "Synthetic test job", owner_brief.notes
+    client_prompt = IntakeBrief::PromptContext.new(revision: owner_brief, audience: "client", locale: :ru).as_json
+    owner_prompt = IntakeBrief::PromptContext.new(revision: owner_brief, audience: "owner", locale: :en).as_json
+    assert_equal "client", client_prompt.fetch("audience")
+    assert client_prompt.fetch("sections").first.fetch("choices").first.fetch("plain_explanation").present?
+    refute owner_prompt.fetch("sections").first.fetch("choices").first.key?("plain_explanation")
+    refute_includes client_prompt.to_s, invitation.token_digest
     assert_equal @client.id, invitation.reload.claimed_by_user_id
     assert_equal intake.id, invitation.project_intake_id
     get client_invitation_preview_path
