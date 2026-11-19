@@ -17,3 +17,7 @@ en:
     private_hint: "Private material is not visible to guests. The AI result is preserved here if it was linked before issuing the invitation."
     no_linked_ai: "No AI draft linked to this invitation. Prior results may still be available in your private AI history."
     preview_ready: "Review this text, then explicitly approve sharing it."
+    recover_title: "Recent private AI drafts"
+    recover_hint: "Choose a saved AI draft to associate with this invitation. This is owner-only and does not publish any new client content."
+    recover_action: "Link selected draft"
+    linked: "Private AI draft linked. Client-facing content is unchanged."
