@@ -12,13 +12,14 @@ export default class extends Controller {
   // fabricated AI result. A future provider-based suggestion must be explicitly
   // consented, costed and reviewed before modifying anything.
   connect() {
-    this.manualServiceIds = new Set()
+    this.manualServiceIds = new Set(this.serviceTargets.filter(input => input.checked).map(input => input.value))
     this.refreshSuggestions()
   }
 
   manualService(event) {
     if (!event.isTrusted) return
     this.manualServiceIds.add(event.currentTarget.value)
+    this.refreshSuggestions()
   }
 
   refreshSuggestions() {
@@ -61,7 +62,10 @@ export default class extends Controller {
       return { input, score }
     }).filter(item => item.score >= 5).sort((a, b) => b.score - a.score)
 
-    const suggested = new Set(scored.slice(0, 6).map(item => item.input.value))
+    const manualChecked = this.serviceTargets.filter(input => this.manualServiceIds.has(input.value) && input.checked).length
+    const capacity = Math.max(0, 6 - manualChecked)
+    const suggested = new Set(scored.filter(item => !this.manualServiceIds.has(item.input.value))
+      .slice(0, capacity).map(item => item.input.value))
     for (const input of this.serviceTargets) {
       if (!this.manualServiceIds.has(input.value)) input.checked = suggested.has(input.value)
     }
