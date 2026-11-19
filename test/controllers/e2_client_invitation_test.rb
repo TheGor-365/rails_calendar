@@ -87,6 +87,14 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_select "body", text: /Please check when the fictional contact form fails/
     assert_select "body", text: /Owner's unverified confidential synthetic requirements/, count: 0
 
+    login(@client)
+    assert_redirected_to client_invitation_preview_path
+    post claim_client_invitation_path, params: { demo_consent: "1" }
+    intake = @client.client_project_intakes.order(:id).last
+    assert intake
+    assert_equal "Please check when the fictional contact form fails.", intake.goal
+    assert_equal @seed, invitation.reload.seed_goal
+
     get owner_invitation_path(invitation)
     assert_redirected_to sign_in_path
     get owner_invitation_path(invitation, format: :json)
