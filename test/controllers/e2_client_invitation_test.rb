@@ -201,6 +201,11 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_equal @workspace.id, intake.workspace_id
     assert_equal [@offering.published_version_id], intake.selected_service_offering_versions.pluck(:id)
     assert_equal 0, intake.client_message_count
+    get client_home_path
+    assert_response :success
+    assert_select "a[href=?]", edit_client_request_path(intake), minimum: 1
+    assert_select "a[href=?]", client_request_path(intake), count: 0
+    assert_select ".wa-client-home__request .rc-status-pill", text: /#{Regexp.escape(I18n.t("e2_resume.draft", locale: :en))}/
     assert_equal 1, intake.intake_brief_revisions.count
     owner_brief = intake.latest_brief_revision
     assert_equal "owner", owner_brief.author_role
@@ -267,6 +272,10 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to client_request_path(intake)
     assert invitation.reload.submitted_at.present?
+    get client_home_path
+    assert_response :success
+    assert_select "a[href=?]", client_request_path(intake), minimum: 1
+    assert_select "a[href=?]", edit_client_request_path(intake), count: 0
     assert_equal 1, intake.client_message_count
     assert_no_difference("IntakeMessage.count") { post submit_client_request_path(intake) }
   end
