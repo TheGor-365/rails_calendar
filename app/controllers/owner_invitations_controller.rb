@@ -60,6 +60,19 @@ class OwnerInvitationsController < ApplicationController
       return render json: { error: "invalid_brief" }, status: :unprocessable_entity
     end
 
+    service_ids = Array(params[:service_version_ids]).reject(&:blank?)
+    unless service_ids.length <= 6 &&
+           service_ids.uniq == service_ids &&
+           service_ids.all? { |id| id.to_s.match?(/\\A[1-9]\\d*\\z/) }
+      return render json: { error: "invalid_brief" }, status: :unprocessable_entity
+    end
+    published_versions = ServiceOfferingVersion.joins(:service_offering)
+      .where(id: service_ids.map(&:to_i), service_offerings: { workspace_id: @workspace.id })
+      .where("service_offerings.published_version_id = service_offering_versions.id").order(:id).to_a
+    unless published_versions.size == service_ids.size
+      return render json: { error: "invalid_brief" }, status: :unprocessable_entity
+    end
+
     # Only user-approved form facts are projected into the paid provider call;
     # never pass session cookies, private files or other clients' content.
     plain = InvitationBriefTaxonomy.sections.flat_map do |group, allowed_keys|
@@ -70,7 +83,8 @@ class OwnerInvitationsController < ApplicationController
       "Fictional preliminary invitation only. Do not claim a contract or promise cost.",
       "Owner task: #{title}",
       "Owner's reviewed brief: #{goal}",
-      *plain
+      *plain,
+      "Selected published owner services: #{published_versions.map(&:title).join(", ")}"
     ].join("\n")
     if ai_input.length > 1200
       return render json: { error: "brief_too_long" }, status: :unprocessable_entity
