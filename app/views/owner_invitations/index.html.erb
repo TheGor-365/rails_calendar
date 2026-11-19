@@ -203,7 +203,9 @@
         </div>
         <label for="proposal_approved_client_preview" class="rc-field-label"><%= t("e2_handoff.client_preview_label") %></label>
         <textarea name="proposal[approved_client_preview]" id="proposal_approved_client_preview"
-                  maxlength="1200" rows="4" class="rc-input rc-input--area"><%= @invitation&.approved_client_preview %></textarea>
+                  maxlength="1200" rows="4" class="rc-input rc-input--area wa-invite-client-preview__textarea"
+                  data-controller="wa-autogrow" data-wa-autogrow-smooth-value="true"
+                  data-action="input->wa-autogrow#resize"><%= @invitation&.approved_client_preview %></textarea>
         <label class="wa-invite-client-preview__consent">
           <input type="checkbox" id="proposal_share_preview" name="proposal[share_preview]" value="1">
           <span><%= t("e2_handoff.share_consent") %></span>
