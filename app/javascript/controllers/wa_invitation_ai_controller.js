@@ -123,6 +123,7 @@ export default class extends Controller {
     if (field.value.trim() && !window.confirm(this.element.dataset.replaceConfirm ||
         "Replace the client preview with this reviewed AI text?")) return
     field.value = proposal
+    field.dispatchEvent(new Event("input", { bubbles: true }))
     // A separate explicit checkbox is required before the text is shared.
     check.checked = false
     field.focus()
