@@ -24,17 +24,18 @@ class ClientRequestsController < ApplicationController
     end
 
     raw_brief = params[:brief]
+    prior_brief = @intake.latest_brief_revision
     raw_selections = raw_brief.is_a?(ActionController::Parameters) ? raw_brief[:selections] : nil
     raw_decisions = raw_brief.is_a?(ActionController::Parameters) ? raw_brief[:decisions] : nil
     selections = raw_selections.respond_to?(:to_unsafe_h) ? raw_selections.to_unsafe_h : raw_selections
     brief_decisions = raw_decisions.respond_to?(:to_unsafe_h) ? raw_decisions.to_unsafe_h : raw_decisions
-    selections ||= {}
-    brief_decisions ||= {}
+    selections ||= raw_brief.nil? ? (prior_brief&.selections || {}) : {}
+    brief_decisions ||= raw_brief.nil? ? (prior_brief&.decisions || {}) : {}
     unless InvitationBriefTaxonomy.valid?(selections) && InvitationBriefTaxonomy.valid_decisions?(brief_decisions)
       @intake.errors.add(:base, I18n.t("e2_builder.invalid"))
       return render :edit, status: :unprocessable_entity
     end
-    brief_notes = raw_brief.is_a?(ActionController::Parameters) ? raw_brief[:notes].to_s.strip : ""
+    brief_notes = raw_brief.is_a?(ActionController::Parameters) ? raw_brief[:notes].to_s.strip : prior_brief&.notes.to_s
     if brief_notes.length > 350
       @intake.errors.add(:base, I18n.t("e2_builder.long_notes"))
       return render :edit, status: :unprocessable_entity
