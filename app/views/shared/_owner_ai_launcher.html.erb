@@ -69,6 +69,12 @@
       </div>
     </details>
     <nav class="wa-ai-dock__links" aria-label="<%= t("owner_ai_assistant.navigation") %>">
+      <% if ClientRequestPilot.enabled?(request: request) %>
+        <%= link_to owner_invitations_path do %>
+          <i class="bi bi-envelope-plus" aria-hidden="true"></i>
+          <%= t("e2.owner_title") %>
+        <% end %>
+      <% end %>
       <%= link_to owner_ai_conversations_path do %>
         <i class="bi bi-chat-square-text" aria-hidden="true"></i>
         <%= t("owner_ai_assistant.my_conversations") %>
