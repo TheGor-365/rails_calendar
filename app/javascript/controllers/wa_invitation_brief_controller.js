@@ -55,7 +55,7 @@ export default class extends Controller {
       // Title/notes reinforce a known service match, but never authorize a
       // recommendation solely from generic words such as Rails.
       if (score > 0) {
-        const significant = freeText.split(/[^\\p{L}\\p{N}]+/u).filter(x => x.length >= 5)
+        const significant = freeText.split(/[^\p{L}\p{N}]+/u).filter(x => x.length >= 5)
         if (significant.some(word => service.includes(word))) score += 2
         if (input.dataset.waServiceCategory === category) score += 1
       }
