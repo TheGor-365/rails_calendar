@@ -22,3 +22,7 @@ es:
     recover_action: "Vincular borrador"
     linked: "Borrador privado vinculado. No se ha cambiado el contenido para el cliente."
     reuse_as_new: "Reutilizar como nueva invitación"
+    draft_attached: "Borrador de IA guardado y vinculado"
+    draft_unlinked: "Aún no hay borrador de IA vinculado"
+    private_not_shared: "Solo para el propietario. Nada se envía automáticamente al cliente."
+    replace_draft: "Cambiar borrador de IA vinculado"
