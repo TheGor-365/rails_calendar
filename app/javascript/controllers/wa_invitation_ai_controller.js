@@ -28,6 +28,10 @@ export default class extends Controller {
       if (match) params.append(`brief_selections[${match[1]}][]`, input.value)
     })
 
+    form.querySelectorAll('input[name="service_version_ids[]"]:checked').forEach(input => {
+      params.append("service_version_ids[]", input.value)
+    })
+
     const csrf = document.querySelector('meta[name="csrf-token"]')?.content
     this.generateTarget.disabled = true
     this.notify(this.element.dataset.generating || "Generating a private AI draft...", false)
