@@ -21,3 +21,4 @@ en:
     recover_hint: "Choose a saved AI draft to associate with this invitation. This is owner-only and does not publish any new client content."
     recover_action: "Link selected draft"
     linked: "Private AI draft linked. Client-facing content is unchanged."
+    reuse_as_new: "Reuse as new invitation"
