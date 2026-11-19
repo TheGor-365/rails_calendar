@@ -272,6 +272,39 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "consented invitation AI returns a private saved draft without issuing invitation" do
+    login(@owner)
+    entry = Struct.new(:id, :result).new(71_019, {
+      "heading" => "Fictional Rails task",
+      "draft" => "Investigate the Rails form problem and propose clear acceptance checks.",
+      "questions" => ["When does the error appear?"],
+      "cautions" => ["Do not promise completion dates."],
+      "next_step" => "Review the proposed questions."
+    })
+    fake = Object.new
+    seen = []
+    fake.define_singleton_method(:generate!) do |**args|
+      seen << args
+      entry
+    end
+    assert_no_difference("ClientRequestInvitation.count") do
+      OwnerAi::Composer.stub(:new, fake) do
+        post owner_invitation_ai_draft_path, as: :json, params: {
+          operation: "intake_questions", paid_consent: "1",
+          seed_title: "Synthetic Rails form", seed_goal: @seed,
+          brief_selections: { tasks: %w[bugfix tests] }
+        }
+      end
+      assert_response :success
+    end
+    assert_equal 1, seen.size
+    assert_equal "intake_questions", seen.first.fetch(:operation)
+    assert_includes seen.first.fetch(:brief), "bugfix"
+    assert_equal "Fictional Rails task", response.parsed_body["heading"]
+    assert_equal owner_ai_assistant_path(entry_id: entry.id, operation: "intake_questions"),
+      response.parsed_body["review_url"]
+  end
+
   test "client cannot access owner invitation AI and disabled provider does not bill" do
     login(@client)
     assert_no_difference("AiSpendEntry.count") do
