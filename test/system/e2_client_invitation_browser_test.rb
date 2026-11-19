@@ -74,11 +74,14 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
     assert_current_path client_invitation_preview_path
     check "demo_consent"
     click_button "Use fictional data and claim editable draft"
+    # Capybara waits for the HTML response; reading the model immediately after
+    # click can race the asynchronous Puma request and return nil.
+    assert_text "Review and edit request", wait: 10
     intake = client.client_project_intakes.order(id: :desc).first
     assert intake
     assert_current_path edit_client_request_path(intake)
-    assert_text "Review and edit request"
     assert_text "Private fictional source"
+    assert_text "What would you like to achieve?"
     assert_equal 0, intake.client_message_count
     [1440, 390, 320].each do |width|
       page.driver.browser.manage.window.resize_to(width, 900)
