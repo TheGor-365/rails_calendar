@@ -20,7 +20,9 @@ module OwnerInvitations
             workspace: invitation.workspace,
             title: invitation.seed_title,
             project_type: invitation.seed_project_type,
-            goal: invitation.seed_goal,
+            # Only owner-reviewed client-facing copy becomes the first client draft.
+            # The original owner hypothesis remains unchanged in the invitation.
+            goal: invitation.approved_client_preview.presence || invitation.seed_goal,
             demo_consent_at: Time.current,
             status: "interviewing"
           )
