@@ -120,6 +120,18 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_equal({ "deployment" => "owner" }, intake.latest_brief_revision.decisions)
     assert_equal "owner", intake.intake_brief_revisions.find_by!(version: 1).author_role
     assert_equal %w[bugfix tests], intake.intake_brief_revisions.find_by!(version: 1).selections.fetch("tasks")
+    assert_no_difference("IntakeBriefRevision.count") do
+      patch client_request_path(intake), params: {
+        project_intake: { title: "Client revised the test task", project_type: "rails_bugfix",
+          goal: "Client now requests a synthetic form with two named acceptance scenarios." },
+        fact_review: { title: "confirmed", project_type: "confirmed", goal: "unknown" },
+        brief: {
+          selections: { tasks: ["bugfix"], backend: ["rails"], frontend: ["bootstrap"] },
+          decisions: { deployment: "owner" }, notes: "Please improve the mobile form first."
+        }
+      }
+      assert_redirected_to edit_client_request_path(intake)
+    end
     assert_equal "Client revised the test task", intake.reload.title
     assert_equal @seed, invitation.reload.seed_goal
     assert_equal "unknown", invitation.fact_state("goal")
@@ -180,6 +192,39 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     post client_invitation_preview_path, params: { invite_token: raw2 }
     assert_response :gone
     assert second.reload.revoked_at.present?
+  end
+
+  test "owner cannot create invitation with forged technical choices" do
+    login(@owner)
+    assert_no_difference("ClientRequestInvitation.count") do
+      post owner_invitations_path, params: {
+        proposal: proposal.merge(
+          brief_selections: { tasks: ["exploit_hidden_data"] },
+          brief_decisions: { deployment: "skip" }
+        ),
+        service_version_ids: []
+      }
+      assert_response :unprocessable_entity
+    end
+  end
+
+  test "client cannot save forged technical taxonomy values" do
+    login(@owner)
+    token = issue_invitation
+    sign_out
+    post client_invitation_preview_path, params: { invite_token: token }
+    login(@client)
+    post claim_client_invitation_path, params: { demo_consent: "1" }
+    intake = @client.client_project_intakes.last
+    assert_no_difference("IntakeBriefRevision.count") do
+      patch client_request_path(intake), params: {
+        project_intake: { title: "Rejected edit", goal: "A fictional request updated by client", project_type: "rails_bugfix" },
+        fact_review: { title: "confirmed", project_type: "confirmed", goal: "unknown" },
+        brief: { selections: { backend: ["unknown_secret_framework"] }, decisions: { tasks: "skip" } }
+      }
+      assert_response :unprocessable_entity
+    end
+    refute_equal "Rejected edit", intake.reload.title
   end
 
   test "cross-owner published versions cannot be embedded in an owner draft" do
