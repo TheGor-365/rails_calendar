@@ -27,6 +27,12 @@ module OwnerInvitations
           invitation.published_versions.each do |version|
             intake.intake_service_selections.create!(service_offering_version: version)
           end
+          intake.intake_brief_revisions.create!(
+            version: 1, author_role: "owner",
+            selections: invitation.brief_selections,
+            decisions: invitation.brief_decisions,
+            notes: invitation.brief_notes
+          )
           invitation.update!(
             claimed_at: Time.current,
             claimed_by_user: client,
