@@ -89,7 +89,7 @@
               <div class="wa-invite-builder__choices">
                 <% options.each do |option| %>
                   <label class="wa-invite-builder__choice">
-                    <%= check_box_tag nil, option, false, data: { wa_brief_choice: true } %>
+                    <input type="checkbox" value="<%= option %>" data-wa-brief-choice>
                     <span><%= t("e2_builder.options.#{option}") %></span>
                   </label>
                 <% end %>
