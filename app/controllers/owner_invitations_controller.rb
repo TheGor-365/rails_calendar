@@ -5,6 +5,26 @@ class OwnerInvitationsController < ApplicationController
 
   def index
     load_index
+    # Reuse only this owner's saved fictional brief; never revive its bearer token.
+    source_id = params[:from_invitation_id].to_s
+    if source_id.match?(/\A[1-9]\d*\z/)
+      source = @workspace.client_request_invitations.find_by(id: source_id)
+      return head :not_found unless source
+
+      @invitation = @workspace.client_request_invitations.new(
+        seed_title: source.seed_title,
+        seed_project_type: source.seed_project_type,
+        seed_goal: source.seed_goal,
+        brief_selections: source.brief_selections,
+        brief_decisions: source.brief_decisions,
+        brief_notes: source.brief_notes,
+        owner_ai_entry_id: source.owner_ai_entry_id,
+        approved_client_preview: source.approved_client_preview,
+        service_version_ids: source.valid_published_versions? ? source.service_version_ids : []
+      )
+    elsif params.key?(:from_invitation_id)
+      return head :not_found
+    end
   end
 
   def create
