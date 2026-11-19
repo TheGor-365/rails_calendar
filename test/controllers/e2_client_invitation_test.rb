@@ -71,6 +71,9 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     get owner_invitation_path(invitation)
     assert_response :success
     assert_select ".wa-invite-owner-artifact__text", text: /fictional contact form/
+    assert_select "footer.wa-invite-artifact-tools", count: 1
+    assert_select "footer.wa-invite-artifact-tools a[href=?]", owner_invitation_path(invitation, format: :json)
+    assert_select "details.wa-invite-artifact-recover", count: 0
     get owner_invitation_path(invitation, format: :json)
     assert_response :success
     assert_match "attachment", response.headers["Content-Disposition"]
