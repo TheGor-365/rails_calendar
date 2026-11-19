@@ -42,8 +42,13 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
     fill_in "proposal_seed_goal", with: "Private fictional source: should not be exposed in guest preview."
     find("input[name='service_version_ids[]']", match: :first).check
     click_button "Issue a 48-hour invitation"
-    assert_selector "#e2-invite-link"
-    invitation_url = find("#e2-invite-link").value
+    assert_selector ".wa-invite-issued:not([hidden])", wait: 10
+    assert_selector "input[data-wa-invitation-issue-target='link']"
+    invitation_url = find("input[data-wa-invitation-issue-target='link']").value
+    assert_field "proposal_seed_title", with: "Fictional owner proposal"
+    assert_field "proposal_seed_goal", with: "Private fictional source: should not be exposed in guest preview."
+    assert_link "Preview invitation"
+    assert_link "Download JSON"
     assert_match(/#token=[0-9a-f]{64}\z/, invitation_url)
     refute_match(/\?invite_token=/, invitation_url)
     [1440, 390, 320].each do |width|
