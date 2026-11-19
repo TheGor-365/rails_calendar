@@ -44,7 +44,7 @@ class OwnerInvitationsController < ApplicationController
         end
         format.html do
           flash[:issued_invitation_url] = url
-          redirect_to owner_invitation_path(@invitation), notice: I18n.t("e2.invitation_issued")
+          redirect_to owner_invitations_path, notice: I18n.t("e2.invitation_issued")
         end
       end
     else
