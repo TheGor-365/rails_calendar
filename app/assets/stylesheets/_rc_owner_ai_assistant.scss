@@ -1163,3 +1163,19 @@
   .wa-invite-artifact-recover > summary,.wa-invite-artifact-recover__chevron {transition:none;}
   .wa-invite-artifact-recover__body {animation:none;}
 }
+
+
+/* E2: client-facing preview grows with the actual text instead of scrolling
+   inside a fixed-height field. Smooth expansion is an opt-in enhancement. */
+.wa-invite-client-preview .wa-invite-client-preview__textarea {
+  min-height: 110px;
+  max-height: none;
+  overflow-y: hidden;
+  resize: none;
+  transition: height .28s cubic-bezier(.2, .7, .2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wa-invite-client-preview .wa-invite-client-preview__textarea {
+    transition: none;
+  }
+}
