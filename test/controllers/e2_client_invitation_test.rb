@@ -101,6 +101,36 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_redirected_to sign_in_path
   end
 
+  test "owner can reuse a revoked invitation's structured brief without reviving its token" do
+    login(@owner)
+    raw = issue_invitation
+    source = ClientRequestInvitation.order(:id).last
+    source.update!(brief_decisions: { "deployment" => "client" })
+    post revoke_owner_invitation_path(source)
+    assert_redirected_to owner_invitations_path
+    assert_equal :revoked, source.reload.state
+
+    assert_no_difference("ClientRequestInvitation.count") do
+      get owner_invitations_path(from_invitation_id: source.id)
+      assert_response :success
+      assert_select "input#proposal_seed_title[value=?]", source.seed_title
+      assert_select "textarea#proposal_seed_goal", text: source.seed_goal
+      assert_select "input[name='proposal[brief_selections][tasks][]'][value='bugfix'][checked]"
+      assert_select "select[name='proposal[brief_decisions][deployment]'] option[value='client'][selected]"
+      assert_select "input#proposal_owner_ai_entry_id"
+      assert_select ".wa-invite-issued[hidden]", count: 1
+    end
+    assert_equal :revoked, source.reload.state
+    assert_equal ClientRequestInvitation.digest_for(raw), source.token_digest
+
+    sign_out
+    login(@owner_b)
+    get owner_invitations_path(from_invitation_id: source.id)
+    assert_response :not_found
+    get owner_invitations_path(from_invitation_id: "invalid")
+    assert_response :not_found
+  end
+
   test "only the owner can link an existing private AI record" do
     login(@owner)
     post owner_invitations_path, as: :json, params: {
