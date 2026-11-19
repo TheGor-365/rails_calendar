@@ -88,9 +88,9 @@
               </div>
               <label class="wa-invite-builder__decision">
                 <select class="rc-input" name="proposal[brief_decisions][<%= group %>]" data-wa-brief-decision aria-label="<%= t("e2_builder.decision_label") %>">
-                  <option value="skip"><%= t("e2_builder.skip") %></option>
-                  <option value="client"><%= t("e2_builder.client_decides") %></option>
-                  <option value="owner"><%= t("e2_builder.owner_decides") %></option>
+                  <% [["skip", t("e2_builder.skip")], ["client", t("e2_builder.client_decides")], ["owner", t("e2_builder.owner_decides")]].each do |value, name| %>
+                    <option value="<%= value %>" <%= "selected" if (@invitation&.brief_decisions || {}).fetch(group, "skip") == value %>><%= name %></option>
+                  <% end %>
                 </select>
               </label>
             </fieldset>
