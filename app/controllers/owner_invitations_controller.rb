@@ -65,6 +65,9 @@ class OwnerInvitationsController < ApplicationController
     response.headers["X-Robots-Tag"] = "noindex, nofollow"
     @owner_ai_result = @invitation.owner_ai_entry&.result if
       @invitation.owner_ai_entry&.status == "settled"
+    @recent_ai_drafts = owner_invitation_ai_entries.limit(8).to_a.select do |entry|
+      OwnerAi::PageActionRegistry.allowed?(:invitation, entry.result["purpose"])
+    end
 
     respond_to do |format|
       format.html
@@ -86,6 +89,17 @@ class OwnerInvitationsController < ApplicationController
           type: "application/json", disposition: "attachment"
       end
     end
+  end
+
+  def attach_ai_draft
+    invitation = current_user.owner_workspace.client_request_invitations.find_by(id: params[:id])
+    return head :not_found unless invitation
+
+    candidate = owner_invitation_ai_entries.find_by(id: params[:entry_id])
+    return head :not_found unless candidate &&
+      OwnerAi::PageActionRegistry.allowed?(:invitation, candidate.result["purpose"])
+    invitation.update!(owner_ai_entry: candidate)
+    redirect_to owner_invitation_path(invitation), notice: I18n.t("e2_handoff.linked")
   end
 
   # E2.2: a real, journalled provider draft for this page. No changes are
@@ -187,6 +201,12 @@ class OwnerInvitationsController < ApplicationController
     @invitations = @workspace.client_request_invitations.order(created_at: :desc).limit(50)
     @offerings = @workspace.service_offerings.where.not(published_version_id: nil)
       .includes(:published_version).order(:position, :id)
+  end
+
+  def owner_invitation_ai_entries
+    current_user.owner_workspace.professional_profile.ai_spend_entries
+      .where(status: "settled", operation: OwnerAi::Composer::VERSION)
+      .order(id: :desc)
   end
 
   def proposal_params
