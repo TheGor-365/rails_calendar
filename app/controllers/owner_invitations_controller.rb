@@ -40,6 +40,7 @@ class OwnerInvitationsController < ApplicationController
   # applied to the invitation, and no cost is incurred without a fresh consent.
   # Fetch callers render this result in-place for an explicit human review.
   def ai_draft
+    @workspace = current_user.owner_workspace
     response.headers["Cache-Control"] = "no-store"
     operation = params[:operation].to_s
     allowed = %w[intake_questions client_reply plan_outline]
