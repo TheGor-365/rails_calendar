@@ -20,6 +20,52 @@
     <p class="rc-hint"><%= t("e2.review_required") %></p>
     <%= form_with model: @intake, url: client_request_path(@intake), method: :patch,
                   html: { class: "rc-form" } do |f| %>
+      <% brief = @intake.latest_brief_revision %>
+      <section class="wa-e2-client-brief" aria-labelledby="wa-e2-client-brief-heading">
+        <div class="wa-invite-field-heading">
+          <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-translate"></i></span>
+          <div>
+            <h2 id="wa-e2-client-brief-heading"><%= t("e2_client_brief.title") %></h2>
+            <p class="rc-hint"><%= t("e2_client_brief.intro") %></p>
+          </div>
+        </div>
+        <% InvitationBriefTaxonomy.sections.each do |group, options| %>
+          <fieldset class="wa-e2-client-brief__section">
+            <legend><i class="bi <%= InvitationBriefTaxonomy::ICONS.fetch(group) %>" aria-hidden="true"></i> <%= t("e2_client_brief.groups.#{group}") %></legend>
+            <p class="rc-hint"><%= t("e2_client_brief.group_help.#{group}") %></p>
+            <div class="wa-e2-client-brief__choices">
+              <% options.each do |option| %>
+                <label class="wa-e2-client-brief__choice">
+                  <input type="checkbox" name="brief[selections][<%= group %>][]" value="<%= option %>"
+                         <%= "checked" if Array(brief&.selections&.fetch(group, [])).include?(option) %>>
+                  <span>
+                    <strong><%= t("e2_builder.options.#{option}") %></strong>
+                    <small><%= t("e2_client_brief.explain.#{option}") %></small>
+                  </span>
+                </label>
+              <% end %>
+            </div>
+            <label class="wa-e2-client-brief__decision">
+              <span><%= t("e2_client_brief.uncertain") %></span>
+              <%= select_tag "brief[decisions][#{group}]",
+                  options_for_select([
+                    [t("e2_builder.skip"), "skip"],
+                    [t("e2_builder.client_decides"), "client"],
+                    [t("e2_builder.owner_decides"), "owner"]
+                  ], brief&.decisions&.fetch(group, "skip") || "skip"),
+                  class: "rc-input" %>
+            </label>
+          </fieldset>
+        <% end %>
+        <div class="rc-field">
+          <%= label_tag "brief_notes", t("e2_client_brief.notes"), class: "rc-field-label" %>
+          <%= text_area_tag "brief[notes]", brief&.notes, id: "brief_notes",
+                maxlength: 350, rows: 2, class: "rc-input rc-input--area",
+                placeholder: t("e2_client_brief.notes_placeholder") %>
+        </div>
+        <p class="rc-hint"><i class="bi bi-shield-check" aria-hidden="true"></i>
+          <%= t("e2_client_brief.no_auto_ai") %></p>
+      </section>
       <div class="rc-field mb-3">
         <%= f.label :title, t("intake.field_title"), class: "rc-field-label" %>
         <%= f.text_field :title, class: "rc-input", maxlength: 120, required: true %>
