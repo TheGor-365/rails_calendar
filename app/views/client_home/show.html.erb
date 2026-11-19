@@ -112,9 +112,20 @@
             <ul class="rc-record-list">
               <% @client_requests.each do |item| %>
                 <li class="rc-record wa-client-home__request">
+                  <% pending_invitation = item.client_request_invitation %>
+                  <% needs_completion = pending_invitation.present? && pending_invitation.submitted_at.nil? %>
                   <div class="wa-client-home__request-head">
-                    <h3 class="h5 mb-0"><%= link_to rc_icon_label("arrow-up-right", item.title), client_request_path(item), class: "rc-text-link" %></h3>
+                    <h3 class="h5 mb-0">
+                      <%= link_to rc_icon_label(needs_completion ? "pencil-square" : "arrow-up-right", item.title),
+                          needs_completion ? edit_client_request_path(item) : client_request_path(item), class: "rc-text-link" %>
+                    </h3>
                     <div class="wa-client-home__request-meta">
+                      <% if needs_completion %>
+                        <span class="rc-status-pill rc-status-pill--muted">
+                          <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                          <%= t("e2_resume.draft") %>
+                        </span>
+                      <% end %>
                       <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= rc_intake_type(item.project_type) %></span>
                       <span class="rc-status-pill"><i class="bi bi-circle-half" aria-hidden="true"></i><%= rc_intake_status(item.status) %></span>
                     </div>
