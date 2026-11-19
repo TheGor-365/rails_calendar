@@ -43,8 +43,7 @@ class OwnerInvitationsController < ApplicationController
     @workspace = current_user.owner_workspace
     response.headers["Cache-Control"] = "no-store"
     operation = params[:operation].to_s
-    allowed = %w[intake_questions client_reply plan_outline]
-    unless allowed.include?(operation)
+    unless OwnerAi::PageActionRegistry.allowed?(:invitation, operation)
       return render json: { error: "unsupported_operation" }, status: :unprocessable_entity
     end
     unless params[:paid_consent] == "1"
