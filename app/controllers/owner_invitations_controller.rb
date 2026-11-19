@@ -66,7 +66,7 @@ class OwnerInvitationsController < ApplicationController
     @owner_ai_result = @invitation.owner_ai_entry&.result if
       @invitation.owner_ai_entry&.status == "settled"
     @recent_ai_drafts = owner_invitation_ai_entries.limit(8).to_a.select do |entry|
-      OwnerAi::PageActionRegistry.allowed?(:invitation, entry.result["purpose"])
+      entry.result.is_a?(Hash) && OwnerAi::PageActionRegistry.allowed?(:invitation, entry.result["purpose"])
     end
 
     respond_to do |format|
@@ -204,7 +204,9 @@ class OwnerInvitationsController < ApplicationController
   end
 
   def owner_invitation_ai_entries
-    current_user.owner_workspace.professional_profile.ai_spend_entries
+    profile = current_user.owner_workspace.professional_profile
+    return AiSpendEntry.none unless profile
+    profile.ai_spend_entries
       .where(status: "settled", operation: OwnerAi::Composer::VERSION)
       .order(id: :desc)
   end
