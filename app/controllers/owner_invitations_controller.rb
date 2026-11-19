@@ -63,7 +63,7 @@ class OwnerInvitationsController < ApplicationController
     service_ids = Array(params[:service_version_ids]).reject(&:blank?)
     unless service_ids.length <= 6 &&
            service_ids.uniq == service_ids &&
-           service_ids.all? { |id| id.to_s.match?(/\\A[1-9]\\d*\\z/) }
+           service_ids.all? { |id| id.to_s.match?(/\A[1-9]\d*\z/) }
       return render json: { error: "invalid_brief" }, status: :unprocessable_entity
     end
     published_versions = ServiceOfferingVersion.joins(:service_offering)
