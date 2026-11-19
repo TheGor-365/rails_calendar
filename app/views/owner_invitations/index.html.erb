@@ -51,14 +51,16 @@
       <div class="rc-field mb-3">
         <%= label_tag "proposal_seed_title", t("e2.seed_title"), class: "rc-field-label" %>
         <%= text_field_tag "proposal[seed_title]", @invitation&.seed_title, id: "proposal_seed_title",
-              class: "rc-input", maxlength: 120, required: true %>
+              class: "rc-input", maxlength: 120, required: true,
+              data: { action: "input->wa-invitation-brief#refreshSuggestions" } %>
       </div>
       <div class="rc-field mb-3">
         <%= label_tag "proposal_seed_project_type", t("e2.seed_type"), class: "rc-field-label" %>
         <%= select_tag "proposal[seed_project_type]",
               options_for_select(ProjectIntake::TYPES.map { |type| [rc_intake_type(type), type] },
                                  @invitation&.seed_project_type),
-              id: "proposal_seed_project_type", class: "rc-input" %>
+              id: "proposal_seed_project_type", class: "rc-input",
+              data: { action: "change->wa-invitation-brief#refreshSuggestions" } %>
       </div>
       </div>
       <section class="wa-invite-builder" aria-labelledby="wa-invite-builder-heading">
@@ -75,7 +77,7 @@
               <div class="wa-invite-builder__choices">
                 <% options.each do |option| %>
                   <label class="wa-invite-builder__choice">
-                    <input type="checkbox" name="proposal[brief_selections][<%= group %>][]" value="<%= option %>" data-wa-brief-choice <%= "checked" if @invitation&.brief_selections&.fetch(group, [])&.include?(option) %>>
+                    <input type="checkbox" name="proposal[brief_selections][<%= group %>][]" value="<%= option %>" data-wa-brief-choice data-action="change->wa-invitation-brief#refreshSuggestions" <%= "checked" if @invitation&.brief_selections&.fetch(group, [])&.include?(option) %>>
                     <span><%= t("e2_builder.options.#{option}") %></span>
                   </label>
                 <% end %>
@@ -92,7 +94,7 @@
         <% end %>
         <label class="rc-field-label" for="wa-invite-builder-notes"><%= t("e2_builder.notes") %></label>
         <textarea id="wa-invite-builder-notes" name="proposal[brief_notes]" rows="2" maxlength="350" class="rc-input rc-input--area"
-                  data-wa-invitation-brief-target="notes"><%= @invitation&.brief_notes %></textarea>
+                  data-wa-invitation-brief-target="notes" data-action="input->wa-invitation-brief#refreshSuggestions"><%= @invitation&.brief_notes %></textarea>
         <div class="wa-invite-builder__actions">
           <button type="button" class="rc-action rc-action--soft" data-action="click->wa-invitation-brief#compose">
             <%= rc_icon_label("magic", t("e2_builder.assemble")) %>
@@ -116,7 +118,13 @@
         <% @offerings.each do |offering| %>
           <label class="wa-invite-service-choice">
             <%= check_box_tag "service_version_ids[]", offering.published_version_id,
-                  @invitation&.service_version_ids&.include?(offering.published_version_id) || false %>
+                  @invitation&.service_version_ids&.include?(offering.published_version_id) || false,
+                  data: {
+                    wa_invitation_brief_target: "service",
+                    wa_service_search: [offering.published_version.title, offering.published_version.summary].join(" "),
+                    wa_service_category: offering.published_version.project_category,
+                    action: "change->wa-invitation-brief#manualService"
+                  } %>
             <span class="wa-invite-service-choice__icon" aria-hidden="true"><i class="bi bi-check2-square"></i></span>
             <span><%= offering.published_version.title %></span>
           </label>
