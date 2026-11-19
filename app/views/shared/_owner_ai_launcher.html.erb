@@ -9,6 +9,9 @@
       <div>
         <strong><%= t("owner_ai_assistant.title") %></strong>
       </div>
+      <button type="button" class="wa-ai-dock__close" data-action="click->wa-ai-dock#close" aria-label="Close AI assistant">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
     </header>
     <%= link_to owner_ai_assistant_path, class: "wa-ai-dock__workspace-link" do %>
       <span class="wa-ai-dock__workspace-symbol"><i class="bi bi-columns-gap" aria-hidden="true"></i></span>
@@ -17,12 +20,18 @@
       </span>
     <% end %>
     <%= form_with url: create_owner_ai_draft_path, method: :post, class: "wa-ai-dock__form" do %>
-      <div class="rc-field">
-        <%= label_tag "wa-dock-operation", t("owner_ai_assistant.operation"), class: "rc-field-label" %>
-        <%= select_tag :operation, options_for_select(OwnerAi::OperationRegistry.keys.map { |key|
-              [t("owner_ai_assistant.operation_#{key}"), key]
-            }), id: "wa-dock-operation", class: "rc-input" %>
-      </div>
+      <fieldset class="rc-field wa-ai-dock__operations">
+        <legend class="rc-field-label"><%= t("owner_ai_assistant.operation") %></legend>
+        <div class="wa-ai-dock__operation-grid">
+          <% OwnerAi::OperationRegistry.keys.each_with_index do |key, index| %>
+            <label class="wa-ai-dock__operation">
+              <%= radio_button_tag :operation, key, index.zero?, required: true %>
+              <i class="bi <%= OwnerAi::OperationRegistry.fetch(key).fetch(:icon) %>" aria-hidden="true"></i>
+              <span><%= t("owner_ai_assistant.operation_#{key}") %></span>
+            </label>
+          <% end %>
+        </div>
+      </fieldset>
       <div class="rc-field">
         <%= label_tag "wa-dock-brief", t("owner_ai_assistant.brief"), class: "rc-field-label" %>
         <%= text_area_tag :brief, nil, id: "wa-dock-brief", class: "rc-input rc-input--area",
@@ -47,15 +56,8 @@
         <%= t("owner_ai_assistant.find_with_ai") %>
       </summary>
       <div class="wa-ai-dock__find-body">
-        <div class="wa-ai-dock__find-categories" role="list" aria-label="<%= t('owner_ai_assistant.find_categories') %>">
-          <span role="listitem"><i class="bi bi-file-earmark" aria-hidden="true"></i><%= t("owner_ai_assistant.find_files") %></span>
-          <span role="listitem"><i class="bi bi-window-stack" aria-hidden="true"></i><%= t("owner_ai_assistant.find_pages") %></span>
-          <span role="listitem"><i class="bi bi-info-circle" aria-hidden="true"></i><%= t("owner_ai_assistant.find_info") %></span>
-          <span role="listitem"><i class="bi bi-calendar-event" aria-hidden="true"></i><%= t("owner_ai_assistant.find_dates") %></span>
-          <span role="listitem"><i class="bi bi-list-check" aria-hidden="true"></i><%= t("owner_ai_assistant.find_tasks") %></span>
-          <span role="listitem"><i class="bi bi-archive" aria-hidden="true"></i><%= t("owner_ai_assistant.find_archives") %></span>
-        </div>
-        <p class="rc-hint"><%= t("owner_ai_assistant.find_scope_note") %></p>
+        <%# Only the wired, allowlisted page navigator is presented here.
+            File/date/task/archive provider plugins require independent server policies. %>
         <%= form_with url: navigate_owner_ai_path, method: :post, class: "wa-ai-dock__navigation" do %>
           <%= label_tag "wa-dock-command", t("owner_ai_assistant.navigate_label"), class: "visually-hidden" %>
           <%= text_field_tag :command, nil, id: "wa-dock-command", class: "rc-input",
