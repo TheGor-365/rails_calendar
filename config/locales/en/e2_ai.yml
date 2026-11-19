@@ -1,0 +1,30 @@
+en:
+  e2_ai:
+    title: "AI actions for this invitation"
+    subtitle: "A real, private AI draft based on the task above. Nothing is sent to the client automatically."
+    what_changes: "What will be created"
+    explain: "Show what {action} creates"
+    paid_consent: "I approve one paid AI generation. My reviewed task may be sent to xAI."
+    generate: "Generate AI draft"
+    disabled: "AI is disabled in this server session. No paid calls can run."
+    consent_required: "Approve this paid AI call to continue."
+    generating: "Generating your private draft…"
+    saved: "Draft saved in your private AI history. Review it before using."
+    unavailable: "AI is unavailable. Your task and selected services remain unchanged."
+    invalid: "Check the task title, summary and selected options."
+    too_long: "The draft is too long for this field. Open the saved result to review it."
+    replace_confirm: "Replace the task description in this form with the AI draft?"
+    applied: "AI draft inserted for review. The invitation has not been created."
+    open_saved: "View saved AI draft"
+    use_in_form: "Use in task description"
+    result: "AI draft preview"
+    actions:
+      intake_questions:
+        name: "Client questions"
+        description: "Produces targeted questions and multiple-choice prompts. Saved to your private AI history; you decide what to reuse in the invitation."
+      client_reply:
+        name: "Client-ready explanation"
+        description: "Produces a short, plain-language summary and missing facts. Nothing is sent to the client unless you review and issue an invitation."
+      plan_outline:
+        name: "Draft plan"
+        description: "Produces proposed milestones, dependencies and cautions. This is not an approved scope or promised schedule."
