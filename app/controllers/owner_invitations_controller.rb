@@ -11,6 +11,9 @@ class OwnerInvitationsController < ApplicationController
       source = @workspace.client_request_invitations.find_by(id: source_id)
       return head :not_found unless source
 
+      @reused_ai_entry = source.owner_ai_entry if source.owner_ai_entry&.status == "settled" &&
+        source.owner_ai_entry.result.is_a?(Hash) &&
+        OwnerAi::PageActionRegistry.allowed?(:invitation, source.owner_ai_entry.result["purpose"])
       @invitation = @workspace.client_request_invitations.new(
         seed_title: source.seed_title,
         seed_project_type: source.seed_project_type,
