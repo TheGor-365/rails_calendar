@@ -64,7 +64,7 @@
         <%= form_with url: attach_owner_invitation_ai_draft_path(@invitation),
                       method: :patch, html: { class: "wa-invite-owner-artifact__recover-form" } do %>
           <%= select_tag :entry_id, options_for_select(@recent_ai_drafts.map { |entry|
-                [`##{entry.id} — #{entry.result["heading"].to_s.truncate(95)}`, entry.id]
+                ["##{entry.id} — #{entry.result["heading"].to_s.truncate(95)}", entry.id]
               }, @invitation.owner_ai_entry_id), class: "rc-input", required: true,
               aria: { label: t("e2_handoff.recover_title") } %>
           <button class="rc-action rc-action--soft" type="submit">
