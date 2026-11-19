@@ -76,6 +76,12 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_equal @workspace.id, intake.workspace_id
     assert_equal [@offering.published_version_id], intake.selected_service_offering_versions.pluck(:id)
     assert_equal 0, intake.client_message_count
+    assert_equal 1, intake.intake_brief_revisions.count
+    owner_brief = intake.latest_brief_revision
+    assert_equal "owner", owner_brief.author_role
+    assert_equal({ "tasks" => %w[bugfix tests], "backend" => ["rails"] }, owner_brief.selections)
+    assert_equal({ "deployment" => "client" }, owner_brief.decisions)
+    assert_equal "Synthetic test job", owner_brief.notes
     assert_equal @client.id, invitation.reload.claimed_by_user_id
     assert_equal intake.id, invitation.project_intake_id
     get client_invitation_preview_path
@@ -95,9 +101,19 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
         title: "Client revised the test task", project_type: "rails_bugfix",
         goal: "Client now requests a synthetic form with two named acceptance scenarios."
       },
-      fact_review: { title: "confirmed", project_type: "confirmed", goal: "unknown" }
+      fact_review: { title: "confirmed", project_type: "confirmed", goal: "unknown" },
+      brief: {
+        selections: { tasks: ["bugfix"], backend: ["rails"], frontend: ["bootstrap"] },
+        decisions: { deployment: "owner" }, notes: "Please improve the mobile form first."
+      }
     }
     assert_redirected_to edit_client_request_path(intake)
+    assert_equal 2, intake.intake_brief_revisions.count
+    assert_equal "client", intake.latest_brief_revision.author_role
+    assert_equal({ "frontend" => ["bootstrap"] }, intake.latest_brief_revision.selections.slice("frontend"))
+    assert_equal({ "deployment" => "owner" }, intake.latest_brief_revision.decisions)
+    assert_equal "owner", intake.intake_brief_revisions.find_by!(version: 1).author_role
+    assert_equal %w[bugfix tests], intake.intake_brief_revisions.find_by!(version: 1).selections.fetch("tasks")
     assert_equal "Client revised the test task", intake.reload.title
     assert_equal @seed, invitation.reload.seed_goal
     assert_equal "unknown", invitation.fact_state("goal")
@@ -180,7 +196,12 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
 
   def issue_invitation
     post owner_invitations_path, params: {
-      proposal: proposal, service_version_ids: [@offering.published_version_id]
+      proposal: proposal.merge(
+        brief_selections: { tasks: %w[bugfix tests], backend: ["rails"] },
+        brief_decisions: { deployment: "client" },
+        brief_notes: "Synthetic test job"
+      ),
+      service_version_ids: [@offering.published_version_id]
     }
     assert_redirected_to owner_invitations_path
     follow_redirect!
