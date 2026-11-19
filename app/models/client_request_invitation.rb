@@ -17,6 +17,8 @@ class ClientRequestInvitation < ApplicationRecord
   validates :expires_at, presence: true
   validate :service_versions_are_published, on: :create
   validate :valid_fact_reviews
+  validate :valid_brief_choices
+  validates :brief_notes, length: { maximum: 350 }
 
   def self.digest_for(raw_token)
     OpenSSL::HMAC.hexdigest("SHA256", Rails.application.secret_key_base, "rc-e2-invitation-v1:#{raw_token}")
@@ -55,6 +57,11 @@ class ClientRequestInvitation < ApplicationRecord
     ok = client_fact_reviews.is_a?(Hash) &&
       client_fact_reviews.all? { |key, value| FACT_KEYS.include?(key) && FACT_STATES.include?(value) }
     errors.add(:client_fact_reviews, "contains an unsupported fact decision") unless ok
+  end
+
+  def valid_brief_choices
+    errors.add(:brief_selections, "contains unsupported choices") unless InvitationBriefTaxonomy.valid?(brief_selections)
+    errors.add(:brief_decisions, "contains unsupported choices") unless InvitationBriefTaxonomy.valid_decisions?(brief_decisions)
   end
 
   def service_versions_are_published
