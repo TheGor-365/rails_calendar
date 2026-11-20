@@ -20,7 +20,7 @@
             aria-controls="wa-requests-incoming" aria-selected="true" data-action="click->wa-requests#select">
       <i class="bi bi-inbox" aria-hidden="true"></i>
       <span><%= t("requests_hub.incoming") %></span>
-      <strong class="wa-requests__count"><%= @intakes.size %></strong>
+      <strong class="wa-requests__count"><%= @incoming_total_count %></strong>
       <% if @unread_incoming_count.positive? %>
         <span class="wa-requests__unread" title="<%= t("requests_hub.unread_count", count: @unread_incoming_count) %>"><%= @unread_incoming_count %></span>
       <% end %>
@@ -30,7 +30,7 @@
               aria-controls="wa-requests-outgoing" aria-selected="false" data-action="click->wa-requests#select">
         <i class="bi bi-send-check" aria-hidden="true"></i>
         <span><%= t("requests_hub.outgoing") %></span>
-        <strong class="wa-requests__count"><%= @outgoing_invitations.size %></strong>
+        <strong class="wa-requests__count"><%= @outgoing_total_count %></strong>
         <% if @outgoing_attention_count.positive? %>
           <span class="wa-requests__attention" title="<%= t("requests_hub.claimed_count", count: @outgoing_attention_count) %>"><%= @outgoing_attention_count %></span>
         <% end %>
