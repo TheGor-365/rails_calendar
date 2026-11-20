@@ -35,3 +35,22 @@
 @media (prefers-reduced-motion: reduce) {
   .wa-activity-journal .wa-activity-journal__record { transition: none; }
 }
+
+.wa-notifications__tabs {
+  display: flex; gap: .6rem; flex-wrap: wrap;
+  .rc-action { min-height: 44px; }
+}
+.wa-notifications__count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 26px; min-height: 24px; border-radius: 9px;
+  background: #e6f7f1; color: #006d62; font-size: .78rem; padding: .1rem .4rem;
+}
+.wa-activity-journal__record.wa-notifications__unread {
+  border-inline-start: 3px solid #008477; background: #fafffd;
+}
+.wa-notifications__unread .wa-activity-journal__icon {
+  background: #dff6ee; color: #007467;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wa-notifications__tabs .rc-action { transition: none; }
+}
