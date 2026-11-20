@@ -10,10 +10,6 @@ module Calendar
       # Existing historical sources predate the event ledger. Show them only
       # if no event for that exact source has been captured.
       captured = events.map { |entry| [entry.subject_type, entry.subject_id] }.to_set
-      # Query the full workspace event IDs (not just this time window), because
-      # an update may have occurred in a different month from source creation.
-      captured.merge(ActivityEvent.where(workspace_id: workspace.id)
-        .pluck(:subject_type, :subject_id))
       workspace.client_request_invitations.where(created_at: from...through).each do |record|
         next if captured.include?(["ClientRequestInvitation", record.id])
         items << {
