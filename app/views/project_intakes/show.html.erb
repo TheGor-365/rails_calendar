@@ -28,6 +28,7 @@
     ["intake-brief", "card-text", t("intake.owner_view.brief")],
     ["intake-interview", "chat-left-text", t("intake.interview_title")]
   ] %>
+  <% owner_nav_sections << ["intake-scope", "diagram-3", t("e2_scope.owner_title")] if @intake.latest_scope_revision %>
   <% owner_nav_sections << ["intake-review", "shield-lock", t("intake.admin_title")] if admin_signed_in? %>
   <% owner_nav_sections << ["intake-spec", "file-earmark-text", t("intake.spec_title")] if @latest_spec && (admin_signed_in? || @latest_spec.approved?) %>
   <% owner_nav_sections << ["private-project-calendar", "calendar-range", t("intake.calendar_title")] if @milestones.any? && (admin_signed_in? || @latest_spec&.approved?) %>
@@ -85,6 +86,40 @@
       </div>
     <% end %>
   </section>
+  <% if (scope_revision = @intake.latest_scope_revision) %>
+    <section class="surface-panel wa-owner-intake__panel wa-scope-owner mb-4" id="intake-scope" aria-labelledby="intake-scope-heading">
+      <div class="wa-owner-intake__section-heading">
+        <span class="wa-owner-intake__icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></span>
+        <div>
+          <h2 id="intake-scope-heading"><%= t("e2_scope.owner_title") %></h2>
+          <p class="rc-hint mb-0"><%= t("e2_scope.owner_hint", version: scope_revision.version) %></p>
+        </div>
+      </div>
+      <div class="wa-scope-owner__grid">
+        <% IntakeScopeSections::ITEMS.each_with_index do |(key, icon), index| %>
+          <% answer = scope_revision.answers.fetch(key, {}) %>
+          <article class="wa-scope-owner__item">
+            <div class="wa-scope-owner__item-top">
+              <span class="wa-scope__section-icon"><i class="bi <%= icon %>" aria-hidden="true"></i></span>
+              <div>
+                <small><%= format("R-%03d", index + 1) %> <%= t("e2_scope.section_reference") %></small>
+                <h3><%= t("e2_scope.sections.#{key}.title") %></h3>
+              </div>
+            </div>
+            <p class="wa-scope-owner__technical"><%= t("e2_scope.sections.#{key}.technical") %></p>
+            <p class="wa-scope-owner__client"><span><%= t("e2_scope.owner_client_says") %></span>
+              <%= answer.fetch("text", "").presence || t("e2_scope.not_yet_answered") %></p>
+            <div class="wa-scope-owner__meta">
+              <span><%= t("e2_scope.statuses.#{answer.fetch("status", "unknown")}") %></span>
+              <span><%= t("e2_scope.responsibilities.#{answer.fetch("responsibility", "open")}") %></span>
+            </div>
+          </article>
+        <% end %>
+      </div>
+      <p class="rc-hint mt-3"><%= t("e2_scope.owner_warning") %></p>
+    </section>
+  <% end %>
+
   <section class="surface-panel wa-owner-intake__panel mb-4" id="intake-interview"
            aria-label="<%= t("intake.interview_aria") %>">
     <div class="wa-owner-intake__section-heading">
