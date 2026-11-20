@@ -73,3 +73,7 @@ application.register("wa-requests", WaRequestsController)
 // Owner library: client-side live filters of authorized and rendered records.
 import WaLibraryController from "./wa_library_controller"
 application.register("wa-library", WaLibraryController)
+
+// Fluid progressive enhancement of artifact accordion cards.
+import WaAccordionController from "./wa_accordion_controller"
+application.register("wa-accordion", WaAccordionController)
