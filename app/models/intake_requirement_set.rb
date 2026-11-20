@@ -26,6 +26,8 @@ class IntakeRequirementSet < ApplicationRecord
     row.is_a?(Hash) &&
       row.keys.sort == %w[acceptance_criteria id source statement status] &&
       row["id"].is_a?(String) && row["id"].match?(/\AR-\d{3,6}\z/) &&
+      row["source"].is_a?(Hash) &&
+      row["source"].keys.sort == %w[revision_id section type] &&
       IntakeScopeSections::KEYS.include?(row["source"]["section"]) &&
       row["source"]["revision_id"] == revision_id &&
       row["source"]["type"] == "intake_scope_revision" &&
