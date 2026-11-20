@@ -1,0 +1,25 @@
+<%# Private projection of persistent owner actions, separate from scheduled consultations. %>
+<% if owner_signed_in? %>
+  <section class="wa-calendar-activity" aria-label="<%= t("calendar_actions.activity_heading") %>">
+    <div class="wa-calendar-activity__heading">
+      <div><p class="eyebrow mb-1"><%= t("calendar_actions.activity_eyebrow") %></p>
+        <h2><i class="bi bi-activity" aria-hidden="true"></i> <%= t("calendar_actions.activity_heading") %>
+          <span class="wa-calendar-activity__count"><%= activities.size %></span></h2></div>
+      <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path, class: "rc-action rc-action--quiet rc-action--small" %>
+    </div>
+    <% if activities.any? %>
+      <div class="wa-calendar-activity__list">
+        <% activities.each do |item| %>
+          <%= link_to item[:path], class: "wa-calendar-activity__item" do %>
+            <span class="wa-calendar-activity__icon"><i class="bi bi-<%= item[:icon] %>" aria-hidden="true"></i></span>
+            <span class="wa-calendar-activity__text"><strong><%= item[:title] %></strong>
+              <small><%= t("calendar_actions.kinds.#{item[:kind]}") %> · <%= l(item[:created_at], format: :short) %> · <%= item[:status] %></small></span>
+            <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="wa-calendar-activity__empty"><%= t("calendar_actions.no_activity") %></p>
+    <% end %>
+  </section>
+<% end %>
