@@ -1,0 +1,22 @@
+ru:
+  calendar_actions:
+    create: "Создать"
+    new_entry: "КАЛЕНДАРЬ / СОЗДАНИЕ"
+    consultation: "Консультация"
+    invitation: "Приглашение клиенту"
+    request: "Новая заявка"
+    library: "Библиотека"
+    with_ai: "Создать с ИИ"
+    close: "Закрыть"
+    create_on: "Создать событие на %{date}"
+    create_in_hour: "Создать событие на %{time}"
+    network_error: "Не удалось сохранить. Проверьте соединение и повторите."
+    activity_eyebrow: "ИСТОРИЯ / СОБЫТИЯ"
+    activity_heading: "Активность и артефакты"
+    no_activity: "За выбранный период действий не найдено."
+    now: "Текущее время"
+    kinds:
+      invitation: "Приглашение"
+      request: "Заявка"
+      ai: "Генерация ИИ"
+      requirements: "Версия требований"
