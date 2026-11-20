@@ -16,7 +16,7 @@
 
   <div class="wa-requests__switch" role="tablist" aria-label="<%= t("requests_hub.switch_label") %>">
     <button type="button" role="tab" id="wa-requests-tab-incoming" class="wa-requests__tab" data-wa-requests-target="tab" data-view="incoming"
-            aria-controls="wa-requests-incoming" aria-selected="true" data-action="click->wa-requests#select">
+            aria-controls="wa-requests-incoming" aria-selected="true" data-action="click->wa-requests#select keydown->wa-requests#keyboard">
       <i class="bi bi-inbox" aria-hidden="true"></i>
       <span><%= t("requests_hub.incoming") %></span>
       <strong class="wa-requests__count"><%= @incoming_total_count %></strong>
@@ -26,7 +26,7 @@
     </button>
     <% if owner_signed_in? %>
       <button type="button" role="tab" id="wa-requests-tab-outgoing" class="wa-requests__tab" data-wa-requests-target="tab" data-view="outgoing"
-              aria-controls="wa-requests-outgoing" aria-selected="false" data-action="click->wa-requests#select">
+              aria-controls="wa-requests-outgoing" aria-selected="false" data-action="click->wa-requests#select keydown->wa-requests#keyboard">
         <i class="bi bi-send-check" aria-hidden="true"></i>
         <span><%= t("requests_hub.outgoing") %></span>
         <strong class="wa-requests__count"><%= @outgoing_total_count %></strong>
