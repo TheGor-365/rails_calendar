@@ -1,0 +1,62 @@
+<div class="container wa-activity-journal my-4 my-sm-5">
+  <header class="rc-page-hero mb-4">
+    <div>
+      <p class="eyebrow mb-2"><%= t("activity_journal.eyebrow") %></p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol"><i class="bi bi-activity" aria-hidden="true"></i></span>
+        <h1 class="page-title"><%= t("activity_journal.title") %></h1>
+      </div>
+      <p class="rc-muted"><%= t("activity_journal.description") %></p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("calendar3", t("nav.calendar")), root_path, class: "rc-action rc-action--quiet" %>
+    </div>
+  </header>
+
+  <section class="surface-panel p-3 p-sm-4 mb-4" aria-labelledby="wa-activity-filter-title">
+    <h2 id="wa-activity-filter-title" class="h6 mb-3"><i class="bi bi-funnel" aria-hidden="true"></i> <%= t("activity_journal.filters") %></h2>
+    <%= form_with url: owner_activity_events_path, method: :get, class: "wa-activity-journal__filters", data: { turbo_frame: "activity-results", controller: "wa-activity-filter", action: "input->wa-activity-filter#change change->wa-activity-filter#change" } do |form| %>
+      <div><%= form.label :q, t("activity_journal.search"), class: "rc-field-label" %>
+        <%= form.search_field :q, value: @query, maxlength: 120, placeholder: t("activity_journal.search_placeholder"), class: "rc-input" %></div>
+      <div><%= form.label :kind, t("activity_journal.type"), class: "rc-field-label" %>
+        <%= form.select :kind, [["#{t("activity_journal.all")}", "all"]] + ActivityEvent::KINDS.map { |kind| [t("activity_journal.events.#{kind}"), kind] }, { selected: @kind }, class: "rc-input" %></div>
+      <div><%= form.label :from, t("activity_journal.from"), class: "rc-field-label" %>
+        <%= form.date_field :from, value: @from, class: "rc-input" %></div>
+      <div><%= form.label :to, t("activity_journal.to"), class: "rc-field-label" %>
+        <%= form.date_field :to, value: @to, class: "rc-input" %></div>
+      <div class="wa-activity-journal__filter-action">
+        <%= link_to rc_icon_label("arrow-counterclockwise", t("activity_journal.reset")), owner_activity_events_path, class: "rc-action rc-action--quiet" %>
+      </div>
+    <% end %>
+  </section>
+
+  <%= turbo_frame_tag "activity-results" do %>
+    <div class="wa-activity-journal__head">
+      <h2><%= t("activity_journal.results") %> <span><%= @total_count %></span></h2>
+      <p><%= t("activity_journal.most_recent") %></p>
+    </div>
+    <% if @events.any? %>
+      <div class="wa-activity-journal__list">
+        <% @events.each do |event| %>
+          <% view = Activity::Presenter.display(event) %>
+          <article class="wa-activity-journal__record">
+            <div class="wa-activity-journal__icon"><i class="bi bi-<%= view[:icon] %>" aria-hidden="true"></i></div>
+            <div class="wa-activity-journal__content">
+              <strong><%= event.title %></strong>
+              <p><%= t("activity_journal.events.#{event.kind}") %> ·
+                <time datetime="<%= event.occurred_at.iso8601 %>"><%= l(event.occurred_at, format: :short) %></time></p>
+              <small><%= event.subject_type %> #<%= event.subject_id %> · ID <%= event.id %></small>
+            </div>
+            <div class="wa-activity-journal__actions">
+              <%= link_to rc_icon_label("box-arrow-up-right", t("activity_journal.open")), view[:path], class: "rc-action rc-action--quiet rc-action--small", data: { turbo_frame: "_top" } %>
+              <%= link_to rc_icon_label("file-earmark-text", "TXT"), export_owner_activity_event_path(event), class: "rc-action rc-action--soft rc-action--small", data: { turbo_frame: "_top" } %>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="rc-notice rc-notice--neutral"><%= t("activity_journal.none") %></p>
+    <% end %>
+  <% end %>
+</div>
