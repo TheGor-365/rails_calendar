@@ -48,8 +48,8 @@
 
   <% if owner_signed_in? %>
     <%= link_to admin_project_intakes_path,
-                class: "rc-mobile-dock-item wa-inbox-mobile #{'is-active' if controller_path == 'admin/project_intakes' && action_name == 'index'}",
-                aria: { label: t("nav.intake_inbox"), current: ("page" if controller_path == 'admin/project_intakes' && action_name == 'index') } do %>
+                class: "rc-mobile-dock-item wa-inbox-mobile #{'is-active' if ['admin/project_intakes', 'owner_invitations', 'owner_requirements'].include?(controller_path)}",
+                aria: { label: t("nav.intake_inbox"), current: ("page" if ['admin/project_intakes', 'owner_invitations', 'owner_requirements'].include?(controller_path)) } do %>
       <span class="rc-mobile-dock-icon wa-unread-mobile-icon">
         <i class="bi bi-inboxes" aria-hidden="true"></i>
         <% if owner_unread_intake_count.positive? %>
@@ -60,6 +60,7 @@
     <% end %>
   <% end %>
 
+  <%# The library lives in the top navigation on desktop and the cabinet on mobile. %>
   <% records_destination = owner_signed_in? ? owner_cabinet_path : consultations_path %>
   <% records_active = owner_signed_in? ? request.path == owner_cabinet_path : consultations_active %>
   <%= link_to records_destination,
