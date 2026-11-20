@@ -43,6 +43,14 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     get owner_artifacts_path(kind: "ai", q: "Rails contact form review")
     assert_response :success
     assert_select "h1", text: "Library"
+    assert_select "[data-controller='wa-library']", count: 1
+    assert_select "[data-wa-library-target='search']", count: 1
+    assert_select "[data-wa-library-target='kind']", count: 1
+    assert_select "[data-wa-library-target='from']", count: 1
+    assert_select "[data-wa-library-target='to']", count: 1
+    assert_select "[data-wa-library-target='chip'][data-kind='ai']", count: 1
+    assert_select "[data-controller='wa-accordion']", minimum: 1
+    assert_select "a[aria-current='page'][href=?]", owner_artifacts_path, minimum: 1
     assert_select "a[href=?]", export_owner_artifact_path(kind: "ai", id: entry.id), minimum: 1
     get export_owner_artifact_path(kind: "ai", id: entry.id)
     assert_response :success
