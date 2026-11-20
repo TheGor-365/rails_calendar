@@ -26,6 +26,9 @@ class PagesController < ApplicationController
       from: from, through: through
     ).order(:start_time, :id).to_a
 
+    @month_invitations = owner_signed_in? ? current_user.owner_workspace.client_request_invitations
+      .where(created_at: from...through).order(created_at: :desc).limit(100) : []
+
     @consultations_by_day = (first_visible_day..last_visible_day).to_h do |date|
       day_start = Time.zone.local(date.year, date.month, date.day)
       day_end = day_start + 1.day
@@ -50,6 +53,8 @@ class PagesController < ApplicationController
     day_end = day_start + 1.day
 
     @consultations = overlapping_consultations(day_start, day_end)
+    @day_invitations = owner_signed_in? ? current_user.owner_workspace.client_request_invitations
+      .where(created_at: day_start...day_end).order(created_at: :desc) : []
     @timeline = Calendar::DayEventLayout.new(
       consultations: @consultations, day_start: day_start, day_end: day_end
     )
