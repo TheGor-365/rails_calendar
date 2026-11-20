@@ -26,5 +26,6 @@
       <% end %>
     </ol>
     <%= link_to t("owner_setup.my_practice"), owner_practice_path, class: "rc-action rc-action--quiet" %>
+    <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path(kind: "ai"), class: "rc-action rc-action--primary" %>
   </div>
 </div>
