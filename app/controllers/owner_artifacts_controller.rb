@@ -75,8 +75,8 @@ class OwnerArtifactsController < ApplicationController
   def owner_ai_entries
     profile_id = workspace.professional_profile&.id
     own_intakes = ProjectIntake.where(workspace_id: workspace.id).select(:id)
-    AiSpendEntry.where(professional_profile_id: profile_id, project_intake_id: nil)
-      .or(AiSpendEntry.where(project_intake_id: own_intakes, professional_profile_id: nil))
+    owner_profile_entries = profile_id ? AiSpendEntry.where(professional_profile_id: profile_id, project_intake_id: nil) : AiSpendEntry.none
+    owner_profile_entries.or(AiSpendEntry.where(project_intake_id: own_intakes, professional_profile_id: nil))
   end
 
   def collection
