@@ -50,7 +50,7 @@
             <% if admin_signed_in? %>
               <button type="button" class="wa-calendar-hour-add"
                       aria-label="<%= t("calendar_actions.create_in_hour", time: slot[:start_time].strftime('%H:%M')) %>"
-                      data-action="click->wa-calendar-create#open" data-start-at="<%= slot[:start_time].iso8601 %>">
+                      data-action="click->wa-calendar-create#openMenu" data-start-at="<%= slot[:start_time].iso8601 %>">
                 <i class="bi bi-plus" aria-hidden="true"></i>
               </button>
             <% end %>
@@ -128,5 +128,6 @@
     <%= t("calendar.day_help", zone: Time.zone.name) %>
   </p>
   <%= render "activity_list", activities: @day_activity %>
+  <%= render "slot_menu" %>
   <%= render "creation_dialog" %>
 </div>
