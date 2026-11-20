@@ -61,7 +61,7 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
     click_button "Sign out"
     visit invitation_url
     assert_current_path client_invitation_preview_path, wait: 10
-    assert_text "Invitation preview"
+    assert_text "Your project invitation"
     assert_text version.title
     assert_no_text "Private fictional source"
     refute_match(/token=/, page.current_url)
@@ -86,6 +86,8 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
     assert intake
     assert_current_path edit_client_request_path(intake)
     assert_text "Private fictional source"
+    assert_text "Let's define what needs to be built"
+    assert_selector ".wa-scope__section", count: 12
     assert_text "What would you like to achieve?"
     assert_equal 0, intake.client_message_count
     [1440, 390, 320].each do |width|
