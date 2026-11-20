@@ -28,6 +28,10 @@ class PagesController < ApplicationController
 
     @month_invitations = owner_signed_in? ? current_user.owner_workspace.client_request_invitations
       .where(created_at: from...through).order(created_at: :desc).limit(100) : []
+    @month_activity = owner_signed_in? ? Calendar::OwnerActivity.between(
+      workspace: current_user.owner_workspace, from: from, through: through
+    ) : []
+    @month_activity_by_day = @month_activity.group_by { |item| item[:created_at].in_time_zone.to_date }
 
     @consultations_by_day = (first_visible_day..last_visible_day).to_h do |date|
       day_start = Time.zone.local(date.year, date.month, date.day)
@@ -55,6 +59,9 @@ class PagesController < ApplicationController
     @consultations = overlapping_consultations(day_start, day_end)
     @day_invitations = owner_signed_in? ? current_user.owner_workspace.client_request_invitations
       .where(created_at: day_start...day_end).order(created_at: :desc) : []
+    @day_activity = owner_signed_in? ? Calendar::OwnerActivity.between(
+      workspace: current_user.owner_workspace, from: day_start, through: day_end
+    ) : []
     @timeline = Calendar::DayEventLayout.new(
       consultations: @consultations, day_start: day_start, day_end: day_end
     )
@@ -87,6 +94,9 @@ class PagesController < ApplicationController
                                   @selected_date.day, @selected_hour)
     @hour_end = @hour_start + 1.hour
     @consultations = overlapping_consultations(@hour_start, @hour_end)
+    @hour_activity = owner_signed_in? ? Calendar::OwnerActivity.between(
+      workspace: current_user.owner_workspace, from: @hour_start, through: @hour_end
+    ) : []
   rescue Date::Error, TypeError, ArgumentError
     redirect_to root_path, alert: "Invalid calendar interval"
   end
