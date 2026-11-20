@@ -21,6 +21,67 @@
     <%= form_with model: @intake, url: client_request_path(@intake), method: :patch,
                   html: { class: "rc-form" } do |f| %>
       <% brief = @intake.latest_brief_revision %>
+      <% scope_revision = @intake.latest_scope_revision %>
+      <section class="wa-scope" aria-labelledby="wa-scope-title">
+        <div class="wa-scope__heading">
+          <span class="wa-scope__mark"><i class="bi bi-diagram-3" aria-hidden="true"></i></span>
+          <div>
+            <p class="wa-scope__eyebrow"><%= t("e2_scope.eyebrow") %></p>
+            <h2 id="wa-scope-title"><%= t("e2_scope.title") %></h2>
+            <p class="rc-hint"><%= t("e2_scope.intro") %></p>
+          </div>
+          <% if scope_revision %>
+            <span class="wa-scope__version">v<%= scope_revision.version %></span>
+          <% end %>
+        </div>
+        <div class="wa-scope__progress"><span><%= t("e2_scope.progress") %></span>
+          <strong><%= scope_revision ? scope_revision.answers.count { |_k, value| value["text"].present? } : 0 %> / 12</strong>
+        </div>
+        <div class="wa-scope__sections">
+          <% IntakeScopeSections::ITEMS.each_with_index do |(key, icon), index| %>
+            <% saved_answer = scope_revision&.answers&.fetch(key, {}) || {} %>
+            <details class="wa-scope__section" <%= "open" if index == 0 %>>
+              <summary>
+                <span class="wa-scope__number"><%= format("%02d", index + 1) %></span>
+                <span class="wa-scope__section-icon"><i class="bi <%= icon %>" aria-hidden="true"></i></span>
+                <span class="wa-scope__section-title">
+                  <strong><%= t("e2_scope.sections.#{key}.title") %></strong>
+                  <small><%= t("e2_scope.sections.#{key}.help") %></small>
+                </span>
+                <i class="bi bi-chevron-down wa-scope__chevron" aria-hidden="true"></i>
+              </summary>
+              <div class="wa-scope__section-body">
+                <label class="rc-field-label" for="scope-<%= key %>"><%= t("e2_scope.your_answer") %></label>
+                <textarea class="rc-input rc-input--area" id="scope-<%= key %>"
+                  name="scope[<%= key %>][text]" maxlength="1600" rows="3"
+                  data-controller="wa-autogrow" data-action="input->wa-autogrow#resize"
+                  placeholder="<%= t("e2_scope.sections.#{key}.placeholder") %>"><%= saved_answer["text"] %></textarea>
+                <div class="wa-scope__decisions">
+                  <label>
+                    <span><%= t("e2_scope.status_label") %></span>
+                    <%= select_tag "scope[#{key}][status]",
+                        options_for_select(IntakeScopeSections::STATUSES.map { |v| [t("e2_scope.statuses.#{v}"), v] },
+                          saved_answer.fetch("status", "unknown")), class: "rc-input" %>
+                  </label>
+                  <label>
+                    <span><%= t("e2_scope.responsibility_label") %></span>
+                    <%= select_tag "scope[#{key}][responsibility]",
+                        options_for_select(IntakeScopeSections::RESPONSIBILITIES.map { |v| [t("e2_scope.responsibilities.#{v}"), v] },
+                          saved_answer.fetch("responsibility", "open")), class: "rc-input" %>
+                  </label>
+                </div>
+                <details class="wa-scope__technical">
+                  <summary><i class="bi bi-code-slash" aria-hidden="true"></i> <%= t("e2_scope.technical_label") %></summary>
+                  <p><%= t("e2_scope.sections.#{key}.technical") %></p>
+                </details>
+              </div>
+            </details>
+          <% end %>
+        </div>
+        <p class="wa-scope__foot"><i class="bi bi-shield-check" aria-hidden="true"></i>
+          <%= t("e2_scope.draft_only") %></p>
+      </section>
+
       <section class="wa-e2-client-brief" aria-labelledby="wa-e2-client-brief-heading">
         <div class="wa-invite-field-heading">
           <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-translate"></i></span>
