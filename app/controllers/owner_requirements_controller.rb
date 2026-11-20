@@ -49,7 +49,7 @@ class OwnerRequirementsController < ApplicationController
   end
 
   def require_local_pilot!
-    head :not_found unless Rails.env.development? &&
+    head :not_found unless (Rails.env.development? || Rails.env.test?) &&
       ENV["RC_LOCAL_CLIENT_REQUESTS_ENABLED"] == "true"
   end
 
