@@ -1,0 +1,22 @@
+hy:
+  calendar_actions:
+    create: "Ստեղծել"
+    new_entry: "ՕՐԱՑՈՒՅՑ / ՍՏԵՂԾՈՒՄ"
+    consultation: "Խորհրդատվություն"
+    invitation: "Հրավեր հաճախորդին"
+    request: "Նոր հայտ"
+    library: "Գրադարան"
+    with_ai: "Ստեղծել ԱԲ-ով"
+    close: "Փակել"
+    create_on: "Ստեղծել իրադարձություն %{date}"
+    create_in_hour: "Ստեղծել իրադարձություն %{time}"
+    network_error: "Չհաջողվեց պահպանել։ Ստուգեք կապը։"
+    activity_eyebrow: "ՊԱՏՄՈՒԹՅՈՒՆ / ԻՐԱԴԱՐՁՈՒԹՅՈՒՆՆԵՐ"
+    activity_heading: "Գործողություններ և նյութեր"
+    no_activity: "Այս շրջանում գործողություններ չկան։"
+    now: "Ընթացիկ ժամանակ"
+    kinds:
+      invitation: "Հրավեր"
+      request: "Հայտ"
+      ai: "ԱԲ գեներացում"
+      requirements: "Պահանջների տարբերակ"
