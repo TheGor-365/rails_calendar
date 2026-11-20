@@ -25,6 +25,43 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     @prior_ai.nil? ? ENV.delete("RC_GROK_ENABLED") : ENV["RC_GROK_ENABLED"] = @prior_ai
   end
 
+  test "artifact library indexes persisted AI result and exports private provenance" do
+    entry = AiSpendEntry.create!(
+      professional_profile: @workspace.professional_profile,
+      operation: OwnerAi::Composer::VERSION, model: "local-test-model",
+      request_digest: Digest::SHA256.hexdigest(SecureRandom.hex(16)),
+      status: "settled", reserved_ticks: 0, charged_ticks: 0,
+      result: {
+        "purpose" => "intake_questions",
+        "heading" => "Rails contact form review",
+        "draft" => "Check server validation and acceptance requirements",
+        "questions" => [], "cautions" => [], "next_step" => "Review"
+      }
+    )
+
+    login(@owner)
+    get owner_artifacts_path(kind: "ai", q: "Rails contact form review")
+    assert_response :success
+    assert_select "h1", text: "Library"
+    assert_select "a[href=?]", export_owner_artifact_path(kind: "ai", id: entry.id), minimum: 1
+    get export_owner_artifact_path(kind: "ai", id: entry.id)
+    assert_response :success
+    assert_equal "text/plain", response.media_type
+    payload = JSON.parse(response.body)
+    assert_equal "ai", payload.fetch("type")
+    assert_equal entry.id, payload.fetch("id")
+    assert_equal "local-test-model", payload.fetch("source")
+    assert_equal "Rails contact form review", payload.fetch("content").fetch("heading")
+
+    sign_out
+    login(@owner_b)
+    get owner_artifacts_path(kind: "ai", q: "Rails contact form review")
+    assert_response :success
+    assert_select "body", text: /Rails contact form review/, count: 0
+    get export_owner_artifact_path(kind: "ai", id: entry.id)
+    assert_response :not_found
+  end
+
   test "owner can locate sent invitations in workspace, inbox and cabinet without a guessed URL" do
     login(@owner)
     issue_invitation
