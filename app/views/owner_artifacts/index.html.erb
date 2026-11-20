@@ -57,6 +57,9 @@
           </details>
           <div class="wa-requests__actions">
             <%= link_to rc_icon_label("eye", t("artifact_library.open")), item[:path], class: "rc-action rc-action--primary" %>
+            <% if item[:kind] == "invitation" %>
+              <%= link_to rc_icon_label("arrow-repeat", t("e2_handoff.reuse_as_new")), owner_invitations_path(from_invitation_id: item[:id]), class: "rc-action rc-action--soft" %>
+            <% end %>
             <%= link_to rc_icon_label("file-earmark-arrow-down", t("artifact_library.export")), export_owner_artifact_path(kind: item[:kind], id: item[:id]), class: "rc-action rc-action--quiet" %>
           </div>
         </div>
