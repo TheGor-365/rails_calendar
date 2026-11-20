@@ -1,0 +1,20 @@
+es:
+  e2_presentation:
+    proposal: "PROPUESTA DEL DESARROLLADOR"
+    starting_point: "Lo que sabemos hasta ahora"
+    related_services: "Servicios relacionados"
+    next_label: "SIGUIENTE PASO"
+    next_title: "Cuéntanos qué resultado necesitas"
+    next_description: "Completa o modifica la propuesta, explica tus objetivos. Puedes dejar las decisiones técnicas al desarrollador."
+    steps_title: "Cómo trabajaremos"
+    steps:
+      understand:
+        title: "Definir el resultado"
+        help: "Objetivo y funcionalidades esenciales"
+      clarify:
+        title: "Aclarar los detalles"
+        help: "Preguntas claras con explicaciones técnicas sencillas"
+      agree:
+        title: "Revisar la especificación"
+        help: "Ambas partes revisan la versión final"
+    free_choice: "¿No conoces la respuesta? El desarrollador puede recomendar una solución."
