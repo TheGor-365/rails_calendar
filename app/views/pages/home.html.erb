@@ -95,7 +95,7 @@
           <li class="calendar-mobile-agenda-day" data-date="<%= date.iso8601 %>">
             <%= link_to calendar_day_path(date: date.iso8601), class: "calendar-mobile-date-link" do %>
               <time datetime="<%= date.iso8601 %>"><%= rc_local_date(date, format: :rc_short) %></time>
-              <span><%= rc_icon_label("arrow-up-right", "#{rc_count(day_events.size, "calendar", "event")} · #{t("calendar.view_day")}") %></span>
+              <span><%= rc_icon_label("arrow-up-right", "#{rc_count(day_events.size + @month_activity_by_day.fetch(date, []).size, "calendar", "event")} · #{t("calendar.view_day")}") %></span>
             <% end %>
             <ul class="calendar-mobile-event-list">
               <% day_events.first(2).each do |consultation| %>
@@ -110,9 +110,19 @@
                   <% end %>
                 </li>
               <% end %>
-              <% if day_events.length > 2 %>
+              <% if owner_signed_in? && day_events.size < 2 %>
+                <% @month_activity_by_day.fetch(date, []).first(2 - day_events.size).each do |activity| %>
+                  <li>
+                    <%= link_to activity[:path], class: "calendar-mobile-event-link" do %>
+                      <span class="calendar-mobile-event-title"><i class="bi bi-<%= activity[:icon] %>" aria-hidden="true"></i> <%= truncate(activity[:title], length: 66) %></span>
+                      <span class="calendar-mobile-event-time"><%= l(activity[:created_at], format: :short) %></span>
+                    <% end %>
+                  </li>
+                <% end %>
+              <% end %>
+              <% if day_events.length + @month_activity_by_day.fetch(date, []).size > 2 %>
                 <li>
-                  <%= link_to rc_icon_label("list-ul", t("calendar.view_all_events", count: day_events.length)), calendar_day_path(date: date.iso8601),
+                  <%= link_to rc_icon_label("list-ul", t("calendar.view_all_events", count: day_events.length + @month_activity_by_day.fetch(date, []).size)), calendar_day_path(date: date.iso8601),
                               class: "calendar-mobile-more" %>
                 </li>
               <% end %>
