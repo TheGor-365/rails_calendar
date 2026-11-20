@@ -41,4 +41,11 @@ class OwnerAiConversation < ApplicationRecord
   def remove!
     with_lock { update!(state: "removed", archived_at: Time.current) unless removed? }
   end
+  after_create_commit :record_conversation_created
+
+  def record_conversation_created
+    Activity::Recorder.record!(workspace: workspace, subject: self,
+      kind: "conversation_created", title: title, occurred_at: created_at)
+  end
+
 end
