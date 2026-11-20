@@ -7,13 +7,6 @@ class OwnerArtifactsController < ApplicationController
     @kind = %w[all invitation ai requirements].include?(params[:kind]) ? params[:kind] : "all"
     @query = params[:q].to_s.strip.slice(0, 120)
     @artifacts = collection
-    @artifacts = @artifacts.select { |item| item[:kind] == @kind } unless @kind == "all"
-    if @query.present?
-      term = @query.downcase
-      @artifacts = @artifacts.select do |item|
-        [item[:title], item[:summary], item[:kind], item[:source], item[:preview]].any? { |part| part.to_s.downcase.include?(term) }
-      end
-    end
     @artifacts = @artifacts.sort_by { |item| [item[:created_at], item[:id]] }.reverse.first(100)
     @kind_counts = @artifacts.group_by { |item| item[:kind] }.transform_values(&:size)
     @latest_at = @artifacts.first&.dig(:created_at)
