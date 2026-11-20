@@ -15,6 +15,8 @@ class OwnerArtifactsController < ApplicationController
       end
     end
     @artifacts = @artifacts.sort_by { |item| [item[:created_at], item[:id]] }.reverse.first(100)
+    @kind_counts = @artifacts.group_by { |item| item[:kind] }.transform_values(&:size)
+    @latest_at = @artifacts.first&.dig(:created_at)
     response.headers["Cache-Control"] = "private, no-store"
   end
 
