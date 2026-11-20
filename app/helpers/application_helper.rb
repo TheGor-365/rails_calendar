@@ -25,6 +25,12 @@ module ApplicationHelper
     @owner_unread_intake_count ||= OwnerIntakeInbox.unread_for(owner: current_user).count
   end
 
+  def owner_unread_activity_count
+    return 0 unless owner_signed_in? && current_user.owner_workspace
+
+    @owner_unread_activity_count ||= Activity::Inbox.unread_for(owner: current_user).count
+  end
+
   def owner_unread_badge_label
     total = owner_unread_intake_count
     total > 99 ? "99+" : total.to_s
