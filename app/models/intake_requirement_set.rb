@@ -12,6 +12,14 @@ class IntakeRequirementSet < ApplicationRecord
     persisted?
   end
 
+  after_create_commit :record_requirement_revision
+
+  def record_requirement_revision
+    Activity::Recorder.record!(workspace: project_intake.workspace, subject: self,
+      kind: "requirements_saved", title: "#{project_intake.title} · v#{version}",
+      metadata: { "version" => version }, occurred_at: created_at)
+  end
+
   private
 
   def requirements_integrity
