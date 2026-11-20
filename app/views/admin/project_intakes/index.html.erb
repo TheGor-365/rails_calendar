@@ -7,11 +7,47 @@
     <%= link_to rc_icon_label("clipboard2-plus", t("intake.start_intake")), new_project_intake_path, class: "rc-action rc-action--primary" %>
     </div>
   </header>
+  <% if owner_signed_in? %>
+    <section class="surface-panel p-3 p-sm-4 mb-4" aria-labelledby="owner-outgoing-inbox">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h2 class="h5 mb-0" id="owner-outgoing-inbox"><i class="bi bi-send-check" aria-hidden="true"></i> <%= t("owner_activity.outgoing") %></h2>
+        <%= link_to rc_icon_label("plus-circle", t("owner_activity.all_outgoing")), owner_invitations_path(anchor: "invitation-history"), class: "rc-action rc-action--quiet rc-action--small" %>
+      </div>
+      <% if @outgoing_invitations.any? %>
+        <ul class="rc-record-list">
+          <% @outgoing_invitations.each do |invitation| %>
+            <li class="rc-record">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div>
+                  <strong><%= link_to invitation.seed_title, owner_invitation_path(invitation), class: "rc-text-link" %></strong>
+                  <p class="rc-muted mb-0"><%= t("e2.state_#{invitation.state}") %> · <%= l(invitation.created_at, format: :short) %></p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                  <%= link_to rc_icon_label("eye", t("e2_handoff.preview_title")), owner_invitation_path(invitation), class: "rc-action rc-action--quiet rc-action--small" %>
+                  <% if invitation.project_intake_id.present? %>
+                    <%= link_to rc_icon_label("journal-text", t("owner_activity.open_request")), project_intake_path(invitation.project_intake_id), class: "rc-action rc-action--soft rc-action--small" %>
+                    <% if invitation.project_intake&.latest_scope_revision %>
+                      <%= link_to rc_icon_label("list-check", t("owner_activity.requirements")), owner_requirements_path(invitation.project_intake_id), class: "rc-action rc-action--primary rc-action--small" %>
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="rc-muted mb-0"><%= t("owner_activity.none_outgoing") %></p>
+      <% end %>
+    </section>
+  <% end %>
   <ul class="rc-record-list">
     <% @intakes.each do |intake| %>
       <li class="rc-record wa-inbox-record<%= ' wa-inbox-record--unread' if @unread_intake_ids.include?(intake.id) %>">
         <h2 class="h5 wa-inbox-record__heading">
           <%= link_to rc_icon_label("arrow-up-right", intake.title), project_intake_path(intake), class: "rc-text-link" %>
+          <% if owner_signed_in? && intake.latest_scope_revision %>
+            <%= link_to rc_icon_label("list-check", t("owner_activity.requirements")), owner_requirements_path(intake), class: "rc-action rc-action--quiet rc-action--small" %>
+          <% end %>
           <% if @unread_intake_ids.include?(intake.id) %>
             <span class="wa-inbox-record__new"><span class="wa-unread-dot" aria-hidden="true"></span><%= t("intake.unread_new") %></span>
           <% end %>
