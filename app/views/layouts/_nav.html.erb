@@ -63,7 +63,6 @@
       <% end %>
       <%= link_to consultations_path,
                   class: "rc-nav-link #{'active' if controller_name == 'consultations'}",
-                  aria: { current: ("page" if controller_name == 'consultations') },
                   aria: { current: ("page" if controller_name == 'consultations') } do %>
         <%= rc_icon_label("journal-text", t("nav.consultations")) %>
       <% end %>
