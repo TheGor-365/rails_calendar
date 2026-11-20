@@ -19,6 +19,12 @@ en:
       client: "I'll decide"
       owner: "Developer to recommend"
       open: "Decide together"
+    owner_title: "Technical review of client's project"
+    owner_hint: "Discovery draft v%{version}. Technical decisions are not approved yet."
+    section_reference: "SECTION"
+    owner_client_says: "In the client's words"
+    not_yet_answered: "Not answered yet; clarify with the client or propose an option."
+    owner_warning: "Section numbers are navigation labels, not requirement IDs. Future specification requirements will receive unique R-IDs and source references."
     sections:
       business_goal:
         title: "Business goal and context"
