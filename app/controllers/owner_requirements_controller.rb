@@ -8,6 +8,7 @@ class OwnerRequirementsController < ApplicationController
   def show
     @scope_revision = @intake.latest_scope_revision
     @set = @intake.latest_requirement_set
+    @history = @intake.intake_requirement_sets.order(version: :desc).limit(12)
     response.headers["Cache-Control"] = "private, no-store"
   end
 
@@ -49,6 +50,7 @@ class OwnerRequirementsController < ApplicationController
       current = @intake.latest_requirement_set
       next :missing unless current
       next :stale unless params[:base_version].to_s == current.version.to_s
+      next :stale unless current.intake_scope_revision_id == @intake.latest_scope_revision&.id
 
       incoming = params[:edits]
       next :invalid unless incoming.is_a?(ActionController::Parameters)
