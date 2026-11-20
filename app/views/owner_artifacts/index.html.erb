@@ -1,0 +1,58 @@
+<div class="container wa-requests my-4 my-sm-5">
+  <header class="rc-page-hero mb-4">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow"><%= t("artifact_library.eyebrow") %></p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-collection"></i></span>
+        <h1 class="page-title"><%= t("artifact_library.title") %></h1>
+      </div>
+      <p class="rc-muted"><%= t("artifact_library.subtitle") %></p>
+    </div>
+  </header>
+  <section class="surface-panel p-3 p-sm-4 mb-4">
+    <%= form_with url: owner_artifacts_path, method: :get, local: true, class: "d-flex flex-wrap gap-2 align-items-end" do %>
+      <div class="flex-grow-1">
+        <%= label_tag :q, t("artifact_library.search"), class: "rc-field-label" %>
+        <%= search_field_tag :q, @query, class: "form-control", maxlength: 120, placeholder: t("artifact_library.search_hint") %>
+      </div>
+      <div>
+        <%= label_tag :kind, t("artifact_library.category"), class: "rc-field-label" %>
+        <%= select_tag :kind, options_for_select(%w[all invitation ai requirements].map { |key| [t("artifact_library.kinds.#{key}"), key] }, @kind), class: "form-select" %>
+      </div>
+      <%= button_tag rc_icon_label("search", t("artifact_library.find")), class: "rc-action rc-action--primary", type: "submit" %>
+      <%= link_to rc_icon_label("arrow-counterclockwise", t("artifact_library.reset")), owner_artifacts_path, class: "rc-action rc-action--quiet" %>
+    <% end %>
+  </section>
+  <div class="wa-requests__section-heading">
+    <h2><%= t("artifact_library.results", count: @artifacts.size) %></h2>
+  </div>
+  <div class="wa-requests__records">
+    <% @artifacts.each do |item| %>
+      <details class="wa-requests__record">
+        <summary>
+          <span class="wa-requests__record-icon"><i class="bi bi-<%= { "invitation" => "send-check", "ai" => "stars", "requirements" => "list-check" }.fetch(item[:kind]) %>" aria-hidden="true"></i></span>
+          <span class="wa-requests__record-main">
+            <strong><%= item[:title] %></strong>
+            <small><%= t("artifact_library.kinds.#{item[:kind]}") %> · <%= l(item[:created_at], format: :short) %> · <%= item[:status] %></small>
+          </span>
+          <i class="bi bi-chevron-down wa-requests__chevron" aria-hidden="true"></i>
+        </summary>
+        <div class="wa-requests__detail">
+          <div class="wa-requests__facts">
+            <div><span><%= t("artifact_library.source") %></span><strong><%= item[:source] %></strong></div>
+            <div><span><%= t("artifact_library.date") %></span><strong><%= l(item[:created_at], format: :short) %></strong></div>
+            <div><span><%= t("artifact_library.status") %></span><strong><%= item[:status] %></strong></div>
+          </div>
+          <p class="wa-requests__description"><%= item[:summary] %></p>
+          <div class="wa-requests__actions">
+            <%= link_to rc_icon_label("eye", t("artifact_library.open")), item[:path], class: "rc-action rc-action--primary" %>
+            <%= link_to rc_icon_label("file-earmark-arrow-down", t("artifact_library.export")), export_owner_artifact_path(kind: item[:kind], id: item[:id]), class: "rc-action rc-action--quiet" %>
+          </div>
+        </div>
+      </details>
+    <% end %>
+    <% if @artifacts.empty? %>
+      <div class="rc-empty-state" role="status"><i class="bi bi-collection" aria-hidden="true"></i><p><%= t("artifact_library.empty") %></p></div>
+    <% end %>
+  </div>
+</div>
