@@ -1,0 +1,18 @@
+es:
+  e23_requirements:
+    eyebrow: "ESPACIO / REQUISITOS"
+    title: "Candidatos a requisitos"
+    back: "Volver a la solicitud"
+    current_source: "Origen de los requisitos"
+    source_version: "Respuestas del cliente: v%{version}"
+    already_current: "Esta versión ya se procesó."
+    generate: "Preparar candidatos de requisitos"
+    no_answers: "Todavía no hay respuestas detalladas del cliente."
+    unchanged: "Las respuestas ya se procesaron."
+    saved: "Nueva revisión guardada."
+    set_title: "Borrador de requisitos v%{version}"
+    private_warning: "Solo para el desarrollador. No se inventan datos del cliente."
+    trace: "Fuente: revisión #%{revision}, sección %{section}"
+    technical: "Interpretación técnica"
+    acceptance_pending: "Los criterios de aceptación aún deben revisarse."
+    no_approval: "Son candidatos, no un documento aprobado ni un contrato."
