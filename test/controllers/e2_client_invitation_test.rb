@@ -44,9 +44,20 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
 
+    get root_path(start_date: invitation.created_at.in_time_zone.to_date.iso8601)
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
+
+    get calendar_day_path(date: invitation.created_at.in_time_zone.to_date.iso8601)
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
+
     sign_out
     login(@owner_b)
     get workspace_path
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invitation), count: 0
+    get calendar_day_path(date: invitation.created_at.in_time_zone.to_date.iso8601)
     assert_response :success
     assert_select "a[href=?]", owner_invitation_path(invitation), count: 0
   end
