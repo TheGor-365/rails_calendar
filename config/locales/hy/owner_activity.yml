@@ -1,0 +1,7 @@
+hy:
+  owner_activity:
+    outgoing: "Ուղարկված հրավերներ"
+    all_outgoing: "Բոլոր հրավերները"
+    open_request: "Բացել հայտը"
+    requirements: "Պահանջներ և տեխնիկական առաջադրանք"
+    none_outgoing: "Ուղարկված հրավերներ դեռ չկան։"
