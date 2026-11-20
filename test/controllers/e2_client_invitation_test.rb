@@ -380,6 +380,17 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
       assert_response :unprocessable_entity
     end
     assert_equal 2, intake.latest_scope_revision.version
+
+    sign_out
+    login(@owner)
+    get project_intake_path(intake)
+    assert_response :success
+    assert_select ".wa-scope-owner__item", count: 12
+    assert_select ".wa-scope-owner__client", text: /The form confirms delivery/
+    sign_out
+    login(@owner_b)
+    get project_intake_path(intake)
+    assert_response :not_found
   end
 
   test "different client cannot claim, alter or view someone else's invitation draft" do
