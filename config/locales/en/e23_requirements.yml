@@ -25,3 +25,5 @@ en:
     review_saved: "A new requirement revision was saved. The prior revision is unchanged."
     stale: "This form is outdated. Reload and review the latest version."
     invalid_review: "Review validation failed. Check statements, statuses and acceptance criteria."
+    history_title: "Revision history"
+    history_count: "requirements"
