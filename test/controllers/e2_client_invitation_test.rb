@@ -70,6 +70,30 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "owner calendar and day show persisted invitation only within its workspace" do
+    login(@owner)
+    issue_invitation
+    invitation = @workspace.client_request_invitations.order(:id).last
+    assert invitation
+    day = invitation.created_at.in_time_zone.to_date
+
+    get root_path(start_date: day.iso8601)
+    assert_response :success
+    assert_select ".wa-calendar-activity__item[href=?]", owner_invitation_path(invitation), minimum: 1
+    assert_select "button[data-action='click->wa-calendar-create#open']", minimum: 1
+    assert_select "form[data-action='submit->wa-calendar-create#save']", minimum: 1
+
+    get calendar_day_path(date: day.iso8601)
+    assert_response :success
+    assert_select ".wa-calendar-activity__item[href=?]", owner_invitation_path(invitation), minimum: 1
+
+    sign_out
+    login(@owner_b)
+    get root_path(start_date: day.iso8601)
+    assert_response :success
+    assert_select ".wa-calendar-activity__item[href=?]", owner_invitation_path(invitation), count: 0
+  end
+
   test "owner can locate sent invitations in workspace, inbox and cabinet without a guessed URL" do
     login(@owner)
     issue_invitation
