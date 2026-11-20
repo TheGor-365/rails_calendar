@@ -17,6 +17,7 @@ module IntakeScopeSections
   }.freeze
   KEYS = ITEMS.keys.freeze
   STATUSES = %w[suggested confirmed unknown excluded].freeze
+  RESPONSIBILITIES = %w[client owner open].freeze
 
   def self.normalize(raw)
     return nil unless raw.is_a?(Hash)
@@ -25,12 +26,13 @@ module IntakeScopeSections
     normalized = {}
     raw.each do |key, value|
       return nil unless value.is_a?(Hash)
-      return nil unless (value.keys - %w[text status]).empty?
+      return nil unless (value.keys - %w[text status responsibility]).empty?
       text = value.fetch("text", "")
       status = value.fetch("status", "unknown")
       return nil unless text.is_a?(String) && text.length <= 1600
-      return nil unless STATUSES.include?(status)
-      normalized[key] = { "text" => text.strip, "status" => status }
+      responsibility = value.fetch("responsibility", "open")
+      return nil unless STATUSES.include?(status) && RESPONSIBILITIES.include?(responsibility)
+      normalized[key] = { "text" => text.strip, "status" => status, "responsibility" => responsibility }
     end
     normalized
   end
