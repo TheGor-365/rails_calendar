@@ -1,0 +1,18 @@
+en:
+  e23_requirements:
+    eyebrow: "WORKSPACE / REQUIREMENTS"
+    title: "Project requirement candidates"
+    back: "Back to request"
+    current_source: "Source of requirements"
+    source_version: "Client answers: revision v%{version}"
+    already_current: "Current answers already processed. No duplicate generated."
+    generate: "Prepare requirement candidates"
+    no_answers: "Client has not saved detailed answers yet."
+    unchanged: "Current answers already processed."
+    saved: "New candidate revision saved."
+    set_title: "Requirement draft v%{version}"
+    private_warning: "Owner only. The original client words are preserved without invention."
+    trace: "Source: answer revision #%{revision}, section %{section}"
+    technical: "Technical interpretation"
+    acceptance_pending: "Acceptance criteria need review and clarification."
+    no_approval: "These are candidates, not an approved specification or contract. A section may contain multiple atomic requirements requiring decomposition."
