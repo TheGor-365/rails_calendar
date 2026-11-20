@@ -58,7 +58,6 @@ class ClientInvitationsController < ApplicationController
     return redirect_to sign_in_path unless client_signed_in?
     @invitation = invited_from_cookie
     return head :not_found unless @invitation
-    return head :unprocessable_entity unless params[:demo_consent] == "1"
 
     result = OwnerInvitations::Claim.call(invitation: @invitation, client: current_user)
     if result.is_a?(ProjectIntake)
