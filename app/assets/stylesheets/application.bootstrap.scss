@@ -1778,3 +1778,6 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
 // White Atlas calendar context actions and temporal contrast.
 @import 'wa_calendar_actions';
+
+// Private owner event history, traceable to canonical records.
+@import 'wa_activity_journal';
