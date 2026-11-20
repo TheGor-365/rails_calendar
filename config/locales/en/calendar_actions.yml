@@ -1,0 +1,22 @@
+en:
+  calendar_actions:
+    create: "Create"
+    new_entry: "CALENDAR / CREATE"
+    consultation: "Consultation"
+    invitation: "Client invitation"
+    request: "New request"
+    library: "Library"
+    with_ai: "Create with AI"
+    close: "Close"
+    create_on: "Create event on %{date}"
+    create_in_hour: "Create event at %{time}"
+    network_error: "Could not save. Check the connection and retry."
+    activity_eyebrow: "HISTORY / EVENTS"
+    activity_heading: "Activity and artifacts"
+    no_activity: "No actions found for this period."
+    now: "Current time"
+    kinds:
+      invitation: "Invitation"
+      request: "Request"
+      ai: "AI generation"
+      requirements: "Requirements version"
