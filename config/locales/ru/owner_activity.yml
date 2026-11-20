@@ -1,0 +1,7 @@
+ru:
+  owner_activity:
+    outgoing: "Исходящие приглашения"
+    all_outgoing: "Все приглашения"
+    open_request: "Открыть заявку"
+    requirements: "Требования и ТЗ"
+    none_outgoing: "Исходящих приглашений пока нет."
