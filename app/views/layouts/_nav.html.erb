@@ -25,6 +25,7 @@
          controller_path == "owner_requirements" ||
          controller_path == "project_intakes" && action_name == "show"
        ) %>
+    <% owner_notifications_active = owner_signed_in? && controller_path == "owner_notifications" %>
     <% owner_library_active = owner_signed_in? && controller_path == "owner_artifacts" %>
     <% client_cabinet_active = client_signed_in? && ([client_home_path, client_cabinet_path].include?(request.path) || (controller_path == "client_requests" && %w[show review].include?(action_name))) %>
     <% client_creation_active = client_signed_in? && controller_path == "client_requests" && %w[new create].include?(action_name) %>
@@ -46,6 +47,13 @@
                     class: "rc-nav-link wa-ai-nav-entry #{'active' if owner_ai_active}",
                     aria: { current: ("page" if owner_ai_active) } do %>
           <%= rc_icon_label("stars", t("owner_ai_assistant.nav_label")) %>
+        <% end %>
+        <%= link_to owner_notifications_path, class: "rc-nav-link #{'active' if owner_notifications_active}",
+                    aria: { current: ("page" if owner_notifications_active) } do %>
+          <%= rc_icon_label("bell", t("notifications.title")) %>
+          <% if owner_unread_activity_count.positive? %>
+            <span class="wa-unread-count" aria-label="<%= t("notifications.unread") %>"><%= [owner_unread_activity_count, 99].min %><%= '+' if owner_unread_activity_count > 99 %></span>
+          <% end %>
         <% end %>
         <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path,
                     class: "rc-nav-link #{'active' if owner_library_active}",
