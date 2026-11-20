@@ -73,7 +73,7 @@
         <% if admin_signed_in? %>
           <%= link_to admin_project_intakes_path,
                       class: "rc-nav-link wa-inbox-nav #{'active' if owner_requests_active}", aria: { current: ("page" if owner_requests_active) } do %>
-            <%= rc_icon_label("inboxes", t("nav.intake_inbox")) %>
+            <%= rc_icon_label("inboxes", t("requests_hub.title")) %>
             <% if owner_signed_in? && owner_unread_intake_count.positive? %>
               <span class="wa-unread-count" aria-label="<%= t("intake.unread_count", count: owner_unread_intake_count) %>"><%= owner_unread_badge_label %></span>
             <% end %>
