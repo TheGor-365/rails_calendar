@@ -23,19 +23,15 @@
         <h2 class="h6"><%= t("e2.services") %></h2>
         <ul><% versions.each do |version| %><li><%= version.title %></li><% end %></ul>
       <% end %>
-      <p class="rc-notice"><%= t("e2.not_agreement") %></p>
+      <p class="rc-hint wa-e2-invite__disclaimer"><i class="bi bi-info-circle" aria-hidden="true"></i> <%= t("e2.not_agreement") %></p>
       <% if @invitation.claimed_by_user_id == current_user&.id && @invitation.project_intake %>
         <%= link_to t("e2.open_request"),
               (@invitation.submitted_at.present? ? client_request_path(@invitation.project_intake) : edit_client_request_path(@invitation.project_intake)),
               class: "rc-action rc-action--primary" %>
       <% elsif client_signed_in? %>
         <%= form_with url: claim_client_invitation_path, method: :post, html: { class: "rc-form" } do %>
-          <div class="rc-field mb-3">
-            <%= check_box_tag :demo_consent, "1", false, required: true %>
-            <%= label_tag :demo_consent, t("e2.demo_warning") %>
-          </div>
           <button type="submit" class="rc-action rc-action--primary">
-            <%= rc_icon_label("check2-circle", t("e2.claim_action")) %>
+            <%= rc_icon_label("arrow-right-circle", t("e2.claim_action")) %>
           </button>
         <% end %>
       <% else %>
