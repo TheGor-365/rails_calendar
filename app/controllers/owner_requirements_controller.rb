@@ -20,7 +20,7 @@ class OwnerRequirementsController < ApplicationController
       next :unchanged if previous&.intake_scope_revision_id == scope_revision.id
 
       rows = Intake::RequirementCandidates.new(
-        scope_revision: scope_revision, previous_set: previous
+        scope_revision: scope_revision, previous_sets: @intake.intake_requirement_sets.order(:version).to_a
       ).build
       next :no_answers if rows.empty?
 
