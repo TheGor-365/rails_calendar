@@ -40,6 +40,10 @@ Rails.application.routes.draw do
   post "/client/requests/:id/reply", to: "client_requests#reply", as: :reply_client_request
   post "/client/requests/:id/review", to: "client_requests#review", as: :review_client_request
 
+  # E2.3: private source-traced requirements candidate drafts (no AI call).
+  get "/workspace/intakes/:id/requirements", to: "owner_requirements#show", as: :owner_requirements
+  post "/workspace/intakes/:id/requirements", to: "owner_requirements#create"
+
   # Private owner entry, never a public client cabinet.
   get "/workspace", to: "workspace#home", as: :workspace
   get "/workspace/invitations", to: "owner_invitations#index", as: :owner_invitations
