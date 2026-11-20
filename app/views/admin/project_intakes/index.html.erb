@@ -11,6 +11,7 @@
     <div class="rc-page-hero__actions">
       <%= link_to rc_icon_label("send-plus", t("requests_hub.new_outgoing")), owner_invitations_path, class: "rc-action rc-action--primary" if owner_signed_in? %>
       <%= link_to rc_icon_label("plus-lg", t("requests_hub.new_request")), new_project_intake_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path, class: "rc-action rc-action--quiet" if owner_signed_in? %>
     </div>
   </header>
 
