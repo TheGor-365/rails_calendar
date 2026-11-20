@@ -25,6 +25,57 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     @prior_ai.nil? ? ENV.delete("RC_GROK_ENABLED") : ENV["RC_GROK_ENABLED"] = @prior_ai
   end
 
+  test "artifact library indexes owner conversations and service revisions without leaking another workspace" do
+    conversation = @workspace.owner_ai_conversations.create!(
+      title: "Client proposal discovery", scope: "owner_general", state: "active"
+    )
+    conversation.owner_ai_messages.create!(
+      role: "owner", state: "draft", sequence: 1, body: "Discuss API reliability and delivery",
+      operation: "note"
+    )
+    version = @offering.latest_version
+
+    login(@owner)
+    get owner_artifacts_path(kind: "conversation", q: "Client proposal discovery")
+    assert_response :success
+    assert_select "[data-kind='conversation'][data-wa-library-target='item']", minimum: 1
+    assert_select "a[href=?]", owner_ai_conversation_path(conversation), minimum: 1
+
+    get export_owner_artifact_path(kind: "conversation", id: conversation.id)
+    assert_response :success
+    assert_equal "text/plain", response.media_type
+    payload = JSON.parse(response.body)
+    assert_equal "conversation", payload.fetch("type")
+    assert_equal "Discuss API reliability and delivery", payload.fetch("content").first.fetch("body")
+    assert_equal @owner.email, payload.fetch("author")
+
+    get owner_artifacts_path(kind: "service", q: version.title)
+    assert_response :success
+    assert_select "[data-kind='service'][data-wa-library-target='item']", minimum: 1
+    assert_select "a[href=?]", owner_service_path(@offering), minimum: 1
+
+    get export_owner_artifact_path(kind: "service", id: version.id)
+    assert_response :success
+    service_payload = JSON.parse(response.body)
+    assert_equal "service", service_payload.fetch("type")
+    assert_equal version.id, service_payload.fetch("id")
+    assert_equal version.canonical_data.fetch("summary"), service_payload.fetch("content").fetch("summary")
+
+    sign_out
+    login(@owner_b)
+    get owner_artifacts_path(kind: "conversation", q: "Client proposal discovery")
+    assert_response :success
+    assert_select "[data-kind='conversation'][data-wa-library-target='item']", count: 0
+    get export_owner_artifact_path(kind: "conversation", id: conversation.id)
+    assert_response :not_found
+
+    get owner_artifacts_path(kind: "service", q: version.title)
+    assert_response :success
+    assert_select "[data-kind='service'][data-wa-library-target='item']", count: 0
+    get export_owner_artifact_path(kind: "service", id: version.id)
+    assert_response :not_found
+  end
+
   test "artifact library indexes persisted AI result and exports private provenance" do
     entry = AiSpendEntry.create!(
       professional_profile: @workspace.professional_profile,
