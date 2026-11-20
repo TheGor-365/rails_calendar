@@ -14,7 +14,9 @@ module Intake
       prior_ids = @previous_set ? @previous_set.requirements.to_h { |r| [r.dig("source", "section"), r["id"]] } : {}
       next_id = @previous_set ? @previous_set.requirements.filter_map { |r| r["id"].split("-").last.to_i }.max.to_i : 0
 
-      @scope_revision.answers.each_with_object([]) do |(section, answer), output|
+      IntakeScopeSections::KEYS.each_with_object([]) do |section, output|
+        answer = @scope_revision.answers[section]
+        next unless answer
         next unless IntakeScopeSections::KEYS.include?(section)
         text = answer.fetch("text", "").to_s.strip
         next if text.empty?
