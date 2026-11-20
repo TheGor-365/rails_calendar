@@ -15,7 +15,7 @@
           <p class="rc-hint mb-0"><%= entry.model %> · <%= l(entry.created_at, format: :short) %> ·
             <%= entry.charged_ticks ? format("$%.8f", entry.charged_ticks.to_f / AiSpendLedger::USD_TICKS) : t("owner_setup.cost_pending") %></p>
           <div class="d-flex flex-wrap gap-2 mt-2">
-            <% if entry.status == "settled" && entry.result.is_a?(Hash) %>
+            <% if entry.operation == OwnerAi::Composer::VERSION && entry.status == "settled" && entry.result.is_a?(Hash) %>
               <%= link_to rc_icon_label("journal-text", t("owner_activity.view_ai_result")), owner_ai_assistant_path(entry_id: entry.id), class: "rc-action rc-action--quiet rc-action--small" %>
             <% end %>
             <% if (invitation = @linked_invitation_by_entry_id[entry.id]) %>
