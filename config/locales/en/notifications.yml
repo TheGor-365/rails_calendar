@@ -1,0 +1,12 @@
+en:
+  notifications:
+    eyebrow: "WORKSPACE / NOTIFICATIONS"
+    title: "Notifications"
+    description: "Recent request, document and AI activity with direct access to source records."
+    filters: "Notification filter"
+    unread: "Unread"
+    all: "All activity"
+    mark_all: "Mark all as read"
+    read_open: "Open and mark read"
+    all_read: "All available notifications marked as read."
+    empty: "No notifications to show."
