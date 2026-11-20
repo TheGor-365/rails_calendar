@@ -61,13 +61,14 @@
   <% end %>
 
   <%# The library lives in the top navigation on desktop and the cabinet on mobile. %>
-  <% records_destination = owner_signed_in? ? owner_cabinet_path : consultations_path %>
-  <% records_active = owner_signed_in? ? request.path == owner_cabinet_path : consultations_active %>
+  <% library_active = owner_signed_in? && controller_path == "owner_artifacts" %>
+  <% records_destination = library_active ? owner_artifacts_path : (owner_signed_in? ? owner_cabinet_path : consultations_path) %>
+  <% records_active = library_active || (owner_signed_in? ? request.path == owner_cabinet_path : consultations_active) %>
   <%= link_to records_destination,
               class: "rc-mobile-dock-item #{'is-active' if records_active}",
               aria: { current: ("page" if records_active) } do %>
-    <i class="bi <%= owner_signed_in? ? 'bi-person-badge' : 'bi-list-ul' %> rc-mobile-dock-icon" aria-hidden="true"></i>
-    <span class="rc-mobile-dock-label"><%= owner_signed_in? ? t("account_hub.owner_cabinet") : t("nav.records") %></span>
+    <i class="bi <%= library_active ? 'bi-collection' : (owner_signed_in? ? 'bi-person-badge' : 'bi-list-ul') %> rc-mobile-dock-icon" aria-hidden="true"></i>
+    <span class="rc-mobile-dock-label"><%= library_active ? t("artifact_library.title") : (owner_signed_in? ? t("account_hub.owner_cabinet") : t("nav.records")) %></span>
   <% end %>
 
   <% if admin_signed_in? %>
