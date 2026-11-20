@@ -1,0 +1,80 @@
+// White Atlas calendar creation and subtle past/current/future time divisions.
+.wa-calendar {
+  .wa-calendar-create-menu { position: relative; z-index: 20; }
+  .wa-calendar-create-menu__details { position: relative; }
+  .wa-calendar-create-menu__details > summary { list-style: none; }
+  .wa-calendar-create-menu__details > summary::-webkit-details-marker { display: none; }
+  .wa-calendar-create-menu__details > summary .bi-chevron-down { font-size: .68rem; margin-left: .25rem; transition: transform .2s ease; }
+  .wa-calendar-create-menu__details[open] > summary .bi-chevron-down { transform: rotate(180deg); }
+  .wa-calendar-create-menu__items {
+    position: absolute; top: calc(100% + .5rem); right: 0; z-index: 30;
+    display: grid; gap: .26rem; width: min(310px, 90vw); padding: .56rem;
+    background: white; border: 1px solid var(--ws-border, var(--rc-line));
+    border-radius: 15px; box-shadow: 0 14px 36px rgba(10, 50, 47, .16);
+    animation: wa-calendar-appear .18s ease both;
+  }
+  .wa-calendar-create-menu__items :is(a,button) {
+    display: flex; width: 100%; gap: .7rem; align-items: center;
+    padding: .76rem; border: 1px solid transparent; border-radius: 10px;
+    background: transparent; color: var(--rc-ink); font-size: .83rem;
+    font-weight: 690; text-decoration: none; text-align: left;
+    cursor: pointer; transition: background-color .2s ease, transform .2s ease;
+  }
+  .wa-calendar-create-menu__items :is(a,button):hover { background: var(--rc-accent-wash); color: var(--rc-accent-dark); }
+  .wa-calendar-create-menu__items :is(a,button) .bi { color: var(--rc-accent); }
+  .wa-calendar-create-menu__divider { border-top: 1px solid var(--rc-soft-line); margin: .28rem 0; }
+  .wa-calendar-create-menu__items .wa-calendar-create-menu__ai { background: var(--rc-accent-wash); color: var(--rc-accent-dark); }
+  .calendar-grid td:has(.wa-calendar-date--past) { background: #f5f7f7; }
+  .calendar-grid td:has(.wa-calendar-date--past) .calendar-day-link { color: #657a78; }
+  .calendar-grid td:has(.wa-calendar-date--today) { box-shadow: inset 0 2px 0 var(--rc-accent); }
+  .calendar-grid td:has(.wa-calendar-date--future) { background: #fff; }
+  .wa-calendar-cell-add {
+    position: relative; z-index: 2; display: inline-grid; place-items: center;
+    height: 22px; width: 22px; padding: 0; border: 1px solid #c5e5dd;
+    color: var(--rc-accent); background: #eef9f6; border-radius: 7px;
+    transition: background .18s ease, transform .18s ease;
+  }
+  .wa-calendar-cell-add:hover { background: #d8f1e9; transform: scale(1.06); }
+  .wa-calendar-hour-add {
+    position: absolute; right: .12rem; top: .12rem; z-index: 3;
+    display: inline-grid; place-items: center; width: 23px; height: 23px;
+    border: 1px solid transparent; border-radius: 6px; color: var(--rc-accent);
+    background: transparent; cursor: pointer; opacity: .55;
+  }
+  .rc-time-axis-hour:hover .wa-calendar-hour-add,
+  .wa-calendar-hour-add:focus-visible { opacity: 1; background: #e4f4ed; }
+  .rc-time-axis-hour.wa-calendar-hour--past { background: #f3f6f5; }
+  .rc-hour-band.wa-calendar-hour--past { background: #f5f7f7; }
+  .rc-hour-band.wa-calendar-hour--past:hover { background: #e9f2ef; }
+}
+.wa-calendar-dialog {
+  width: min(600px, calc(100vw - 24px)); max-height: min(90vh, 800px);
+  padding: 0; border: 1px solid #c9e0db; border-radius: 22px;
+  background: #fff; color: var(--rc-ink);
+  box-shadow: 0 24px 80px rgba(9, 39, 40, .24);
+}
+.wa-calendar-dialog::backdrop { background: rgba(10, 36, 39, .48); backdrop-filter: blur(3px); }
+.wa-calendar-dialog__body { padding: clamp(1.2rem, 3vw, 1.8rem); }
+.wa-calendar-dialog__header { display: flex; align-items: center; gap: .8rem; border-bottom: 1px solid var(--rc-soft-line); padding-bottom: 1rem; margin-bottom: 1.3rem; }
+.wa-calendar-dialog__icon { display: grid; place-items: center; width: 43px; height: 43px; border-radius: 11px; background: var(--rc-accent-wash); color: var(--rc-accent); }
+.wa-calendar-dialog__header h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -.035em; margin: 0; }
+.wa-calendar-dialog__close { margin-left: auto; border: 0; border-radius: 9px; background: #f2f6f5; padding: .55rem; color: var(--rc-muted); }
+.wa-calendar-dialog__form { display: grid; gap: 1rem; }
+.wa-calendar-dialog__form label { display: block; font-size: .75rem; font-weight: 780; color: var(--rc-muted); margin-bottom: .35rem; }
+.wa-calendar-dialog__form :is(input,textarea) { display: block; width: 100%; padding: .65rem .8rem; min-height: 43px;
+  border: 1px solid #d5e3e1; border-radius: 11px; background: #f8faf9; color: var(--rc-ink);
+  font-size: .9rem; transition: border-color .2s ease, box-shadow .2s ease; }
+.wa-calendar-dialog__form :is(input,textarea):focus { outline: none; border-color: var(--rc-accent); box-shadow: 0 0 0 3px #dbf4eb; }
+.wa-calendar-dialog__times { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+.wa-calendar-dialog__error { margin: 0; color: #af3a4a; font-size: .84rem; }
+.wa-calendar-dialog__error:empty { display: none; }
+.wa-calendar-dialog__actions { display: flex; gap: .6rem; flex-wrap: wrap; padding-top: .3rem; }
+@keyframes wa-calendar-appear { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 575.98px) {
+  .wa-calendar .wa-calendar-cell-add { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; }
+  .wa-calendar-dialog__times { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wa-calendar .wa-calendar-create-menu__items { animation: none; }
+  .wa-calendar .wa-calendar-cell-add, .wa-calendar .wa-calendar-create-menu__items :is(a,button) { transition: none; }
+}
