@@ -6,14 +6,15 @@ module Admin
     def index
       @incoming_total_count = intake_scope.count
       @intakes = intake_scope.order(created_at: :desc, id: :desc).limit(50)
-      @outgoing_total_count = owner_signed_in? ? current_user.owner_workspace.client_request_invitations.count : 0
-      @outgoing_invitations = owner_signed_in? ? current_user.owner_workspace.client_request_invitations.includes(:project_intake).order(created_at: :desc, id: :desc).limit(30) : ClientRequestInvitation.none
+      invitations = owner_signed_in? ? current_user.owner_workspace&.client_request_invitations : nil
+      invitations ||= ClientRequestInvitation.none
+      @outgoing_total_count = invitations.count
+      @outgoing_invitations = invitations.includes(:project_intake).order(created_at: :desc, id: :desc).limit(30)
       @unread_intake_ids = owner_signed_in? ?
         OwnerIntakeInbox.unread_for(owner: current_user).where(id: @intakes.map(&:id)).pluck(:id) : []
       @unread_incoming_count = owner_signed_in? ? OwnerIntakeInbox.unread_for(owner: current_user).count : 0
-      @outgoing_attention_count = owner_signed_in? ?
-        current_user.owner_workspace.client_request_invitations.where.not(claimed_at: nil)
-          .where(revoked_at: nil).count : 0
+      @outgoing_attention_count = invitations.where.not(claimed_at: nil)
+        .where(revoked_at: nil).count
     end
 
     def draft_spec
