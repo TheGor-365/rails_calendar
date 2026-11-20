@@ -2,7 +2,7 @@ en:
   artifact_library:
     eyebrow: "WORKSPACE / ARTIFACTS"
     title: "Library"
-    subtitle: "Saved invitations, AI outputs and requirement versions. Download files directly from the original records with metadata."
+    subtitle: "Invitations, AI outputs, requirements, conversations and service revisions. Files are generated from original records with provenance."
     search: "Search"
     search_hint: "Title, content, model or source"
     category: "Category"
@@ -31,3 +31,5 @@ en:
       invitation: "Invitations"
       ai: "AI results"
       requirements: "Requirement versions"
+      conversation: "AI conversations"
+      service: "Service versions"
