@@ -15,7 +15,6 @@ class IntakeScopeRevision < ApplicationRecord
   private
 
   def supported_answers
-    errors.add(:answers, "contains unsupported sections or statuses") unless
-      IntakeScopeSections.normalize(answers)
+    errors.add(:answers, "contains unsupported sections or statuses") unless IntakeScopeSections.normalize(answers)
   end
 end
