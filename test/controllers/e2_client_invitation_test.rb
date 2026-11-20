@@ -25,6 +25,32 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     @prior_ai.nil? ? ENV.delete("RC_GROK_ENABLED") : ENV["RC_GROK_ENABLED"] = @prior_ai
   end
 
+  test "owner can locate sent invitations in workspace, inbox and cabinet without a guessed URL" do
+    login(@owner)
+    issue_invitation
+    invitation = @workspace.client_request_invitations.order(:id).last
+    assert invitation
+
+    get workspace_path
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
+    assert_select "a[href=?]", owner_invitations_path(anchor: "invitation-history"), minimum: 1
+
+    get admin_project_intakes_path
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
+
+    get owner_cabinet_path
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
+
+    sign_out
+    login(@owner_b)
+    get workspace_path
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invitation), count: 0
+  end
+
   test "owner invitation is scoped, one-time digest only and never lists another owner seed" do
     login(@owner)
     raw = issue_invitation
