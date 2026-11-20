@@ -54,7 +54,7 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", export_owner_artifact_path(kind: "invitation", id: invitation.id), minimum: 1
     get export_owner_artifact_path(kind: "invitation", id: invitation.id)
     assert_response :success
-    assert_match(/text\\/plain/, response.media_type)
+    assert_equal "text/plain", response.media_type
     archive = JSON.parse(response.body)
     assert_equal invitation.seed_title, archive.fetch("title")
     assert_equal "invitation", archive.fetch("type")
