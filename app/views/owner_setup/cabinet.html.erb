@@ -1,4 +1,13 @@
 <div class="container ws-account-page my-4 my-sm-5" id="owner-cabinet">
+  <div class="d-flex flex-wrap justify-content-end gap-2 mb-3">
+    <%= link_to owner_notifications_path, class: "rc-action rc-action--soft" do %>
+      <%= rc_icon_label("bell", t("notifications.title")) %>
+      <% if owner_unread_activity_count.positive? %>
+        <span class="wa-unread-count"><%= [owner_unread_activity_count, 99].min %><%= '+' if owner_unread_activity_count > 99 %></span>
+      <% end %>
+    <% end %>
+    <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--quiet" %>
+  </div>
   <header class="ws-account-hero">
     <div class="ws-account-hero-copy">
       <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("account_hub.owner_eyebrow") %></p>
