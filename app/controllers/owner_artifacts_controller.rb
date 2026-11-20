@@ -36,7 +36,7 @@ class OwnerArtifactsController < ApplicationController
           brief_notes: invitation.brief_notes, linked_intake_id: invitation.project_intake_id,
           ai_entry_id: invitation.owner_ai_entry_id } }
     when "ai"
-      entry = workspace.professional_profile&.ai_spend_entries&.find_by(id: id)
+      entry = owner_ai_entries.find_by(id: id)
       return head :not_found unless entry
       { type: "ai", id: entry.id, created_at: entry.created_at.iso8601,
         title: entry.result.is_a?(Hash) ? entry.result["heading"].presence || entry.operation : entry.operation,
@@ -72,6 +72,13 @@ class OwnerArtifactsController < ApplicationController
     current_user.owner_workspace
   end
 
+  def owner_ai_entries
+    profile_id = workspace.professional_profile&.id
+    own_intakes = ProjectIntake.where(workspace_id: workspace.id).select(:id)
+    AiSpendEntry.where(professional_profile_id: profile_id, project_intake_id: nil)
+      .or(AiSpendEntry.where(project_intake_id: own_intakes, professional_profile_id: nil))
+  end
+
   def collection
     records = []
     workspace.client_request_invitations.includes(:project_intake).order(id: :desc).limit(100).each do |item|
@@ -79,15 +86,13 @@ class OwnerArtifactsController < ApplicationController
         summary: item.seed_goal, source: "owner invitation", status: item.state.to_s,
         created_at: item.created_at, path: owner_invitation_path(item), preview: item.seed_goal }
     end
-    if (profile = workspace.professional_profile)
-      profile.ai_spend_entries.order(id: :desc).limit(100).each do |entry|
+    owner_ai_entries.order(id: :desc).limit(100).each do |entry|
         result = entry.result.is_a?(Hash) ? entry.result : {}
         records << { kind: "ai", id: entry.id, title: result["heading"].presence || entry.operation,
           summary: result["draft"].to_s.truncate(260), source: entry.model, status: entry.status,
           created_at: entry.created_at,
           path: entry.operation == OwnerAi::Composer::VERSION && entry.status == "settled" ? owner_ai_assistant_path(entry_id: entry.id) : owner_ai_activity_path,
           preview: JSON.pretty_generate(result) }
-      end
     end
     IntakeRequirementSet.joins(:project_intake)
       .where(project_intakes: { workspace_id: workspace.id })
