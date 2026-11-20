@@ -77,3 +77,7 @@ application.register("wa-library", WaLibraryController)
 // Fluid progressive enhancement of artifact accordion cards.
 import WaAccordionController from "./wa_accordion_controller"
 application.register("wa-accordion", WaAccordionController)
+
+// Contextual calendar creation without leaving the month or day view.
+import WaCalendarCreateController from "./wa_calendar_create_controller"
+application.register("wa-calendar-create", WaCalendarCreateController)
