@@ -26,7 +26,6 @@ module Calendar
       profile_entries = profile_id ? AiSpendEntry.where(professional_profile_id: profile_id, project_intake_id: nil) : AiSpendEntry.none
       intake_entries = AiSpendEntry.where(project_intake_id: project_ids, professional_profile_id: nil)
       profile_entries.or(intake_entries).where(created_at: from...through).each do |entry|
-        next unless entry.status == "settled"
         result = entry.result.is_a?(Hash) ? entry.result : {}
         items << {
           kind: :ai, icon: "stars", title: result["heading"].presence || entry.operation,
