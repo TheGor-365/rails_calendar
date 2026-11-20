@@ -4,7 +4,9 @@ module Admin
     before_action :set_intake, only: %i[draft_spec approve_spec edit_spec revise_spec plan]
 
     def index
+      @incoming_total_count = intake_scope.count
       @intakes = intake_scope.order(created_at: :desc, id: :desc).limit(50)
+      @outgoing_total_count = owner_signed_in? ? current_user.owner_workspace.client_request_invitations.count : 0
       @outgoing_invitations = owner_signed_in? ? current_user.owner_workspace.client_request_invitations.includes(:project_intake).order(created_at: :desc, id: :desc).limit(30) : ClientRequestInvitation.none
       @unread_intake_ids = owner_signed_in? ?
         OwnerIntakeInbox.unread_for(owner: current_user).where(id: @intakes.map(&:id)).pluck(:id) : []
