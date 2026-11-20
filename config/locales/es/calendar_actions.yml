@@ -1,0 +1,22 @@
+es:
+  calendar_actions:
+    create: "Crear"
+    new_entry: "CALENDARIO / CREAR"
+    consultation: "Consulta"
+    invitation: "Invitación al cliente"
+    request: "Nueva solicitud"
+    library: "Biblioteca"
+    with_ai: "Crear con IA"
+    close: "Cerrar"
+    create_on: "Crear evento para %{date}"
+    create_in_hour: "Crear evento a las %{time}"
+    network_error: "No se pudo guardar. Comprueba la conexión."
+    activity_eyebrow: "HISTORIAL / EVENTOS"
+    activity_heading: "Actividad y artefactos"
+    no_activity: "No se encontraron acciones en este período."
+    now: "Hora actual"
+    kinds:
+      invitation: "Invitación"
+      request: "Solicitud"
+      ai: "Generación de IA"
+      requirements: "Versión de requisitos"
