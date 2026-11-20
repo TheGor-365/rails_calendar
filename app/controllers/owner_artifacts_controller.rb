@@ -11,7 +11,7 @@ class OwnerArtifactsController < ApplicationController
     if @query.present?
       term = @query.downcase
       @artifacts = @artifacts.select do |item|
-        [item[:title], item[:summary], item[:kind], item[:source]].any? { |part| part.to_s.downcase.include?(term) }
+        [item[:title], item[:summary], item[:kind], item[:source], item[:preview]].any? { |part| part.to_s.downcase.include?(term) }
       end
     end
     @artifacts = @artifacts.sort_by { |item| [item[:created_at], item[:id]] }.reverse.first(100)
@@ -77,14 +77,16 @@ class OwnerArtifactsController < ApplicationController
     workspace.client_request_invitations.includes(:project_intake).order(id: :desc).limit(100).each do |item|
       records << { kind: "invitation", id: item.id, title: item.seed_title,
         summary: item.seed_goal, source: "owner invitation", status: item.state.to_s,
-        created_at: item.created_at, path: owner_invitation_path(item) }
+        created_at: item.created_at, path: owner_invitation_path(item), preview: item.seed_goal }
     end
     if (profile = workspace.professional_profile)
       profile.ai_spend_entries.order(id: :desc).limit(100).each do |entry|
         result = entry.result.is_a?(Hash) ? entry.result : {}
         records << { kind: "ai", id: entry.id, title: result["heading"].presence || entry.operation,
           summary: result["draft"].to_s.truncate(260), source: entry.model, status: entry.status,
-          created_at: entry.created_at, path: owner_ai_activity_path }
+          created_at: entry.created_at,
+          path: entry.operation == OwnerAi::Composer::VERSION && entry.status == "settled" ? owner_ai_assistant_path(entry_id: entry.id) : owner_ai_activity_path,
+          preview: JSON.pretty_generate(result) }
       end
     end
     IntakeRequirementSet.joins(:project_intake)
@@ -94,7 +96,8 @@ class OwnerArtifactsController < ApplicationController
         title: "#{set.project_intake.title} · v#{set.version}",
         summary: "#{set.requirements.size} requirements", source: "intake #{set.project_intake_id}",
         status: "revision", created_at: set.created_at,
-        path: owner_requirements_path(set.project_intake_id) }
+        path: owner_requirements_path(set.project_intake_id),
+        preview: JSON.pretty_generate(set.requirements) }
     end
     records
   end
