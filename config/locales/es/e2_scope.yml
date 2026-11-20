@@ -19,6 +19,12 @@ es:
       client: "Yo"
       owner: "El desarrollador"
       open: "Juntos"
+    owner_title: "Revisión técnica de la solicitud"
+    owner_hint: "Borrador de descubrimiento v%{version}. Las decisiones técnicas aún no están aprobadas."
+    section_reference: "SECCIÓN"
+    owner_client_says: "En palabras del cliente"
+    not_yet_answered: "Sin respuesta; consultar o proponer una solución."
+    owner_warning: "Los números de sección no son IDs de requisitos. Cada requisito futuro tendrá su propio R-ID y fuente."
     sections:
       business_goal:
         title: "Objetivo del proyecto"
