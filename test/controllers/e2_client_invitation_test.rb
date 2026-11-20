@@ -513,6 +513,27 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     end
     assert_equal 2, intake.latest_requirement_set.version
 
+    atomic = { base_version: current.version, edits: {
+      "0" => { statement: current.requirements.first.fetch("statement"),
+               status: "suggested",
+               acceptance_criteria: current.requirements.first.fetch("acceptance_criteria").join("\n") }
+    }, new_requirement: {
+      section: "business_goal",
+      statement: "The form notifies the visitor after submission.",
+      acceptance_criteria: "A visible success message appears."
+    } }
+    assert_difference("IntakeRequirementSet.count", 1) do
+      patch owner_requirements_path(intake), params: atomic
+      assert_redirected_to owner_requirements_path(intake)
+    end
+    expanded = intake.latest_requirement_set
+    assert_equal 3, expanded.version
+    assert_equal %w[R-001 R-002], expanded.requirements.pluck("id")
+    assert_equal "business_goal", expanded.requirements.last.dig("source", "section")
+    assert_equal ["A visible success message appears."],
+      expanded.requirements.last.fetch("acceptance_criteria")
+    assert_equal 1, current.reload.requirements.size
+
     sign_out
     login(@client)
     patch owner_requirements_path(intake), params: changes
