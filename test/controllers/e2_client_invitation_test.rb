@@ -323,6 +323,65 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_no_difference("IntakeMessage.count") { post submit_client_request_path(intake) }
   end
 
+  test "client discovery saves twelve editable sections as immutable versions without provider calls" do
+    login(@owner)
+    raw = issue_invitation
+    sign_out
+    post client_invitation_preview_path, params: { invite_token: raw }
+    login(@client)
+    post claim_client_invitation_path
+    intake = @client.client_project_intakes.last
+    assert intake
+
+    get edit_client_request_path(intake)
+    assert_response :success
+    assert_select ".wa-scope__section", count: 12
+    assert_select "textarea[name='scope[business_goal][text]']", count: 1
+    assert_select "select[name='scope[estimate][responsibility]']", count: 1
+
+    payload = {
+      project_intake: { title: intake.title, project_type: intake.project_type,
+                        goal: intake.goal },
+      fact_review: { title: "confirmed", project_type: "confirmed", goal: "unknown" },
+      scope: {
+        business_goal: { text: "A form sends a confirmation message.", status: "confirmed", responsibility: "client" },
+        data: { text: "", status: "unknown", responsibility: "owner" }
+      }
+    }
+    assert_no_difference("AiSpendEntry.count") do
+      assert_difference("IntakeScopeRevision.count", 1) do
+        patch client_request_path(intake), params: payload
+        assert_redirected_to edit_client_request_path(intake)
+      end
+    end
+    first = intake.latest_scope_revision
+    assert_equal 1, first.version
+    assert_equal "client", first.author_role
+    assert_equal "owner", first.answers.fetch("data").fetch("responsibility")
+    assert first.readonly?
+
+    assert_no_difference("IntakeScopeRevision.count") do
+      patch client_request_path(intake), params: payload
+      assert_redirected_to edit_client_request_path(intake)
+    end
+
+    payload[:scope][:business_goal][:text] = "The form confirms delivery and saves a record."
+    assert_difference("IntakeScopeRevision.count", 1) do
+      patch client_request_path(intake), params: payload
+      assert_redirected_to edit_client_request_path(intake)
+    end
+    assert_equal 2, intake.latest_scope_revision.version
+    assert_equal "A form sends a confirmation message.",
+      intake.intake_scope_revisions.find_by!(version: 1).answers.fetch("business_goal").fetch("text")
+
+    payload[:scope][:rogue_admin] = { text: "hidden", status: "confirmed", responsibility: "client" }
+    assert_no_difference("IntakeScopeRevision.count") do
+      patch client_request_path(intake), params: payload
+      assert_response :unprocessable_entity
+    end
+    assert_equal 2, intake.latest_scope_revision.version
+  end
+
   test "different client cannot claim, alter or view someone else's invitation draft" do
     login(@owner)
     raw = issue_invitation
