@@ -55,7 +55,7 @@ class OwnerRequirementsController < ApplicationController
 
   def load_intake!
     workspace = current_user.owner_workspace
-    @intake = workspace&.project_intakes&.find_by(id: params[:id])
+    @intake = ProjectIntake.where(workspace_id: workspace&.id).find_by(id: params[:id])
     head :not_found unless @intake
   end
 end
