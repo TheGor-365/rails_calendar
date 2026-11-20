@@ -94,6 +94,63 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_select ".wa-calendar-activity__item[href=?]", owner_invitation_path(invitation), count: 0
   end
 
+  test "activity journal automatically records an invitation once and isolates owners" do
+    login(@owner)
+    assert_difference "ActivityEvent.where(workspace_id: @workspace.id, kind: 'invitation_issued').count", 1 do
+      issue_invitation
+    end
+    invitation = @workspace.client_request_invitations.order(:id).last
+    event = @workspace.activity_events.find_by!(
+      subject_type: "ClientRequestInvitation", subject_id: invitation.id, kind: "invitation_issued"
+    )
+
+    assert_no_difference "ActivityEvent.count" do
+      2.times do
+        Activity::Recorder.record!(workspace: @workspace, subject: invitation,
+          kind: "invitation_issued", title: invitation.seed_title)
+      end
+    end
+
+    get owner_activity_events_path
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
+    assert_select "a[href=?]", export_owner_activity_event_path(event), minimum: 1
+
+    get export_owner_activity_event_path(event)
+    assert_response :success
+    assert_equal "text/plain", response.media_type
+    payload = JSON.parse(response.body)
+    assert_equal event.event_key, payload.fetch("key")
+    assert_equal invitation.id, payload.fetch("subject").fetch("id")
+    assert_no_match(/token_digest|seed_goal|secret_key_base/, response.body)
+
+    sign_out
+    login(@owner_b)
+    get owner_activity_events_path
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invitation), count: 0
+    get export_owner_activity_event_path(event)
+    assert_response :not_found
+  end
+
+  test "AI spend transitions are retained as separate immutable events" do
+    entry = AiSpendEntry.create!(
+      professional_profile: @workspace.professional_profile,
+      operation: OwnerAi::Composer::VERSION, model: "local-test-model",
+      request_digest: Digest::SHA256.hexdigest(SecureRandom.hex(16)),
+      status: "reserved", reserved_ticks: 0
+    )
+    assert_equal 1, @workspace.activity_events.where(subject_type: "AiSpendEntry",
+      subject_id: entry.id, kind: "ai_attempted").count
+    entry.update!(status: "settled", charged_ticks: 0, resolved_at: Time.current)
+    assert_equal 1, @workspace.activity_events.where(subject_type: "AiSpendEntry",
+      subject_id: entry.id, kind: "ai_settled").count
+
+    assert_raises(ActiveRecord::ReadOnlyError) do
+      @workspace.activity_events.where(subject_type: "AiSpendEntry", subject_id: entry.id).first.destroy!
+    end
+  end
+
   test "owner can locate sent invitations in workspace, inbox and cabinet without a guessed URL" do
     login(@owner)
     issue_invitation
