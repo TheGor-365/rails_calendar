@@ -153,6 +153,14 @@
         <h2><%= t("account_hub.work_overview") %></h2>
         <div class="ws-account-fact"><span><%= t("account_hub.intake_drafts") %></span><strong><%= @open_intakes %></strong></div>
         <div class="ws-account-fact"><span><%= t("account_hub.upcoming_consultations") %></span><strong><%= @upcoming_consultations %></strong></div>
+        <div class="ws-account-fact"><span><%= t("owner_activity.outgoing") %></span><strong><%= @outgoing_count %></strong></div>
+        <%= link_to rc_icon_label("send-check", t("owner_activity.all_outgoing")), owner_invitations_path(anchor: "invitation-history"), class: "rc-action rc-action--soft rc-action--small" %>
+        <% @recent_outgoing.each do |invitation| %>
+          <div class="ws-account-fact">
+            <%= link_to invitation.seed_title, owner_invitation_path(invitation), class: "rc-text-link" %>
+            <span><%= t("e2.state_#{invitation.state}") %></span>
+          </div>
+        <% end %>
         <%= link_to rc_icon_label("inboxes", t("account_hub.open_requests")), admin_project_intakes_path, class: "rc-action rc-action--quiet rc-action--small" %>
       </div>
     </aside>
