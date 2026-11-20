@@ -1,3 +1,5 @@
+require "set"
+
 # Private, read-only projection of persisted owner actions into calendar dates.
 # Existing authoritative records are NOT copied or mutated here. Durable event
 # outbox, notifications and cross-surface subscriptions are a separate phase.
