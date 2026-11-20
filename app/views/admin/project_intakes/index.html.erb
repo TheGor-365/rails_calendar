@@ -23,7 +23,7 @@
                   <p class="rc-muted mb-0"><%= t("e2.state_#{invitation.state}") %> · <%= l(invitation.created_at, format: :short) %></p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
-                  <%= link_to rc_icon_label("eye", t("e2_handoff.preview_title")), owner_invitation_path(invitation), class: "rc-action rc-action--quiet rc-action--small" %>
+                  <%= link_to rc_icon_label("eye", t("e2_handoff.owner_preview")), owner_invitation_path(invitation), class: "rc-action rc-action--quiet rc-action--small" %>
                   <% if invitation.project_intake_id.present? %>
                     <%= link_to rc_icon_label("journal-text", t("owner_activity.open_request")), project_intake_path(invitation.project_intake_id), class: "rc-action rc-action--soft rc-action--small" %>
                     <% if invitation.project_intake&.latest_scope_revision %>
