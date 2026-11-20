@@ -86,6 +86,19 @@
       </div>
     <% end %>
   </section>
+  <% if owner_signed_in? && @intake.latest_scope_revision %>
+    <section class="surface-panel wa-owner-intake__panel mb-4">
+      <div class="wa-owner-intake__section-heading">
+        <span class="wa-owner-intake__icon"><i class="bi bi-list-check" aria-hidden="true"></i></span>
+        <div>
+          <h2><%= t("e23_requirements.title") %></h2>
+          <p class="rc-hint mb-0"><%= t("e23_requirements.no_approval") %></p>
+        </div>
+      </div>
+      <%= link_to rc_icon_label("journal-code", t("e23_requirements.generate")),
+        owner_requirements_path(@intake), class: "rc-action rc-action--primary" %>
+    </section>
+  <% end %>
   <% if (scope_revision = @intake.latest_scope_revision) %>
     <section class="surface-panel wa-owner-intake__panel wa-scope-owner mb-4" id="intake-scope" aria-labelledby="intake-scope-heading">
       <div class="wa-owner-intake__section-heading">
