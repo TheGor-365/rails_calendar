@@ -92,7 +92,7 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
 
     login(@client)
     assert_redirected_to client_invitation_preview_path
-    post claim_client_invitation_path, params: { demo_consent: "1" }
+    post claim_client_invitation_path
     intake = @client.client_project_intakes.order(:id).last
     assert intake
     assert_equal "Please check when the fictional contact form fails.", intake.goal
@@ -228,9 +228,15 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
 
     login(@client)
     assert_redirected_to client_invitation_preview_path
+    get client_invitation_preview_path
+    assert_response :success
+    assert_select "form[action=?]", claim_client_invitation_path do
+      assert_select "input[name='demo_consent']", count: 0
+      assert_select "button[type='submit']", text: /Start my project request/
+    end
     assert_difference("ProjectIntake.count", 1) do
       assert_difference("IntakeServiceSelection.count", 1) do
-        post claim_client_invitation_path, params: { demo_consent: "1" }
+        post claim_client_invitation_path
       end
     end
     intake = @client.client_project_intakes.last
@@ -262,7 +268,7 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", edit_client_request_path(intake)
 
     assert_no_difference("ProjectIntake.count") do
-      post claim_client_invitation_path, params: { demo_consent: "1" }
+      post claim_client_invitation_path
       assert_redirected_to edit_client_request_path(intake)
     end
     assert_no_difference("IntakeMessage.count") do
@@ -323,7 +329,7 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     sign_out
     post client_invitation_preview_path, params: { invite_token: raw }
     login(@client)
-    post claim_client_invitation_path, params: { demo_consent: "1" }
+    post claim_client_invitation_path
     intake = @client.client_project_intakes.last
     sign_out
     login(@client_b)
@@ -333,7 +339,7 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     patch client_request_path(intake), params: { project_intake: { title: "Forgery" } }
     assert_response :not_found
-    post claim_client_invitation_path, params: { demo_consent: "1" }
+    post claim_client_invitation_path
     assert_response :conflict
     assert_equal @client.id, ClientRequestInvitation.last.claimed_by_user_id
     assert_equal 1, ClientRequestInvitation.last.project_intake.intake_service_selections.count
@@ -385,7 +391,7 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     sign_out
     post client_invitation_preview_path, params: { invite_token: token }
     login(@client)
-    post claim_client_invitation_path, params: { demo_consent: "1" }
+    post claim_client_invitation_path
     intake = @client.client_project_intakes.last
     assert_no_difference("IntakeBriefRevision.count") do
       patch client_request_path(intake), params: {
