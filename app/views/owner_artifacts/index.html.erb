@@ -67,13 +67,13 @@
           <div class="wa-library__date-field">
             <label for="wa-library-from" class="rc-field-label"><%= t("artifact_library.from") %></label>
             <input id="wa-library-from" type="date" name="from" class="form-control"
-                   value="<%= params[:from].to_s.match?(/\\A\\d{4}-\\d{2}-\\d{2}\\z/) ? params[:from] : "" %>"
+                   value="<%= params[:from].to_s %>"
                    data-wa-library-target="from" data-action="change->wa-library#apply">
           </div>
           <div class="wa-library__date-field">
             <label for="wa-library-to" class="rc-field-label"><%= t("artifact_library.to") %></label>
             <input id="wa-library-to" type="date" name="to" class="form-control"
-                   value="<%= params[:to].to_s.match?(/\\A\\d{4}-\\d{2}-\\d{2}\\z/) ? params[:to] : "" %>"
+                   value="<%= params[:to].to_s %>"
                    data-wa-library-target="to" data-action="change->wa-library#apply">
           </div>
           <button type="submit" class="rc-action rc-action--primary"><%= rc_icon_label("search", t("artifact_library.find")) %></button>
@@ -81,7 +81,7 @@
         </div>
       </form>
       <div class="wa-requests__section-heading mt-3">
-        <h2 id="wa-library-results-title"><%= t("artifact_library.results", count: "") .sub(": ", ":") %> <span data-wa-library-target="count"><%= @artifacts.length %></span></h2>
+        <h2 id="wa-library-results-title"><%= t("artifact_library.results", count: "") %> <span data-wa-library-target="count"><%= @artifacts.length %></span></h2>
         <p class="rc-hint mb-0"><i class="bi bi-lightning-charge" aria-hidden="true"></i> <%= t("artifact_library.live_hint") %></p>
       </div>
       <div class="wa-requests__records">
