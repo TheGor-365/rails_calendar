@@ -1,0 +1,101 @@
+# Private artifact catalogue, backed by existing persisted source records.
+# No duplicated documents, no speculative AI enrichment, no public files.
+class OwnerArtifactsController < ApplicationController
+  before_action :require_owner!
+
+  def index
+    @kind = %w[all invitation ai requirements].include?(params[:kind]) ? params[:kind] : "all"
+    @query = params[:q].to_s.strip.slice(0, 120)
+    @artifacts = collection
+    @artifacts = @artifacts.select { |item| item[:kind] == @kind } unless @kind == "all"
+    if @query.present?
+      term = @query.downcase
+      @artifacts = @artifacts.select do |item|
+        [item[:title], item[:summary], item[:kind], item[:source]].any? { |part| part.to_s.downcase.include?(term) }
+      end
+    end
+    @artifacts = @artifacts.sort_by { |item| [item[:created_at], item[:id]] }.reverse.first(100)
+    response.headers["Cache-Control"] = "private, no-store"
+  end
+
+  def export
+    kind = params[:kind].to_s
+    id = params[:id].to_s
+    return head :not_found unless id.match?(/\A[1-9]\d*\z/)
+
+    payload = case kind
+    when "invitation"
+      invitation = workspace.client_request_invitations.find_by(id: id)
+      return head :not_found unless invitation
+      { type: "invitation", id: invitation.id, created_at: invitation.created_at.iso8601,
+        title: invitation.seed_title, status: invitation.state.to_s, author: current_user.email,
+        source: "owner invitation", content: {
+          project_type: invitation.seed_project_type, goal: invitation.seed_goal,
+          approved_client_preview: invitation.approved_client_preview,
+          brief_selections: invitation.brief_selections, brief_decisions: invitation.brief_decisions,
+          brief_notes: invitation.brief_notes, linked_intake_id: invitation.project_intake_id,
+          ai_entry_id: invitation.owner_ai_entry_id } }
+    when "ai"
+      entry = workspace.professional_profile&.ai_spend_entries&.find_by(id: id)
+      return head :not_found unless entry
+      { type: "ai", id: entry.id, created_at: entry.created_at.iso8601,
+        title: entry.result.is_a?(Hash) ? entry.result["heading"].presence || entry.operation : entry.operation,
+        status: entry.status, author: current_user.email, source: entry.model,
+        operation: entry.operation, charged_usd: entry.charged_ticks && format("%.8f", entry.charged_ticks.to_f / AiSpendLedger::USD_TICKS),
+        content: entry.result }
+    when "requirements"
+      set = IntakeRequirementSet.joins(:project_intake)
+        .where(project_intakes: { workspace_id: workspace.id }).find_by(id: id)
+      return head :not_found unless set
+      { type: "requirements", id: set.id, created_at: set.created_at.iso8601,
+        title: set.project_intake.title, status: "draft_revision", author: current_user.email,
+        source: "client scope revision #{set.intake_scope_revision_id}",
+        version: set.version, project_intake_id: set.project_intake_id, content: set.requirements }
+    else
+      return head :not_found
+    end
+
+    response.headers["Cache-Control"] = "private, no-store"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    send_data JSON.pretty_generate(payload), type: "text/plain; charset=utf-8",
+      disposition: "attachment", filename: "rails-calendar-#{kind}-#{id}.txt"
+  end
+
+  private
+
+  def require_owner!
+    return if owner_signed_in? && current_user.owner_workspace
+    head :not_found
+  end
+
+  def workspace
+    current_user.owner_workspace
+  end
+
+  def collection
+    records = []
+    workspace.client_request_invitations.includes(:project_intake).order(id: :desc).limit(100).each do |item|
+      records << { kind: "invitation", id: item.id, title: item.seed_title,
+        summary: item.seed_goal, source: "owner invitation", status: item.state.to_s,
+        created_at: item.created_at, path: owner_invitation_path(item) }
+    end
+    if (profile = workspace.professional_profile)
+      profile.ai_spend_entries.order(id: :desc).limit(100).each do |entry|
+        result = entry.result.is_a?(Hash) ? entry.result : {}
+        records << { kind: "ai", id: entry.id, title: result["heading"].presence || entry.operation,
+          summary: result["draft"].to_s.truncate(260), source: entry.model, status: entry.status,
+          created_at: entry.created_at, path: owner_ai_activity_path }
+      end
+    end
+    IntakeRequirementSet.joins(:project_intake)
+      .where(project_intakes: { workspace_id: workspace.id })
+      .includes(:project_intake).order(id: :desc).limit(100).each do |set|
+      records << { kind: "requirements", id: set.id,
+        title: "#{set.project_intake.title} · v#{set.version}",
+        summary: "#{set.requirements.size} requirements", source: "intake #{set.project_intake_id}",
+        status: "revision", created_at: set.created_at,
+        path: owner_requirements_path(set.project_intake_id) }
+    end
+    records
+  end
+end
