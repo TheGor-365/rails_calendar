@@ -2,7 +2,7 @@ es:
   artifact_library:
     eyebrow: "ESPACIO DE TRABAJO / ARCHIVOS"
     title: "Biblioteca"
-    subtitle: "Invitaciones guardadas, resultados de IA y versiones de requisitos. Archivos generados a partir de registros originales."
+    subtitle: "Invitaciones, resultados de IA, requisitos, conversaciones y versiones de servicios con metadatos de origen."
     search: "Buscar"
     search_hint: "Título, contenido, modelo o fuente"
     category: "Categoría"
@@ -31,3 +31,5 @@ es:
       invitation: "Invitaciones"
       ai: "Resultados de IA"
       requirements: "Versiones de requisitos"
+      conversation: "Conversaciones de IA"
+      service: "Versiones de servicios"
