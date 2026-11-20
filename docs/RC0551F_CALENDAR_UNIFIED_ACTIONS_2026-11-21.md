@@ -24,3 +24,11 @@ The existing month and 24-hour day grid correctly store and position `Consultati
 - Review GitHub Actions on current HEAD; run `yarn build && yarn build:css` and isolated test DB tests `test/controllers/consultations_controller_test.rb`, `test/controllers/pages_controller_test.rb`, `test/controllers/e2_client_invitation_test.rb`.
 - Ensure terminal is `~/rails_calendar_ai_c21c`, `RAILS_ENV=test` for test, `RC_GROK_ENABLED=false`, no generic `DATABASE_URL`, and psql says `rails_calendar_rc0551f_e2_test_20261119` on UNIX socket. Do NOT run migrations without an explicit DB check.
 - Browser validate month/day/selected hour, cell popovers, inline create, event display, private cross-owner isolation, mobile responsiveness, and visual alignment with White Atlas.
+
+
+## Follow-up improvements in the same slice
+- A plus control inside each month date or 24-hour slot now opens a **contextual icon menu**, not the appointment form directly; consultation selection launches the inline dialog. The header has the same action destinations.
+- The mobile calendar agenda includes days that contain owner activity even without consultations, with a combined event count and source links.
+- AI attempts are listed regardless of settlement, including reserved/uncertain/cancelled, using their actual recorded states.
+- Activity status labels have locale translations and a safe fallback to the stored status.
+- Header creation defaults to the current hour for the currently displayed day/month rather than always a past midnight/first-of-month slot.
