@@ -106,9 +106,9 @@
                 <div><span><%= t("artifact_library.status") %></span><strong><%= item[:status] %></strong></div>
               </div>
               <p class="wa-requests__description"><%= item[:summary] %></p>
-              <details class="surface-panel p-2 p-sm-3 mb-3">
-                <summary class="fw-semibold"><i class="bi bi-file-earmark-text" aria-hidden="true"></i> <%= t("artifact_library.preview") %></summary>
-                <div class="mt-3" data-controller="wa-copy">
+              <details class="surface-panel p-2 p-sm-3 mb-3 wa-library__nested" data-controller="wa-accordion">
+                <summary class="fw-semibold" data-action="click->wa-accordion#toggle"><i class="bi bi-file-earmark-text" aria-hidden="true"></i> <%= t("artifact_library.preview") %></summary>
+                <div class="mt-3" data-controller="wa-copy" data-wa-accordion-target="content">
                   <%= text_area_tag nil, item[:preview], readonly: true, rows: 8,
                         class: "form-control font-monospace mb-2", data: { wa_copy_target: "input" } %>
                   <button type="button" class="rc-action rc-action--soft rc-action--small" data-action="click->wa-copy#copy"><%= rc_icon_label("clipboard", t("artifact_library.copy")) %></button>
