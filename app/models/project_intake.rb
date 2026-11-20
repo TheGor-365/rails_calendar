@@ -9,6 +9,11 @@ class ProjectIntake < ApplicationRecord
   has_many :intake_service_selections, dependent: :restrict_with_exception
   has_many :intake_brief_revisions, dependent: :restrict_with_exception
   has_many :intake_scope_revisions, dependent: :restrict_with_exception
+  has_many :intake_requirement_sets, dependent: :restrict_with_exception
+
+  def latest_requirement_set
+    intake_requirement_sets.order(version: :desc).first
+  end
 
   def latest_scope_revision
     intake_scope_revisions.order(version: :desc).first
