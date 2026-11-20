@@ -69,3 +69,7 @@ application.register("wa-invitation-issue", WaInvitationIssueController)
 // Persistent, accessible incoming/outgoing requests switch.
 import WaRequestsController from "./wa_requests_controller"
 application.register("wa-requests", WaRequestsController)
+
+// Owner library: client-side live filters of authorized and rendered records.
+import WaLibraryController from "./wa_library_controller"
+application.register("wa-library", WaLibraryController)
