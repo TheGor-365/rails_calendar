@@ -7,3 +7,5 @@ en:
     none_outgoing: "No invitations have been sent."
     view_ai_result: "View AI result"
     open_invitation: "Open invitation"
+    project_activity: "Project activity"
+    none_in_period: "No outgoing invitations in this period."
