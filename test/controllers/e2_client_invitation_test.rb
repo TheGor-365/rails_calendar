@@ -30,8 +30,7 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
       title: "Client proposal discovery", scope: "owner_general", state: "active"
     )
     conversation.owner_ai_messages.create!(
-      role: "owner", state: "draft", sequence: 1, body: "Discuss API reliability and delivery",
-      operation: "note"
+      role: "owner", state: "draft", sequence: 1, body: "Discuss API reliability and delivery"
     )
     version = @offering.latest_version
 
