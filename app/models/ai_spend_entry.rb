@@ -22,6 +22,13 @@ class AiSpendEntry < ApplicationRecord
     Activity::Recorder.record!(workspace: activity_workspace, subject: self,
       kind: "ai_attempted", title: operation, metadata: { "operation" => operation, "status" => status },
       occurred_at: created_at)
+    # Existing providers sometimes create a fully settled ledger row in a single
+    # insert rather than transitioning through reserved. Capture that too.
+    kind = { "settled" => "ai_settled", "uncertain" => "ai_uncertain",
+             "cancelled" => "ai_cancelled" }[status]
+    Activity::Recorder.record!(workspace: activity_workspace, subject: self,
+      kind: kind, title: operation, metadata: { "operation" => operation, "status" => status },
+      occurred_at: resolved_at || created_at) if kind
   end
 
   def record_ai_resolution
