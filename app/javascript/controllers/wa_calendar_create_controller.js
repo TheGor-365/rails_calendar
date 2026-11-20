@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { Turbo } from "@hotwired/turbo-rails"
 
 // Owner-only, inline creation for a dated calendar slot; posts to existing guarded
 // consultations endpoint and keeps the user on the same calendar view.
@@ -18,6 +19,10 @@ export default class extends Controller {
   close(event) {
     event?.preventDefault()
     this.dialogTarget.close()
+  }
+
+  outside(event) {
+    if (event.target === this.dialogTarget) this.close()
   }
 
   setStart(value) {
@@ -55,7 +60,6 @@ export default class extends Controller {
         return
       }
       this.close()
-      const { Turbo } = await import("@hotwired/turbo-rails")
       Turbo.visit(window.location.href, { action: "replace" })
     } catch (_) {
       this.errorTarget.textContent = this.element.dataset.networkError || "Unable to save"
