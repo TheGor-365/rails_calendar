@@ -16,6 +16,18 @@ export default class extends Controller {
     this.activate(event.currentTarget.dataset.view)
   }
 
+  keyboard(event) {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return
+    event.preventDefault()
+    const tabs = this.tabTargets
+    const index = tabs.indexOf(event.currentTarget)
+    const next = event.key === "Home" ? 0 :
+      event.key === "End" ? tabs.length - 1 :
+      (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length
+    this.activate(tabs[next].dataset.view)
+    tabs[next].focus()
+  }
+
   activate(view) {
     const chosen = this.panelTargets.some(panel => panel.dataset.view === view) ? view : "incoming"
     this.tabTargets.forEach(tab => {
