@@ -4,6 +4,7 @@ class Workspace < ApplicationRecord
   has_many :service_offerings, dependent: :restrict_with_exception
   has_many :client_request_invitations, dependent: :restrict_with_exception
   has_many :owner_ai_conversations, dependent: :restrict_with_exception
+  has_many :activity_events, dependent: :restrict_with_exception
 
   validates :name, presence: true, length: { maximum: 120 }
   validates :owner_user_id, uniqueness: true
