@@ -21,7 +21,7 @@
         <h2><i class="bi bi-funnel" aria-hidden="true"></i> <%= t("artifact_library.filters") %></h2>
         <p class="wa-library__side-caption"><%= t("artifact_library.category") %></p>
         <div class="wa-library__category-list">
-          <% { "all" => ["collection", @artifacts.size], "invitation" => ["send-check", @kind_counts["invitation"].to_i], "ai" => ["stars", @kind_counts["ai"].to_i], "requirements" => ["list-check", @kind_counts["requirements"].to_i] }.each do |kind, (icon, count)| %>
+          <% { "all" => ["collection", @artifacts.size], "invitation" => ["send-check", @kind_counts["invitation"].to_i], "ai" => ["stars", @kind_counts["ai"].to_i], "requirements" => ["list-check", @kind_counts["requirements"].to_i], "conversation" => ["chat-dots", @kind_counts["conversation"].to_i], "service" => ["boxes", @kind_counts["service"].to_i] }.each do |kind, (icon, count)| %>
             <button class="wa-library__category" type="button" data-wa-library-target="chip" data-action="click->wa-library#setKind"
                     data-kind="<%= kind %>" aria-pressed="<%= @kind == kind %>">
               <i class="bi bi-<%= icon %>" aria-hidden="true"></i>
@@ -60,7 +60,7 @@
           <div class="wa-library__select-wrap">
             <label for="wa-library-kind" class="rc-field-label"><i class="bi bi-tags" aria-hidden="true"></i> <%= t("artifact_library.category") %></label>
             <select id="wa-library-kind" name="kind" class="form-select" data-wa-library-target="kind" data-action="change->wa-library#apply">
-              <% %w[all invitation ai requirements].each do |kind| %>
+              <% %w[all invitation ai requirements conversation service].each do |kind| %>
                 <option value="<%= kind %>" <%= 'selected' if @kind == kind %>><%= t("artifact_library.kinds.#{kind}") %></option>
               <% end %>
             </select>
@@ -93,7 +93,7 @@
                    data-search="<%= [item[:title], item[:summary], item[:kind], item[:source], item[:preview]].join(" ").truncate(12000) %>"
                    data-controller="wa-accordion">
             <summary data-action="click->wa-accordion#toggle">
-              <span class="wa-requests__record-icon"><i class="bi bi-<%= { "invitation" => "send-check", "ai" => "stars", "requirements" => "list-check" }.fetch(item[:kind]) %>" aria-hidden="true"></i></span>
+              <span class="wa-requests__record-icon"><i class="bi bi-<%= { "invitation" => "send-check", "ai" => "stars", "requirements" => "list-check", "conversation" => "chat-dots", "service" => "boxes" }.fetch(item[:kind]) %>" aria-hidden="true"></i></span>
               <span class="wa-requests__record-main">
                 <strong><%= item[:title] %></strong>
                 <small><%= t("artifact_library.kinds.#{item[:kind]}") %> · <%= l(item[:created_at], format: :short) %> · <%= item[:status] %></small>
