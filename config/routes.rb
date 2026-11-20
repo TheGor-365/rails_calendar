@@ -45,6 +45,10 @@ Rails.application.routes.draw do
   post "/workspace/intakes/:id/requirements", to: "owner_requirements#create"
   patch "/workspace/intakes/:id/requirements", to: "owner_requirements#update"
 
+  # Canonical owner workspace activity; metadata exports contain no private drafts.
+  get "/workspace/activity", to: "owner_activity_events#index", as: :owner_activity_events
+  get "/workspace/activity/:id.txt", to: "owner_activity_events#export", as: :export_owner_activity_event
+
   # Owner artifact library. Downloads are generated from persisted source records.
   get "/workspace/library", to: "owner_artifacts#index", as: :owner_artifacts
   get "/workspace/library/:kind/:id.txt", to: "owner_artifacts#export", as: :export_owner_artifact
