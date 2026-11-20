@@ -45,6 +45,11 @@ Rails.application.routes.draw do
   post "/workspace/intakes/:id/requirements", to: "owner_requirements#create"
   patch "/workspace/intakes/:id/requirements", to: "owner_requirements#update"
 
+  # Owner-only notification inbox; viewing GET never changes read state.
+  get "/workspace/notifications", to: "owner_notifications#index", as: :owner_notifications
+  post "/workspace/notifications/read_all", to: "owner_notifications#read_all", as: :read_all_owner_notifications
+  post "/workspace/notifications/:id/read", to: "owner_notifications#read", as: :read_owner_notification
+
   # Canonical owner workspace activity; metadata exports contain no private drafts.
   get "/workspace/activity", to: "owner_activity_events#index", as: :owner_activity_events
   get "/workspace/activity/:id.txt", to: "owner_activity_events#export", as: :export_owner_activity_event
