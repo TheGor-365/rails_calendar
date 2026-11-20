@@ -145,6 +145,8 @@ class OwnerSetupController < ApplicationController
     @version_count = @profile.professional_context_snapshots.count
     @open_intakes = ProjectIntake.where(status: %w[interviewing draft_spec]).count
     @upcoming_consultations = Consultation.where("start_time >= ?", Time.current).count
+    @outgoing_count = @workspace.client_request_invitations.count
+    @recent_outgoing = @workspace.client_request_invitations.order(created_at: :desc, id: :desc).limit(5)
   end
 
   def ai_activity
