@@ -38,7 +38,12 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
 
     get admin_project_intakes_path
     assert_response :success
-    assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
+    assert_select "h1", text: "Requests"
+    assert_select "[data-controller='wa-requests']", count: 1
+    assert_select "button[role='tab'][data-view='incoming'][aria-selected='true']", count: 1
+    assert_select "button[role='tab'][data-view='outgoing'][aria-selected='false']", count: 1
+    assert_select "#wa-requests-outgoing[hidden] details", minimum: 1
+    assert_select "#wa-requests-outgoing a[href=?]", owner_invitation_path(invitation), minimum: 1
 
     get owner_cabinet_path
     assert_response :success
