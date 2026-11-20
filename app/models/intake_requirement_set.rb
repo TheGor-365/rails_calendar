@@ -34,6 +34,7 @@ class IntakeRequirementSet < ApplicationRecord
       row["statement"].is_a?(String) && row["statement"].length.between?(1, 1600) &&
       %w[suggested unknown excluded].include?(row["status"]) &&
       row["acceptance_criteria"].is_a?(Array) &&
+      row["acceptance_criteria"].length <= 8 &&
       row["acceptance_criteria"].all? { |v| v.is_a?(String) && v.length.between?(1, 500) }
   end
 end
