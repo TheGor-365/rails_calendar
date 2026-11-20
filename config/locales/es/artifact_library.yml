@@ -15,6 +15,8 @@ es:
     open: "Abrir"
     export: "Descargar TXT"
     empty: "No se encontraron registros."
+    preview: "Contenido del archivo"
+    copy: "Copiar contenido"
     kinds:
       all: "Todos"
       invitation: "Invitaciones"
