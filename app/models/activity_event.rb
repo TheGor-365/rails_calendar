@@ -2,6 +2,7 @@
 # Do not store invitation tokens, private client answers, prompts or credentials.
 class ActivityEvent < ApplicationRecord
   belongs_to :workspace
+  has_many :activity_event_reads, dependent: :restrict_with_exception
 
   KINDS = %w[invitation_issued invitation_claimed invitation_submitted invitation_revoked
              intake_created requirements_saved ai_attempted ai_settled ai_uncertain
