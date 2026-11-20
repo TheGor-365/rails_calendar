@@ -129,13 +129,18 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
 
     get root_path(start_date: day.iso8601)
     assert_response :success
+    assert_select "details.wa-calendar-activity[data-controller='wa-accordion']", count: 1
     assert_select ".wa-calendar-activity__item[href=?]", owner_invitation_path(invitation), minimum: 1
     assert_select "button[data-action='click->wa-calendar-create#open']", minimum: 1
     assert_select "form[data-action='submit->wa-calendar-create#save']", minimum: 1
 
     get calendar_day_path(date: day.iso8601)
     assert_response :success
+    assert_select "details.wa-calendar-activity[data-controller='wa-accordion']", count: 1
     assert_select ".wa-calendar-activity__item[href=?]", owner_invitation_path(invitation), minimum: 1
+    assert_select "details.wa-calendar-hour-activity[data-controller='wa-accordion']", minimum: 1
+    assert_select ".wa-calendar-hour-activity__entry[href=?]", owner_invitation_path(invitation), minimum: 1
+    assert_select ".wa-calendar-hour-activity[style*='top: #{invitation.created_at.in_time_zone.hour * Calendar::DayEventLayout::HOUR_HEIGHT_PX + 3}px']", minimum: 1
 
     sign_out
     login(@owner_b)
