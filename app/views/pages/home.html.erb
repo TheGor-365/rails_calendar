@@ -30,39 +30,16 @@
     </article>
   </section>
 
-  <% if owner_signed_in? %>
-    <section class="surface-panel p-3 p-sm-4 mb-3" aria-labelledby="calendar-project-activity">
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h2 class="h5 mb-0" id="calendar-project-activity"><i class="bi bi-send-check" aria-hidden="true"></i> <%= t("owner_activity.project_activity") %> (<%= @month_invitations.size %>)</h2>
-        <%= link_to rc_icon_label("arrow-up-right", t("owner_activity.all_outgoing")), owner_invitations_path(anchor: "invitation-history"), class: "rc-action rc-action--quiet rc-action--small" %>
-      </div>
-      <% if @month_invitations.any? %>
-        <div class="d-flex flex-column gap-2">
-          <% @month_invitations.first(10).each do |invitation| %>
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-              <%= link_to rc_icon_label("envelope-paper", invitation.seed_title), owner_invitation_path(invitation), class: "rc-text-link" %>
-              <span class="rc-hint"><%= l(invitation.created_at, format: :short) %> · <%= t("e2.state_#{invitation.state}") %></span>
-            </div>
-          <% end %>
-          <% if @month_invitations.size > 10 %>
-            <%= link_to t("owner_activity.all_outgoing"), owner_invitations_path(anchor: "invitation-history"), class: "rc-text-link" %>
-          <% end %>
-        </div>
-      <% else %>
-        <p class="rc-muted mb-0"><%= t("owner_activity.none_in_period") %></p>
-      <% end %>
-    </section>
-  <% end %>
-
   <%= month_calendar(events: @consultations) do |date, _calendar_events| %>
     <% day_events = @consultations_by_day.fetch(date, []) %>
+    <% day_actions = @month_activity_by_day.fetch(date, []) %>
     <div class="calendar-date-heading wa-calendar-date <%= date < Time.zone.today ? 'wa-calendar-date--past' : date > Time.zone.today ? 'wa-calendar-date--future' : 'wa-calendar-date--today' %>">
       <%= link_to calendar_day_path(date: date.iso8601), class: "calendar-day-link",
                   aria: { label: t("calendar.view_date", date: rc_local_date(date, format: :rc_day_aria)) } do %>
         <time class="calendar-day-label" datetime="<%= date.iso8601 %>"><%= date.day %></time>
       <% end %>
-      <span class="calendar-day-count" data-empty="<%= day_events.empty? %>" aria-label="<%= rc_count(day_events.length, "calendar", "event") %>">
-        <%= day_events.length %>
+      <span class="calendar-day-count" data-empty="<%= day_events.empty? && day_actions.empty? %>" aria-label="<%= rc_count(day_events.length + day_actions.length, "calendar", "event") %>">
+        <%= day_events.length + day_actions.length %>
       </span>
       <% if admin_signed_in? %>
         <button type="button" class="wa-calendar-cell-add"
@@ -85,6 +62,18 @@
           </span>
         <% end %>
       </article>
+    <% end %>
+    <% if owner_signed_in? && day_events.length < 2 %>
+      <% day_actions.first(2 - day_events.length).each do |activity| %>
+        <article class="calendar-event">
+          <%= link_to activity[:path], class: "calendar-event-link wa-calendar-activity-link" do %>
+            <span class="calendar-event-content">
+              <span class="calendar-event-name"><i class="bi bi-<%= activity[:icon] %>" aria-hidden="true"></i> <%= truncate(activity[:title], length: 25) %></span>
+              <span class="calendar-event-time"><%= l(activity[:created_at], format: :short) %></span>
+            </span>
+          <% end %>
+        </article>
+      <% end %>
     <% end %>
     <% if day_events.length > 2 %>
       <%= link_to rc_icon_label("three-dots", t("calendar.more_count", count: day_events.length - 2)), calendar_day_path(date: date.iso8601),
@@ -135,5 +124,6 @@
       <p class="rc-notice rc-notice--neutral" role="status"><%= t("calendar.empty_month") %></p>
     <% end %>
   </section>
+  <%= render "activity_list", activities: @month_activity %>
   <%= render "creation_dialog" %>
 </div>
