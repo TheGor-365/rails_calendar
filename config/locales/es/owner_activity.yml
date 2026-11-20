@@ -1,0 +1,7 @@
+es:
+  owner_activity:
+    outgoing: "Invitaciones enviadas"
+    all_outgoing: "Todas las invitaciones"
+    open_request: "Abrir solicitud"
+    requirements: "Requisitos y alcance"
+    none_outgoing: "Todavía no hay invitaciones enviadas."
