@@ -1,0 +1,22 @@
+en:
+  artifact_library:
+    eyebrow: "WORKSPACE / ARTIFACTS"
+    title: "Library"
+    subtitle: "Saved invitations, AI outputs and requirement versions. Download files directly from the original records with metadata."
+    search: "Search"
+    search_hint: "Title, content, model or source"
+    category: "Category"
+    find: "Find"
+    reset: "Reset"
+    results: "Results: %{count}"
+    source: "Source"
+    date: "Date"
+    status: "Status"
+    open: "Open"
+    export: "Download TXT"
+    empty: "No matching records."
+    kinds:
+      all: "All"
+      invitation: "Invitations"
+      ai: "AI results"
+      requirements: "Requirement versions"
