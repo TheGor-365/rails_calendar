@@ -69,6 +69,33 @@ class OwnerRequirementsController < ApplicationController
         row.merge("statement" => statement, "status" => status, "acceptance_criteria" => criteria)
       end
       next :invalid if rows.any?(&:nil?)
+      additional = params[:new_requirement]
+      if additional.present?
+        next :invalid unless additional.is_a?(ActionController::Parameters)
+        proposed = additional.to_unsafe_h
+        next :invalid unless proposed.keys.sort == %w[acceptance_criteria section statement]
+        text = proposed["statement"].to_s.strip
+        if text.present?
+          section = proposed["section"].to_s
+          criteria = proposed["acceptance_criteria"].to_s.lines.map(&:strip).reject(&:empty?)
+          allowed_sections = current.requirements.map { |row| row.dig("source", "section") }
+          next :invalid if rows.length >= 96 || !allowed_sections.include?(section) ||
+            text.length > 1600 || criteria.length > 8 ||
+            criteria.any? { |value| value.length > 500 }
+          next_id = current.requirements.filter_map { |row| row["id"].split("-").last.to_i }.max.to_i + 1
+          rows << {
+            "id" => format("R-%03d", next_id),
+            "source" => {
+              "type" => "intake_scope_revision",
+              "revision_id" => current.intake_scope_revision_id,
+              "section" => section
+            },
+            "statement" => text,
+            "status" => "suggested",
+            "acceptance_criteria" => criteria
+          }
+        end
+      end
       next :unchanged if rows == current.requirements
 
       @intake.intake_requirement_sets.create!(
