@@ -41,6 +41,19 @@ class ClientRequestsController < ApplicationController
       return render :edit, status: :unprocessable_entity
     end
 
+    # Only the twelve supported discovery sections may enter a versioned snapshot.
+    # No AI or external provider is invoked by saving a draft.
+    raw_scope = params[:scope]
+    scope_answers = nil
+    if raw_scope.present?
+      scope_hash = raw_scope.respond_to?(:to_unsafe_h) ? raw_scope.to_unsafe_h : raw_scope
+      scope_answers = IntakeScopeSections.normalize(scope_hash)
+      unless scope_answers
+        @intake.errors.add(:base, I18n.t("e2_scope.invalid"))
+        return render :edit, status: :unprocessable_entity
+      end
+    end
+
     saved = @invitation.with_lock do
       next false if @invitation.reload.submitted_at.present?
       @intake.assign_attributes(request_params)
@@ -54,6 +67,16 @@ class ClientRequestsController < ApplicationController
           author_role: "client", selections: selections,
           decisions: brief_decisions, notes: brief_notes.presence
         )
+      end
+      if scope_answers
+        previous_scope = @intake.intake_scope_revisions.order(version: :desc).first
+        if !previous_scope || previous_scope.answers != scope_answers
+          @intake.intake_scope_revisions.create!(
+            version: (previous_scope&.version || 0) + 1,
+            author_role: "client",
+            answers: scope_answers
+          )
+        end
       end
       true
     end
