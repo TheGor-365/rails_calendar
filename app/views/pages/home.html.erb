@@ -1,4 +1,4 @@
-<div class="container my-4 my-sm-5">
+<div class="container my-4 my-sm-5 wa-calendar" data-controller="wa-calendar-create" data-wa-calendar-create-url-value="<%= consultations_path %>" data-network-error="<%= t("calendar_actions.network_error") %>">
   <header class="rc-page-hero mb-4">
     <div>
       <p class="eyebrow mb-2"><%= t("calendar.overview_eyebrow") %></p>
@@ -10,7 +10,7 @@
                   class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("list-ul", t("calendar.events_by_date")), "#month-events", class: "rc-action rc-action--quiet calendar-mobile-agenda-trigger" %>
       <% if admin_signed_in? %>
-        <%= link_to rc_icon_label("plus-lg", t("calendar.new_consultation")), new_consultation_path, class: "rc-action rc-action--primary" %>
+        <%= render "creation_menu", start_at: Time.zone.local(@displayed_month.year, @displayed_month.month, 1, 10) %>
       <% end %>
     </div>
   </header>
@@ -56,7 +56,7 @@
 
   <%= month_calendar(events: @consultations) do |date, _calendar_events| %>
     <% day_events = @consultations_by_day.fetch(date, []) %>
-    <div class="calendar-date-heading">
+    <div class="calendar-date-heading wa-calendar-date <%= date < Time.zone.today ? 'wa-calendar-date--past' : date > Time.zone.today ? 'wa-calendar-date--future' : 'wa-calendar-date--today' %>">
       <%= link_to calendar_day_path(date: date.iso8601), class: "calendar-day-link",
                   aria: { label: t("calendar.view_date", date: rc_local_date(date, format: :rc_day_aria)) } do %>
         <time class="calendar-day-label" datetime="<%= date.iso8601 %>"><%= date.day %></time>
@@ -64,6 +64,14 @@
       <span class="calendar-day-count" data-empty="<%= day_events.empty? %>" aria-label="<%= rc_count(day_events.length, "calendar", "event") %>">
         <%= day_events.length %>
       </span>
+      <% if admin_signed_in? %>
+        <button type="button" class="wa-calendar-cell-add"
+                aria-label="<%= t("calendar_actions.create_on", date: date.iso8601) %>"
+                data-action="click->wa-calendar-create#open"
+                data-start-at="<%= Time.zone.local(date.year, date.month, date.day, 10).iso8601 %>">
+          <i class="bi bi-plus-lg" aria-hidden="true"></i>
+        </button>
+      <% end %>
     </div>
 
     <% day_events.first(2).each do |consultation| %>
@@ -127,4 +135,5 @@
       <p class="rc-notice rc-notice--neutral" role="status"><%= t("calendar.empty_month") %></p>
     <% end %>
   </section>
+  <%= render "creation_dialog" %>
 </div>
