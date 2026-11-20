@@ -49,6 +49,18 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
 
+    get owner_artifacts_path
+    assert_response :success
+    assert_select "a[href=?]", export_owner_artifact_path(kind: "invitation", id: invitation.id), minimum: 1
+    get export_owner_artifact_path(kind: "invitation", id: invitation.id)
+    assert_response :success
+    assert_match(/text\\/plain/, response.media_type)
+    archive = JSON.parse(response.body)
+    assert_equal invitation.seed_title, archive.fetch("title")
+    assert_equal "invitation", archive.fetch("type")
+    refute archive.key?("token_digest")
+
+
     get root_path(start_date: invitation.created_at.in_time_zone.to_date.iso8601)
     assert_response :success
     assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
@@ -62,6 +74,11 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     get workspace_path
     assert_response :success
     assert_select "a[href=?]", owner_invitation_path(invitation), count: 0
+    get owner_artifacts_path
+    assert_response :success
+    assert_select "a[href=?]", export_owner_artifact_path(kind: "invitation", id: invitation.id), count: 0
+    get export_owner_artifact_path(kind: "invitation", id: invitation.id)
+    assert_response :not_found
     get calendar_day_path(date: invitation.created_at.in_time_zone.to_date.iso8601)
     assert_response :success
     assert_select "a[href=?]", owner_invitation_path(invitation), count: 0
