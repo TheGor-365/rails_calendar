@@ -25,6 +25,7 @@
         </li>
       <% end %>
     </ol>
+    <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--soft" %>
     <%= link_to t("owner_setup.my_practice"), owner_practice_path, class: "rc-action rc-action--quiet" %>
     <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path(kind: "ai"), class: "rc-action rc-action--primary" %>
   </div>
