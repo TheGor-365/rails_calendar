@@ -11,6 +11,9 @@ class WorkspaceController < ApplicationController
     @review_count = owned.where(status: "draft_spec").count
     @recent_intakes = owned.order(created_at: :desc, id: :desc).limit(5)
     @practice_profile = current_user.owner_workspace&.professional_profile
+    @outgoing_invitations = current_user.owner_workspace.client_request_invitations
+      .includes(:project_intake).order(created_at: :desc, id: :desc).limit(8)
+    @outgoing_count = current_user.owner_workspace.client_request_invitations.count
   end
 
   private
