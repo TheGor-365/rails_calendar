@@ -19,6 +19,12 @@ hy:
       client: "Ես"
       owner: "Մշակողը"
       open: "Միասին"
+    owner_title: "Հաճախորդի պահանջի տեխնիկական դիտարկում"
+    owner_hint: "Տվյալների նախնական տարբերակ v%{version}։ Լուծումները դեռ հաստատված չեն։"
+    section_reference: "ԲԱԺԻՆ"
+    owner_client_says: "Հաճախորդի խոսքերով"
+    not_yet_answered: "Դեռ պատասխան չկա։"
+    owner_warning: "Բաժինների համարները պահանջների նույնացուցիչներ չեն։"
     sections:
       business_goal:
         title: "Նպատակ և համատեքստ"
