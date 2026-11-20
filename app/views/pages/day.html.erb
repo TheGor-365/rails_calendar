@@ -1,4 +1,4 @@
-<div class="container my-4 my-sm-5">
+<div class="container my-4 my-sm-5 wa-calendar" data-controller="wa-calendar-create" data-wa-calendar-create-url-value="<%= consultations_path %>" data-network-error="<%= t("calendar_actions.network_error") %>">
   <header class="rc-page-hero mb-4">
     <div>
       <p class="eyebrow mb-2"><%= t("calendar.day_eyebrow", day_number: @selected_date.strftime("%j")) %></p>
@@ -13,8 +13,7 @@
     </div>
     <div class="d-flex flex-wrap gap-2">
       <% if admin_signed_in? %>
-        <%= link_to rc_icon_label("plus-lg", t("calendar.new_consultation")), new_consultation_path(start_at: @hour_slots.first[:start_time].iso8601),
-                    class: "rc-action rc-action--primary" %>
+        <%= render "creation_menu", start_at: @hour_slots.first[:start_time] %>
       <% end %>
       <%= link_to rc_icon_label("calendar3", t("calendar.month")), root_path(start_date: @selected_date.iso8601),
                   class: "rc-action rc-action--quiet" %>
@@ -66,11 +65,18 @@
     <div class="rc-day-grid">
       <div class="rc-time-axis" aria-label="<%= t("calendar.hour_axis_aria") %>">
         <% @hour_slots.each do |slot| %>
-          <div class="rc-time-axis-hour" id="hour-<%= format('%02d', slot[:hour]) %>">
+          <div class="rc-time-axis-hour <%= 'wa-calendar-hour--past' if slot[:end_time] <= Time.current %>" id="hour-<%= format('%02d', slot[:hour]) %>">
             <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
                         class: "rc-time-axis-link",
                         aria: { label: t("calendar.inspect_interval", range: "#{slot[:start_time].strftime('%H:%M')}–#{slot[:end_time].strftime('%H:%M')}") } do %>
               <time datetime="<%= slot[:start_time].iso8601 %>"><%= slot[:start_time].strftime("%H:%M") %></time>
+            <% end %>
+            <% if admin_signed_in? %>
+              <button type="button" class="wa-calendar-hour-add"
+                      aria-label="<%= t("calendar_actions.create_in_hour", time: slot[:start_time].strftime('%H:%M')) %>"
+                      data-action="click->wa-calendar-create#open" data-start-at="<%= slot[:start_time].iso8601 %>">
+                <i class="bi bi-plus" aria-hidden="true"></i>
+              </button>
             <% end %>
             <% if slot[:count].positive? %>
               <span class="rc-time-axis-count" aria-label="<%= rc_count(slot[:count], "calendar", "event") %>"><%= slot[:count] %></span>
@@ -87,7 +93,7 @@
               <% from_label = slot[:start_time].strftime("%H:%M") %>
               <% to_label = slot[:end_time].strftime("%H:%M") %>
               <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
-                          class: "rc-hour-band #{'rc-hour-band--busy' if slot[:count].positive?}",
+                          class: "rc-hour-band #{'rc-hour-band--busy' if slot[:count].positive?} #{'wa-calendar-hour--past' if slot[:end_time] <= Time.current}",
                           role: "listitem",
                           aria: { label: t("calendar.inspect_interval_count", range: "#{from_label}–#{to_label}", events: rc_count(slot[:count], "calendar", "event")) },
                           title: t("calendar.inspect_interval", range: "#{from_label}–#{to_label}") do %>
@@ -140,4 +146,5 @@
   <p class="rc-hint mt-3">
     <%= t("calendar.day_help", zone: Time.zone.name) %>
   </p>
+  <%= render "creation_dialog" %>
 </div>
