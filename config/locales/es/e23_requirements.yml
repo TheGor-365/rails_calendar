@@ -27,3 +27,6 @@ es:
     invalid_review: "La revisión no es válida. Comprueba los requisitos, estados y criterios."
     history_title: "Historial de versiones"
     history_count: "requisitos"
+    add_atomic: "Añadir un requisito individual"
+    add_atomic_help: "Si una sección incluye varias funciones, añade una función verificable vinculada a la sección original."
+    section_label: "Sección de origen"
