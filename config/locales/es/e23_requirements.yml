@@ -25,3 +25,5 @@ es:
     review_saved: "Se guardó una nueva versión. La anterior no se modificó."
     stale: "Este formulario está desactualizado. Recarga y revisa la última versión."
     invalid_review: "La revisión no es válida. Comprueba los requisitos, estados y criterios."
+    history_title: "Historial de versiones"
+    history_count: "requisitos"
