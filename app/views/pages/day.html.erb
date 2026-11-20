@@ -33,30 +33,6 @@
     <% end %>
   </nav>
 
-  <% if owner_signed_in? %>
-    <section class="surface-panel p-3 p-sm-4 mb-3" aria-labelledby="day-project-activity">
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <h2 class="h5 mb-0" id="day-project-activity"><i class="bi bi-send-check" aria-hidden="true"></i> <%= t("owner_activity.project_activity") %> (<%= @day_invitations.size %>)</h2>
-        <%= link_to rc_icon_label("arrow-up-right", t("owner_activity.all_outgoing")), owner_invitations_path(anchor: "invitation-history"), class: "rc-action rc-action--quiet rc-action--small" %>
-      </div>
-      <% if @day_invitations.any? %>
-        <ul class="rc-record-list">
-          <% @day_invitations.each do |invitation| %>
-            <li class="rc-record d-flex flex-wrap align-items-center justify-content-between gap-2">
-              <div>
-                <strong><%= link_to invitation.seed_title, owner_invitation_path(invitation), class: "rc-text-link" %></strong>
-                <p class="rc-hint mb-0"><%= l(invitation.created_at, format: :short) %> · <%= t("e2.state_#{invitation.state}") %></p>
-              </div>
-              <%= link_to rc_icon_label("eye", t("e2_handoff.owner_preview")), owner_invitation_path(invitation), class: "rc-action rc-action--quiet rc-action--small" %>
-            </li>
-          <% end %>
-        </ul>
-      <% else %>
-        <p class="rc-muted mb-0"><%= t("owner_activity.none_in_period") %></p>
-      <% end %>
-    </section>
-  <% end %>
-
   <section class="rc-agenda" aria-label="<%= t("calendar.agenda_aria") %>">
     <div class="rc-agenda-legend" aria-hidden="true">
       <span><%= t("calendar.time_heading") %></span><span><%= t("calendar.event_heading") %></span>
@@ -104,6 +80,11 @@
             <% end %>
           </div>
 
+          <% if @selected_date == Time.zone.today %>
+            <div class="wa-calendar-nowline"
+                 style="top: <%= ((Time.zone.now.hour * 60 + Time.zone.now.min) * 100.0 / 1440).round(3) %>%"
+                 aria-label="<%= t("calendar_actions.now") %>"></div>
+          <% end %>
           <div class="rc-event-layer" aria-label="<%= t("calendar.event_layer_aria") %>">
             <% @timeline.items.each do |item| %>
               <% event = item.consultation %>
@@ -146,5 +127,6 @@
   <p class="rc-hint mt-3">
     <%= t("calendar.day_help", zone: Time.zone.name) %>
   </p>
+  <%= render "activity_list", activities: @day_activity %>
   <%= render "creation_dialog" %>
 </div>
