@@ -77,11 +77,11 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
     fill_in "Password", with: PASSWORD
     click_button "Sign in"
     assert_current_path client_invitation_preview_path
-    check "demo_consent"
-    click_button "Use fictional data and claim editable draft"
+    assert_no_selector "input[name='demo_consent']"
+    click_button "Start my project request"
     # Capybara waits for the HTML response; reading the model immediately after
     # click can race the asynchronous Puma request and return nil.
-    assert_text "Review and edit request", wait: 10
+    assert_text "Shape your project request", wait: 10
     intake = client.client_project_intakes.order(id: :desc).first
     assert intake
     assert_current_path edit_client_request_path(intake)
