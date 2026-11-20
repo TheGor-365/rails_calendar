@@ -81,3 +81,6 @@ application.register("wa-accordion", WaAccordionController)
 // Contextual calendar creation without leaving the month or day view.
 import WaCalendarCreateController from "./wa_calendar_create_controller"
 application.register("wa-calendar-create", WaCalendarCreateController)
+
+import WaActivityFilterController from "./wa_activity_filter_controller"
+application.register("wa-activity-filter", WaActivityFilterController)
