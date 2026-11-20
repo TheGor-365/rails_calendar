@@ -43,6 +43,7 @@ Rails.application.routes.draw do
   # E2.3: private source-traced requirements candidate drafts (no AI call).
   get "/workspace/intakes/:id/requirements", to: "owner_requirements#show", as: :owner_requirements
   post "/workspace/intakes/:id/requirements", to: "owner_requirements#create"
+  patch "/workspace/intakes/:id/requirements", to: "owner_requirements#update"
 
   # Private owner entry, never a public client cabinet.
   get "/workspace", to: "workspace#home", as: :workspace
