@@ -44,7 +44,7 @@
       <% if admin_signed_in? %>
         <button type="button" class="wa-calendar-cell-add"
                 aria-label="<%= t("calendar_actions.create_on", date: date.iso8601) %>"
-                data-action="click->wa-calendar-create#open"
+                data-action="click->wa-calendar-create#openMenu"
                 data-start-at="<%= Time.zone.local(date.year, date.month, date.day, 10).iso8601 %>">
           <i class="bi bi-plus-lg" aria-hidden="true"></i>
         </button>
@@ -125,5 +125,6 @@
     <% end %>
   </section>
   <%= render "activity_list", activities: @month_activity %>
+  <%= render "slot_menu" %>
   <%= render "creation_dialog" %>
 </div>
