@@ -452,6 +452,73 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "E2.4 owner review creates immutable criteria with stale replay protection" do
+    login(@owner)
+    token = issue_invitation
+    sign_out
+    post client_invitation_preview_path, params: { invite_token: token }
+    login(@client)
+    post claim_client_invitation_path
+    intake = @client.client_project_intakes.order(:id).last
+    patch client_request_path(intake), params: {
+      project_intake: { title: intake.title, project_type: intake.project_type, goal: intake.goal },
+      fact_review: { title: "confirmed", project_type: "confirmed", goal: "unknown" },
+      scope: { business_goal: {
+        text: "Visitors submit a contact form.", status: "confirmed", responsibility: "client"
+      } }
+    }
+    assert_redirected_to edit_client_request_path(intake)
+    sign_out
+    login(@owner)
+    post owner_requirements_path(intake)
+    assert_redirected_to owner_requirements_path(intake)
+    original = intake.latest_requirement_set
+    assert_equal 1, original.version
+
+    get owner_requirements_path(intake)
+    assert_response :success
+    assert_select "textarea[name='edits[0][statement]']", count: 1
+    changes = { base_version: original.version, edits: {
+      "0" => { statement: "Visitors can send the contact form.",
+               status: "suggested",
+               acceptance_criteria: "A successful request is displayed.\nA record is stored." }
+    } }
+    assert_no_difference("AiSpendEntry.count") do
+      assert_difference("IntakeRequirementSet.count", 1) do
+        patch owner_requirements_path(intake), params: changes
+        assert_redirected_to owner_requirements_path(intake)
+      end
+    end
+    current = intake.latest_requirement_set
+    assert_equal 2, current.version
+    assert_equal original.intake_scope_revision_id, current.intake_scope_revision_id
+    assert_equal original.requirements.first.fetch("id"), current.requirements.first.fetch("id")
+    assert_equal original.requirements.first.fetch("source"), current.requirements.first.fetch("source")
+    assert_equal ["A successful request is displayed.", "A record is stored."],
+      current.requirements.first.fetch("acceptance_criteria")
+    assert_equal [], original.reload.requirements.first.fetch("acceptance_criteria")
+    assert original.readonly?
+
+    assert_no_difference("IntakeRequirementSet.count") do
+      patch owner_requirements_path(intake), params: changes
+      assert_redirected_to owner_requirements_path(intake)
+    end
+    malicious = { base_version: current.version, edits: {
+      "0" => { statement: "Tampered", status: "confirmed", acceptance_criteria: "done",
+               source: { revision_id: 999 } }
+    } }
+    assert_no_difference("IntakeRequirementSet.count") do
+      patch owner_requirements_path(intake), params: malicious
+      assert_redirected_to owner_requirements_path(intake)
+    end
+    assert_equal 2, intake.latest_requirement_set.version
+
+    sign_out
+    login(@client)
+    patch owner_requirements_path(intake), params: changes
+    assert_response :not_found
+  end
+
   test "different client cannot claim, alter or view someone else's invitation draft" do
     login(@owner)
     raw = issue_invitation
