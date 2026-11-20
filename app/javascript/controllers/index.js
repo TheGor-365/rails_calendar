@@ -65,3 +65,7 @@ application.register("wa-invitation-ai", WaInvitationAiController)
 
 import WaInvitationIssueController from "./wa_invitation_issue_controller"
 application.register("wa-invitation-issue", WaInvitationIssueController)
+
+// Persistent, accessible incoming/outgoing requests switch.
+import WaRequestsController from "./wa_requests_controller"
+application.register("wa-requests", WaRequestsController)
