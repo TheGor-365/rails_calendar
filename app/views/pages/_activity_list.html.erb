@@ -5,6 +5,7 @@
       <div><p class="eyebrow mb-1"><%= t("calendar_actions.activity_eyebrow") %></p>
         <h2><i class="bi bi-activity" aria-hidden="true"></i> <%= t("calendar_actions.activity_heading") %>
           <span class="wa-calendar-activity__count"><%= activities.size %></span></h2></div>
+      <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--soft rc-action--small" %>
       <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path, class: "rc-action rc-action--quiet rc-action--small" %>
     </div>
     <% if activities.any? %>
