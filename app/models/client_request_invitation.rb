@@ -54,6 +54,24 @@ class ClientRequestInvitation < ApplicationRecord
       published_versions.size == ids.size
   end
 
+  after_create_commit :record_invitation_issued
+  after_update_commit :record_invitation_transitions
+
+  def record_invitation_issued
+    Activity::Recorder.record!(workspace: workspace, subject: self,
+      kind: "invitation_issued", title: seed_title, occurred_at: created_at)
+  end
+
+  def record_invitation_transitions
+    { "claimed_at" => "invitation_claimed", "submitted_at" => "invitation_submitted",
+      "revoked_at" => "invitation_revoked" }.each do |attribute, kind|
+      next unless saved_change_to_attribute?(attribute) && public_send(attribute).present?
+      Activity::Recorder.record!(workspace: workspace, subject: self,
+        kind: kind, title: seed_title, occurred_at: public_send(attribute))
+    end
+  end
+
+
   private
 
   def valid_fact_reviews
