@@ -393,6 +393,65 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "owner creates immutable source-traced requirement candidates with stable IDs and no AI charges" do
+    login(@owner)
+    token = issue_invitation
+    sign_out
+    post client_invitation_preview_path, params: { invite_token: token }
+    login(@client)
+    post claim_client_invitation_path
+    intake = @client.client_project_intakes.last
+    assert intake
+
+    patch client_request_path(intake), params: {
+      project_intake: { title: intake.title, project_type: intake.project_type, goal: intake.goal },
+      fact_review: { title: "confirmed", project_type: "confirmed", goal: "unknown" },
+      scope: {
+        business_goal: { text: "Visitors can submit a form.", status: "confirmed", responsibility: "client" },
+        data: { text: "Store request records.", status: "unknown", responsibility: "owner" }
+      }
+    }
+    assert_redirected_to edit_client_request_path(intake)
+    sign_out
+    login(@owner)
+
+    get owner_requirements_path(intake)
+    assert_response :success
+    assert_select ".wa-req-review__item", count: 0
+    assert_no_difference("AiSpendEntry.count") do
+      assert_difference("IntakeRequirementSet.count", 1) do
+        post owner_requirements_path(intake)
+        assert_redirected_to owner_requirements_path(intake)
+      end
+    end
+    set = intake.latest_requirement_set
+    assert_equal 1, set.version
+    assert set.readonly?
+    assert_equal %w[R-001 R-002], set.requirements.pluck("id")
+    assert_equal ["suggested"], set.requirements.map { |r| r["status"] }.uniq
+    assert_equal intake.latest_scope_revision.id, set.requirements.first.dig("source", "revision_id")
+    assert_equal [], set.requirements.first.fetch("acceptance_criteria")
+    assert_equal "Visitors can submit a form.", set.requirements.first.fetch("statement")
+
+    get owner_requirements_path(intake)
+    assert_response :success
+    assert_select ".wa-req-review__item", count: 2
+    assert_no_difference("IntakeRequirementSet.count") do
+      post owner_requirements_path(intake)
+      assert_redirected_to owner_requirements_path(intake)
+    end
+    sign_out
+    login(@owner_b)
+    get owner_requirements_path(intake)
+    assert_response :not_found
+    post owner_requirements_path(intake)
+    assert_response :not_found
+    sign_out
+    login(@client)
+    get owner_requirements_path(intake)
+    assert_response :not_found
+  end
+
   test "different client cannot claim, alter or view someone else's invitation draft" do
     login(@owner)
     raw = issue_invitation
