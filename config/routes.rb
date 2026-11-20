@@ -45,6 +45,10 @@ Rails.application.routes.draw do
   post "/workspace/intakes/:id/requirements", to: "owner_requirements#create"
   patch "/workspace/intakes/:id/requirements", to: "owner_requirements#update"
 
+  # Owner artifact library. Downloads are generated from persisted source records.
+  get "/workspace/library", to: "owner_artifacts#index", as: :owner_artifacts
+  get "/workspace/library/:kind/:id.txt", to: "owner_artifacts#export", as: :export_owner_artifact
+
   # Private owner entry, never a public client cabinet.
   get "/workspace", to: "workspace#home", as: :workspace
   get "/workspace/invitations", to: "owner_invitations#index", as: :owner_invitations
