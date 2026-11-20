@@ -151,6 +151,9 @@ class OwnerSetupController < ApplicationController
 
   def ai_activity
     @entries = @profile.ai_spend_entries.order(id: :desc).limit(30)
+    @linked_invitation_by_entry_id = @workspace.client_request_invitations
+      .where(owner_ai_entry_id: @entries.map(&:id))
+      .index_by(&:owner_ai_entry_id)
     @spend = AiSpendLedger.spend_summary
   end
 
