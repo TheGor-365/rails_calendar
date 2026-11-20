@@ -47,4 +47,11 @@ class ProjectIntake < ApplicationRecord
   def client_message_count
     intake_messages.where(role: "client").count
   end
+  after_create_commit :record_intake_created
+
+  def record_intake_created
+    Activity::Recorder.record!(workspace: workspace, subject: self,
+      kind: "intake_created", title: title, occurred_at: created_at)
+  end
+
 end
