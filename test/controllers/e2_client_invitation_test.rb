@@ -94,6 +94,74 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_select ".wa-calendar-activity__item[href=?]", owner_invitation_path(invitation), count: 0
   end
 
+  test "notification inbox is owner-scoped, persists read receipts and links to source" do
+    login(@owner)
+    issue_invitation
+    invite = @workspace.client_request_invitations.order(:id).last
+    event = @workspace.activity_events.find_by!(
+      subject_type: "ClientRequestInvitation", subject_id: invite.id, kind: "invitation_issued"
+    )
+
+    assert_equal 1, Activity::Inbox.unread_for(owner: @owner)
+      .where(id: event.id).count
+    get owner_notifications_path
+    assert_response :success
+    assert_select "h1", text: "Notifications"
+    assert_select "form[action=?]", read_owner_notification_path(event), minimum: 1
+
+    assert_no_difference("ActivityEventRead.count") do
+      get owner_notifications_path
+      assert_response :success
+    end
+
+    assert_difference("ActivityEventRead.count", 1) do
+      post read_owner_notification_path(event)
+      assert_redirected_to owner_invitation_path(invite)
+    end
+    assert_equal 0, Activity::Inbox.unread_for(owner: @owner)
+      .where(id: event.id).count
+    assert_no_difference("ActivityEventRead.count") do
+      post read_owner_notification_path(event)
+      assert_redirected_to owner_invitation_path(invite)
+    end
+
+    get owner_notifications_path(filter: "all")
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invite), minimum: 1
+
+    sign_out
+    login(@owner_b)
+    get owner_notifications_path(filter: "all")
+    assert_response :success
+    assert_select "a[href=?]", owner_invitation_path(invite), count: 0
+    post read_owner_notification_path(event)
+    assert_response :not_found
+    assert_equal 0, ActivityEventRead.where(owner_user_id: @owner_b.id,
+      activity_event_id: event.id).count
+  end
+
+  test "mark all notifications records bounded idempotent receipts per owner" do
+    login(@owner)
+    issue_invitation
+    first = @workspace.client_request_invitations.order(:id).last
+    event = @workspace.activity_events.find_by!(
+      subject_type: "ClientRequestInvitation", subject_id: first.id, kind: "invitation_issued"
+    )
+    assert Activity::Inbox.unread_for(owner: @owner).exists?(id: event.id)
+
+    post read_all_owner_notifications_path
+    assert_redirected_to owner_notifications_path
+    assert_not Activity::Inbox.unread_for(owner: @owner).exists?(id: event.id)
+    count = ActivityEventRead.where(owner_user_id: @owner.id).count
+    post read_all_owner_notifications_path
+    assert_response :see_other
+    assert_equal count, ActivityEventRead.where(owner_user_id: @owner.id).count
+
+    assert_no_difference("ActivityEventRead.where(owner_user_id: @owner_b.id).count") do
+      post read_all_owner_notifications_path
+    end
+  end
+
   test "activity journal automatically records an invitation once and isolates owners" do
     login(@owner)
     assert_difference "ActivityEvent.where(workspace_id: @workspace.id, kind: 'invitation_issued').count", 1 do
