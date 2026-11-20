@@ -50,6 +50,12 @@
   <section class="ws-hub-section" aria-labelledby="ws-tools">
     <div class="ws-hub-section-head"><h2 id="ws-tools"><%= t("workspace.tools_heading") %></h2><span><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("workspace.owner_only") %></span></div>
     <div class="ws-hub-tools">
+      <%= link_to owner_notifications_path, class: "ws-hub-tool" do %>
+        <span class="ws-hub-tool-icon"><i class="bi bi-bell" aria-hidden="true"></i></span>
+        <strong><%= t("notifications.title") %> <%= "(#{owner_unread_activity_count})" if owner_unread_activity_count.positive? %></strong>
+        <small><%= t("notifications.description") %></small>
+        <span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+      <% end %>
       <%= link_to owner_activity_events_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-activity" aria-hidden="true"></i></span><strong><%= t("activity_journal.title") %></strong><small><%= t("activity_journal.description") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
       <%= link_to owner_artifacts_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-collection" aria-hidden="true"></i></span><strong><%= t("artifact_library.title") %></strong><small><%= t("artifact_library.subtitle") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
       <%= link_to root_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-calendar3" aria-hidden="true"></i></span><strong><%= t("workspace.calendar") %></strong><small><%= t("workspace.calendar_desc") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
