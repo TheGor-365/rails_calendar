@@ -5,14 +5,15 @@ module Intake
   class RequirementCandidates
     MAX_ROWS = 12
 
-    def initialize(scope_revision:, previous_set: nil)
+    def initialize(scope_revision:, previous_sets: [])
       @scope_revision = scope_revision
-      @previous_set = previous_set
+      @previous_sets = previous_sets
     end
 
     def build
-      prior_ids = @previous_set ? @previous_set.requirements.to_h { |r| [r.dig("source", "section"), r["id"]] } : {}
-      next_id = @previous_set ? @previous_set.requirements.filter_map { |r| r["id"].split("-").last.to_i }.max.to_i : 0
+      historical = @previous_sets.flat_map(&:requirements)
+      prior_ids = historical.to_h { |r| [r.dig("source", "section"), r["id"]] }
+      next_id = historical.filter_map { |r| r["id"].split("-").last.to_i }.max.to_i
 
       IntakeScopeSections::KEYS.each_with_object([]) do |section, output|
         answer = @scope_revision.answers[section]
