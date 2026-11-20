@@ -4,16 +4,31 @@ import { Turbo } from "@hotwired/turbo-rails"
 // Owner-only, inline creation for a dated calendar slot; posts to existing guarded
 // consultations endpoint and keeps the user on the same calendar view.
 export default class extends Controller {
-  static targets = ["dialog", "start", "end", "title", "description", "error", "submit"]
+  static targets = ["dialog", "start", "end", "title", "description", "error", "submit", "popover"]
   static values = { url: String }
 
   open(event) {
     event.preventDefault()
-    const requested = event.currentTarget.dataset.startAt
+    if (this.hasPopoverTarget && this.popoverTarget.matches(":popover-open")) this.popoverTarget.hidePopover()
+    const requested = event.currentTarget.dataset.startAt || this.slotStart
     if (requested) this.setStart(requested)
     this.errorTarget.textContent = ""
     this.dialogTarget.showModal()
     this.titleTarget.focus()
+  }
+
+  openMenu(event) {
+    event.preventDefault()
+    if (!this.hasPopoverTarget) return
+    this.slotStart = event.currentTarget.dataset.startAt
+    const panel = this.popoverTarget
+    panel.showPopover()
+    const source = event.currentTarget.getBoundingClientRect()
+    const width = panel.getBoundingClientRect().width
+    const height = panel.getBoundingClientRect().height
+    const top = Math.min(source.bottom + 6, window.innerHeight - height - 8)
+    panel.style.top = `${Math.max(8, top)}px`
+    panel.style.left = `${Math.max(8, Math.min(source.left, window.innerWidth - width - 8))}px`
   }
 
   close(event) {
