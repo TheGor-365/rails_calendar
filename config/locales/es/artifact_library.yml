@@ -1,0 +1,22 @@
+es:
+  artifact_library:
+    eyebrow: "ESPACIO DE TRABAJO / ARCHIVOS"
+    title: "Biblioteca"
+    subtitle: "Invitaciones guardadas, resultados de IA y versiones de requisitos. Archivos generados a partir de registros originales."
+    search: "Buscar"
+    search_hint: "Título, contenido, modelo o fuente"
+    category: "Categoría"
+    find: "Buscar"
+    reset: "Restablecer"
+    results: "Resultados: %{count}"
+    source: "Fuente"
+    date: "Fecha"
+    status: "Estado"
+    open: "Abrir"
+    export: "Descargar TXT"
+    empty: "No se encontraron registros."
+    kinds:
+      all: "Todos"
+      invitation: "Invitaciones"
+      ai: "Resultados de IA"
+      requirements: "Versiones de requisitos"
