@@ -8,7 +8,19 @@ class OwnerRequirementsController < ApplicationController
   def show
     @scope_revision = @intake.latest_scope_revision
     @set = @intake.latest_requirement_set
-    @history = @intake.intake_requirement_sets.order(version: :desc).limit(12)
+    @history = @intake.intake_requirement_sets.includes(:intake_scope_revision)
+      .order(version: :desc).limit(12).to_a
+    # Load one preceding snapshot per visible revision, including the
+    # predecessor of the oldest item in the paginated history.
+    predecessor_versions = @history.filter_map { |set| set.version - 1 if set.version > 1 }
+    predecessors = @intake.intake_requirement_sets.where(version: predecessor_versions).index_by(&:version)
+    @history_diffs = @history.to_h do |set|
+      previous = predecessors[set.version - 1]
+      changes = if set.version == 1 || previous
+        Intake::RequirementRevisionDiff.new(previous: previous, current: set).changes
+      end
+      [set.version, changes]
+    end
     response.headers["Cache-Control"] = "private, no-store"
   end
 
