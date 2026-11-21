@@ -16,6 +16,8 @@ ru:
     open: "Открыть"
     none: "Событий по заданным параметрам нет."
     events:
+      service_published: "Услуга опубликована"
+      service_unpublished: "Услуга снята с публикации"
       invitation_issued: "Приглашение создано"
       invitation_claimed: "Клиент принял приглашение"
       invitation_submitted: "Заявка отправлена клиентом"
