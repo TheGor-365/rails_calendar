@@ -23,6 +23,7 @@ hy:
       invitation_submitted: "Հայտն ուղարկվել է"
       invitation_revoked: "Հրավերը հետ է կանչվել"
       intake_created: "Հայտ է ստեղծվել"
+      scope_revision_saved: "Նախագծի պահանջների տարբերակը պահպանվել է"
       requirements_saved: "Պահանջները պահպանվել են"
       ai_attempted: "ԱԲ հարցումը գրանցվել է"
       ai_settled: "ԱԲ արդյունքը ստացվել է"
