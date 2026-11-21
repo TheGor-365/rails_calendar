@@ -26,4 +26,5 @@ en:
       ai_settled: "AI result received"
       ai_uncertain: "AI billing needs review"
       ai_cancelled: "AI request cancelled"
+      ai_reply_saved: "AI reply saved"
       conversation_created: "Conversation created"
