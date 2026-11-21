@@ -30,7 +30,8 @@ module Activity
       else paths.owner_artifacts_path
       end
       { kind: event.kind.start_with?("ai_") ? :ai : event.kind.start_with?("invitation_") ? :invitation :
-          event.kind == "requirements_saved" ? :requirements : :request,
+          event.kind == "requirements_saved" ? :requirements :
+          event.kind == "conversation_created" ? :conversation : :request,
         icon: ICONS.fetch(event.kind, "activity"), title: event.title,
         created_at: event.occurred_at, path: path, status: event.kind,
         subject_type: event.subject_type, subject_id: event.subject_id }
