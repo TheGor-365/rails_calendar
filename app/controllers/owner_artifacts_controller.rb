@@ -109,7 +109,9 @@ class OwnerArtifactsController < ApplicationController
         records << { kind: "ai", id: entry.id, title: result["heading"].presence || entry.operation,
           summary: result["draft"].to_s.truncate(260), source: entry.model, status: entry.status,
           created_at: entry.created_at,
-          path: entry.operation == OwnerAi::Composer::VERSION && entry.status == "settled" ? owner_ai_assistant_path(entry_id: entry.id) : owner_ai_activity_path,
+          path: Activity::SourceLinks.ai_conversation_path(workspace_id: workspace.id, spend_entry: entry) ||
+            (entry.operation == OwnerAi::Composer::VERSION && entry.status == "settled" ?
+              owner_ai_assistant_path(entry_id: entry.id) : owner_ai_activity_path),
           preview: JSON.pretty_generate(result) }
     end
     IntakeRequirementSet.joins(:project_intake)
