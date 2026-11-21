@@ -66,6 +66,14 @@ Next *read-only* operator actions: `ps -p 6778 -o pid=,ppid=,user=,comm=,etime=`
 
 CI context: reviewed R0.4b1 writer code `15968f4` passed [Rails #44945367534](https://github.com/TheGor-365/rails_calendar/actions/runs/44945367534) and [Security #44945367615](https://github.com/TheGor-365/rails_calendar/actions/runs/44945367615). A newer docs HEAD `7a61b47` independently had a Chrome avatar-popover failure; this is unrelated to backup script. Recheck the *current* HEAD and its own workflows. Neither green code CI nor a stopped process proves an archive/scratch restore was executed.
 
+## R0.4b2 target process tree verified — optional owner-operated :3002 stop gate
+
+**Owner's actual read-only `ps`/`readlink` result (2026-11-21):** PID **6778**, PPID **6492**, gor, **`zsh`**, executable `/usr/bin/zsh`, cwd `/home/gor/rails_calendar_ai_c21c`, running ~7 days. `ps --ppid 788493` displayed **no children**. The distinct Ruby PID **788493** listens on `127.0.0.1:3002` and uses `/home/gor/.asdf/installs/ruby/3.4.12/bin/ruby`. The standalone Rails runner under Ruby 3.4.13 is a different process. The parent shell is NOT a stop target. PID identity and port must be rechecked immediately before any signal to prevent acting on a recycled PID.
+
+**If and only if owner elects to interrupt the isolated :3002 service**, the targeted stop is a normal `SIGTERM` to PID 788493, with preconditions checking PID, PPID, cwd, executable, lack of child processes and port ownership. No `pkill`, no signal to PPID 6778, no `sudo systemctl stop`, no stop of PostgreSQL or :3001. After the attempt verify :3002 has no listener and the exact review DB has zero other sessions. If a guard fails or :3002 relaunches, HALT and investigate; never force kill as a retry. **This is a planned user command only; it has NOT been executed.** Interrupting :3002 and creating backups/scratch DB are **distinct authorizations**. Before any backup writer invocation, separately review its source, obtain explicit agreement, confirm the source DB and writer shutdown and export no credentials to the transcript.
+
+**Git status and privacy:** the owner's local checkout still reports ` M db/schema.rb` and is older than remote Draft PR #81. Never reset/rebase/pull over uncommitted state or paste sensitive `/proc/*/environ`, DB URLs, raw archives or client data.
+
 ## Phase C. Rehearsal/migration, only after explicit authorization
 1. Validate the exact Rails connection again (database, server, socket, user, environment), and ensure no pending unrelated migrations. Git code SHA and `schema_migrations` must correspond.
 2. On the **restored scratch DB only**, try the **specific** migration `20261121003000` with an isolated environment that cannot reach production; prove new constraints/table, run targeted tests/read-only outbox simulation, compare counts. Do NOT connect Rails process port 3002 to the scratch without a distinct port and documented isolation.
