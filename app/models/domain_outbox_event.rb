@@ -7,7 +7,10 @@ class DomainOutboxEvent < ApplicationRecord
   STATES = %w[pending delivered failed].freeze
   SOURCES = {
     "IntakeRequirementSet" => "requirements_saved",
-    "OwnerAiMessage" => "ai_reply_saved"
+    "OwnerAiMessage" => "ai_reply_saved",
+    "ClientRequestInvitation" => %w[
+      invitation_issued invitation_claimed invitation_submitted invitation_revoked
+    ].freeze
   }.freeze
   MAX_ATTEMPTS = 5
 
@@ -64,9 +67,36 @@ class DomainOutboxEvent < ApplicationRecord
     }], unique_by: :idx_domain_outbox_source_revision)
   end
 
+  # Reuse each existing invitation transition as an immutable source event.
+  # No token_digest, client answers, invitation URLs or free-text data are queued.
+  INVITATION_EVENT_FIELDS = {
+    "invitation_issued" => [1, :created_at],
+    "invitation_claimed" => [2, :claimed_at],
+    "invitation_submitted" => [3, :submitted_at],
+    "invitation_revoked" => [4, :revoked_at]
+  }.freeze
+
+  def self.enqueue_invitation_transition!(invitation, kind:)
+    mapping = INVITATION_EVENT_FIELDS[kind]
+    return unless mapping && invitation.persisted? &&
+      invitation.workspace_id.present?
+
+    version, timestamp_field = mapping
+    occurred_at = invitation.public_send(timestamp_field)
+    return unless occurred_at.present?
+
+    now = Time.current
+    insert_all([{
+      workspace_id: invitation.workspace_id, source_type: "ClientRequestInvitation",
+      source_id: invitation.id, source_version: version, kind: kind,
+      occurred_at: occurred_at, state: "pending", attempts: 0,
+      created_at: now, updated_at: now
+    }], unique_by: :idx_domain_outbox_source_revision)
+  end
+
   private
 
   def allowed_kind
-    errors.add(:kind, "is unsupported") if SOURCES[source_type] != kind
+    errors.add(:kind, "is unsupported") unless Array(SOURCES[source_type]).include?(kind)
   end
 end
