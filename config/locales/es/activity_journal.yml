@@ -23,6 +23,7 @@ es:
       invitation_submitted: "Solicitud enviada"
       invitation_revoked: "Invitación revocada"
       intake_created: "Solicitud creada"
+      scope_revision_saved: "Versión del alcance del proyecto guardada"
       requirements_saved: "Requisitos guardados"
       ai_attempted: "Solicitud de IA registrada"
       ai_settled: "Resultado de IA recibido"
