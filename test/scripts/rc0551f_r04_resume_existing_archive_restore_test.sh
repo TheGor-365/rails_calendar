@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# R0.4b offline deny-path and structural tests. NEVER connect to a real database,
+# create a backup directory, or grant consent in GitHub CI.
+set -euo pipefail
+trap 'printf "R0.4b OFFLINE ASSERTION FAILED at test line %s (no secrets logged)\\n" "$LINENO" >&2' ERR
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+SCRIPT="$ROOT/script/rc0551f_r04_resume_existing_archive_restore.sh"
+bash -n "$SCRIPT"
+
+scratch="$(mktemp -d)"
+trap 'rm -rf -- "$scratch"' EXIT
+
+if env RAILS_ENV=production DATABASE_URL='' \
+  RC_CONFIRM_SOURCE_DB=rails_calendar_rc0551f_c21b_review_20261117 \
+  RC_CONFIRM_WRITERS_STOPPED=YES RC_CONFIRM_RESUME_ONLY_RESTORE=YES \
+  RC_CONFIRM_STORAGE_GROUP_REVIEW=YES \
+  bash "$SCRIPT" > "$scratch/deny-prod.txt" 2>&1; then
+  echo 'FAIL: production script invocation must be denied' >&2
+  exit 1
+fi
+grep -Fq 'STOP R0.4b: Production/test environment denied' "$scratch/deny-prod.txt"
+
+if env -u RAILS_ENV DATABASE_URL='postgresql://bad.invalid/prod' \
+  RC_CONFIRM_SOURCE_DB=rails_calendar_rc0551f_c21b_review_20261117 \
+  RC_CONFIRM_WRITERS_STOPPED=YES RC_CONFIRM_RESUME_ONLY_RESTORE=YES \
+  RC_CONFIRM_STORAGE_GROUP_REVIEW=YES \
+  bash "$SCRIPT" > "$scratch/deny-url.txt" 2>&1; then
+  echo 'FAIL: inherited DATABASE_URL must be denied' >&2
+  exit 1
+fi
+grep -Fq 'STOP R0.4b: DATABASE_URL is set' "$scratch/deny-url.txt"
+
+if env -u DATABASE_URL -u RC_CONFIRM_SOURCE_DB -u RC_CONFIRM_WRITERS_STOPPED \
+  -u RC_CONFIRM_RESUME_ONLY_RESTORE -u RC_CONFIRM_STORAGE_GROUP_REVIEW \
+  RAILS_ENV=development RC_LOCAL_DEV_DATABASE_URL=postgresql://example.invalid/review \
+  bash "$SCRIPT" > "$scratch/deny-source.txt" 2>&1; then
+  echo 'FAIL: missing source DB confirmation must be denied' >&2
+  exit 1
+fi
+grep -Fq 'RC_CONFIRM_SOURCE_DB must equal the exact review database' "$scratch/deny-source.txt"
+
+if env -u DATABASE_URL -u RC_CONFIRM_WRITERS_STOPPED \
+  RC_CONFIRM_SOURCE_DB=rails_calendar_rc0551f_c21b_review_20261117 \
+  RAILS_ENV=development RC_LOCAL_DEV_DATABASE_URL=postgresql://example.invalid/review \
+  bash "$SCRIPT" > "$scratch/deny-writers.txt" 2>&1; then
+  echo 'FAIL: non-confirmed writers must be denied' >&2
+  exit 1
+fi
+grep -Fq 'RC_CONFIRM_WRITERS_STOPPED=YES' "$scratch/deny-writers.txt"
+
+if env -u DATABASE_URL -u RC_CONFIRM_RESUME_ONLY_RESTORE \
+  RC_CONFIRM_SOURCE_DB=rails_calendar_rc0551f_c21b_review_20261117 \
+  RC_CONFIRM_WRITERS_STOPPED=YES RAILS_ENV=development \
+  RC_LOCAL_DEV_DATABASE_URL=postgresql://example.invalid/review \
+  bash "$SCRIPT" > "$scratch/deny-restore.txt" 2>&1; then
+  echo 'FAIL: unapproved backup and scratch restore must be denied' >&2
+  exit 1
+fi
+grep -Fq 'RC_CONFIRM_RESUME_ONLY_RESTORE=YES' "$scratch/deny-restore.txt"
+
+grep -Fq 'EXPECTED_DB="rails_calendar_rc0551f_c21b_review_20261117"' "$SCRIPT"
+grep -Fq 'PG_BIN="/usr/lib/postgresql/16/bin"' "$SCRIPT"
+grep -Fq 'SOCKET="/var/run/postgresql"' "$SCRIPT"
+grep -Fq 'BACKUP_ROOT="$HOME/.local/share/rails-calendar/review-backups-r04"' "$SCRIPT"
+grep -Fq "PGOPTIONS='-c default_transaction_read_only=on'" "$SCRIPT"
+grep -Fq '"$resolved" == "$identity"' "$SCRIPT"
+grep -Fq 'rolcreatedb OR rolsuper' "$SCRIPT"
+grep -Fq 'find -P "$ROOT/storage" -type l' "$SCRIPT"
+grep -Fq '"$ROOT" == "$HOME/rails_calendar_ai_c21c"' "$SCRIPT"
+grep -Fq 'primary_members="$(getent passwd' "$SCRIPT"
+grep -Fq 'supplemental_members="$(getent group' "$SCRIPT"
+grep -Fq 'service.is_a?(ActiveStorage::Service::DiskService)' "$SCRIPT"
+grep -Fq '"$actual_media_root" == "$ROOT/storage"' "$SCRIPT"
+grep -Fq 'ss -H -ltn "sport = :3002"' "$SCRIPT"
+grep -Fq '4 * db_bytes + 3 * media_bytes + 2147483648' "$SCRIPT"
+if grep -Fq '"$PG_BIN/pg_dump"' "$SCRIPT"; then echo 'FAIL: resume must not call pg_dump' >&2; exit 1; fi
+grep -Fq '"$PG_BIN/pg_restore" -l "$backup/review.pgcustom"' "$SCRIPT"
+grep -Fq '"$PG_BIN/createdb" -w -h "$SOCKET" -p "$PORT"' "$SCRIPT"
+grep -Fq '"$PG_BIN/pg_restore" -w --exit-on-error --no-owner --no-acl' "$SCRIPT"
+grep -Fq 'diff -qr "$ROOT/storage" "$backup/media_restore/storage"' "$SCRIPT"
+grep -Fq 'sha256sum -c --status SHA256SUMS' "$SCRIPT"
+grep -Fq 'schema_migrations differ' "$SCRIPT"
+grep -Fq 'backup_and_scratch_preserved=yes' "$SCRIPT"
+grep -Fq 'Expected exactly one existing backup session' "$SCRIPT"
+grep -Fq 'RESTORE-EXISTING-ARCHIVE' "$SCRIPT"
+grep -Fq '[[ -t 0 ]]' "$SCRIPT"
+if grep -Fq 'tar -xf ' "$SCRIPT"; then echo 'FAIL: resume must not extract tar' >&2; exit 1; fi
+
+# Regression: the real UTC stamp includes uppercase T and Z. The generated
+# PostgreSQL database identifier must never inherit uppercase letters.
+# Offline only: no createdb, pg_restore, pg_dump, or real DB connections.
+grep -Fxq 'scratch_stamp="${stamp,,}"' "$SCRIPT"
+grep -Fxq 'scratch="rails_calendar_r04_restore_${scratch_stamp}_$RANDOM"' "$SCRIPT"
+for sample in 20261122T001600Z 20261231T235959Z; do
+  normalized="${sample,,}"
+  scratch_name="rails_calendar_r04_restore_${normalized}_12345"
+  [[ "$scratch_name" =~ ^[a-z0-9_]+$ ]] || {
+    echo 'FAIL: generated scratch database name contains invalid characters' >&2
+    exit 1
+  }
+  [[ "${#scratch_name}" -le 63 ]] || {
+    echo 'FAIL: generated scratch database name is too long' >&2
+    exit 1
+  }
+  [[ "$scratch_name" != rails_calendar_rc0551f_c21b_review_20261117 ]] || {
+    echo 'FAIL: generated scratch database name collides with source' >&2
+    exit 1
+  }
+done
+
+# No destructive DB/file cleanup and no unreviewed automatic schema mutation.
+if grep -Eq '^[[:space:]]*(dropdb|rm[[:space:]]+-rf|chmod[[:space:]]|chown[[:space:]]|bin/rails[[:space:]]+db:)' "$SCRIPT"; then
+  echo 'FAIL: destructive or unreviewed data mutation in R0.4b writer' >&2
+  exit 1
+fi
+echo 'R0.4b2 existing archive → scratch OFFLINE denial tests: PASS'

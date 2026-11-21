@@ -69,6 +69,9 @@ jobs:
           bash -n script/rc0551f_r04_review_db_backup_restore.sh
           bash -n test/scripts/rc0551f_r04_review_db_backup_restore_test.sh
           bash test/scripts/rc0551f_r04_review_db_backup_restore_test.sh
+          bash -n script/rc0551f_r04_resume_existing_archive_restore.sh
+          bash -n test/scripts/rc0551f_r04_resume_existing_archive_restore_test.sh
+          bash test/scripts/rc0551f_r04_resume_existing_archive_restore_test.sh
           bash -n script/rc0551f_c21_backup_and_verify.sh
           bash -n test/scripts/rc0551f_c21_backup_and_verify_test.sh
           bash test/scripts/rc0551f_c21_backup_and_verify_test.sh
