@@ -74,15 +74,15 @@ class PagesController < ApplicationController
       slot_start = Time.zone.local(@selected_date.year, @selected_date.month, @selected_date.day, hour)
       slot_end = slot_start + 1.hour
 
+      consultation_count = @consultations.count do |consultation|
+        consultation.start_time < slot_end && consultation.end_time > slot_start
+      end
+      activity_count = @day_activity_by_hour.fetch(hour, []).size
       {
-        hour: hour,
-        start_time: slot_start,
-        end_time: slot_end,
-        consultation_count: @consultations.count do |consultation|
-          consultation.start_time < slot_end && consultation.end_time > slot_start
-        end,
-        activity_count: @day_activity_by_hour.fetch(hour, []).size
-      }.tap { |slot| slot[:count] = slot[:consultation_count] + slot[:activity_count] }
+        hour: hour, start_time: slot_start, end_time: slot_end,
+        consultation_count: consultation_count, activity_count: activity_count,
+        count: consultation_count + activity_count
+      }
     end
   rescue Date::Error, TypeError, ArgumentError
     redirect_to root_path, alert: "Invalid calendar date"
