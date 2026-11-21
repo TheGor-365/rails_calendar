@@ -258,6 +258,99 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "C2.3 revision keys are idempotent and cannot copy another owner's records" do
+    conversation = @workspace.owner_ai_conversations.create!(
+      title: "Fictional immutable source", scope: "owner_general", state: "active"
+    )
+    legacy = @workspace.activity_events.find_by!(
+      kind: "conversation_created", subject_type: "OwnerAiConversation", subject_id: conversation.id
+    )
+    assert_equal "OwnerAiConversation:#{conversation.id}:conversation_created", legacy.event_key
+    assert_difference("ActivityEvent.count", 2) do
+      [1, 1, 2, 2].each do |version|
+        Activity::Recorder.record!(workspace: @workspace, subject: conversation,
+          kind: "conversation_created", title: "Synthetic revision #{version}",
+          revision: version, metadata: { "version" => version })
+      end
+    end
+    assert_equal [1, 2], @workspace.activity_events.where(
+      subject_type: "OwnerAiConversation", subject_id: conversation.id
+    ).where.not(event_key: legacy.event_key).order(:event_key).pluck(:metadata).map { |row| row.fetch("version") }
+
+    assert_no_difference("ActivityEvent.count") do
+      Activity::Recorder.record!(workspace: @workspace_b, subject: conversation,
+        kind: "conversation_created", title: "Foreign", revision: 3)
+      Activity::Recorder.record!(workspace: @workspace, subject: conversation,
+        kind: "conversation_created", title: "Bad revision", revision: 0)
+      Activity::Recorder.record!(workspace: @workspace, subject: conversation,
+        kind: "conversation_created", title: "Unsafe metadata", revision: 3,
+        metadata: { "private_client_answer" => "not allowed" })
+    end
+    assert_equal legacy.id, @workspace.activity_events.find_by!(event_key: legacy.event_key).id
+  end
+
+  test "C2.3 one settled AI reply links journal calendar and library to the authorized conversation" do
+    conversation = @workspace.owner_ai_conversations.create!(
+      title: "Fictional billable review", scope: "owner_general", state: "active"
+    )
+    ledger = AiSpendEntry.create!(
+      professional_profile: @workspace.professional_profile,
+      operation: OwnerAi::ConversationResponder::VERSION,
+      model: "local-synthetic", request_digest: Digest::SHA256.hexdigest(SecureRandom.hex(16)),
+      status: "settled", reserved_ticks: 0, charged_ticks: 0,
+      result: { "conversation_id" => conversation.id }
+    )
+    owner_message = conversation.owner_ai_messages.create!(
+      role: "owner", state: "settled", sequence: 1, body: "Explain a fictional Rails case"
+    )
+    conversation.owner_ai_messages.create!(
+      role: "assistant", state: "settled", sequence: 2, body: "A synthetic answer.",
+      parent_message: owner_message, ai_spend_entry: ledger
+    )
+    event = @workspace.activity_events.find_by!(
+      subject_type: "AiSpendEntry", subject_id: ledger.id, kind: "ai_settled"
+    )
+    source = owner_ai_conversation_path(conversation)
+    assert_equal source, Activity::SourceLinks.ai_conversation_path(
+      workspace_id: @workspace.id, spend_entry: ledger
+    )
+    assert_equal source, Activity::Presenter.display(event)[:path]
+
+    foreign = @workspace_b.owner_ai_conversations.create!(
+      title: "Foreign source", scope: "owner_general", state: "active"
+    )
+    ledger.result = { "conversation_id" => foreign.id }
+    assert_nil Activity::SourceLinks.ai_conversation_path(
+      workspace_id: @workspace.id, spend_entry: ledger
+    )
+    ledger.reload
+
+    login(@owner)
+    assert_no_difference ["AiSpendEntry.count", "ActivityEvent.count"] do
+      get owner_activity_events_path
+      assert_response :success
+      assert_select "a[href=?]", source, minimum: 1
+
+      get owner_artifacts_path(kind: "ai")
+      assert_response :success
+      assert_select "a[href=?]", source, minimum: 1
+
+      day = event.occurred_at.in_time_zone.to_date.iso8601
+      get calendar_day_path(date: day)
+      assert_response :success
+      assert_select "a[href=?]", source, minimum: 1
+    end
+
+    sign_out
+    login(@owner_b)
+    get owner_activity_events_path
+    assert_response :success
+    assert_select "a[href=?]", source, count: 0
+    get owner_artifacts_path(kind: "ai")
+    assert_response :success
+    assert_select "a[href=?]", source, count: 0
+  end
+
   test "activity journal automatically records an invitation once and isolates owners" do
     login(@owner)
     assert_difference "ActivityEvent.where(workspace_id: @workspace.id, kind: 'invitation_issued').count", 1 do
