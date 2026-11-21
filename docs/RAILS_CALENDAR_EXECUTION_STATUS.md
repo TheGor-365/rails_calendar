@@ -9,7 +9,7 @@
 
 Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit workflow runs/jobs. Compare with the SHA in this document. New head = document may be stale, so reconcile first. When a test is red, its log is the gate. Never silently rewrite another developer's status or treat release based on a historic run. The PR is stacked on `feat/rc0551f-c21b-white-atlas-client-avatar-2026-11-17`, not main. Branch status is **Draft**, no merge/deploy confirmation.
 
-**At checkpoint:** after `d03b6a5675cad8b063689ec577a4192389ed04ea` C2.3b3.1 code+tests were committed; a subsequent *documentation* commit may move HEAD. **Exact new SHA CI/Security are pending until verified from GitHub; do not treat older green results as approval.**
+**Latest verified code checkpoint:** `675edf8b4697a62b09bd2aa3c8615e60139c8c09` (C2.3b3.1 invitation lifecycle outbox and runbook), [Rails CI #44902199313](https://github.com/TheGor-365/rails_calendar/actions/runs/44902199313) **SUCCESS** (370 Rails runs / 6114 assertions, 47 Chrome runs / 726 assertions, 0 failures/errors/skips; PostgreSQL 18 fresh and upgrade **SUCCESS**), [Security #44902199307](https://github.com/TheGor-365/rails_calendar/actions/runs/44902199307) **SUCCESS**. This status-file commit is documentation-only and **moves HEAD again**; the next chat MUST verify checks of its own latest SHA and not mistake the prior code-tested SHA for the newest commit.
 
 ## 2. Local machine / DB (user's terminal, 21.11.2026)
 
@@ -39,7 +39,7 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 | `C2.3a.1–C2.3a.3` Versioned ActivityRecorder and safe AI source links | **CODE + prior CI VERIFIED** | commit `65eec885`, Rails CI [44851693225](https://github.com/TheGor-365/rails_calendar/actions/runs/44851693225), Security [44851693181](https://github.com/TheGor-365/rails_calendar/actions/runs/44851693181) | manual QA/recovery of older sources |
 | `C2.3b1` Transactional requirements outbox + bounded replay | **CODE + prior CI VERIFIED** | `1b66cdc`, Rails CI [44852573505](https://github.com/TheGor-365/rails_calendar/actions/runs/44852573505), Security [44852573483](https://github.com/TheGor-365/rails_calendar/actions/runs/44852573483) | Migration **not applied** to local review DB |
 | `C2.3b2` Settled AI reply outbox and activity recovery | **CODE + prior CI VERIFIED** | `be6410d`, Rails CI [44854301203](https://github.com/TheGor-365/rails_calendar/actions/runs/44854301203), Security [44854301208](https://github.com/TheGor-365/rails_calendar/actions/runs/44854301208) | UI/source navigation & local migration not accepted |
-| `C2.3b3.1` Invitation issued/claimed/submitted/revoked outbox | **CODE + regression tests committed, CURRENT CI PENDING** | `d03b6a5` and preceding model/replayer commits | exact new SHA Rails/Chrome/PG18/Security; local QA |
+| `C2.3b3.1` Invitation issued/claimed/submitted/revoked outbox | **CODE + CI VERIFIED** on `675edf8` | [Rails CI #44902199313](https://github.com/TheGor-365/rails_calendar/actions/runs/44902199313), [Security #44902199307](https://github.com/TheGor-365/rails_calendar/actions/runs/44902199307); 370/6114 Rails, 47/726 Chrome, PG18 fresh+upgrade | local browser, backup/restore and review DB migration **NOT VERIFIED** |
 | `C2.3b3.2` Invitation source replay and old-state compatibility | **PARTIAL CODE** (`C2.3b3.1` includes replay) | current feature | edge cases across claim/submit/revoke, crash/replay |
 | `C2.3b4–b7` Service versions, scope/client source adapters, queue metrics, backfill | **NOT VERIFIED** | inspect models before authoring | implementation, CI, QA and migration gate |
 | `C2.3c.1–c6` Deterministic projection registry and consistency | **PARTIAL legacy projections** | Calendar OwnerActivity, OwnerArtifacts, Activity Inbox | generalized subscription/rebuild/lag metrics not done |
@@ -56,8 +56,8 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 
 ## 4. Immediate next *unverified* step
 
-1. **P0 CI for C2.3b3.1:** read exact HEAD and workflow logs, fix true errors, require Rails/Chrome/PG18 fresh+upgrade and Security PASS on that SHA. If green, update this ledger with SHA and run URLs. If red, stop feature expansion and fix first.
-2. **R0 local migration safety:** owner has not fetched or migrated new code. Need read-only `Rails effective DB` and `db/schema.rb` diff, then a reviewed backup+scratch-restore procedure specifically for `rails_calendar_rc0551f_c21b_review_20261117`; no `db:migrate` without safety.
+1. **P0 C2.3b3.1 green on code SHA 675edf8:** already verified exact-head Rails/Chrome/PG18 fresh+upgrade and Security; do NOT reimplement. Next chat checks newer branch HEAD for docs-only commits or code changes, and re-verifies its own run status.
+2. **R0 local migration safety (BLOCKER):** owner has not fetched or migrated new code. Use [R0.4 review DB safety runbook](RC0551F_REVIEW_DB_BACKUP_MIGRATION_GATE.md) for read-only `Rails effective DB` and `db/schema.rb` diff, then private backup+scratch restore specifically for `rails_calendar_rc0551f_c21b_review_20261117`; no `db:migrate` without safety and explicit owner action.
 3. **C2.3b3.2 / C2.3b4:** once prior CI stable, expand invitation state tests and one new canonical source adapter (service version or scope), preserving no model calls/private data in metadata.
 
 ## 5. Registry update rule (mandatory after any code work)
