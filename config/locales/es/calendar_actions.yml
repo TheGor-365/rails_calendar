@@ -16,6 +16,7 @@ es:
     no_activity: "No se encontraron acciones en este período."
     now: "Hora actual"
     kinds:
+      conversation: "Conversación de IA"
       invitation: "Invitación"
       request: "Solicitud"
       ai: "Generación de IA"
