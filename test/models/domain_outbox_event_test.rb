@@ -362,6 +362,133 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
     end
   end
 
+  test "C2.3b5 saved scoped intake is atomic and replayable without private text" do
+    intake = nil
+    assert_difference(["ProjectIntake.count", "DomainOutboxEvent.count", "ActivityEvent.count"], 1) do
+      intake = ProjectIntake.create!(
+        workspace: @workspace, title: "Fictional confidential client form",
+        project_type: "rails_bugfix", goal: "An entirely synthetic private client request.",
+        demo_consent_at: Time.current
+      )
+    end
+    envelope = DomainOutboxEvent.find_by!(
+      workspace_id: @workspace.id, source_type: "ProjectIntake",
+      source_id: intake.id, source_version: 1, kind: "intake_created"
+    )
+    assert_equal "pending", envelope.state
+    assert_not_includes envelope.attributes.values.map(&:to_s), intake.goal
+    key = "ProjectIntake:#{intake.id}:intake_created"
+
+    assert_no_difference(["AiSpendEntry.count", "ProjectIntake.count"]) do
+      ActivityEvent.where(workspace_id: @workspace.id, event_key: key).delete_all # synthetic test-only
+      assert_equal({ attempted: 1, delivered: 1, failed: 0 },
+        DomainOutbox::Replayer.run!(workspace: @workspace))
+    end
+    assert_equal 1, @workspace.activity_events.where(event_key: key).count
+    assert_equal "delivered", envelope.reload.state
+    assert_no_difference(["ActivityEvent.count", "AiSpendEntry.count"]) do
+      assert_equal 0, DomainOutbox::Replayer.run!(workspace: @workspace)[:attempted]
+    end
+    assert_equal 0, @other_workspace.activity_events.where(event_key: key).count
+  end
+
+  test "C2.3b5 client and owner scope versions are distinct, private and replayable" do
+    client_scope = nil
+    owner_scope = nil
+    answers = {
+      "business_goal" => {
+        "text" => "Sensitive synthetic client wording; never copied to event metadata",
+        "status" => "unknown", "responsibility" => "client"
+      }
+    }
+    assert_difference(["IntakeScopeRevision.count", "DomainOutboxEvent.count", "ActivityEvent.count"], 2) do
+      client_scope = @intake.intake_scope_revisions.create!(
+        version: 2, author_role: "client", answers: answers
+      )
+      owner_scope = @intake.intake_scope_revisions.create!(
+        version: 3, author_role: "owner", answers: { "business_goal" => {
+          "text" => "A fictional owner implementation suggestion",
+          "status" => "suggested", "responsibility" => "owner"
+        } }
+      )
+    end
+    assert_equal 1, @intake.intake_scope_revisions.where(id: client_scope.id).count
+    rows = DomainOutboxEvent.where(workspace_id: @workspace.id,
+      source_type: "IntakeScopeRevision", source_id: [client_scope.id, owner_scope.id])
+      .order(:source_version)
+    assert_equal [2, 3], rows.pluck(:source_version)
+    assert_equal %w[scope_revision_saved scope_revision_saved], rows.pluck(:kind)
+    assert rows.all? { |row| !row.attributes.values.map(&:to_s).include?(answers.dig("business_goal", "text")) }
+    assert_equal "client", client_scope.reload.author_role
+    assert_equal "owner", owner_scope.reload.author_role
+
+    # A missing client revision is recovered privately without generating text.
+    key = "IntakeScopeRevision:#{client_scope.id}:scope_revision_saved"
+    ActivityEvent.where(workspace_id: @workspace.id, event_key: key).delete_all # test only
+    assert_equal({ attempted: 0, delivered: 0, failed: 0 },
+      DomainOutbox::Replayer.run!(workspace: @other_workspace))
+    assert_no_difference(["AiSpendEntry.count", "IntakeScopeRevision.count"]) do
+      assert_equal({ attempted: 2, delivered: 2, failed: 0 },
+        DomainOutbox::Replayer.run!(workspace: @workspace))
+    end
+    actual = @workspace.activity_events.find_by!(event_key: key)
+    assert_equal({ "version" => 2 }, actual.metadata)
+    assert_not_includes actual.title, "Sensitive synthetic"
+    assert_equal Rails.application.routes.url_helpers.owner_requirements_path(@intake),
+      Activity::Presenter.display(actual)[:path]
+    assert_equal 0, @other_workspace.activity_events.where(event_key: key).count
+  end
+
+  test "C2.3b5 rollback and unassigned legacy sources never create outbox" do
+    assert_no_difference(["DomainOutboxEvent.count", "ActivityEvent.count",
+                          "ProjectIntake.count", "IntakeScopeRevision.count"]) do
+      ProjectIntake.transaction do
+        temporary = ProjectIntake.create!(
+          workspace: @workspace, title: "Rolled-back private synthetic request",
+          project_type: "rails_bugfix", goal: "This synthetic request must not be committed.",
+          demo_consent_at: Time.current
+        )
+        temporary.intake_scope_revisions.create!(
+          version: 1, author_role: "client",
+          answers: { "business_goal" => {
+            "text" => "Private synthetic rollback",
+            "status" => "unknown", "responsibility" => "client"
+          } }
+        )
+        raise ActiveRecord::Rollback
+      end
+    end
+
+    orphan = nil
+    assert_no_difference(["DomainOutboxEvent.count", "ActivityEvent.count"]) do
+      orphan = ProjectIntake.create!(
+        title: "Unassigned legacy fictional intake", project_type: "rails_bugfix",
+        goal: "Legacy source without an assigned workspace is private and unprojected.",
+        demo_consent_at: Time.current
+      )
+      orphan.intake_scope_revisions.create!(
+        version: 1, author_role: "client", answers: {}
+      )
+    end
+    assert_nil orphan.workspace_id
+  end
+
+  test "C2.3b5 refuses foreign source event injection" do
+    record = @intake.intake_scope_revisions.create!(
+      version: 2, author_role: "client", answers: {}
+    )
+    assert_no_difference(["ActivityEvent.count", "AiSpendEntry.count"]) do
+      Activity::Recorder.record!(
+        workspace: @other_workspace, subject: record,
+        kind: "scope_revision_saved", title: "Foreign source", metadata: { "version" => 2 }
+      )
+    end
+    assert_equal({ attempted: 0, delivered: 0, failed: 0 },
+      DomainOutbox::Replayer.run!(workspace: @other_workspace))
+    assert_equal 0, DomainOutboxEvent.where(workspace_id: @other_workspace.id,
+      source_type: "IntakeScopeRevision", source_id: record.id).count
+  end
+
   test "foreign workspace cannot replay and invalid source does not create an event" do
     original = new_revision
     outbox = DomainOutboxEvent.find_by!(source_id: original.id, source_type: "IntakeRequirementSet")
