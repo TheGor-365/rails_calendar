@@ -24,7 +24,7 @@
             <%= link_to item[:path], class: "wa-calendar-activity__item" do %>
               <span class="wa-calendar-activity__icon"><i class="bi bi-<%= item[:icon] %>" aria-hidden="true"></i></span>
               <span class="wa-calendar-activity__text"><strong><%= item[:title] %></strong>
-                <small><%= t("calendar_actions.kinds.#{item[:kind]}") %> · <%= l(item[:created_at], format: :short) %> · <%= ActivityEvent::KINDS.include?(item[:status]) ? t("activity_journal.events.#{item[:status]}") : t("calendar_actions.states.#{item[:status]}", default: item[:status]) %></small></span>
+                <small><%= t("calendar_actions.kinds.#{item[:kind]}") %> · <%= l(item[:created_at], format: :short) %> · <%= rc_calendar_activity_status(item) %></small></span>
               <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
             <% end %>
           <% end %>
