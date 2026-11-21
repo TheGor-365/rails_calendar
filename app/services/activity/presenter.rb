@@ -21,7 +21,11 @@ module Activity
           .where(project_intakes: { workspace_id: event.workspace_id })
           .find_by(id: event.subject_id)
         source ? paths.owner_requirements_path(source.project_intake_id) : paths.owner_artifacts_path
-      when "AiSpendEntry" then paths.owner_ai_activity_path
+      when "AiSpendEntry"
+        entry = AiSpendEntry.find_by(id: event.subject_id) if event.kind == "ai_settled"
+        Activity::SourceLinks.ai_conversation_path(
+          workspace_id: event.workspace_id, spend_entry: entry
+        ) || paths.owner_ai_activity_path
       when "OwnerAiConversation"
         conversation = OwnerAiConversation.where(workspace_id: event.workspace_id)
           .find_by(id: event.subject_id)
