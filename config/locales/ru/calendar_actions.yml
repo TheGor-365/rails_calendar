@@ -16,6 +16,7 @@ ru:
     no_activity: "За выбранный период действий не найдено."
     now: "Текущее время"
     kinds:
+      service: "Услуга"
       conversation: "Беседа ИИ"
       invitation: "Приглашение"
       request: "Заявка"
