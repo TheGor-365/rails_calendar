@@ -74,6 +74,14 @@ CI context: reviewed R0.4b1 writer code `15968f4` passed [Rails #44945367534](ht
 
 **Git status and privacy:** the owner's local checkout still reports ` M db/schema.rb` and is older than remote Draft PR #81. Never reset/rebase/pull over uncommitted state or paste sensitive `/proc/*/environ`, DB URLs, raw archives or client data.
 
+## R0.4b2 owner-controlled :3002 shutdown — EXECUTED and verified in terminal
+
+**New owner-provided terminal evidence (2026-11-21):** Following the prior exact-PID/cwd/executable/PPID/listener/child safeguards, user ran `kill -TERM 788493` **only after every guard passed**. Local Rails server log: `Gracefully stopping, waiting for requests to finish`, `Exiting`; zsh recorded `[1] 788493 terminated bash script/rc0551f_c21c_local_grok_server.sh`. The guard's immediate post-stop `ss -H -ltnp '( sport = :3001 or sport = :3002 )'` printed **nothing**: no listener on either port at that moment. Parent zsh PID 6778 was not signaled. **Status: isolated :3002 GRACEFULLY STOPPED.** This is not a DB backup, scratch restore or permission to deploy.
+
+**Remaining R0.4b2 pre-write checks:** repeat read-only listener inspection for both ports, run a separate exact review DB `pg_stat_activity` count to detect new sessions, optionally enumerate other gor-owned project Ruby background processes without printing argv/environment. The original `pg_stat_activity=0` observation predated server shutdown and is not sufficient for a current writer-quiescence assertion. Any reconnecting worker, new listener, or service auto-restart is a hard STOP until diagnosed.
+
+**Authorization separation:** the user's request to continue and the executed :3002 SIGTERM **do not themselves confirm approval of the distinct DB/media backup and new scratch DB creation**, which entail local data writes and occupy disk. Before the first writer action, review/fetch the exact immutable GitHub code SHA `15968f473477a85a6f1746e63ca843fe56eb2160` into the older checkout **without checkout, reset, merge or changing `db/schema.rb`**, check the script's pinned DB socket and private-path constraints and ask for explicit user approval. Preserve archives/scratch unless later separately authorized to clean.
+
 ## Phase C. Rehearsal/migration, only after explicit authorization
 1. Validate the exact Rails connection again (database, server, socket, user, environment), and ensure no pending unrelated migrations. Git code SHA and `schema_migrations` must correspond.
 2. On the **restored scratch DB only**, try the **specific** migration `20261121003000` with an isolated environment that cannot reach production; prove new constraints/table, run targeted tests/read-only outbox simulation, compare counts. Do NOT connect Rails process port 3002 to the scratch without a distinct port and documented isolation.
