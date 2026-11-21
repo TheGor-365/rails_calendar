@@ -842,8 +842,27 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
       expanded.requirements.last.fetch("acceptance_criteria")
     assert_equal 1, current.reload.requirements.size
 
+    # E2.4c: historical diffs are rendered from immutable saved revisions,
+    # without inserting new versions, charging AI or leaking drafts to clients.
+    assert_no_difference ["IntakeRequirementSet.count", "AiSpendEntry.count"] do
+      get owner_requirements_path(intake)
+      assert_response :success
+    end
+    assert_select "details[data-requirement-diff-version='2']" do
+      assert_select "[data-requirement-change-id='R-001']", count: 1
+      assert_select "pre", text: /Visitors can send the contact form/
+      assert_select "pre", text: /A successful request is displayed/
+    end
+    assert_select "details[data-requirement-diff-version='3']" do
+      assert_select "[data-requirement-change-id='R-002']", count: 1
+      assert_select "pre", text: /The form notifies the visitor/
+    end
+    assert_equal [], original.reload.requirements.first.fetch("acceptance_criteria")
+
     sign_out
     login(@client)
+    get owner_requirements_path(intake)
+    assert_response :not_found
     patch owner_requirements_path(intake), params: changes
     assert_response :not_found
   end
