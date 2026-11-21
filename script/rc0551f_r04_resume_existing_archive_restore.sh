@@ -166,9 +166,9 @@ printf 'Pre-write checks PASS: PG16 local review DB, stopped sessions, media and
   die "Private backup root absent or permissions changed."
 shopt -s nullglob
 sessions=("$BACKUP_ROOT"/r04_*)
-[[ "\${#sessions[@]}" -eq 1 ]] ||
+[[ "${#sessions[@]}" -eq 1 ]] ||
   die "Expected exactly one existing backup session; inspect manually."
-backup="\${sessions[0]}"
+backup="${sessions[0]}"
 [[ -d "$backup" && ! -L "$backup" &&
   "$(stat -c '%U:%a' "$backup")" == "$EXPECTED_ROLE:700" ]] ||
   die "Backup session owner/mode mismatch."

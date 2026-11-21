@@ -82,6 +82,8 @@ grep -Fq 'sha256sum -c --status SHA256SUMS' "$SCRIPT"
 grep -Fq 'schema_migrations differ' "$SCRIPT"
 grep -Fq 'backup_and_scratch_preserved=yes' "$SCRIPT"
 grep -Fq 'Expected exactly one existing backup session' "$SCRIPT"
+grep -Fq '[[ "${#sessions[@]}" -eq 1 ]]' "$SCRIPT"
+grep -Fq 'backup="${sessions[0]}"' "$SCRIPT"
 grep -Fq 'RESTORE-EXISTING-ARCHIVE' "$SCRIPT"
 grep -Fq '[[ -t 0 ]]' "$SCRIPT"
 if grep -Fq 'tar -xf ' "$SCRIPT"; then echo 'FAIL: resume must not extract tar' >&2; exit 1; fi
