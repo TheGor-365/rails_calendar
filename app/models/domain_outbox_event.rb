@@ -10,7 +10,8 @@ class DomainOutboxEvent < ApplicationRecord
     "OwnerAiMessage" => "ai_reply_saved",
     "ClientRequestInvitation" => %w[
       invitation_issued invitation_claimed invitation_submitted invitation_revoked
-    ].freeze
+    ].freeze,
+    "ServiceOfferingPublication" => %w[service_published service_unpublished].freeze
   }.freeze
   MAX_ATTEMPTS = 5
 
@@ -91,6 +92,34 @@ class DomainOutboxEvent < ApplicationRecord
       source_id: invitation.id, source_version: version, kind: kind,
       occurred_at: occurred_at, state: "pending", attempts: 0,
       created_at: now, updated_at: now
+    }], unique_by: :idx_domain_outbox_source_revision)
+  end
+
+  # Immutable publication audits, not an approval action or a mutable
+  # published_version_id pointer, are authoritative for this event.
+  # Each audit source is its own v1 immutable event, including unpublish.
+  def self.enqueue_service_publication!(publication)
+    return unless publication.persisted?
+    offering = publication.service_offering
+    return unless offering&.workspace_id.present? &&
+      publication.owner_user_id == offering.workspace.owner_user_id
+    kind = case publication.event
+    when "publish"
+      return unless publication.service_offering_version&.approved? &&
+        publication.service_offering_version.service_offering_id == offering.id
+      "service_published"
+    when "unpublish"
+      return if publication.service_offering_version_id.present?
+      "service_unpublished"
+    end
+    return unless kind
+
+    now = Time.current
+    insert_all([{
+      workspace_id: offering.workspace_id,
+      source_type: "ServiceOfferingPublication", source_id: publication.id,
+      source_version: 1, kind: kind, occurred_at: publication.created_at,
+      state: "pending", attempts: 0, created_at: now, updated_at: now
     }], unique_by: :idx_domain_outbox_source_revision)
   end
 
