@@ -1,6 +1,6 @@
 # R0.4b2 — resume existing archive to isolated scratch, 2026-11-22
 
-**STATUS 2026-11-22:** OWNER TERMINAL RESTORE PASS / SCRIPTED VALIDATION PASS; independent read-only SQL evidence PENDING. Code CI and Security verified. Do not repeat restore.
+**STATUS 2026-11-22:** OWNER TERMINAL RESTORE PASS / SCRIPTED VALIDATION PASS; independent post-restore read-only SQL comparison PASS. Code CI and Security verified. Do not repeat restore.
 
 ## Evidence
 - Owner terminal local `READ_ONLY_PREFLIGHT=PASS`: HEAD c25be48, `M db/schema.rb`, old writer untracked; exact local PG16.11 socket review DB `rails_calendar_rc0551f_c21b_review_20261117`, role gor, OTHER_SESSIONS=0, OUTBOX=false, 23 GB free.
@@ -28,3 +28,9 @@ After earlier verified SHA256 and local read-only gates, user explicitly approve
 **Next (WRITE, separate permission required):** inspect local checkout drift (`c25be48`, `db/schema.rb M`) and source migration `20261121003000_create_domain_outbox_events.rb`, prepare a scratch-only isolated Rails connection and rehearse only that version, then revalidate. Existing script `rc0551f_c21a_migrate_scratch_only.sh` is for an older DB and different migration; do not run it here.
 
 CI evidence: code commit `36859c3086f6ece81630703145a7e82e8cd56159` — [Rails CI #44958765911](https://github.com/TheGor-365/rails_calendar/actions/runs/44958765911) and [Security #44958765901](https://github.com/TheGor-365/rails_calendar/actions/runs/44958765901) SUCCESS. Pre-restore docs head `8a7bbad` — [Rails CI #44959920387](https://github.com/TheGor-365/rails_calendar/actions/runs/44959920387) and [Security #44959920204](https://github.com/TheGor-365/rails_calendar/actions/runs/44959920204) SUCCESS. Current canonical progress: [execution status](RAILS_CALENDAR_EXECUTION_STATUS.md); [full MVP roadmap](RAILS_CALENDAR_MVP_EXECUTION_ROADMAP.md).
+
+## Independent read-only SQL evidence — 22 November 2026
+
+Owner returned `SCRATCH_DB=rails_calendar_r04_restore_20261121t231331z_27407`, `SOURCE_AND_SCRATCH_SCHEMA=PASS`, `CORE_ROW_COUNTS=PASS`, `SCHEMA_MIGRATIONS=PASS`, `POST_RESTORE_INDEPENDENT_READ_ONLY=PASS`, `MIGRATION_20261121003000=NOT_APPLIED`. This is separate from the restore script's own self-checks. Original PG16 review DB, archive and scratch preserved. No migration is currently authorized.
+
+**New next gate:** [R0.4c scratch-only outbox migration preparation](RC0551F_R04_SCRATCH_OUTBOX_MIGRATION_GATE_2026-11-22.md). Verify remote migration presence and old local checkout drift read-only before proposing any writer. Do not re-run restore.
