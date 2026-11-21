@@ -26,4 +26,5 @@ es:
       ai_settled: "Resultado de IA recibido"
       ai_uncertain: "Facturación de IA pendiente de revisión"
       ai_cancelled: "Solicitud de IA cancelada"
+      ai_reply_saved: "Respuesta de IA guardada"
       conversation_created: "Conversación creada"
