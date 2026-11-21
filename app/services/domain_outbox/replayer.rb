@@ -51,24 +51,38 @@ module DomainOutbox
     end
 
     def self.deliver!(event, workspace:)
-      unless event.source_type == "IntakeRequirementSet" && event.kind == "requirements_saved"
+      case [event.source_type, event.kind]
+      when ["IntakeRequirementSet", "requirements_saved"]
+        source = IntakeRequirementSet.joins(:project_intake)
+          .where(project_intakes: { workspace_id: workspace.id })
+          .find_by(id: event.source_id, version: event.source_version)
+        raise SourceUnavailable, "source not in workspace" unless source
+
+        Activity::Recorder.record!(
+          workspace: workspace, subject: source, kind: "requirements_saved",
+          title: "#{source.project_intake.title} · v#{source.version}",
+          metadata: { "version" => source.version }, occurred_at: event.occurred_at
+        )
+      when ["OwnerAiMessage", "ai_reply_saved"]
+        source = OwnerAiMessage.joins(:owner_ai_conversation)
+          .where(owner_ai_conversations: { workspace_id: workspace.id })
+          .find_by(id: event.source_id, sequence: event.source_version,
+                   role: "assistant", state: "settled")
+        raise SourceUnavailable, "source not in workspace" unless source &&
+          source.ai_spend_entry&.status == "settled" &&
+          source.ai_spend_entry.professional_profile&.workspace_id == workspace.id
+
+        Activity::Recorder.record!(
+          workspace: workspace, subject: source, kind: "ai_reply_saved",
+          title: "AI reply saved", occurred_at: event.occurred_at
+        )
+      else
         raise SourceUnavailable, "unsupported source"
       end
 
-      source = IntakeRequirementSet.joins(:project_intake)
-        .where(project_intakes: { workspace_id: workspace.id })
-        .find_by(id: event.source_id, version: event.source_version)
-      raise SourceUnavailable, "source not in workspace" unless source
-
-      Activity::Recorder.record!(
-        workspace: workspace, subject: source, kind: "requirements_saved",
-        title: "#{source.project_intake.title} · v#{source.version}",
-        metadata: { "version" => source.version }, occurred_at: event.occurred_at
-      )
-
       # Recorder deliberately returns nil for invalid/foreign subjects; verify
       # that the expected immutable event actually exists before acking.
-      key = "IntakeRequirementSet:#{source.id}:requirements_saved"
+      key = "#{event.source_type}:#{event.source_id}:#{event.kind}"
       raise SourceUnavailable, "event not projected" unless ActivityEvent.exists?(
         workspace_id: workspace.id, event_key: key
       )
