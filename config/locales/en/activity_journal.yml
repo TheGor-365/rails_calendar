@@ -23,6 +23,7 @@ en:
       invitation_submitted: "Request submitted"
       invitation_revoked: "Invitation revoked"
       intake_created: "Request created"
+      scope_revision_saved: "Project scope revision saved"
       requirements_saved: "Requirements saved"
       ai_attempted: "AI request recorded"
       ai_settled: "AI result received"
