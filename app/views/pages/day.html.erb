@@ -6,7 +6,11 @@
         <time datetime="<%= @selected_date.iso8601 %>"><%= rc_local_date(@selected_date, format: :rc_full) %></time>
       </h1></div>
       <p class="rc-muted mb-0">
-        <span class="rc-data-number"><%= rc_count(@consultations.size, "calendar", "consultation") %></span>
+        <span class="rc-data-number" data-calendar-day-total><%= rc_count(@day_total, "calendar", "event") %></span>
+        <span aria-hidden="true">·</span> <%= rc_count(@consultations.size, "calendar", "consultation") %>
+        <% if owner_signed_in? %>
+          <span aria-hidden="true">·</span> <%= t("calendar.day_actions", count: @day_activity.size) %>
+        <% end %>
         <span aria-hidden="true">·</span> 00:00–24:00
         <span aria-hidden="true">·</span> <%= Time.zone.name %>
       </p>
@@ -32,6 +36,41 @@
                   class: "rc-navigation-link" %>
     <% end %>
   </nav>
+
+  <% if owner_signed_in? && @day_activity.any? %>
+    <section class="wa-calendar-day-recap mb-3" aria-label="<%= t("calendar.day_activity_heading") %>">
+      <header class="wa-calendar-day-recap__header">
+        <div>
+          <h2 class="h6 mb-1"><i class="bi bi-clock-history" aria-hidden="true"></i> <%= t("calendar.day_activity_heading") %></h2>
+          <p class="rc-hint mb-0"><%= t("calendar.day_activity_hint") %></p>
+        </div>
+        <span class="wa-calendar-day-recap__total"><%= @day_activity.size %></span>
+      </header>
+      <ol class="wa-calendar-day-recap__list">
+        <% @day_activity.first(8).each do |entry| %>
+          <% occurred = entry[:created_at].in_time_zone %>
+          <% period = occurred < Time.current ? "past" : "upcoming" %>
+          <li class="wa-calendar-day-recap__item wa-calendar-day-recap__item--<%= period %>"
+              data-calendar-activity-hour="<%= occurred.hour %>">
+            <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: occurred.hour),
+                        class: "wa-calendar-day-recap__time" do %>
+              <time datetime="<%= occurred.iso8601 %>"><%= occurred.strftime("%H:%M") %></time>
+            <% end %>
+            <div class="wa-calendar-day-recap__description">
+              <strong><%= entry[:title] %></strong>
+              <small><%= t("calendar_actions.kinds.#{entry[:kind]}") %> · <%= t("calendar_actions.states.#{entry[:status]}", default: entry[:status]) %></small>
+            </div>
+            <%= link_to rc_icon_label("arrow-up-right", t("calendar.day_open_source")), entry[:path],
+                        class: "rc-action rc-action--quiet rc-action--small wa-calendar-day-recap__source" %>
+          </li>
+        <% end %>
+      </ol>
+      <% if @day_activity.length > 8 %>
+        <p class="rc-hint mb-0"><%= link_to t("calendar.day_more_activity", count: @day_activity.length - 8),
+                                  owner_activity_events_path %></p>
+      <% end %>
+    </section>
+  <% end %>
 
   <section class="rc-agenda" aria-label="<%= t("calendar.agenda_aria") %>">
     <div class="rc-agenda-legend" aria-hidden="true">
@@ -87,8 +126,9 @@
           <% end %>
           <%# Activity records belong to their actual creation hour, not a detached list only. %>
           <% if owner_signed_in? %>
-            <% @day_activity.group_by { |entry| entry[:created_at].in_time_zone.hour }.each do |hour, entries| %>
-              <details class="wa-calendar-hour-activity" data-controller="wa-accordion"
+            <% @day_activity_by_hour.each do |hour, entries| %>
+              <details class="wa-calendar-hour-activity <%= 'wa-calendar-hour-activity--past' if entries.all? { |entry| entry[:created_at] < Time.current } %>"
+                       data-controller="wa-accordion" data-calendar-hour="<%= hour %>"
                        style="top: <%= hour * Calendar::DayEventLayout::HOUR_HEIGHT_PX + 3 %>px">
                 <summary data-action="click->wa-accordion#toggle"
                          aria-label="<%= format('%02d:00', hour) %> · <%= entries.size %>">
