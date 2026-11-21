@@ -1,5 +1,25 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## R0.4b3 independent post-restore SQL validation PASS — 22 November 2026
+
+**Primary owner-terminal proof:** the separate, all-read-only PostgreSQL 16.11 audit printed:
+```text
+SCRATCH_DB=rails_calendar_r04_restore_20261121t231331z_27407
+SOURCE_AND_SCRATCH_SCHEMA=PASS
+CORE_ROW_COUNTS=PASS
+SCHEMA_MIGRATIONS=PASS
+POST_RESTORE_INDEPENDENT_READ_ONLY=PASS
+MIGRATION_20261121003000=NOT_APPLIED
+```
+Operator verified exact scratch/source role `gor`, local Unix socket PG16, and exactly one DB matching the scratch prefix; compared total public table count, row totals for `users`, `workspaces`, `project_intakes`, `schema_migrations`, `active_storage_blobs`, `active_storage_attachments`, and ordered schema_migrations version set; confirmed `domain_outbox_events` absent in BOTH databases. Also verified existing private restore-report safety markers, archive/media parity and non-sensitive existence. No write occurred in this audit and no archive contents/logs were uploaded.
+
+**Status classification:** `R0.4b2 OWNER-TERMINAL RESTORE PASS` + `R0.4b3 INDEPENDENT READ-ONLY DB PARITY PASS`. Backup/restore gate for local PG16 review snapshot is VERIFIED at these boundaries. This does **NOT** verify app/runtime at :3002, future migration, Chrome acceptance, Railway PG18 backup/restore or production data parity. The exact original source `rails_calendar_rc0551f_c21b_review_20261117`, private archive and restored scratch are PRESERVED. Do not repeat restore or delete temporary DB; local checkout `c25be48` / modified `db/schema.rb` remain protected.
+
+**Next targeted gate — C2.3b1 / R0.4c SCRATCH-ONLY outbox migration rehearsal (NOT AUTHORIZED, NOT EXECUTED):** the current remote feature contains `db/migrate/20261121003000_create_domain_outbox_events.rb` Git blob `b1175a8ab37c5726fcaaae269adc7b1ea16892c7` (Rails 8.1 migration; creates `domain_outbox_events` with workspace FK, unique source revision index, delivery queue index and three CHECK constraints). The owner's local working-tree HEAD is historically `c25be48`, so presence of this migration locally and schema drift must be verified **read-only** before any execution. Never use the historical `script/rc0551f_c21a_migrate_scratch_only.sh` (different DB/version) and never blind `git pull`, reset the locally modified schema, run `db:prepare` or apply all pending migrations. First compare exact remote migration blob with local Git object/current file and identify a non-mutating method to execute only one migration with Rails explicitly connected to the restored scratch. Obtain a new, specific affirmative owner authorization BEFORE any migration writes. No Railway/main/paid AI.
+
+**Prior exact-head CI:** pre-update PR HEAD `0b79d9db1bca250e8c18412bda67934c21f16165` [Rails CI #44961064956](https://github.com/TheGor-365/rails_calendar/actions/runs/44961064956) SUCCESS, [Security #44961065079](https://github.com/TheGor-365/rails_calendar/actions/runs/44961065079) SUCCESS. This documentation change requires its own exact-SHA CI verification.
+
+
 ## R0.4b2 owner-operated scratch restore PASS — 22 November 2026
 
 **Evidence (owner terminal, 2026-11-22):** User explicitly authorized ONE new local scratch database and invoked pinned `script/rc0551f_r04_resume_existing_archive_restore.sh` (Git blob `968ac8db697152f3193a3b9ba128df6bbab87362`) on Linux Mint. Output: `LOCAL_RECOVERY_SCRIPT=VERIFIED`, `RESTORE_SCOPE=NEW_SCRATCH_ONLY`, `Pre-write checks PASS`, `READY: existing private backup verified`, explicit typed `RESTORE-EXISTING-ARCHIVE`, `Created isolated scratch DB. Source database untouched by restore.`, and **`PASS R0.4b2: EXISTING private archive and new isolated scratch restore verified.`** No STOP/error in terminal output. The immutable verified script uses `createdb -T template0`, PG16 custom `pg_restore --exit-on-error --no-owner --no-acl` into scratch only, compares public table totals, six core row totals and exact `schema_migrations`, and rechecks media archive and SHA256. Existing archive and scratch were PRESERVED. Private `resume_verification_private.txt` is written locally; do not upload it, client data or archives.
@@ -119,7 +139,7 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 | `R0.3` Schema drift review | `M db/schema.rb` **CONFIRMED** | user `git status --short` | Do not reset; audit diff safely |
 | `R0.4a` Exact local review DB + storage read-only preflight | **CODE + CI VERIFIED; NOT RUN LOCALLY** | `c6d8372` [Rails #44932465224](https://github.com/TheGor-365/rails_calendar/actions/runs/44932465224) and [Security #44932465167](https://github.com/TheGor-365/rails_calendar/actions/runs/44932465167) SUCCESS, [runbook](RC0551F_REVIEW_DB_BACKUP_MIGRATION_GATE.md) | local script is in remote feature only; R0.4a itself not executed on owner machine |
 | `R0.4b1` Exact review DB backup and isolated restore script + offline deny tests | **CODE + CI VERIFIED; NOT RUN LOCALLY** | functional SHA `15968f4`, [Rails #44945367534](https://github.com/TheGor-365/rails_calendar/actions/runs/44945367534) SUCCESS (391/6390 Rails, 47/726 Chrome, PG18 fresh/upgrade, R0.4b deny tests), [Security #44945367615](https://github.com/TheGor-365/rails_calendar/actions/runs/44945367615) SUCCESS; [runbook](RC0551F_REVIEW_DB_BACKUP_MIGRATION_GATE.md) | explicit user consent and stopped writers, verified local scratch restore not done |
-| `R0.4b2` Existing archive → isolated scratch | **OWNER_TERMINAL_RESTORE_PASS / SCRIPTED_CHECKS_PASS** | Terminal output 22.11: guarded `createdb` + `pg_restore`, restored table/row/schema_migrations comparisons + archive/media SHA checks succeeded; code SHA `36859c3` CI/Security PASS | Independent read-only PG16 scratch/source comparison still pending; preserve scratch and private archive. |
+| `R0.4b2–b3` Existing archive restore and independent scratch parity | **LOCAL OWNER RESTORE VERIFIED + INDEPENDENT READ-ONLY PARITY PASS** | Owner terminal 22.11: scripted restore PASS; read-only source/scratch exact PG16 identity, six core row counts, public table count, all schema_migrations matched; exact scratch `rails_calendar_r04_restore_20261121t231331z_27407` | Scratch-only migration `20261121003000` still NOT APPLIED or authorized; local code/schema drift and Rails effective scratch target pending. |
 | `R0.5` Exact CI + browser QA | Historic CI green, new head pending | links below | New head CI; role/viewport QA |
 | `C2.2.1–C2.2.4` Month/day/hour/source and visual contrast | **CODE in Draft** | feature commits `ecc0552` and later | owner :3002 screenshots for new checkout absent |
 | `C2.2.5–C2.2.6` Responsive/ACL + unrelated spec workbench flake | Test coverage present, some historic failures | previous Chrome logs in PR | full human validation & no flakes |
@@ -152,10 +172,10 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 
 ## 4. Immediate next *unverified* step
 
-1. **R0.4b2 owner-operated restore SUCCESS; do not repeat.** Existing private archive and scratch preserved; original DB not migrated, local `db/schema.rb M` preserved.
-2. **P0 independent post-restore read-only evidence (NEXT):** identify unique local PG16 scratch; validate database identity/socket, public table counts, six core row counts and exact `schema_migrations`; check safe verification markers. No local writes.
-3. **P1 SCRATCH ONLY migration rehearsal (separate explicit approval, NOT DONE):** verify current migration file `db/migrate/20261121003000_create_domain_outbox_events.rb` and code/schema drift, target isolated scratch connection only; no blind all-migrations, no review DB migration.
-4. **P2:** finish outbox browser QA, `C2.3b6b2/C2.3b6c2` supervised replay, `C2.3b7` dry-run backfill, `C2.3c` deterministic projections, `C2.4` reviewed AI Action Engine, `E1–E2.5`, `M6–M8` according to [MVP roadmap](RAILS_CALENDAR_MVP_EXECUTION_ROADMAP.md). Check exact SHA CI/security after any new commit. PR remains Draft; Railway and paid AI not authorized.
+1. **R0.4b2/b3 RESTORE VERIFIED, DO NOT REPEAT.** Original local review DB, 0700 private archive, recovered scratch `rails_calendar_r04_restore_20261121t231331z_27407` preserved; no source outbox migration, production or cleanup.
+2. **P0 R0.4c / C2.3b1 scratch-only migration readiness (NEXT, READ-ONLY):** detect current local checkout SHA, `db/schema.rb` staged/unstaged changes, exact availability/hash of remote migration `20261121003000_create_domain_outbox_events.rb` (blob `b1175a8...`), Ruby/Bundler and roles, remaining local scratch identity. Do not modify files. Prepare a single-version, guarded scratch-only migration procedure that cannot silently connect to source, edit local schema or apply unrelated migrations.
+3. **P1 AFTER SEPARATE OWNER APPROVAL:** run targeted migration VERSION=20261121003000 on scratch only; validate constraints/indices, schema_migrations and preserved core rows independently. No automatic restore/migration retry or scratch cleanup.
+4. **P2 code and feature roadmap:** `C2.3b6b2/C2.3b6c2` supervised replay + concurrency, `C2.3b7` dry-run backfill, `C2.3c` projections, `C2.4` action engine, `E1–E2.5`, `M6–M8`; independently complete local C2.2 browser/ACL acceptance, then Railway release only after owner-approved M8 gates. No misleading DONE labels.
 
 ## 5. Registry update rule (mandatory after any code work)
 
