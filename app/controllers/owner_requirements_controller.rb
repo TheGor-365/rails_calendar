@@ -144,8 +144,12 @@ class OwnerRequirementsController < ApplicationController
   end
 
   def load_intake!
+    # Never turn a missing owner workspace into a workspace_id: NULL query:
+    # unassigned legacy requests are not an owner's private tenant.
     workspace = current_user.owner_workspace
-    @intake = ProjectIntake.where(workspace_id: workspace&.id).find_by(id: params[:id])
+    return head :not_found unless workspace
+
+    @intake = ProjectIntake.where(workspace_id: workspace.id).find_by(id: params[:id])
     head :not_found unless @intake
   end
 end
