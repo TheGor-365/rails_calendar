@@ -119,6 +119,6 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
     assert_equal "failed", missing.reload.state
     assert_equal "DomainOutbox::Replayer::SourceUnavailable", missing.last_error_code
     assert missing.next_attempt_at > Time.current
-    assert_equal "pending", outbox.reload.state == "delivered" ? "pending" : outbox.state
+    assert_equal "delivered", outbox.reload.state
   end
 end
