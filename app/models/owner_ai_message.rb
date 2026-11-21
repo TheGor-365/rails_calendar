@@ -29,6 +29,12 @@ class OwnerAiMessage < ApplicationRecord
 
   before_validation :set_request_id, on: :create
 
+  # Save the source-only delivery envelope in the *same transaction* as a
+  # newly-settled assistant reply. Its activity projection remains separate.
+  after_save :enqueue_settled_reply, if: :newly_settled_assistant_reply?
+  after_commit :record_settled_reply, on: %i[create update],
+    if: :newly_settled_assistant_reply?
+
   scope :in_order, -> { order(:sequence, :id) }
 
   def owner_message?
@@ -40,6 +46,23 @@ class OwnerAiMessage < ApplicationRecord
   end
 
   private
+
+  def newly_settled_assistant_reply?
+    assistant_message? && state == "settled" && ai_spend_entry&.status == "settled" &&
+      (saved_change_to_state? || saved_change_to_id?)
+  end
+
+  def enqueue_settled_reply
+    DomainOutboxEvent.enqueue_settled_reply!(self)
+  end
+
+  def record_settled_reply
+    Activity::Recorder.record!(
+      workspace: owner_ai_conversation.workspace, subject: self,
+      kind: "ai_reply_saved", title: "AI reply saved",
+      occurred_at: updated_at
+    )
+  end
 
   def set_request_id
     self.request_id ||= SecureRandom.uuid
