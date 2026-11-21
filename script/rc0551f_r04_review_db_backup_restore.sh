@@ -106,7 +106,7 @@ resolved="$(PGOPTIONS='-c default_transaction_read_only=on' \
   -v ON_ERROR_STOP=1 -Atc "SELECT current_database() || '|' || current_user || '|' ||
     current_setting('server_version_num') || '|' ||
     CASE WHEN inet_server_addr() IS NULL THEN 'socket' ELSE 'tcp' END")" ||
-  die "RC_LOCAL_DEV_DATABASE_URL could not be verified.")
+  die "RC_LOCAL_DEV_DATABASE_URL could not be verified."
 [[ "$resolved" == "$identity" ]] ||
   die "Configured Rails DB does not match the exact reviewed local DB."
 
