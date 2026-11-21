@@ -25,6 +25,8 @@ die() { printf 'STOP R0.4b: %s\n' "$1" >&2; exit 1; }
   die "Explicit RC_LOCAL_DEV_DATABASE_URL required (never print its value)."
 [[ "$(id -un)" == "$EXPECTED_ROLE" ]] ||
   die "Expected the unprivileged local gor account."
+[[ "$ROOT" == "$HOME/rails_calendar_ai_c21c" ]] ||
+  die "Script must run from the exact reviewed local Rails checkout."
 [[ "${RC_CONFIRM_SOURCE_DB:-}" == "$EXPECTED_DB" ]] ||
   die "Explicit RC_CONFIRM_SOURCE_DB must equal the exact review database name."
 [[ "${RC_CONFIRM_WRITERS_STOPPED:-}" == YES ]] ||
@@ -54,6 +56,28 @@ done
   die "Storage owner mismatch."
 [[ "$(stat -c '%G' "$ROOT/storage")" == "$EXPECTED_ROLE" ]] ||
   die "Storage group mismatch; stop for manual review."
+
+# The observed directory is group-writable (0775). Before archiving private
+# files, reject a group shared with *any* other primary/supplementary accounts.
+command -v getent >/dev/null || die "getent required for storage group audit."
+storage_gid="$(stat -c '%g' "$ROOT/storage")"
+primary_members="$(getent passwd | awk -F: -v gid="$storage_gid" '$4 == gid { print $1 }')"
+supplemental_members="$(getent group "$EXPECTED_ROLE" | awk -F: '{ print $4 }')"
+[[ "$primary_members" == "$EXPECTED_ROLE" && -z "$supplemental_members" ]] ||
+  die "Group-writable storage belongs to a shared group; stop for permission review."
+
+# Do not assume a config name alone proves where Active Storage actually writes.
+[[ -f "$ROOT/bin/rails" ]] || die "Rails executable missing in reviewed checkout."
+actual_media_root="$(cd "$ROOT" &&
+  ASDF_RUBY_VERSION=3.4.13 RAILS_ENV=development RC_GROK_ENABLED=false
+  PGOPTIONS='-c default_transaction_read_only=on' ruby bin/rails runner '
+    service = ActiveStorage::Blob.service
+    abort("STOP: non-local Active Storage service") unless
+      service.is_a?(ActiveStorage::Service::DiskService)
+    puts File.realpath(service.root.to_s)
+  ')" || die "Cannot verify effective Active Storage disk root."
+[[ "$actual_media_root" == "$ROOT/storage" ]] ||
+  die "Effective Active Storage root is not the reviewed storage/ directory."
 
 # The original :3001 server is never stopped by this tool. The user must
 # identify active writers before running it; :3002 must be stopped too.
