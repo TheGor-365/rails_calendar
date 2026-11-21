@@ -24,6 +24,10 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
         }
       }
     )
+    # C2.3b5: model setup itself now commits an intake + scope envelope.
+    # Drain those synthetic baseline events so subsequent isolated replay
+    # expectations concern only the exact source created in each test.
+    DomainOutbox::Replayer.run!(workspace: @workspace)
   end
 
   def new_revision(version: 1)
