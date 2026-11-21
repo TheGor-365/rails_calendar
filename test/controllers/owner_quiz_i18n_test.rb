@@ -39,7 +39,7 @@ class OwnerQuizI18nTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select "html[lang=?]", code
         assert_select "h1", text: workspace_title
-        assert_select ".ws-hub-tool[href=?]", new_project_intake_path, count: 1
+        assert_select ".ws-hub-tool[href=?]", owner_services_path, count: 1
 
         get project_intake_quiz_path(@intake, step: "outcome")
         assert_response :success
