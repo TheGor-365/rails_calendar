@@ -16,6 +16,8 @@ hy:
     open: "Բացել"
     none: "Համապատասխան իրադարձություններ չկան։"
     events:
+      service_published: "Ծառայությունը հրապարակվել է"
+      service_unpublished: "Ծառայությունը հանվել է հրապարակումից"
       invitation_issued: "Հրավեր է ստեղծվել"
       invitation_claimed: "Հրավերն ընդունվել է"
       invitation_submitted: "Հայտն ուղարկվել է"
