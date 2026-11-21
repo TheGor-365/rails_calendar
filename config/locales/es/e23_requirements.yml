@@ -30,3 +30,17 @@ es:
     add_atomic: "Añadir un requisito individual"
     add_atomic_help: "Si una sección incluye varias funciones, añade una función verificable vinculada a la sección original."
     section_label: "Sección de origen"
+  e24_requirements:
+    diff_summary: "Cambios frente a la versión anterior: %{count}"
+    no_changes: "Sin cambios en los requisitos."
+    before: "Antes"
+    after: "Después"
+    kinds:
+      added: "Añadido"
+      removed: "Eliminado"
+      changed: "Modificado"
+    fields:
+      statement: "Requisito"
+      status: "Estado"
+      acceptance_criteria: "Criterios de aceptación"
+      source: "Origen"
