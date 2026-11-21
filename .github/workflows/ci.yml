@@ -219,6 +219,13 @@ jobs:
             puts "PG18_BASELINE_FIXTURE_PASS"
           '
 
+      # Keep the previously deployed baseline's exact Ruby 3.4.12 runtime,
+      # then switch to the patched interpreter required by the candidate.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.13'
+          bundler-cache: false
+
       - name: Upgrade the same PG18 database to candidate HEAD
         working-directory: candidate
         run: |
