@@ -82,6 +82,28 @@ grep -Fq 'sha256sum -c SHA256SUMS' "$SCRIPT"
 grep -Fq 'schema_migrations differ' "$SCRIPT"
 grep -Fq 'backup_and_scratch_preserved=yes' "$SCRIPT"
 
+# Regression: the real UTC stamp includes uppercase T and Z. The generated
+# PostgreSQL database identifier must never inherit uppercase letters.
+# Offline only: no createdb, pg_restore, pg_dump, or real DB connections.
+grep -Fxq 'scratch_stamp="${stamp,,}"' "$SCRIPT"
+grep -Fxq 'scratch="rails_calendar_r04_restore_${scratch_stamp}_$RANDOM"' "$SCRIPT"
+for sample in 20261122T001600Z 20261231T235959Z; do
+  normalized="${sample,,}"
+  scratch_name="rails_calendar_r04_restore_${normalized}_12345"
+  [[ "$scratch_name" =~ ^[a-z0-9_]+$ ]] || {
+    echo 'FAIL: generated scratch database name contains invalid characters' >&2
+    exit 1
+  }
+  [[ "${#scratch_name}" -le 63 ]] || {
+    echo 'FAIL: generated scratch database name is too long' >&2
+    exit 1
+  }
+  [[ "$scratch_name" != rails_calendar_rc0551f_c21b_review_20261117 ]] || {
+    echo 'FAIL: generated scratch database name collides with source' >&2
+    exit 1
+  }
+done
+
 # No destructive DB/file cleanup and no unreviewed automatic schema mutation.
 if grep -Eq '^[[:space:]]*(dropdb|rm[[:space:]]+-rf|chmod[[:space:]]|chown[[:space:]]|bin/rails[[:space:]]+db:)' "$SCRIPT"; then
   echo 'FAIL: destructive or unreviewed data mutation in R0.4b writer' >&2
