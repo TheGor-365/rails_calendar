@@ -701,6 +701,27 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "owner without workspace cannot view unassigned legacy requirement drafts" do
+    orphan = ProjectIntake.create!(
+      title: "Private unassigned synthetic intake",
+      project_type: "rails_bugfix",
+      goal: "A fictional request that must not be visible to unrelated owners.",
+      demo_consent_at: Time.current
+    )
+    owner_without_workspace = make_test_owner("e24-orphan-#{SecureRandom.hex(5)}@example.test")
+    assert_nil owner_without_workspace.owner_workspace
+
+    login(owner_without_workspace)
+    get owner_requirements_path(orphan)
+    assert_response :not_found
+    assert_no_match(/Private unassigned synthetic intake/, response.body)
+
+    sign_out
+    login(@owner)
+    get owner_requirements_path(orphan)
+    assert_response :not_found
+  end
+
   test "owner creates immutable source-traced requirement candidates with stable IDs and no AI charges" do
     login(@owner)
     token = issue_invitation
