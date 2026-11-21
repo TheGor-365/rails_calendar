@@ -79,6 +79,25 @@ module DomainOutbox
           workspace: workspace, subject: source, kind: event.kind,
           title: source.seed_title, occurred_at: event.occurred_at
         )
+      when ["ServiceOfferingPublication", "service_published"],
+           ["ServiceOfferingPublication", "service_unpublished"]
+        source = ServiceOfferingPublication.joins(:service_offering)
+          .where(service_offerings: { workspace_id: workspace.id })
+          .find_by(id: event.source_id)
+        expected_kind = source&.event == "publish" ? "service_published" : "service_unpublished"
+        raise SourceUnavailable, "publication does not match owner or revision" unless
+          source && event.kind == expected_kind && event.source_version == 1 &&
+          source.owner_user_id == workspace.owner_user_id &&
+          (source.event == "unpublish" ||
+           (source.service_offering_version&.approved? &&
+            source.service_offering_version.service_offering_id == source.service_offering_id))
+
+        title = source.event == "publish" ? source.service_offering_version.title :
+          "Service #{source.service_offering.key} unpublished"
+        Activity::Recorder.record!(
+          workspace: workspace, subject: source, kind: event.kind,
+          title: title, occurred_at: event.occurred_at
+        )
       when ["OwnerAiMessage", "ai_reply_saved"]
         source = OwnerAiMessage.joins(:owner_ai_conversation)
           .where(owner_ai_conversations: { workspace_id: workspace.id })
