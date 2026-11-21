@@ -28,11 +28,44 @@ Rails.application.routes.draw do
   get "/client/requests/new", to: "client_requests#new", as: :new_client_request
   post "/client/requests", to: "client_requests#create", as: :client_requests
   get "/client/requests/:id", to: "client_requests#show", as: :client_request
+  get "/client/requests/:id/edit", to: "client_requests#edit", as: :edit_client_request
+  patch "/client/requests/:id", to: "client_requests#update"
+  post "/client/requests/:id/submit", to: "client_requests#submit", as: :submit_client_request
+
+  # E2: fragment-token landing, filtered POST preview and verified-client claim.
+  get "/invite", to: "client_invitations#landing", as: :client_invitation
+  post "/invite/preview", to: "client_invitations#preview"
+  get "/invite/preview", to: "client_invitations#show", as: :client_invitation_preview
+  post "/invite/claim", to: "client_invitations#claim", as: :claim_client_invitation
   post "/client/requests/:id/reply", to: "client_requests#reply", as: :reply_client_request
   post "/client/requests/:id/review", to: "client_requests#review", as: :review_client_request
 
+  # E2.3: private source-traced requirements candidate drafts (no AI call).
+  get "/workspace/intakes/:id/requirements", to: "owner_requirements#show", as: :owner_requirements
+  post "/workspace/intakes/:id/requirements", to: "owner_requirements#create"
+  patch "/workspace/intakes/:id/requirements", to: "owner_requirements#update"
+
+  # Owner-only notification inbox; viewing GET never changes read state.
+  get "/workspace/notifications", to: "owner_notifications#index", as: :owner_notifications
+  post "/workspace/notifications/read_all", to: "owner_notifications#read_all", as: :read_all_owner_notifications
+  post "/workspace/notifications/:id/read", to: "owner_notifications#read", as: :read_owner_notification
+
+  # Canonical owner workspace activity; metadata exports contain no private drafts.
+  get "/workspace/activity", to: "owner_activity_events#index", as: :owner_activity_events
+  get "/workspace/activity/:id.txt", to: "owner_activity_events#export", as: :export_owner_activity_event
+
+  # Owner artifact library. Downloads are generated from persisted source records.
+  get "/workspace/library", to: "owner_artifacts#index", as: :owner_artifacts
+  get "/workspace/library/:kind/:id.txt", to: "owner_artifacts#export", as: :export_owner_artifact
+
   # Private owner entry, never a public client cabinet.
   get "/workspace", to: "workspace#home", as: :workspace
+  get "/workspace/invitations", to: "owner_invitations#index", as: :owner_invitations
+  post "/workspace/invitations", to: "owner_invitations#create"
+  post "/workspace/invitations/ai_draft", to: "owner_invitations#ai_draft", as: :owner_invitation_ai_draft
+  get "/workspace/invitations/:id", to: "owner_invitations#show", as: :owner_invitation
+  patch "/workspace/invitations/:id/ai_draft", to: "owner_invitations#attach_ai_draft", as: :attach_owner_invitation_ai_draft
+  post "/workspace/invitations/:id/revoke", to: "owner_invitations#revoke", as: :revoke_owner_invitation
 
   # RC052: owner-only professional intelligence, AI review and immutable approval.
   get "/workspace/setup", to: "owner_setup#show", as: :owner_setup
@@ -53,7 +86,11 @@ Rails.application.routes.draw do
   post "/workspace/assistant/conversations", to: "owner_ai_conversations#create"
   get "/workspace/assistant/conversations/:id", to: "owner_ai_conversations#show", as: :owner_ai_conversation
   post "/workspace/assistant/conversations/:id/messages", to: "owner_ai_conversations#add_message", as: :owner_ai_conversation_messages
+  get "/workspace/assistant/conversations/:id/messages/:message_id/files/:attachment_id", to: "owner_ai_conversations#file", as: :owner_ai_conversation_file
+  patch "/workspace/assistant/conversations/:id/title", to: "owner_ai_conversations#rename", as: :rename_owner_ai_conversation
   post "/workspace/assistant/conversations/:id/archive", to: "owner_ai_conversations#archive", as: :archive_owner_ai_conversation
+  post "/workspace/assistant/conversations/:id/restore", to: "owner_ai_conversations#restore", as: :restore_owner_ai_conversation
+  delete "/workspace/assistant/conversations/:id/remove", to: "owner_ai_conversations#remove", as: :remove_owner_ai_conversation
 
   # RC055.1: private owner-controlled service offering revisions.
   get "/workspace/services", to: "owner_service_offerings#index", as: :owner_services

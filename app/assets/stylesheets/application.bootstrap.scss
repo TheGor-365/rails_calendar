@@ -1769,3 +1769,15 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
 // Scoped global owner-only AI launcher and draft review.
 @import 'rc_owner_ai_assistant';
+
+// Owner requests hub: White Atlas tabs, cards and accordion details.
+@import 'wa_requests';
+
+// White Atlas artifact library sidebar and live search.
+@import 'wa_library';
+
+// White Atlas calendar context actions and temporal contrast.
+@import 'wa_calendar_actions';
+
+// Private owner event history, traceable to canonical records.
+@import 'wa_activity_journal';

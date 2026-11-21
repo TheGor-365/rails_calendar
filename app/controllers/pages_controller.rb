@@ -26,6 +26,14 @@ class PagesController < ApplicationController
       from: from, through: through
     ).order(:start_time, :id).to_a
 
+    workspace = current_user.owner_workspace if owner_signed_in?
+    @month_invitations = workspace ? workspace.client_request_invitations
+      .where(created_at: from...through).order(created_at: :desc).limit(100) : []
+    @month_activity = workspace ? Calendar::OwnerActivity.between(
+      workspace: workspace, from: from, through: through
+    ) : []
+    @month_activity_by_day = @month_activity.group_by { |item| item[:created_at].in_time_zone.to_date }
+
     @consultations_by_day = (first_visible_day..last_visible_day).to_h do |date|
       day_start = Time.zone.local(date.year, date.month, date.day)
       day_end = day_start + 1.day
@@ -36,7 +44,8 @@ class PagesController < ApplicationController
     # The narrow seven-column grid is an overview; event links live in a
     # chronological agenda below it, not off-screen in a wide table.
     @month_days_with_events = @consultations_by_day.select do |date, events|
-      date.year == calendar_date.year && date.month == calendar_date.month && events.any?
+      date.year == calendar_date.year && date.month == calendar_date.month &&
+        (events.any? || @month_activity_by_day.fetch(date, []).any?)
     end
   rescue Date::Error, TypeError, ArgumentError
     redirect_to root_path, alert: "Invalid calendar date"
@@ -50,6 +59,14 @@ class PagesController < ApplicationController
     day_end = day_start + 1.day
 
     @consultations = overlapping_consultations(day_start, day_end)
+    workspace = current_user.owner_workspace if owner_signed_in?
+    @day_invitations = workspace ? workspace.client_request_invitations
+      .where(created_at: day_start...day_end).order(created_at: :desc) : []
+    @day_activity = workspace ? Calendar::OwnerActivity.between(
+      workspace: workspace, from: day_start, through: day_end
+    ) : []
+    @day_activity_by_hour = @day_activity.group_by { |item| item[:created_at].in_time_zone.hour }
+    @day_total = @consultations.size + @day_activity.size
     @timeline = Calendar::DayEventLayout.new(
       consultations: @consultations, day_start: day_start, day_end: day_end
     )
@@ -58,13 +75,14 @@ class PagesController < ApplicationController
       slot_start = Time.zone.local(@selected_date.year, @selected_date.month, @selected_date.day, hour)
       slot_end = slot_start + 1.hour
 
+      consultation_count = @consultations.count do |consultation|
+        consultation.start_time < slot_end && consultation.end_time > slot_start
+      end
+      activity_count = @day_activity_by_hour.fetch(hour, []).size
       {
-        hour: hour,
-        start_time: slot_start,
-        end_time: slot_end,
-        count: @consultations.count do |consultation|
-          consultation.start_time < slot_end && consultation.end_time > slot_start
-        end
+        hour: hour, start_time: slot_start, end_time: slot_end,
+        consultation_count: consultation_count, activity_count: activity_count,
+        count: consultation_count + activity_count
       }
     end
   rescue Date::Error, TypeError, ArgumentError
@@ -82,6 +100,11 @@ class PagesController < ApplicationController
                                   @selected_date.day, @selected_hour)
     @hour_end = @hour_start + 1.hour
     @consultations = overlapping_consultations(@hour_start, @hour_end)
+    workspace = current_user.owner_workspace if owner_signed_in?
+    @hour_activity = workspace ? Calendar::OwnerActivity.between(
+      workspace: workspace, from: @hour_start, through: @hour_end
+    ) : []
+    @hour_total = @consultations.size + @hour_activity.size
   rescue Date::Error, TypeError, ArgumentError
     redirect_to root_path, alert: "Invalid calendar interval"
   end

@@ -36,9 +36,11 @@ class ConsultationsController < ApplicationController
     respond_to do |format|
       if @consultation.save
         format.html { redirect_to consultation_url(@consultation), notice: I18n.t("consultations.created") }
+        format.json { render json: { id: @consultation.id, title: @consultation.title, path: consultation_path(@consultation) }, status: :created }
       else
         prepare_overlap_advisory
         format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: { errors: @consultation.errors.full_messages }, status: :unprocessable_entity }
       end
     end
   end

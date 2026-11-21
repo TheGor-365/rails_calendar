@@ -27,6 +27,8 @@ class ClientAvatarsController < ApplicationController
     response.headers["X-Content-Type-Options"] = "nosniff"
     send_data attachment.blob.download, type: attachment.blob.content_type,
               disposition: "inline", filename: attachment.blob.filename.to_s
+  rescue ActiveStorage::FileNotFoundError
+    head :not_found
   end
 
   private

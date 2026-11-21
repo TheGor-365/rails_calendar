@@ -1,5 +1,17 @@
 en:
   owner_ai_assistant:
+    consent_short: "I agree to one paid Grok generation"
+    cost_more: "Costs and data sharing"
+    my_conversations: "My conversations"
+    find_with_ai: "Find with AI"
+    find_categories: "Search categories (planned)"
+    find_files: "Files"
+    find_pages: "Pages"
+    find_info: "Information"
+    find_dates: "Dates"
+    find_tasks: "Tasks"
+    find_archives: "Archive"
+    find_scope_note: "Currently, only page navigation works. File and project search will be added later."
     open: "Open AI assistant"
     short_title: "AI assistant"
     title: "Owner AI assistant"

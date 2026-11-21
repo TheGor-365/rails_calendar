@@ -1,0 +1,37 @@
+<%# Private history disclosure, anchored to the canonical activity ledger. %>
+<% if owner_signed_in? %>
+  <details class="wa-calendar-activity" data-controller="wa-accordion"
+           aria-label="<%= t("calendar_actions.activity_heading") %>">
+    <summary class="wa-calendar-activity__summary" data-action="click->wa-accordion#toggle">
+      <span class="wa-calendar-activity__heading">
+        <span class="wa-calendar-activity__title">
+          <span class="eyebrow"><%= t("calendar_actions.activity_eyebrow") %></span>
+          <strong><i class="bi bi-activity" aria-hidden="true"></i> <%= t("calendar_actions.activity_heading") %>
+            <span class="wa-calendar-activity__count"><%= activities.size %></span>
+          </strong>
+        </span>
+        <i class="bi bi-chevron-down wa-calendar-activity__chevron" aria-hidden="true"></i>
+      </span>
+    </summary>
+    <div class="wa-calendar-activity__body" data-wa-accordion-target="content">
+      <nav class="wa-calendar-activity__links" aria-label="<%= t("calendar_actions.activity_heading") %>">
+        <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--soft rc-action--small" %>
+        <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path, class: "rc-action rc-action--quiet rc-action--small" %>
+      </nav>
+      <% if activities.any? %>
+        <div class="wa-calendar-activity__list">
+          <% activities.each do |item| %>
+            <%= link_to item[:path], class: "wa-calendar-activity__item" do %>
+              <span class="wa-calendar-activity__icon"><i class="bi bi-<%= item[:icon] %>" aria-hidden="true"></i></span>
+              <span class="wa-calendar-activity__text"><strong><%= item[:title] %></strong>
+                <small><%= t("calendar_actions.kinds.#{item[:kind]}") %> · <%= l(item[:created_at], format: :short) %> · <%= rc_calendar_activity_status(item) %></small></span>
+              <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="wa-calendar-activity__empty"><%= t("calendar_actions.no_activity") %></p>
+      <% end %>
+    </div>
+  </details>
+<% end %>

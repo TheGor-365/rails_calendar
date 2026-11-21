@@ -1,0 +1,12 @@
+es:
+  notifications:
+    eyebrow: "ESPACIO DE TRABAJO / NOTIFICACIONES"
+    title: "Notificaciones"
+    description: "Actividad reciente de solicitudes, documentos e IA con acceso directo al origen."
+    filters: "Filtro de notificaciones"
+    unread: "Sin leer"
+    all: "Todas"
+    mark_all: "Marcar todas como leídas"
+    read_open: "Abrir y marcar"
+    all_read: "Todas las notificaciones disponibles se marcaron como leídas."
+    empty: "No hay notificaciones nuevas."

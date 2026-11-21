@@ -48,25 +48,27 @@
 
   <% if owner_signed_in? %>
     <%= link_to admin_project_intakes_path,
-                class: "rc-mobile-dock-item wa-inbox-mobile #{'is-active' if controller_path == 'admin/project_intakes' && action_name == 'index'}",
-                aria: { label: t("nav.intake_inbox"), current: ("page" if controller_path == 'admin/project_intakes' && action_name == 'index') } do %>
+                class: "rc-mobile-dock-item wa-inbox-mobile #{'is-active' if ['admin/project_intakes', 'owner_invitations', 'owner_requirements'].include?(controller_path)}",
+                aria: { label: t("requests_hub.title"), current: ("page" if ['admin/project_intakes', 'owner_invitations', 'owner_requirements'].include?(controller_path)) } do %>
       <span class="rc-mobile-dock-icon wa-unread-mobile-icon">
         <i class="bi bi-inboxes" aria-hidden="true"></i>
         <% if owner_unread_intake_count.positive? %>
           <span class="wa-unread-count wa-unread-count--mobile" aria-label="<%= t("intake.unread_count", count: owner_unread_intake_count) %>"><%= owner_unread_badge_label %></span>
         <% end %>
       </span>
-      <span class="rc-mobile-dock-label"><%= t("nav.intake_inbox") %></span>
+      <span class="rc-mobile-dock-label"><%= t("requests_hub.title") %></span>
     <% end %>
   <% end %>
 
-  <% records_destination = owner_signed_in? ? owner_cabinet_path : consultations_path %>
-  <% records_active = owner_signed_in? ? request.path == owner_cabinet_path : consultations_active %>
+  <%# The library lives in the top navigation on desktop and the cabinet on mobile. %>
+  <% library_active = owner_signed_in? && controller_path == "owner_artifacts" %>
+  <% records_destination = library_active ? owner_artifacts_path : (owner_signed_in? ? owner_cabinet_path : consultations_path) %>
+  <% records_active = library_active || (owner_signed_in? ? request.path == owner_cabinet_path : consultations_active) %>
   <%= link_to records_destination,
               class: "rc-mobile-dock-item #{'is-active' if records_active}",
               aria: { current: ("page" if records_active) } do %>
-    <i class="bi <%= owner_signed_in? ? 'bi-person-badge' : 'bi-list-ul' %> rc-mobile-dock-icon" aria-hidden="true"></i>
-    <span class="rc-mobile-dock-label"><%= owner_signed_in? ? t("account_hub.owner_cabinet") : t("nav.records") %></span>
+    <i class="bi <%= library_active ? 'bi-collection' : (owner_signed_in? ? 'bi-person-badge' : 'bi-list-ul') %> rc-mobile-dock-icon" aria-hidden="true"></i>
+    <span class="rc-mobile-dock-label"><%= library_active ? t("artifact_library.title") : (owner_signed_in? ? t("account_hub.owner_cabinet") : t("nav.records")) %></span>
   <% end %>
 
   <% if admin_signed_in? %>

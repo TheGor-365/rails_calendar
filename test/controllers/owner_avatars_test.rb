@@ -72,6 +72,17 @@ class OwnerAvatarsTest < ActionDispatch::IntegrationTest
     assert_equal 0, @other.owner_avatars_attachments.count
   end
 
+  test "missing private avatar file returns 404 instead of raising 500" do
+    login(@owner)
+    post owner_avatars_path, params: { avatar: { file: image_upload } }
+    attachment = @owner.owner_avatars_attachments.last
+    attachment.blob.service.delete(attachment.blob.key)
+
+    get owner_avatar_file_path(attachment)
+    assert_response :not_found
+    assert_equal 1, @owner.owner_avatars_attachments.count
+  end
+
   test "wrong file extension and MIME are rejected" do
     login(@owner)
     post owner_avatars_path, params: { avatar: { file: image_upload(filename: "payload.html") } }

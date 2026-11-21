@@ -1,0 +1,93 @@
+<div class="container wa-e2-entry my-4 my-sm-5">
+  <header class="rc-page-hero wa-e2-entry__hero mb-4">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow"><%= t("e2.guest_eyebrow") %></p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-stars"></i></span>
+        <h1 class="page-title"><%= t("e2.preview_title") %></h1>
+      </div>
+      <p class="rc-muted"><%= t("e2.preview_public") %></p>
+    </div>
+  </header>
+  <% if @invitation.nil? || %i[invalid expired revoked already_claimed services_changed].include?(@state) ||
+        (@invitation.claimed_at.present? && (!client_signed_in? || @invitation.claimed_by_user_id != current_user.id)) %>
+    <section class="surface-panel p-3 p-sm-4">
+      <p class="rc-notice rc-notice--error" role="status"><%= t("e2.state_#{@state || :invalid}") %></p>
+      <%= link_to t("e2.back_public"), services_path, class: "rc-action rc-action--quiet" %>
+    </section>
+  <% else %>
+    <div class="wa-e2-entry__grid">
+      <main class="wa-e2-entry__main">
+        <section class="surface-panel wa-e2-entry__proposal">
+          <p class="wa-e2-entry__eyebrow"><i class="bi bi-briefcase" aria-hidden="true"></i> <%= t("e2_presentation.proposal") %></p>
+          <h2><%= @invitation.seed_title %></h2>
+          <span class="wa-e2-entry__category"><i class="bi bi-tag" aria-hidden="true"></i>
+            <%= rc_intake_type(@invitation.seed_project_type) %>
+          </span>
+          <% if @invitation.approved_client_preview.present? %>
+            <div class="wa-e2-entry__summary">
+              <h3><i class="bi bi-chat-left-text" aria-hidden="true"></i> <%= t("e2_presentation.starting_point") %></h3>
+              <p><%= @invitation.approved_client_preview %></p>
+            </div>
+          <% end %>
+          <% versions = @invitation.published_versions %>
+          <% if versions.any? %>
+            <div class="wa-e2-entry__services">
+              <h3><i class="bi bi-grid-1x2" aria-hidden="true"></i> <%= t("e2_presentation.related_services") %></h3>
+              <ul>
+                <% versions.each do |version| %>
+                  <li><i class="bi bi-check2-circle" aria-hidden="true"></i><span><%= version.title %></span></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </section>
+        <section class="wa-e2-entry__next" aria-labelledby="e2-next-title">
+          <div class="wa-e2-entry__next-heading">
+            <span class="wa-e2-entry__step-icon"><i class="bi bi-signpost-split" aria-hidden="true"></i></span>
+            <div>
+              <p class="wa-e2-entry__eyebrow"><%= t("e2_presentation.next_label") %></p>
+              <h2 id="e2-next-title"><%= t("e2_presentation.next_title") %></h2>
+            </div>
+          </div>
+          <p><%= t("e2_presentation.next_description") %></p>
+          <p class="wa-e2-entry__disclaimer"><i class="bi bi-info-circle" aria-hidden="true"></i> <%= t("e2.not_agreement") %></p>
+          <% if @invitation.claimed_by_user_id == current_user&.id && @invitation.project_intake %>
+            <%= link_to rc_icon_label("arrow-right-circle", t("e2.open_request")),
+                  (@invitation.submitted_at.present? ? client_request_path(@invitation.project_intake) : edit_client_request_path(@invitation.project_intake)),
+                  class: "rc-action rc-action--primary wa-e2-entry__cta" %>
+          <% elsif client_signed_in? %>
+            <%= form_with url: claim_client_invitation_path, method: :post, html: { class: "rc-form" } do %>
+              <button type="submit" class="rc-action rc-action--primary wa-e2-entry__cta">
+                <%= rc_icon_label("arrow-right-circle", t("e2.claim_action")) %>
+              </button>
+            <% end %>
+          <% else %>
+            <div class="wa-e2-entry__auth">
+              <%= link_to rc_icon_label("box-arrow-in-right", t("e2.sign_in")), sign_in_path, class: "rc-action rc-action--primary" %>
+              <% if ClientSignupAvailability.enabled? %>
+                <%= link_to rc_icon_label("person-plus", t("e2.register")), client_registration_path, class: "rc-action rc-action--soft" %>
+              <% end %>
+            </div>
+          <% end %>
+        </section>
+      </main>
+      <aside class="surface-panel wa-e2-entry__steps" aria-label="<%= t("e2_presentation.steps_title") %>">
+        <h2><i class="bi bi-diagram-3" aria-hidden="true"></i> <%= t("e2_presentation.steps_title") %></h2>
+        <ol>
+          <% %w[understand clarify agree].each_with_index do |step, index| %>
+            <li>
+              <span class="wa-e2-entry__number"><%= format("%02d", index + 1) %></span>
+              <div>
+                <strong><%= t("e2_presentation.steps.#{step}.title") %></strong>
+                <small><%= t("e2_presentation.steps.#{step}.help") %></small>
+              </div>
+            </li>
+          <% end %>
+        </ol>
+        <p class="wa-e2-entry__aside-note"><i class="bi bi-lightbulb" aria-hidden="true"></i>
+          <%= t("e2_presentation.free_choice") %></p>
+      </aside>
+    </div>
+  <% end %>
+</div>

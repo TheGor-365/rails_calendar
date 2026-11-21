@@ -1,5 +1,15 @@
 en:
   client_requests:
+    choose_services_title: "Choose services (optional)"
+    choose_services_help: "Pick any published services that fit, or skip the catalog and describe another task. Selected versions are retained with your request."
+    no_published_services: "No published services are currently selectable in this local pilot. You can still describe a fictional task."
+    no_service_hint: "No selection needed for a custom request. You may leave title and details blank when a service is selected; we will open an editable first draft."
+    service_revision: "Service revision v%{version}"
+    invalid_services: "Service selection was changed, unpublished or belongs to another specialist. Please review the options."
+    choose_specialist: "Choose a specialist for a request without selected services"
+    specialist_label: "Specialist #%{id}"
+    initial_goal: "Synthetic project request for: %{services}. Further requirements and acceptance criteria are not yet confirmed."
+    selected_services_heading: "Selected published services"
     eyebrow: "CLIENT WORKSPACE / LOCAL PILOT"
     new_title: "Create a test request"
     new_hint: "A verified client can submit a fictional request for the owner to review. This pilot never sends real orders."

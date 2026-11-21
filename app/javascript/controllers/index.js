@@ -40,3 +40,47 @@ application.register("wa-avatar-editor", WaAvatarEditorController)
 // Global owner-only AI assistant; native details remains usable without JS.
 import WaAiDockController from "./wa_ai_dock_controller"
 application.register("wa-ai-dock", WaAiDockController)
+
+// In-frame owner AI dialogue, progress and attachment selection.
+import WaThreadController from "./wa_thread_controller"
+application.register("wa-thread", WaThreadController)
+
+// Per-thread auto-title override; only the user's explicit edits are saved.
+import WaThreadTitleController from "./wa_thread_title_controller"
+application.register("wa-thread-title", WaThreadTitleController)
+
+// E2 fragment-only invite token and private owner copy control.
+import WaInvitationLinkController from "./wa_invitation_link_controller"
+application.register("wa-invitation-link", WaInvitationLinkController)
+import WaCopyController from "./wa_copy_controller"
+application.register("wa-copy", WaCopyController)
+
+// E2 local-only structured brief composition; no AI calls.
+import WaInvitationBriefController from "./wa_invitation_brief_controller"
+application.register("wa-invitation-brief", WaInvitationBriefController)
+
+// Owner invitation actions use the existing consented and journalled AI provider.
+import WaInvitationAiController from "./wa_invitation_ai_controller"
+application.register("wa-invitation-ai", WaInvitationAiController)
+
+import WaInvitationIssueController from "./wa_invitation_issue_controller"
+application.register("wa-invitation-issue", WaInvitationIssueController)
+
+// Persistent, accessible incoming/outgoing requests switch.
+import WaRequestsController from "./wa_requests_controller"
+application.register("wa-requests", WaRequestsController)
+
+// Owner library: client-side live filters of authorized and rendered records.
+import WaLibraryController from "./wa_library_controller"
+application.register("wa-library", WaLibraryController)
+
+// Fluid progressive enhancement of artifact accordion cards.
+import WaAccordionController from "./wa_accordion_controller"
+application.register("wa-accordion", WaAccordionController)
+
+// Contextual calendar creation without leaving the month or day view.
+import WaCalendarCreateController from "./wa_calendar_create_controller"
+application.register("wa-calendar-create", WaCalendarCreateController)
+
+import WaActivityFilterController from "./wa_activity_filter_controller"
+application.register("wa-activity-filter", WaActivityFilterController)

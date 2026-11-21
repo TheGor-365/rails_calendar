@@ -1,0 +1,168 @@
+<div class="container wa-owner-intake my-4 my-sm-5">
+  <header class="rc-page-hero mb-4"><div class="rc-page-hero__content">
+    <p class="eyebrow"><%= t("e23_requirements.eyebrow") %></p>
+    <div class="rc-page-hero__heading">
+      <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-list-check"></i></span>
+      <h1 class="page-title"><%= t("e23_requirements.title") %></h1>
+    </div>
+    <p class="rc-muted"><%= @intake.title %></p>
+    <div class="rc-page-hero__actions mt-3">
+      <%= link_to rc_icon_label("arrow-left", t("e23_requirements.back")),
+            project_intake_path(@intake), class: "rc-action rc-action--quiet" %>
+    </div>
+  </div></header>
+  <section class="surface-panel p-3 p-sm-4 mb-3">
+    <h2 class="h5"><i class="bi bi-diagram-3" aria-hidden="true"></i> <%= t("e23_requirements.current_source") %></h2>
+    <% if @scope_revision %>
+      <p class="rc-hint"><%= t("e23_requirements.source_version", version: @scope_revision.version) %></p>
+      <% if @set && @set.intake_scope_revision_id == @scope_revision.id %>
+        <p class="rc-notice rc-notice--success"><%= t("e23_requirements.already_current") %></p>
+      <% else %>
+        <%= button_to rc_icon_label("file-earmark-plus", t("e23_requirements.generate")),
+              owner_requirements_path(@intake), method: :post,
+              class: "rc-action rc-action--primary" %>
+      <% end %>
+    <% else %>
+      <p class="rc-hint"><%= t("e23_requirements.no_answers") %></p>
+    <% end %>
+  </section>
+  <% if @history.present? %>
+    <details class="surface-panel p-3 p-sm-4 mb-3">
+      <summary class="fw-semibold"><i class="bi bi-clock-history" aria-hidden="true"></i>
+        <%= t("e23_requirements.history_title") %> (<%= @intake.intake_requirement_sets.count %>)
+      </summary>
+      <ol class="mt-3 mb-0">
+        <% @history.each do |revision| %>
+          <li class="mb-2">
+            <strong>v<%= revision.version %></strong>
+            <span class="rc-hint">
+              <%= l(revision.created_at, format: :short) %> ·
+              <%= t("e23_requirements.source_version", version: revision.intake_scope_revision.version) %> ·
+              <%= revision.requirements.length %> <%= t("e23_requirements.history_count") %>
+            </span>
+            <% changes = @history_diffs[revision.version] %>
+            <% if changes %>
+              <details class="wa-req-history__diff mt-2" data-requirement-diff-version="<%= revision.version %>">
+                <summary class="rc-hint"><%= t("e24_requirements.diff_summary", count: changes.length) %></summary>
+                <% if changes.empty? %>
+                  <p class="rc-hint mt-2"><%= t("e24_requirements.no_changes") %></p>
+                <% else %>
+                  <ul class="list-unstyled mt-2 mb-0">
+                    <% changes.each do |change| %>
+                      <li class="border rounded-3 p-2 p-sm-3 mb-2" data-requirement-change-id="<%= change[:id] %>">
+                        <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                          <strong><%= change[:id] %></strong>
+                          <span class="rc-status-pill rc-status-pill--muted">
+                            <%= t("e24_requirements.kinds.#{change[:kind]}") %>
+                          </span>
+                        </div>
+                        <% change[:fields].each do |field| %>
+                          <div class="mb-2">
+                            <strong class="small"><%= t("e24_requirements.fields.#{field}") %></strong>
+                            <div class="row g-2 mt-1">
+                              <% if change[:before] %>
+                                <div class="col-12 col-md-6">
+                                  <span class="rc-hint"><%= t("e24_requirements.before") %></span>
+                                  <% value = change[:before].fetch(field) %>
+                                  <pre class="small mb-0 p-2 border rounded text-break" style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= value.is_a?(String) ? value : JSON.pretty_generate(value) %></pre>
+                                </div>
+                              <% end %>
+                              <% if change[:after] %>
+                                <div class="col-12 col-md-6">
+                                  <span class="rc-hint"><%= t("e24_requirements.after") %></span>
+                                  <% value = change[:after].fetch(field) %>
+                                  <pre class="small mb-0 p-2 border rounded text-break" style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= value.is_a?(String) ? value : JSON.pretty_generate(value) %></pre>
+                                </div>
+                              <% end %>
+                            </div>
+                          </div>
+                        <% end %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              </details>
+            <% end %>
+          </li>
+        <% end %>
+      </ol>
+    </details>
+  <% end %>
+  <% if @set %>
+    <section class="surface-panel p-3 p-sm-4 wa-req-review" aria-labelledby="wa-req-review-title">
+      <div class="wa-invite-field-heading">
+        <span class="wa-invite-section-icon"><i class="bi bi-journal-code" aria-hidden="true"></i></span>
+        <div>
+          <h2 id="wa-req-review-title"><%= t("e23_requirements.set_title", version: @set.version) %></h2>
+          <p class="rc-hint"><%= t("e23_requirements.private_warning") %></p>
+        </div>
+      </div>
+      <%= form_with url: owner_requirements_path(@intake), method: :patch, local: true do %>
+        <%= hidden_field_tag :base_version, @set.version %>
+      <div class="wa-req-review__items">
+        <% @set.requirements.each_with_index do |item, i| %>
+          <% section = item.dig("source", "section") %>
+          <article class="wa-req-review__item">
+            <div class="wa-req-review__top">
+              <span class="wa-req-review__id"><%= item.fetch("id") %></span>
+              <span class="rc-status-pill rc-status-pill--muted"><%= t("e2_scope.statuses.#{item.fetch("status")}") %></span>
+            </div>
+            <p class="wa-req-review__section"><%= t("e2_scope.sections.#{section}.title") %></p>
+            <p class="wa-req-review__statement"><%= item.fetch("statement") %></p>
+            <p class="rc-hint"><i class="bi bi-link-45deg" aria-hidden="true"></i>
+              <%= t("e23_requirements.trace", revision: item.dig("source", "revision_id"), section: section) %></p>
+            <details class="wa-scope__technical">
+              <summary><i class="bi bi-code-slash" aria-hidden="true"></i> <%= t("e23_requirements.technical") %></summary>
+              <p><%= t("e2_scope.sections.#{section}.technical") %></p>
+            </details>
+            <div class="mt-3">
+              <%= label_tag "req_statement_#{i}", t("e23_requirements.statement_label"), class: "form-label fw-semibold" %>
+              <%= text_area_tag "edits[#{i}][statement]", item.fetch("statement"),
+                    id: "req_statement_#{i}", class: "form-control", rows: 3, maxlength: 1600, required: true %>
+            </div>
+            <div class="mt-3">
+              <%= label_tag "req_status_#{i}", t("e23_requirements.status_label"), class: "form-label fw-semibold" %>
+              <%= select_tag "edits[#{i}][status]",
+                    options_for_select(%w[suggested unknown excluded].map { |key| [t("e2_scope.statuses.#{key}"), key] }, item.fetch("status")),
+                    id: "req_status_#{i}", class: "form-select" %>
+            </div>
+            <div class="mt-3">
+              <%= label_tag "req_criteria_#{i}", t("e23_requirements.criteria_label"), class: "form-label fw-semibold" %>
+              <%= text_area_tag "edits[#{i}][acceptance_criteria]", item.fetch("acceptance_criteria").join("\n"),
+                    id: "req_criteria_#{i}", class: "form-control", rows: 3,
+                    placeholder: t("e23_requirements.criteria_hint") %>
+              <p class="rc-hint mt-1"><%= t("e23_requirements.criteria_help") %></p>
+            </div>
+          </article>
+        <% end %>
+      </div>
+      <details class="surface-panel p-3 my-3">
+        <summary class="fw-semibold"><i class="bi bi-plus-circle" aria-hidden="true"></i>
+          <%= t("e23_requirements.add_atomic") %></summary>
+        <p class="rc-hint mt-2"><%= t("e23_requirements.add_atomic_help") %></p>
+        <div class="mt-3">
+          <%= label_tag "req_new_section", t("e23_requirements.section_label"), class: "form-label" %>
+          <%= select_tag "new_requirement[section]",
+                options_for_select(@set.requirements.map { |r| r.dig("source", "section") }.uniq.map { |key| [t("e2_scope.sections.#{key}.title"), key] }),
+                id: "req_new_section", class: "form-select" %>
+        </div>
+        <div class="mt-3">
+          <%= label_tag "req_new_statement", t("e23_requirements.statement_label"), class: "form-label" %>
+          <%= text_area_tag "new_requirement[statement]", "", id: "req_new_statement",
+                class: "form-control", rows: 3, maxlength: 1600 %>
+        </div>
+        <div class="mt-3">
+          <%= label_tag "req_new_criteria", t("e23_requirements.criteria_label"), class: "form-label" %>
+          <%= text_area_tag "new_requirement[acceptance_criteria]", "", id: "req_new_criteria",
+                class: "form-control", rows: 3, placeholder: t("e23_requirements.criteria_hint") %>
+        </div>
+      </details>
+      <div class="d-flex justify-content-end mt-3">
+        <%= button_tag rc_icon_label("check2-circle", t("e23_requirements.save_review")),
+              type: "submit", class: "rc-action rc-action--primary" %>
+      </div>
+      <% end %>
+      <p class="rc-hint mt-3"><%= t("e23_requirements.no_approval") %></p>
+    </section>
+  <% end %>
+</div>

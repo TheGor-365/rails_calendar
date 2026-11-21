@@ -73,7 +73,8 @@ class ClientRegistrationsController < ApplicationController
     if user
       session.delete(:pending_client_signup_email)
       start_account_session!(user)
-      redirect_to client_home_path, notice: I18n.t("flash.email_verified")
+      destination = cookies.encrypted[:rc_e2_invitation_id].present? ? client_invitation_preview_path : client_home_path
+      redirect_to destination, notice: I18n.t("flash.email_verified")
     else
       flash.now[:alert] = I18n.t(VERIFY_ERROR)
       verify_form

@@ -4,9 +4,17 @@ module Admin
     before_action :set_intake, only: %i[draft_spec approve_spec edit_spec revise_spec plan]
 
     def index
-      @intakes = ProjectIntake.order(created_at: :desc, id: :desc).limit(50)
+      @incoming_total_count = intake_scope.count
+      @intakes = intake_scope.order(created_at: :desc, id: :desc).limit(50)
+      invitations = owner_signed_in? ? current_user.owner_workspace&.client_request_invitations : nil
+      invitations ||= ClientRequestInvitation.none
+      @outgoing_total_count = invitations.count
+      @outgoing_invitations = invitations.includes(:project_intake).order(created_at: :desc, id: :desc).limit(30)
       @unread_intake_ids = owner_signed_in? ?
         OwnerIntakeInbox.unread_for(owner: current_user).where(id: @intakes.map(&:id)).pluck(:id) : []
+      @unread_incoming_count = owner_signed_in? ? OwnerIntakeInbox.unread_for(owner: current_user).count : 0
+      @outgoing_attention_count = invitations.where.not(claimed_at: nil)
+        .where(revoked_at: nil).count
     end
 
     def draft_spec
@@ -169,7 +177,13 @@ module Admin
     end
 
     def set_intake
-      @intake = ProjectIntake.find(params[:id])
+      @intake = intake_scope.find(params[:id])
+    end
+
+    def intake_scope
+      return ProjectIntake.all unless owner_signed_in?
+      assigned = ProjectIntake.where(workspace_id: current_user.owner_workspace&.id)
+      User.where(role: "owner").count == 1 ? assigned.or(ProjectIntake.where(workspace_id: nil)) : assigned
     end
   end
 end

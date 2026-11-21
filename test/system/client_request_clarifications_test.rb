@@ -69,7 +69,7 @@ class ClientRequestClarificationsSystemTest < ApplicationSystemTestCase
     assert_selector "header a.wa-inbox-nav .wa-unread-count", text: "1"
 
     visit admin_project_intakes_path
-    assert_selector ".wa-inbox-record--unread", count: 1
+    assert_selector ".wa-requests__record--unread", count: 1
     visit project_intake_path(@intake)
     assert_text "Please test the fictional sign-up form with a keyboard."
     assert_no_selector "header a.wa-inbox-nav .wa-unread-count"

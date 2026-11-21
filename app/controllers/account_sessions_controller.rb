@@ -21,7 +21,8 @@ class AccountSessionsController < ApplicationController
       redirect_to workspace_path, notice: I18n.t("flash.signed_in")
     elsif user&.verified_client?
       start_account_session!(user)
-      redirect_to client_home_path, notice: "Signed in"
+      redirect_to(cookies.encrypted[:rc_e2_invitation_id].present? ? client_invitation_preview_path : client_home_path,
+                  notice: I18n.t("flash.signed_in"))
     else
       reset_session
       flash.now[:alert] = I18n.t("flash.invalid_login")

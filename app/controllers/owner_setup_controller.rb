@@ -145,10 +145,15 @@ class OwnerSetupController < ApplicationController
     @version_count = @profile.professional_context_snapshots.count
     @open_intakes = ProjectIntake.where(status: %w[interviewing draft_spec]).count
     @upcoming_consultations = Consultation.where("start_time >= ?", Time.current).count
+    @outgoing_count = @workspace.client_request_invitations.count
+    @recent_outgoing = @workspace.client_request_invitations.order(created_at: :desc, id: :desc).limit(5)
   end
 
   def ai_activity
     @entries = @profile.ai_spend_entries.order(id: :desc).limit(30)
+    @linked_invitation_by_entry_id = @workspace.client_request_invitations
+      .where(owner_ai_entry_id: @entries.map(&:id))
+      .index_by(&:owner_ai_entry_id)
     @spend = AiSpendLedger.spend_summary
   end
 

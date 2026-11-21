@@ -1,0 +1,56 @@
+<div class="container wa-activity-journal my-4 my-sm-5">
+  <header class="rc-page-hero mb-4">
+    <div class="rc-page-hero__content">
+      <p class="eyebrow"><%= t("notifications.eyebrow") %></p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol"><i class="bi bi-bell" aria-hidden="true"></i></span>
+        <h1 class="page-title"><%= t("notifications.title") %></h1>
+      </div>
+      <p class="rc-muted"><%= t("notifications.description") %></p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--quiet" %>
+      <% if @unread_count.positive? %>
+        <%= button_to rc_icon_label("check2-all", t("notifications.mark_all")), read_all_owner_notifications_path,
+          class: "rc-action rc-action--primary" %>
+      <% end %>
+    </div>
+  </header>
+  <div class="wa-notifications__tabs mb-3" role="group" aria-label="<%= t("notifications.filters") %>">
+    <%= link_to owner_notifications_path(filter: "unread"), class: "rc-action #{@filter == 'unread' ? 'rc-action--primary' : 'rc-action--quiet'}", aria: { current: ("page" if @filter == "unread") } do %>
+      <i class="bi bi-bell-dot" aria-hidden="true"></i>
+      <span><%= t("notifications.unread") %></span>
+      <strong class="wa-notifications__count"><%= @unread_count %></strong>
+    <% end %>
+    <%= link_to rc_icon_label("collection", t("notifications.all")), owner_notifications_path(filter: "all"),
+      class: "rc-action #{@filter == 'all' ? 'rc-action--primary' : 'rc-action--quiet'}",
+      aria: { current: ("page" if @filter == "all") } %>
+  </div>
+  <% if @events.any? %>
+    <div class="wa-activity-journal__list">
+      <% @events.each do |event| %>
+        <% view = Activity::Presenter.display(event) %>
+        <% unread = !@read_ids.include?(event.id) %>
+        <article class="wa-activity-journal__record <%= 'wa-notifications__unread' if unread %>">
+          <div class="wa-activity-journal__icon"><i class="bi bi-<%= view[:icon] %>" aria-hidden="true"></i></div>
+          <div class="wa-activity-journal__content">
+            <strong><%= event.title %></strong>
+            <p><%= t("activity_journal.events.#{event.kind}") %> ·
+              <time datetime="<%= event.occurred_at.iso8601 %>"><%= l(event.occurred_at, format: :short) %></time></p>
+          </div>
+          <div class="wa-activity-journal__actions">
+            <% if unread %>
+              <%= button_to rc_icon_label("box-arrow-up-right", t("notifications.read_open")),
+                  read_owner_notification_path(event), class: "rc-action rc-action--primary rc-action--small" %>
+            <% else %>
+              <%= link_to rc_icon_label("box-arrow-up-right", t("activity_journal.open")),
+                  view[:path], class: "rc-action rc-action--quiet rc-action--small" %>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="surface-panel p-4 rc-muted"><%= t("notifications.empty") %></p>
+  <% end %>
+</div>

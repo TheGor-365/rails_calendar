@@ -1,0 +1,20 @@
+en:
+  e2_presentation:
+    proposal: "DEVELOPER'S PROPOSAL"
+    starting_point: "What we know so far"
+    related_services: "Relevant services"
+    next_label: "YOUR NEXT STEP"
+    next_title: "Make the project yours"
+    next_description: "Tell us what you want to achieve. You can change the proposal, ask questions and leave technical decisions to the developer."
+    steps_title: "How we move forward"
+    steps:
+      understand:
+        title: "Describe the result"
+        help: "Your business goal, visitors and what should work"
+      clarify:
+        title: "Work through the details"
+        help: "Simple questions, with technical options explained"
+      agree:
+        title: "Review the project specification"
+        help: "Nothing becomes agreed until both sides review it"
+    free_choice: "Not sure about a detail? Leave it for the developer to recommend."

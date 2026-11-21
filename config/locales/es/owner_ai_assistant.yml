@@ -1,5 +1,17 @@
 es:
   owner_ai_assistant:
+    consent_short: "Acepto una generación de pago de Grok"
+    cost_more: "Costes y datos enviados"
+    my_conversations: "Mis conversaciones"
+    find_with_ai: "Buscar con IA"
+    find_categories: "Categorías de búsqueda (planificadas)"
+    find_files: "Archivos"
+    find_pages: "Páginas"
+    find_info: "Información"
+    find_dates: "Fechas"
+    find_tasks: "Tareas"
+    find_archives: "Archivo"
+    find_scope_note: "Por ahora solo funciona navegar a páginas. La búsqueda de archivos y proyectos llegará después."
     open: "Abrir asistente de IA"
     short_title: "Asistente IA"
     title: "Asistente IA del propietario"

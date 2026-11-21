@@ -1,4 +1,4 @@
-<div class="container my-4 my-sm-5">
+<div class="container my-4 my-sm-5 wa-calendar" data-controller="wa-calendar-create" data-wa-calendar-create-url-value="<%= consultations_path %>" data-network-error="<%= t("calendar_actions.network_error") %>">
   <header class="rc-page-hero mb-4">
     <div>
       <p class="eyebrow mb-2"><%= t("calendar.day_eyebrow", day_number: @selected_date.strftime("%j")) %></p>
@@ -6,15 +6,18 @@
         <time datetime="<%= @selected_date.iso8601 %>"><%= rc_local_date(@selected_date, format: :rc_full) %></time>
       </h1></div>
       <p class="rc-muted mb-0">
-        <span class="rc-data-number"><%= rc_count(@consultations.size, "calendar", "consultation") %></span>
+        <span class="rc-data-number" data-calendar-day-total><%= rc_count(@day_total, "calendar", "event") %></span>
+        <span aria-hidden="true">·</span> <%= rc_count(@consultations.size, "calendar", "consultation") %>
+        <% if owner_signed_in? %>
+          <span aria-hidden="true">·</span> <%= t("calendar.day_actions", count: @day_activity.size) %>
+        <% end %>
         <span aria-hidden="true">·</span> 00:00–24:00
         <span aria-hidden="true">·</span> <%= Time.zone.name %>
       </p>
     </div>
     <div class="d-flex flex-wrap gap-2">
       <% if admin_signed_in? %>
-        <%= link_to rc_icon_label("plus-lg", t("calendar.new_consultation")), new_consultation_path(start_at: @hour_slots.first[:start_time].iso8601),
-                    class: "rc-action rc-action--primary" %>
+        <%= render "creation_menu", start_at: (@selected_date == Time.zone.today ? Time.zone.local(@selected_date.year, @selected_date.month, @selected_date.day, Time.zone.now.hour) : @hour_slots.first[:start_time]) %>
       <% end %>
       <%= link_to rc_icon_label("calendar3", t("calendar.month")), root_path(start_date: @selected_date.iso8601),
                   class: "rc-action rc-action--quiet" %>
@@ -34,6 +37,41 @@
     <% end %>
   </nav>
 
+  <% if owner_signed_in? && @day_activity.any? %>
+    <section class="wa-calendar-day-recap mb-3" aria-label="<%= t("calendar.day_activity_heading") %>">
+      <header class="wa-calendar-day-recap__header">
+        <div>
+          <h2 class="h6 mb-1"><i class="bi bi-clock-history" aria-hidden="true"></i> <%= t("calendar.day_activity_heading") %></h2>
+          <p class="rc-hint mb-0"><%= t("calendar.day_activity_hint") %></p>
+        </div>
+        <span class="wa-calendar-day-recap__total"><%= @day_activity.size %></span>
+      </header>
+      <ol class="wa-calendar-day-recap__list">
+        <% @day_activity.first(8).each do |entry| %>
+          <% occurred = entry[:created_at].in_time_zone %>
+          <% period = occurred < Time.current ? "past" : "upcoming" %>
+          <li class="wa-calendar-day-recap__item wa-calendar-day-recap__item--<%= period %>"
+              data-calendar-activity-hour="<%= occurred.hour %>">
+            <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: occurred.hour),
+                        class: "wa-calendar-day-recap__time" do %>
+              <time datetime="<%= occurred.iso8601 %>"><%= occurred.strftime("%H:%M") %></time>
+            <% end %>
+            <div class="wa-calendar-day-recap__description">
+              <strong><%= entry[:title] %></strong>
+              <small><%= t("calendar_actions.kinds.#{entry[:kind]}") %> · <%= rc_calendar_activity_status(entry) %></small>
+            </div>
+            <%= link_to rc_icon_label("arrow-up-right", t("calendar.day_open_source")), entry[:path],
+                        class: "rc-action rc-action--quiet rc-action--small wa-calendar-day-recap__source" %>
+          </li>
+        <% end %>
+      </ol>
+      <% if @day_activity.length > 8 %>
+        <p class="rc-hint mb-0"><%= link_to t("calendar.day_more_activity", count: @day_activity.length - 8),
+                                  owner_activity_events_path %></p>
+      <% end %>
+    </section>
+  <% end %>
+
   <section class="rc-agenda" aria-label="<%= t("calendar.agenda_aria") %>">
     <div class="rc-agenda-legend" aria-hidden="true">
       <span><%= t("calendar.time_heading") %></span><span><%= t("calendar.event_heading") %></span>
@@ -42,11 +80,18 @@
     <div class="rc-day-grid">
       <div class="rc-time-axis" aria-label="<%= t("calendar.hour_axis_aria") %>">
         <% @hour_slots.each do |slot| %>
-          <div class="rc-time-axis-hour" id="hour-<%= format('%02d', slot[:hour]) %>">
+          <div class="rc-time-axis-hour <%= 'wa-calendar-hour--past' if slot[:end_time] <= Time.current %>" id="hour-<%= format('%02d', slot[:hour]) %>">
             <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
                         class: "rc-time-axis-link",
                         aria: { label: t("calendar.inspect_interval", range: "#{slot[:start_time].strftime('%H:%M')}–#{slot[:end_time].strftime('%H:%M')}") } do %>
               <time datetime="<%= slot[:start_time].iso8601 %>"><%= slot[:start_time].strftime("%H:%M") %></time>
+            <% end %>
+            <% if admin_signed_in? %>
+              <button type="button" class="wa-calendar-hour-add"
+                      aria-label="<%= t("calendar_actions.create_in_hour", time: slot[:start_time].strftime('%H:%M')) %>"
+                      data-action="click->wa-calendar-create#openMenu" data-start-at="<%= slot[:start_time].iso8601 %>">
+                <i class="bi bi-plus" aria-hidden="true"></i>
+              </button>
             <% end %>
             <% if slot[:count].positive? %>
               <span class="rc-time-axis-count" aria-label="<%= rc_count(slot[:count], "calendar", "event") %>"><%= slot[:count] %></span>
@@ -63,7 +108,7 @@
               <% from_label = slot[:start_time].strftime("%H:%M") %>
               <% to_label = slot[:end_time].strftime("%H:%M") %>
               <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
-                          class: "rc-hour-band #{'rc-hour-band--busy' if slot[:count].positive?}",
+                          class: "rc-hour-band #{'rc-hour-band--busy' if slot[:count].positive?} #{'wa-calendar-hour--past' if slot[:end_time] <= Time.current}",
                           role: "listitem",
                           aria: { label: t("calendar.inspect_interval_count", range: "#{from_label}–#{to_label}", events: rc_count(slot[:count], "calendar", "event")) },
                           title: t("calendar.inspect_interval", range: "#{from_label}–#{to_label}") do %>
@@ -74,6 +119,38 @@
             <% end %>
           </div>
 
+          <% if @selected_date == Time.zone.today %>
+            <div class="wa-calendar-nowline"
+                 style="top: <%= ((Time.zone.now.hour * 60 + Time.zone.now.min) * 100.0 / 1440).round(3) %>%"
+                 aria-label="<%= t("calendar_actions.now") %>"></div>
+          <% end %>
+          <%# Activity records belong to their actual creation hour, not a detached list only. %>
+          <% if owner_signed_in? %>
+            <% @day_activity_by_hour.each do |hour, entries| %>
+              <details class="wa-calendar-hour-activity <%= 'wa-calendar-hour-activity--past' if entries.all? { |entry| entry[:created_at] < Time.current } %>"
+                       data-controller="wa-accordion" data-calendar-hour="<%= hour %>"
+                       style="top: <%= hour * Calendar::DayEventLayout::HOUR_HEIGHT_PX + 3 %>px">
+                <summary data-action="click->wa-accordion#toggle"
+                         aria-label="<%= format('%02d:00', hour) %> · <%= entries.size %>">
+                  <span class="wa-calendar-hour-activity__icon"><i class="bi bi-<%= entries.first[:icon] %>" aria-hidden="true"></i></span>
+                  <span class="wa-calendar-hour-activity__label"><strong><%= truncate(entries.first[:title], length: 45) %></strong>
+                    <small><%= entries.first[:created_at].in_time_zone.strftime("%H:%M") %><% if entries.size > 1 %> · +<%= entries.size - 1 %><% end %></small>
+                  </span>
+                  <i class="bi bi-chevron-down wa-calendar-hour-activity__chevron" aria-hidden="true"></i>
+                </summary>
+                <div class="wa-calendar-hour-activity__body" data-wa-accordion-target="content">
+                  <% entries.each do |entry| %>
+                    <%= link_to entry[:path], class: "wa-calendar-hour-activity__entry" do %>
+                      <span><i class="bi bi-<%= entry[:icon] %>" aria-hidden="true"></i>
+                        <strong><%= entry[:title] %></strong>
+                        <small><%= entry[:created_at].in_time_zone.strftime("%H:%M") %> · <%= t("calendar_actions.kinds.#{entry[:kind]}") %></small></span>
+                      <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                    <% end %>
+                  <% end %>
+                </div>
+              </details>
+            <% end %>
+          <% end %>
           <div class="rc-event-layer" aria-label="<%= t("calendar.event_layer_aria") %>">
             <% @timeline.items.each do |item| %>
               <% event = item.consultation %>
@@ -116,4 +193,7 @@
   <p class="rc-hint mt-3">
     <%= t("calendar.day_help", zone: Time.zone.name) %>
   </p>
+  <%= render "activity_list", activities: @day_activity %>
+  <%= render "slot_menu" %>
+  <%= render "creation_dialog" %>
 </div>

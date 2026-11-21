@@ -1,0 +1,107 @@
+<div class="container my-4 my-sm-5 wa-invite-page">
+  <header class="wa-invite-hero mb-4">
+    <div>
+      <p class="eyebrow"><%= t("e2.owner_eyebrow") %> / <%= @invitation.id %></p>
+      <h1 class="page-title"><%= @invitation.seed_title %></h1>
+      <p class="rc-hint"><%= t("e2.state_#{@invitation.state}") %></p>
+    </div>
+    <div class="wa-invite-issued__actions">
+      <%= link_to rc_icon_label("arrow-left", t("e2_handoff.back")), owner_invitations_path,
+                  class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("copy", t("e2_handoff.reuse_as_new")),
+                  owner_invitations_path(from_invitation_id: @invitation.id),
+                  class: "rc-action rc-action--primary" %>
+    </div>
+  </header>
+
+  <section class="wa-invite-owner-artifact">
+    <div class="wa-invite-owner-artifact__heading">
+      <i class="bi bi-eye" aria-hidden="true"></i>
+      <h2><%= t("e2_handoff.client_view_heading") %></h2>
+    </div>
+    <p class="rc-hint"><%= t("e2_handoff.client_view_hint") %></p>
+    <p class="rc-hint"><%= t("e2.preview_category", category: rc_intake_type(@invitation.seed_project_type)) %></p>
+    <h3><%= @invitation.seed_title %></h3>
+    <% if @invitation.approved_client_preview.present? %>
+      <p class="wa-invite-owner-artifact__text"><%= @invitation.approved_client_preview %></p>
+    <% else %>
+      <p class="rc-hint"><%= t("e2_handoff.not_shared") %></p>
+    <% end %>
+    <% if @invitation.published_versions.any? %>
+      <h3><%= t("e2.services") %></h3>
+      <ul><% @invitation.published_versions.each do |version| %><li><%= version.title %></li><% end %></ul>
+    <% end %>
+    <p class="rc-hint"><%= t("e2.not_agreement") %></p>
+  </section>
+
+  <section class="wa-invite-owner-artifact">
+    <div class="wa-invite-owner-artifact__heading">
+      <i class="bi bi-shield-lock" aria-hidden="true"></i>
+      <h2><%= t("e2_handoff.private_work") %></h2>
+    </div>
+    <p class="rc-hint"><%= t("e2_handoff.private_hint") %></p>
+    <h3><%= t("e2.seed_goal") %></h3>
+    <p class="wa-invite-owner-artifact__text"><%= @invitation.seed_goal %></p>
+    <% if @owner_ai_result.present? %>
+      <div class="wa-invite-owner-artifact__ai">
+        <h3><%= @owner_ai_result["heading"] %></h3>
+        <p class="wa-invite-owner-artifact__text"><%= @owner_ai_result["draft"] %></p>
+        <% if Array(@owner_ai_result["questions"]).any? %>
+          <h4><%= t("owner_ai_assistant.questions") %></h4>
+          <ol><% @owner_ai_result["questions"].each do |question| %><li><%= question %></li><% end %></ol>
+        <% end %>
+        <% if Array(@owner_ai_result["cautions"]).any? %>
+          <h4><%= t("owner_ai_assistant.cautions") %></h4>
+          <ul><% @owner_ai_result["cautions"].each do |caution| %><li><%= caution %></li><% end %></ul>
+        <% end %>
+        <p><%= @owner_ai_result["next_step"] %></p>
+
+      </div>
+    <% else %>
+      <p class="rc-hint"><%= t("e2_handoff.no_linked_ai") %></p>
+    <% end %>
+    <footer class="wa-invite-artifact-tools">
+      <div class="wa-invite-artifact-tools__summary">
+        <span class="wa-invite-artifact-tools__icon" aria-hidden="true">
+          <i class="bi <%= @owner_ai_result.present? ? 'bi-check-circle' : 'bi-journal-text' %>"></i>
+        </span>
+        <div>
+          <strong><%= @owner_ai_result.present? ? t("e2_handoff.draft_attached") : t("e2_handoff.draft_unlinked") %></strong>
+          <p class="rc-hint"><%= t("e2_handoff.private_not_shared") %></p>
+        </div>
+      </div>
+      <div class="wa-invite-artifact-tools__actions">
+        <% if @owner_ai_result.present? %>
+          <%= link_to rc_icon_label("journal-text", t("e2_ai.open_saved")),
+                      owner_ai_assistant_path(entry_id: @invitation.owner_ai_entry_id),
+                      class: "rc-action rc-action--quiet" %>
+        <% end %>
+        <%= link_to rc_icon_label("download", t("e2_handoff.export")),
+                    owner_invitation_path(@invitation, format: :json),
+                    class: "rc-action rc-action--quiet" %>
+      </div>
+    </footer>
+    <% if @recent_ai_drafts.any? %>
+      <details class="wa-invite-artifact-recover">
+        <summary>
+          <i class="bi bi-clock-history" aria-hidden="true"></i>
+          <span><%= @owner_ai_result.present? ? t("e2_handoff.replace_draft") : t("e2_handoff.recover_title") %></span>
+          <i class="bi bi-chevron-down wa-invite-artifact-recover__chevron" aria-hidden="true"></i>
+        </summary>
+        <div class="wa-invite-artifact-recover__body">
+          <p class="rc-hint"><%= t("e2_handoff.recover_hint") %></p>
+          <%= form_with url: attach_owner_invitation_ai_draft_path(@invitation),
+                        method: :patch, html: { class: "wa-invite-artifact-recover__form" } do %>
+            <%= select_tag :entry_id, options_for_select(@recent_ai_drafts.map { |entry|
+                  ["##{entry.id} — #{entry.result["heading"].to_s.truncate(95)}", entry.id]
+                }, @invitation.owner_ai_entry_id), class: "rc-input", required: true,
+                aria: { label: t("e2_handoff.recover_title") } %>
+            <button class="rc-action rc-action--soft" type="submit">
+              <%= rc_icon_label("link-45deg", t("e2_handoff.recover_action")) %>
+            </button>
+          <% end %>
+        </div>
+      </details>
+    <% end %>
+  </section>
+</div>

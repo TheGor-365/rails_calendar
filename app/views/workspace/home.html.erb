@@ -16,14 +16,55 @@
     <div class="ws-hub-metric"><i class="bi bi-inboxes" aria-hidden="true"></i><span><%= t("workspace.intakes_metric") %></span><strong><%= @intake_count %></strong><small><%= t("workspace.intakes_metric_note") %></small></div>
     <div class="ws-hub-metric"><i class="bi bi-clipboard-check" aria-hidden="true"></i><span><%= t("workspace.review_metric") %></span><strong><%= @review_count %></strong><small><%= t("workspace.review_metric_note") %></small></div>
   </section>
+  <section class="ws-hub-section" aria-labelledby="ws-outgoing">
+    <div class="ws-hub-section-head">
+      <h2 id="ws-outgoing"><i class="bi bi-send-check" aria-hidden="true"></i> <%= t("owner_activity.outgoing") %> (<%= @outgoing_count %>)</h2>
+      <%= link_to rc_icon_label("arrow-up-right", t("owner_activity.all_outgoing")), owner_invitations_path(anchor: "invitation-history"), class: "rc-action rc-action--quiet rc-action--small" %>
+    </div>
+    <% if @outgoing_invitations.any? %>
+      <div class="ws-hub-panels">
+        <section class="ws-hub-panel">
+          <ul class="ws-hub-list">
+            <% @outgoing_invitations.each do |invitation| %>
+              <li>
+                <%= link_to owner_invitation_path(invitation) do %>
+                  <strong><i class="bi bi-envelope-paper" aria-hidden="true"></i> <%= invitation.seed_title %></strong>
+                  <small><%= t("e2.state_#{invitation.state}") %> · <%= l(invitation.created_at, format: :short) %></small>
+                  <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                <% end %>
+                <% if invitation.project_intake_id.present? %>
+                  <%= link_to rc_icon_label("journal-text", t("owner_activity.open_request")), project_intake_path(invitation.project_intake_id), class: "rc-action rc-action--soft rc-action--small" %>
+                  <% if invitation.project_intake&.latest_scope_revision %>
+                    <%= link_to rc_icon_label("list-check", t("owner_activity.requirements")), owner_requirements_path(invitation.project_intake_id), class: "rc-action rc-action--quiet rc-action--small" %>
+                  <% end %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </section>
+      </div>
+    <% else %>
+      <p class="ws-hub-empty"><%= t("owner_activity.none_outgoing") %></p>
+    <% end %>
+  </section>
   <section class="ws-hub-section" aria-labelledby="ws-tools">
     <div class="ws-hub-section-head"><h2 id="ws-tools"><%= t("workspace.tools_heading") %></h2><span><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("workspace.owner_only") %></span></div>
     <div class="ws-hub-tools">
+      <%= link_to owner_notifications_path, class: "ws-hub-tool" do %>
+        <span class="ws-hub-tool-icon"><i class="bi bi-bell" aria-hidden="true"></i></span>
+        <strong><%= t("notifications.title") %> <%= "(#{owner_unread_activity_count})" if owner_unread_activity_count.positive? %></strong>
+        <small><%= t("notifications.description") %></small>
+        <span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+      <% end %>
+      <%= link_to owner_activity_events_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-activity" aria-hidden="true"></i></span><strong><%= t("activity_journal.title") %></strong><small><%= t("activity_journal.description") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
+      <%= link_to owner_artifacts_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-collection" aria-hidden="true"></i></span><strong><%= t("artifact_library.title") %></strong><small><%= t("artifact_library.subtitle") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
       <%= link_to root_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-calendar3" aria-hidden="true"></i></span><strong><%= t("workspace.calendar") %></strong><small><%= t("workspace.calendar_desc") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
       <%= link_to consultations_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></span><strong><%= t("workspace.consultations") %></strong><small><%= t("workspace.consultations_desc") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
       <%= link_to admin_project_intakes_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-inboxes" aria-hidden="true"></i></span><strong><%= t("workspace.intakes") %></strong><small><%= t("workspace.intakes_desc") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
       <%= link_to owner_services_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-boxes" aria-hidden="true"></i></span><strong><%= t("owner_services.title") %></strong><small><%= t("owner_services.owner_only_help") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
-      <%= link_to new_project_intake_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-clipboard2-plus" aria-hidden="true"></i></span><strong><%= t("workspace.new_intake") %></strong><small><%= t("workspace.new_intake_desc") %></small><span class="ws-hub-tool-action"><%= t("workspace.start") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
+      <% if ClientRequestPilot.enabled?(request: request) %>
+        <%= link_to owner_invitations_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-envelope-plus" aria-hidden="true"></i></span><strong><%= t("e2.owner_title") %></strong><small><%= t("e2.owner_hint") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
+      <% end %>
     </div>
   </section>
   <div class="ws-hub-panels">

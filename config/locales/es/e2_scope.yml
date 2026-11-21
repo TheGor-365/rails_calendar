@@ -1,0 +1,88 @@
+es:
+  e2_scope:
+    eyebrow: "DEFINICIÓN DEL PROYECTO / 12 SECCIONES"
+    title: "Vamos a definir tu proyecto"
+    intro: "Explica lo importante para ti. Puedes dejar las decisiones técnicas al desarrollador."
+    progress: "Secciones completadas"
+    your_answer: "Tus necesidades"
+    status_label: "¿Qué tan seguro es?"
+    responsibility_label: "¿Quién decide?"
+    technical_label: "Explicación técnica (opcional)"
+    draft_only: "Este es un borrador, no una especificación aprobada ni un contrato. Se conservan las versiones anteriores."
+    invalid: "Revisa los datos de esta sección."
+    statuses:
+      suggested: "Propuesto"
+      confirmed: "Confirmado"
+      unknown: "No estoy seguro"
+      excluded: "Excluido"
+    responsibilities:
+      client: "Yo"
+      owner: "El desarrollador"
+      open: "Juntos"
+    owner_title: "Revisión técnica de la solicitud"
+    owner_hint: "Borrador de descubrimiento v%{version}. Las decisiones técnicas aún no están aprobadas."
+    section_reference: "SECCIÓN"
+    owner_client_says: "En palabras del cliente"
+    not_yet_answered: "Sin respuesta; consultar o proponer una solución."
+    owner_warning: "Los números de sección no son IDs de requisitos. Cada requisito futuro tendrá su propio R-ID y fuente."
+    sections:
+      business_goal:
+        title: "Objetivo del proyecto"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Business objectives, boundaries, metrics and assumptions."
+      audiences:
+        title: "Usuarios y roles"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "User roles, authorization and access control."
+      journeys:
+        title: "Páginas y recorridos"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Navigation, views, user flows and state changes."
+      features:
+        title: "Funciones"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Functional requirements, API endpoints, validations and edge cases."
+      data:
+        title: "Datos e integraciones"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Database schema, integrations, data lifecycle and access rules."
+      quality:
+        title: "Calidad y seguridad"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Performance, security, availability, accessibility and testing."
+      content_design:
+        title: "Contenido y diseño"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Design system, assets, content ownership and responsive layouts."
+      acceptance:
+        title: "Criterios de aceptación"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Acceptance scenarios, measurable outcomes and test evidence."
+      exclusions:
+        title: "Exclusiones"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Out-of-scope items, assumptions and change boundaries."
+      risks:
+        title: "Riesgos y dudas"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Dependencies, blockers, open decisions and mitigation."
+      breakdown:
+        title: "Etapas de trabajo"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Implementation backlog, dependencies and milestones."
+      estimate:
+        title: "Plazos y costes"
+        help: "¿Qué resultado necesitas en esta parte?"
+        placeholder: "Descríbelo con tus propias palabras o déjalo a criterio del desarrollador."
+        technical: "Non-binding estimate, delivery assumptions, infrastructure and running costs."

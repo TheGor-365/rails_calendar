@@ -4,7 +4,26 @@ class ProjectIntake < ApplicationRecord
   MAX_CLIENT_MESSAGES = 8
 
   belongs_to :client_user, class_name: "User", optional: true, inverse_of: :client_project_intakes
+  belongs_to :workspace, optional: true
   has_many :intake_messages, dependent: :restrict_with_exception
+  has_many :intake_service_selections, dependent: :restrict_with_exception
+  has_many :intake_brief_revisions, dependent: :restrict_with_exception
+  has_many :intake_scope_revisions, dependent: :restrict_with_exception
+  has_many :intake_requirement_sets, dependent: :restrict_with_exception
+
+  def latest_requirement_set
+    intake_requirement_sets.order(version: :desc).first
+  end
+
+  def latest_scope_revision
+    intake_scope_revisions.order(version: :desc).first
+  end
+
+  def latest_brief_revision
+    intake_brief_revisions.order(version: :desc).first
+  end
+  has_one :client_request_invitation, dependent: :restrict_with_exception
+  has_many :selected_service_offering_versions, through: :intake_service_selections, source: :service_offering_version
   has_many :owner_intake_read_states, dependent: :restrict_with_exception
   has_many :intake_answers, dependent: :restrict_with_exception
   has_many :intake_spec_versions, dependent: :restrict_with_exception
@@ -28,4 +47,18 @@ class ProjectIntake < ApplicationRecord
   def client_message_count
     intake_messages.where(role: "client").count
   end
+  # The outbox entry shares the original intake's commit/rollback.
+  # Keep the existing after_commit activity for immediate, idempotent UX.
+  after_create :enqueue_intake_created
+  after_create_commit :record_intake_created
+
+  def enqueue_intake_created
+    DomainOutboxEvent.enqueue_intake_created!(self)
+  end
+
+  def record_intake_created
+    Activity::Recorder.record!(workspace: workspace, subject: self,
+      kind: "intake_created", title: title, occurred_at: created_at)
+  end
+
 end

@@ -2,7 +2,7 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # RC-003: supported runtime and patched Rails security release (2026-11-04).
-ruby "3.4.12"
+ruby "3.4.13"
 gem "rails", "= 8.1.4.1"
 gem "bcrypt", "~> 3.1.22"
 

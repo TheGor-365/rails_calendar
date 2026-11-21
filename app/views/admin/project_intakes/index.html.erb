@@ -1,31 +1,126 @@
-<div class="container my-4 my-sm-5">
+<div class="container my-4 my-sm-5 wa-requests" data-controller="wa-requests" data-wa-requests-key-value="rc-owner-requests-view-v1">
   <header class="rc-page-hero mb-4">
     <div class="rc-page-hero__content">
-    <p class="eyebrow"><%= t("intake.admin_index_eyebrow") %></p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-inboxes"></i></span><h1 class="page-title"><%= t("intake.admin_index_title") %></h1></div>
-    <p class="rc-muted"><%= t("intake.admin_index_hint") %></p>
-    <%= link_to rc_icon_label("clipboard2-plus", t("intake.start_intake")), new_project_intake_path, class: "rc-action rc-action--primary" %>
+      <p class="eyebrow"><%= t("requests_hub.eyebrow") %></p>
+      <div class="rc-page-hero__heading">
+        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-inboxes"></i></span>
+        <h1 class="page-title"><%= t("requests_hub.title") %></h1>
+      </div>
+      <p class="rc-muted"><%= t("requests_hub.subtitle") %></p>
+    </div>
+    <div class="rc-page-hero__actions">
+      <%= link_to rc_icon_label("send-plus", t("requests_hub.new_outgoing")), owner_invitations_path, class: "rc-action rc-action--primary" if owner_signed_in? %>
+      <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path, class: "rc-action rc-action--quiet" if owner_signed_in? %>
     </div>
   </header>
-  <ul class="rc-record-list">
-    <% @intakes.each do |intake| %>
-      <li class="rc-record wa-inbox-record<%= ' wa-inbox-record--unread' if @unread_intake_ids.include?(intake.id) %>">
-        <h2 class="h5 wa-inbox-record__heading">
-          <%= link_to rc_icon_label("arrow-up-right", intake.title), project_intake_path(intake), class: "rc-text-link" %>
-          <% if @unread_intake_ids.include?(intake.id) %>
-            <span class="wa-inbox-record__new"><span class="wa-unread-dot" aria-hidden="true"></span><%= t("intake.unread_new") %></span>
-          <% end %>
-        </h2>
-        <p class="rc-muted"><%= rc_intake_type(intake.project_type) %> · <%= rc_intake_status(intake.status) %><% if intake.client_user_id.present? %> · <%= t("client_requests.origin_client") %><% end %> · <%= rc_local_datetime(intake.created_at, format: :rc_date_time) + " UTC" %></p>
-      </li>
+
+  <div class="wa-requests__switch" role="tablist" aria-label="<%= t("requests_hub.switch_label") %>">
+    <button type="button" role="tab" id="wa-requests-tab-incoming" class="wa-requests__tab" data-wa-requests-target="tab" data-view="incoming"
+            aria-controls="wa-requests-incoming" aria-selected="true" data-action="click->wa-requests#select keydown->wa-requests#keyboard">
+      <i class="bi bi-inbox" aria-hidden="true"></i>
+      <span><%= t("requests_hub.incoming") %></span>
+      <strong class="wa-requests__count"><%= @incoming_total_count %></strong>
+      <% if @unread_incoming_count.positive? %>
+        <span class="wa-requests__unread" title="<%= t("requests_hub.unread_count", count: @unread_incoming_count) %>"><%= @unread_incoming_count %></span>
+      <% end %>
+    </button>
+    <% if owner_signed_in? %>
+      <button type="button" role="tab" id="wa-requests-tab-outgoing" class="wa-requests__tab" data-wa-requests-target="tab" data-view="outgoing"
+              aria-controls="wa-requests-outgoing" aria-selected="false" data-action="click->wa-requests#select keydown->wa-requests#keyboard">
+        <i class="bi bi-send-check" aria-hidden="true"></i>
+        <span><%= t("requests_hub.outgoing") %></span>
+        <strong class="wa-requests__count"><%= @outgoing_total_count %></strong>
+        <% if @outgoing_attention_count.positive? %>
+          <span class="wa-requests__attention" title="<%= t("requests_hub.claimed_count", count: @outgoing_attention_count) %>"><%= @outgoing_attention_count %></span>
+        <% end %>
+      </button>
     <% end %>
-  </ul>
-  <% if @intakes.empty? %>
-    <div class="rc-empty-state" role="status">
-      <span class="rc-empty-state__icon" aria-hidden="true"><i class="bi bi-inbox"></i></span>
-      <h2><%= t("intake.admin_index_empty") %></h2>
-      <p><%= t("intake.admin_index_empty_hint") %></p>
-      <%= link_to rc_icon_label("clipboard2-plus", t("intake.admin_index_create")), new_project_intake_path, class: "rc-action rc-action--soft" %>
+  </div>
+
+  <section id="wa-requests-incoming" class="wa-requests__panel" role="tabpanel" aria-labelledby="wa-requests-tab-incoming" data-wa-requests-target="panel" data-view="incoming">
+    <div class="wa-requests__section-heading">
+      <div><h2><%= t("requests_hub.incoming") %></h2><p class="rc-hint"><%= t("requests_hub.incoming_hint") %></p></div>
+      <span class="rc-status-pill"><%= t("requests_hub.unread_count", count: @unread_incoming_count) %></span>
     </div>
+    <div class="wa-requests__records">
+      <% @intakes.each do |intake| %>
+        <details class="wa-requests__record<%= ' wa-requests__record--unread' if @unread_intake_ids.include?(intake.id) %>">
+          <summary>
+            <span class="wa-requests__record-icon"><i class="bi bi-file-earmark-arrow-down" aria-hidden="true"></i></span>
+            <span class="wa-requests__record-main">
+              <strong><%= intake.title %></strong>
+              <small><%= rc_intake_type(intake.project_type) %> · <%= rc_intake_status(intake.status) %> · <%= rc_local_datetime(intake.created_at, format: :rc_date_time) %></small>
+            </span>
+            <% if @unread_intake_ids.include?(intake.id) %><span class="wa-requests__new"><%= t("requests_hub.new_label") %></span><% end %>
+            <i class="bi bi-chevron-down wa-requests__chevron" aria-hidden="true"></i>
+          </summary>
+          <div class="wa-requests__detail">
+            <div class="wa-requests__facts">
+              <div><span><%= t("requests_hub.sender") %></span><strong><%= intake.client_user&.email.presence || t("requests_hub.internal_source") %></strong></div>
+              <div><span><%= t("requests_hub.state") %></span><strong><%= rc_intake_status(intake.status) %></strong></div>
+              <div><span><%= t("requests_hub.created") %></span><strong><%= rc_local_datetime(intake.created_at, format: :rc_date_time) %></strong></div>
+            </div>
+            <p class="wa-requests__description"><%= truncate(intake.goal, length: 500) %></p>
+            <div class="wa-requests__actions">
+              <%= link_to rc_icon_label("arrow-up-right", t("requests_hub.open_request")), project_intake_path(intake), class: "rc-action rc-action--primary" %>
+              <% if owner_signed_in? && intake.latest_scope_revision %>
+                <%= link_to rc_icon_label("list-check", t("owner_activity.requirements")), owner_requirements_path(intake), class: "rc-action rc-action--quiet" %>
+              <% end %>
+            </div>
+          </div>
+        </details>
+      <% end %>
+      <% if @intakes.empty? %>
+        <div class="rc-empty-state" role="status"><i class="bi bi-inbox" aria-hidden="true"></i><p><%= t("requests_hub.no_incoming") %></p></div>
+      <% end %>
+    </div>
+  </section>
+
+  <% if owner_signed_in? %>
+    <section id="wa-requests-outgoing" class="wa-requests__panel" role="tabpanel" aria-labelledby="wa-requests-tab-outgoing"
+             data-wa-requests-target="panel" data-view="outgoing" hidden>
+      <div class="wa-requests__section-heading">
+        <div><h2><%= t("requests_hub.outgoing") %></h2><p class="rc-hint"><%= t("requests_hub.outgoing_hint") %></p></div>
+        <%= link_to rc_icon_label("arrow-up-right", t("owner_activity.all_outgoing")), owner_invitations_path(anchor: "invitation-history"), class: "rc-action rc-action--quiet rc-action--small" %>
+      </div>
+      <div class="wa-requests__records">
+        <% @outgoing_invitations.each do |invitation| %>
+          <details class="wa-requests__record">
+            <summary>
+              <span class="wa-requests__record-icon"><i class="bi bi-send-check" aria-hidden="true"></i></span>
+              <span class="wa-requests__record-main">
+                <strong><%= invitation.seed_title %></strong>
+                <small><%= t("e2.state_#{invitation.state}") %> · <%= rc_local_datetime(invitation.created_at, format: :rc_date_time) %></small>
+              </span>
+              <span class="rc-status-pill rc-status-pill--muted"><%= t("e2.state_#{invitation.state}") %></span>
+              <i class="bi bi-chevron-down wa-requests__chevron" aria-hidden="true"></i>
+            </summary>
+            <div class="wa-requests__detail">
+              <div class="wa-requests__facts">
+                <div><span><%= t("requests_hub.author") %></span><strong><%= current_user.email %></strong></div>
+                <div><span><%= t("requests_hub.state") %></span><strong><%= t("e2.state_#{invitation.state}") %></strong></div>
+                <div><span><%= t("requests_hub.created") %></span><strong><%= rc_local_datetime(invitation.created_at, format: :rc_date_time) %></strong></div>
+                <div><span><%= t("requests_hub.valid_until") %></span><strong><%= rc_local_datetime(invitation.expires_at, format: :rc_date_time) %></strong></div>
+              </div>
+              <p class="wa-requests__description"><%= truncate(invitation.seed_goal, length: 500) %></p>
+              <div class="wa-requests__actions">
+                <%= link_to rc_icon_label("eye", t("e2_handoff.owner_preview")), owner_invitation_path(invitation), class: "rc-action rc-action--primary" %>
+                <%= link_to rc_icon_label("arrow-repeat", t("e2_handoff.reuse_as_new")), owner_invitations_path(from_invitation_id: invitation.id), class: "rc-action rc-action--soft" %>
+                <%= link_to rc_icon_label("download", "JSON"), owner_invitation_path(invitation, format: :json), class: "rc-action rc-action--quiet" %>
+                <% if invitation.project_intake_id.present? %>
+                  <%= link_to rc_icon_label("journal-text", t("requests_hub.open_request")), project_intake_path(invitation.project_intake_id), class: "rc-action rc-action--soft" %>
+                  <% if invitation.project_intake&.latest_scope_revision %>
+                    <%= link_to rc_icon_label("list-check", t("owner_activity.requirements")), owner_requirements_path(invitation.project_intake_id), class: "rc-action rc-action--quiet" %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </details>
+        <% end %>
+        <% if @outgoing_invitations.empty? %>
+          <div class="rc-empty-state" role="status"><i class="bi bi-send" aria-hidden="true"></i><p><%= t("owner_activity.none_outgoing") %></p></div>
+        <% end %>
+      </div>
+    </section>
   <% end %>
 </div>

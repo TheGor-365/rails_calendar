@@ -90,6 +90,26 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to consultation_url(Consultation.last)
   end
 
+  test "admin can create a calendar consultation asynchronously with JSON" do
+    sign_in_as_admin
+
+    assert_difference "Consultation.count", 1 do
+      post consultations_url(format: :json), params: { consultation: @valid_attributes }, as: :json
+    end
+    assert_response :created
+    payload = response.parsed_body
+    assert_equal Consultation.last.id, payload.fetch("id")
+    assert_equal consultation_path(Consultation.last), payload.fetch("path")
+
+    assert_no_difference "Consultation.count" do
+      post consultations_url(format: :json),
+           params: { consultation: @valid_attributes.merge(end_time: @valid_attributes[:start_time]) },
+           as: :json
+    end
+    assert_response :unprocessable_entity
+    assert response.parsed_body.fetch("errors").present?
+  end
+
   test "admin can update a consultation" do
     sign_in_as_admin
     patch consultation_url(@consultation), params: { consultation: { lock_version: @consultation.lock_version, title: "Admin update" } }

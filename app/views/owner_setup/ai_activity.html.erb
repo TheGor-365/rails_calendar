@@ -14,9 +14,19 @@
           <strong><%= entry.operation %> · <%= entry.status %></strong>
           <p class="rc-hint mb-0"><%= entry.model %> · <%= l(entry.created_at, format: :short) %> ·
             <%= entry.charged_ticks ? format("$%.8f", entry.charged_ticks.to_f / AiSpendLedger::USD_TICKS) : t("owner_setup.cost_pending") %></p>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <% if entry.operation == OwnerAi::Composer::VERSION && entry.status == "settled" && entry.result.is_a?(Hash) %>
+              <%= link_to rc_icon_label("journal-text", t("owner_activity.view_ai_result")), owner_ai_assistant_path(entry_id: entry.id), class: "rc-action rc-action--quiet rc-action--small" %>
+            <% end %>
+            <% if (invitation = @linked_invitation_by_entry_id[entry.id]) %>
+              <%= link_to rc_icon_label("send-check", t("owner_activity.open_invitation")), owner_invitation_path(invitation), class: "rc-action rc-action--soft rc-action--small" %>
+            <% end %>
+          </div>
         </li>
       <% end %>
     </ol>
+    <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--soft" %>
     <%= link_to t("owner_setup.my_practice"), owner_practice_path, class: "rc-action rc-action--quiet" %>
+    <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path(kind: "ai"), class: "rc-action rc-action--primary" %>
   </div>
 </div>

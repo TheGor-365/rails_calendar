@@ -36,8 +36,8 @@ class OwnerIntakeUnreadTest < ActionDispatch::IntegrationTest
 
     get admin_project_intakes_path
     assert_response :success
-    assert_select ".wa-inbox-record--unread", count: 2
-    assert_select ".wa-inbox-record__new", text: "New", count: 2
+    assert_select ".wa-requests__record--unread", count: 2
+    assert_select ".wa-requests__new", text: "New", count: 2
     assert_equal 0, OwnerIntakeReadState.count, "inbox list view must not mark any request as read"
 
     get project_intake_path(@request_a)
@@ -49,7 +49,7 @@ class OwnerIntakeUnreadTest < ActionDispatch::IntegrationTest
 
     get admin_project_intakes_path
     assert_response :success
-    assert_select ".wa-inbox-record--unread", count: 1
+    assert_select ".wa-requests__record--unread", count: 1
     assert_equal 1, OwnerIntakeReadState.count
 
     get project_intake_path(@request_b)
@@ -106,7 +106,7 @@ class OwnerIntakeUnreadTest < ActionDispatch::IntegrationTest
     }
     get admin_project_intakes_path
     assert_response :success
-    assert_select ".wa-inbox-record--unread", count: 0
+    assert_select ".wa-requests__record--unread", count: 0
     assert_select "header.app-header .wa-unread-count", count: 0
     get project_intake_path(@request_a)
     assert_response :success

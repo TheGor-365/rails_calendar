@@ -17,6 +17,16 @@
       <% end %>
     <% end %>
 
+    <% owner_workspace_active = owner_signed_in? && controller_path == "workspace" && action_name == "home" %>
+    <% owner_ai_active = owner_signed_in? && (controller_path == "owner_ai_assistant" || controller_path == "owner_ai_conversations") %>
+    <% owner_requests_active = owner_signed_in? && (
+         controller_path == "admin/project_intakes" && action_name == "index" ||
+         controller_path == "owner_invitations" ||
+         controller_path == "owner_requirements" ||
+         controller_path == "project_intakes" && action_name == "show"
+       ) %>
+    <% owner_notifications_active = owner_signed_in? && controller_path == "owner_notifications" %>
+    <% owner_library_active = owner_signed_in? && controller_path == "owner_artifacts" %>
     <% client_cabinet_active = client_signed_in? && ([client_home_path, client_cabinet_path].include?(request.path) || (controller_path == "client_requests" && %w[show review].include?(action_name))) %>
     <% client_creation_active = client_signed_in? && controller_path == "client_requests" && %w[new create].include?(action_name) %>
     <div class="rc-nav-group" aria-label="<%= t("nav.workspace_sections") %>">
@@ -31,13 +41,23 @@
         <% end %>
       <% else %>
       <% if owner_signed_in? %>
-        <%= link_to rc_icon_label("grid-1x2", t("nav.workspace")), workspace_path, class: "rc-nav-link #{'active' if request.path == workspace_path}" %>
-        <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-nav-link #{'active' if request.path == owner_cabinet_path || controller_path == 'owner_setup'}" %>
+        <%= link_to rc_icon_label("grid-1x2", t("nav.workspace")), workspace_path, class: "rc-nav-link #{'active' if owner_workspace_active}", aria: { current: ("page" if owner_workspace_active) } %>
+        <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-nav-link #{'active' if request.path == owner_cabinet_path || controller_path == 'owner_setup'}", aria: { current: ("page" if request.path == owner_cabinet_path || controller_path == 'owner_setup') } %>
         <%= link_to owner_ai_assistant_path,
-                    class: "rc-nav-link wa-ai-nav-entry #{'active' if request.path == owner_ai_assistant_path}",
-                    aria: { current: ("page" if request.path == owner_ai_assistant_path) } do %>
+                    class: "rc-nav-link wa-ai-nav-entry #{'active' if owner_ai_active}",
+                    aria: { current: ("page" if owner_ai_active) } do %>
           <%= rc_icon_label("stars", t("owner_ai_assistant.nav_label")) %>
         <% end %>
+        <%= link_to owner_notifications_path, class: "rc-nav-link #{'active' if owner_notifications_active}",
+                    aria: { current: ("page" if owner_notifications_active) } do %>
+          <%= rc_icon_label("bell", t("notifications.title")) %>
+          <% if owner_unread_activity_count.positive? %>
+            <span class="wa-unread-count" aria-label="<%= t("notifications.unread") %>"><%= [owner_unread_activity_count, 99].min %><%= '+' if owner_unread_activity_count > 99 %></span>
+          <% end %>
+        <% end %>
+        <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path,
+                    class: "rc-nav-link #{'active' if owner_library_active}",
+                    aria: { current: ("page" if owner_library_active) } %>
       <% end %>
       <%= link_to root_path,
                   class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",
@@ -59,8 +79,8 @@
                     class: "rc-nav-link #{'active' if controller_path == 'project_intakes' && action_name == 'new'}" %>
         <% if admin_signed_in? %>
           <%= link_to admin_project_intakes_path,
-                      class: "rc-nav-link wa-inbox-nav #{'active' if controller_path == 'admin/project_intakes' && action_name == 'index'}" do %>
-            <%= rc_icon_label("inboxes", t("nav.intake_inbox")) %>
+                      class: "rc-nav-link wa-inbox-nav #{'active' if owner_requests_active}", aria: { current: ("page" if owner_requests_active) } do %>
+            <%= rc_icon_label("inboxes", t("requests_hub.title")) %>
             <% if owner_signed_in? && owner_unread_intake_count.positive? %>
               <span class="wa-unread-count" aria-label="<%= t("intake.unread_count", count: owner_unread_intake_count) %>"><%= owner_unread_badge_label %></span>
             <% end %>
