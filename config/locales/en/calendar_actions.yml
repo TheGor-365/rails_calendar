@@ -16,6 +16,7 @@ en:
     no_activity: "No actions found for this period."
     now: "Current time"
     kinds:
+      conversation: "AI conversation"
       invitation: "Invitation"
       request: "Request"
       ai: "AI generation"
