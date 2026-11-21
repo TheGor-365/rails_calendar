@@ -16,6 +16,8 @@ es:
     open: "Abrir"
     none: "No hay eventos para estos filtros."
     events:
+      service_published: "Servicio publicado"
+      service_unpublished: "Servicio retirado"
       invitation_issued: "Invitación creada"
       invitation_claimed: "Invitación aceptada"
       invitation_submitted: "Solicitud enviada"
