@@ -212,7 +212,7 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
         project_intake: @intake)
       invitation.update!(submitted_at: submitted_at)
     end
-    rows = @workspace.domain_outbox_events.where(source_type: "ClientRequestInvitation",
+    rows = DomainOutboxEvent.where(workspace_id: @workspace.id, source_type: "ClientRequestInvitation",
       source_id: invitation.id, kind: %w[invitation_claimed invitation_submitted]).order(:source_version)
     assert_equal %w[invitation_claimed invitation_submitted], rows.pluck(:kind)
     assert_equal [2, 3], rows.pluck(:source_version)
@@ -236,7 +236,7 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
       end
     end
     assert_nil invitation.reload.revoked_at
-    assert_not @workspace.domain_outbox_events.where(source_type: "ClientRequestInvitation",
+    assert_not DomainOutboxEvent.where(workspace_id: @workspace.id, source_type: "ClientRequestInvitation",
       source_id: invitation.id, kind: "invitation_revoked").exists?
   end
 
