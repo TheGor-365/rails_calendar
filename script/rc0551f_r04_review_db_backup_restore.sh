@@ -69,7 +69,7 @@ supplemental_members="$(getent group "$EXPECTED_ROLE" | awk -F: '{ print $4 }')"
 # Do not assume a config name alone proves where Active Storage actually writes.
 [[ -f "$ROOT/bin/rails" ]] || die "Rails executable missing in reviewed checkout."
 actual_media_root="$(cd "$ROOT" &&
-  ASDF_RUBY_VERSION=3.4.13 RAILS_ENV=development RC_GROK_ENABLED=false
+  ASDF_RUBY_VERSION=3.4.13 RAILS_ENV=development RC_GROK_ENABLED=false \
   PGOPTIONS='-c default_transaction_read_only=on' ruby bin/rails runner '
     service = ActiveStorage::Blob.service
     abort("STOP: non-local Active Storage service") unless
