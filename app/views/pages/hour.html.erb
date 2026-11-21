@@ -40,7 +40,7 @@
               <time datetime="<%= occurred.iso8601 %>"><%= occurred.strftime("%H:%M") %></time>
               <div>
                 <strong><%= entry[:title] %></strong>
-                <small><%= t("calendar_actions.kinds.#{entry[:kind]}") %> · <%= t("calendar_actions.states.#{entry[:status]}", default: entry[:status]) %></small>
+                <small><%= t("calendar_actions.kinds.#{entry[:kind]}") %> · <%= rc_calendar_activity_status(entry) %></small>
               </div>
               <%= link_to rc_icon_label("arrow-up-right", t("calendar.day_open_source")), entry[:path],
                           class: "rc-action rc-action--quiet rc-action--small" %>
