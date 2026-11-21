@@ -54,8 +54,24 @@ class ClientRequestInvitation < ApplicationRecord
       published_versions.size == ids.size
   end
 
+  # Enqueue within the same transaction as the invitation change.
+  # Existing after_commit events remain as immediate, idempotent projections.
+  after_create :enqueue_invitation_issued
+  after_update :enqueue_invitation_transitions
   after_create_commit :record_invitation_issued
   after_update_commit :record_invitation_transitions
+
+  def enqueue_invitation_issued
+    DomainOutboxEvent.enqueue_invitation_transition!(self, kind: "invitation_issued")
+  end
+
+  def enqueue_invitation_transitions
+    { "claimed_at" => "invitation_claimed", "submitted_at" => "invitation_submitted",
+      "revoked_at" => "invitation_revoked" }.each do |attribute, kind|
+      next unless saved_change_to_attribute?(attribute) && public_send(attribute).present?
+      DomainOutboxEvent.enqueue_invitation_transition!(self, kind: kind)
+    end
+  end
 
   def record_invitation_issued
     Activity::Recorder.record!(workspace: workspace, subject: self,
