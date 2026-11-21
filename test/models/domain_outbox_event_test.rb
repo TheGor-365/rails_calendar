@@ -277,7 +277,7 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
 
   test "C2.3b4 only owner-published service versions produce immutable source events" do
     catalogue, offering, version = synthetic_approved_service
-    assert_no DomainOutboxEvent.where(source_type: "ServiceOfferingPublication").exists?
+    assert_not DomainOutboxEvent.where(source_type: "ServiceOfferingPublication").exists?
 
     assert_difference(["DomainOutboxEvent.count", "ActivityEvent.count"], 1) do
       catalogue.publish!(offering: offering, version_id: version.id,
