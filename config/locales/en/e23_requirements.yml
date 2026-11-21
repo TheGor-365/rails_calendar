@@ -30,3 +30,17 @@ en:
     add_atomic: "Add an atomic requirement"
     add_atomic_help: "If a section contains multiple independent functions, add one verifiable function linked to the source section."
     section_label: "Source answer section"
+  e24_requirements:
+    diff_summary: "Changes from previous version: %{count}"
+    no_changes: "No requirement changes."
+    before: "Before"
+    after: "After"
+    kinds:
+      added: "Added"
+      removed: "Removed"
+      changed: "Changed"
+    fields:
+      statement: "Requirement"
+      status: "Status"
+      acceptance_criteria: "Acceptance criteria"
+      source: "Source"
