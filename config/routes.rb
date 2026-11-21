@@ -51,6 +51,7 @@ Rails.application.routes.draw do
   post "/workspace/notifications/:id/read", to: "owner_notifications#read", as: :read_owner_notification
 
   # Canonical owner workspace activity; metadata exports contain no private drafts.
+  get "/workspace/outbox/health", to: "owner_outbox_health#index", as: :owner_outbox_health
   get "/workspace/activity", to: "owner_activity_events#index", as: :owner_activity_events
   get "/workspace/activity/:id.txt", to: "owner_activity_events#export", as: :export_owner_activity_event
 
