@@ -36,6 +36,11 @@ module Activity
       source_workspace_id = case subject
       when ClientRequestInvitation, ProjectIntake, OwnerAiConversation
         subject.workspace_id
+      when OwnerAiMessage
+        subject.owner_ai_conversation&.workspace_id if subject.role == "assistant" &&
+          subject.state == "settled" && subject.ai_spend_entry&.status == "settled" &&
+          subject.ai_spend_entry.professional_profile&.workspace_id ==
+            subject.owner_ai_conversation&.workspace_id
       when IntakeRequirementSet
         subject.project_intake&.workspace_id
       when AiSpendEntry
