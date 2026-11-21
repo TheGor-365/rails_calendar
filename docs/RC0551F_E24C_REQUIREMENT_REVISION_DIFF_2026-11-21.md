@@ -21,3 +21,6 @@
 
 ## Safety
 No changes to user's local `db/schema.rb`, original port 3001, production Railway, paid Grok, `main`, customer-facing public routes or protected database. Local preview Ruby must be updated to 3.4.13 via asdf before trying current checkout.
+
+## Tenant ACL hardening
+The pre-existing `OwnerRequirementsController#load_intake!` used `workspace&.id` inside a query. With an owner lacking a Workspace, that produced `workspace_id: NULL` and could expose unassigned legacy intake drafts. The controller now returns HTTP 404 when the owner lacks a Workspace, before any query. Only explicit `workspace_id == current owner workspace ID` is accepted. Integration regression covers an orphaned intake and owners both with/without workspaces. No records are deleted or migrated. This is a local-only pilot security repair, not approval for real-client use.
