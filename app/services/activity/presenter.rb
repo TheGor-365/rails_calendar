@@ -8,7 +8,8 @@ module Activity
       "intake_created" => "clipboard2-check", "requirements_saved" => "list-check",
       "ai_attempted" => "stars", "ai_settled" => "stars",
       "ai_uncertain" => "exclamation-circle", "ai_cancelled" => "x-circle",
-      "conversation_created" => "chat-dots"
+      "conversation_created" => "chat-dots",
+      "ai_reply_saved" => "chat-left-text"
     }.freeze
 
     def self.display(event)
@@ -31,6 +32,16 @@ module Activity
           .find_by(id: event.subject_id)
         conversation && !conversation.removed? ?
           paths.owner_ai_conversation_path(conversation) : paths.owner_ai_conversations_path
+      when "OwnerAiMessage"
+        reply = OwnerAiMessage.joins(:owner_ai_conversation)
+          .where(owner_ai_conversations: { workspace_id: event.workspace_id })
+          .find_by(id: event.subject_id, role: "assistant", state: "settled")
+        conversation = reply&.owner_ai_conversation
+        if conversation && !conversation.removed? && reply.ai_spend_entry&.status == "settled"
+          paths.owner_ai_conversation_path(conversation)
+        else
+          paths.owner_ai_conversations_path
+        end
       else paths.owner_artifacts_path
       end
       { kind: event.kind.start_with?("ai_") ? :ai : event.kind.start_with?("invitation_") ? :invitation :
