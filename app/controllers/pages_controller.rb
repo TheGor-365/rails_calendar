@@ -26,10 +26,11 @@ class PagesController < ApplicationController
       from: from, through: through
     ).order(:start_time, :id).to_a
 
-    @month_invitations = owner_signed_in? ? current_user.owner_workspace.client_request_invitations
+    workspace = current_user.owner_workspace if owner_signed_in?
+    @month_invitations = workspace ? workspace.client_request_invitations
       .where(created_at: from...through).order(created_at: :desc).limit(100) : []
-    @month_activity = owner_signed_in? ? Calendar::OwnerActivity.between(
-      workspace: current_user.owner_workspace, from: from, through: through
+    @month_activity = workspace ? Calendar::OwnerActivity.between(
+      workspace: workspace, from: from, through: through
     ) : []
     @month_activity_by_day = @month_activity.group_by { |item| item[:created_at].in_time_zone.to_date }
 
@@ -58,9 +59,9 @@ class PagesController < ApplicationController
     day_end = day_start + 1.day
 
     @consultations = overlapping_consultations(day_start, day_end)
-    @day_invitations = owner_signed_in? ? current_user.owner_workspace.client_request_invitations
-      .where(created_at: day_start...day_end).order(created_at: :desc) : []
     workspace = current_user.owner_workspace if owner_signed_in?
+    @day_invitations = workspace ? workspace.client_request_invitations
+      .where(created_at: day_start...day_end).order(created_at: :desc) : []
     @day_activity = workspace ? Calendar::OwnerActivity.between(
       workspace: workspace, from: day_start, through: day_end
     ) : []
