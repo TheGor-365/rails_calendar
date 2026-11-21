@@ -7,10 +7,10 @@ class ActivityEvent < ApplicationRecord
   KINDS = %w[invitation_issued invitation_claimed invitation_submitted invitation_revoked
              intake_created requirements_saved ai_attempted ai_settled ai_uncertain
              ai_cancelled conversation_created ai_reply_saved
-             service_published service_unpublished].freeze
+             service_published service_unpublished scope_revision_saved].freeze
   SUBJECT_TYPES = %w[ClientRequestInvitation ProjectIntake IntakeRequirementSet
                      AiSpendEntry OwnerAiConversation OwnerAiMessage
-                     ServiceOfferingPublication].freeze
+                     ServiceOfferingPublication IntakeScopeRevision].freeze
 
   validates :event_key, presence: true, length: { maximum: 180 },
     uniqueness: { scope: :workspace_id }
