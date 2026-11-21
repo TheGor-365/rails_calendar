@@ -49,7 +49,7 @@ module Activity
              (subject.event == "publish" && subject.service_offering_version&.approved?))
           offering.workspace_id
         end
-      when IntakeRequirementSet
+      when IntakeScopeRevision, IntakeRequirementSet
         subject.project_intake&.workspace_id
       when AiSpendEntry
         subject.activity_workspace&.id
