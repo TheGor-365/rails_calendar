@@ -29,13 +29,13 @@ class OwnerIntakeUnreadSystemTest < ApplicationSystemTestCase
     visit admin_project_intakes_path
     assert_selector "header a.wa-inbox-nav .wa-unread-count", text: "1"
     assert_selector "nav.rc-mobile-dock--owner a.wa-inbox-mobile .wa-unread-count", text: "1", visible: :all
-    assert_selector ".wa-inbox-record--unread", count: 1
+    assert_selector ".wa-requests__record--unread", count: 1
 
     click_link @intake.title
     assert_current_path project_intake_path(@intake)
     assert_no_selector "header a.wa-inbox-nav .wa-unread-count"
     visit admin_project_intakes_path
-    assert_no_selector ".wa-inbox-record--unread"
+    assert_no_selector ".wa-requests__record--unread"
 
     [390, 320].each do |width|
       page.driver.browser.manage.window.resize_to(width, 932)
