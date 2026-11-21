@@ -22,7 +22,11 @@ module Activity
           .find_by(id: event.subject_id)
         source ? paths.owner_requirements_path(source.project_intake_id) : paths.owner_artifacts_path
       when "AiSpendEntry" then paths.owner_ai_activity_path
-      when "OwnerAiConversation" then paths.owner_ai_conversations_path
+      when "OwnerAiConversation"
+        conversation = OwnerAiConversation.where(workspace_id: event.workspace_id)
+          .find_by(id: event.subject_id)
+        conversation && !conversation.removed? ?
+          paths.owner_ai_conversation_path(conversation) : paths.owner_ai_conversations_path
       else paths.owner_artifacts_path
       end
       { kind: event.kind.start_with?("ai_") ? :ai : event.kind.start_with?("invitation_") ? :invitation :
