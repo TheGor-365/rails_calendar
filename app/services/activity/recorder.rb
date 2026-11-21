@@ -41,6 +41,14 @@ module Activity
           subject.state == "settled" && subject.ai_spend_entry&.status == "settled" &&
           subject.ai_spend_entry.professional_profile&.workspace_id ==
             subject.owner_ai_conversation&.workspace_id
+      when ServiceOfferingPublication
+        offering = subject.service_offering
+        if offering&.workspace_id == workspace.id &&
+            subject.owner_user_id == workspace.owner_user_id &&
+            (subject.event == "unpublish" ||
+             (subject.event == "publish" && subject.service_offering_version&.approved?))
+          offering.workspace_id
+        end
       when IntakeRequirementSet
         subject.project_intake&.workspace_id
       when AiSpendEntry
