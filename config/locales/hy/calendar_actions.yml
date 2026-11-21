@@ -16,6 +16,7 @@ hy:
     no_activity: "Այս շրջանում գործողություններ չկան։"
     now: "Ընթացիկ ժամանակ"
     kinds:
+      service: "Ծառայություն"
       conversation: "ԱԲ զրույց"
       invitation: "Հրավեր"
       request: "Հայտ"
