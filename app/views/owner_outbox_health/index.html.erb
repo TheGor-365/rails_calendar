@@ -23,7 +23,7 @@
         <div class="col-6 col-md-4 col-xl-3">
           <div class="surface-panel p-3" data-outbox-metric="<%= key %>">
             <span class="rc-muted d-block"><%= t("outbox_health.metrics.#{key}") %></span>
-            <strong class="h4 d-block mb-0"><%= key.in?(%w[pending delivered failed]) ? @snapshot[:states].fetch(key) : @snapshot.fetch(key) %></strong>
+            <strong class="h4 d-block mb-0"><%= key.in?(%w[pending delivered failed]) ? @snapshot[:states].fetch(key) : @snapshot.fetch(key.to_sym) %></strong>
           </div>
         </div>
       <% end %>
