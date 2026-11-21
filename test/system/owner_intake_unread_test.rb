@@ -31,7 +31,10 @@ class OwnerIntakeUnreadSystemTest < ApplicationSystemTestCase
     assert_selector "nav.rc-mobile-dock--owner a.wa-inbox-mobile .wa-unread-count", text: "1", visible: :all
     assert_selector ".wa-requests__record--unread", count: 1
 
-    click_link @intake.title
+    within(".wa-requests__record--unread") do
+      find("summary", text: @intake.title).click
+      find("a[href='#{project_intake_path(@intake)}']").click
+    end
     assert_current_path project_intake_path(@intake)
     assert_no_selector "header a.wa-inbox-nav .wa-unread-count"
     visit admin_project_intakes_path
