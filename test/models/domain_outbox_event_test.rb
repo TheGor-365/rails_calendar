@@ -140,7 +140,7 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
     event = @workspace.activity_events.find_by!(event_key: key)
     assert_equal "AI reply saved", event.title
     assert_equal({}, event.metadata)
-    assert_equal owner_ai_conversation_path(conversation), Activity::Presenter.display(event)[:path]
+    assert_equal Rails.application.routes.url_helpers.owner_ai_conversation_path(conversation), Activity::Presenter.display(event)[:path]
 
     assert_no_difference(["DomainOutboxEvent.count", "ActivityEvent.count", "AiSpendEntry.count"]) do
       reply.update!(body: "Fictional revised text, no automatic second delivery")
@@ -172,7 +172,7 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
       Activity::Recorder.record!(workspace: @other_workspace, subject: reply,
         kind: "ai_reply_saved", title: "Unauthorized synthetic foreign event")
     end
-    assert_equal owner_ai_conversation_path(conversation),
+    assert_equal Rails.application.routes.url_helpers.owner_ai_conversation_path(conversation),
       Activity::Presenter.display(@workspace.activity_events.find_by!(event_key: key))[:path]
   end
 
