@@ -47,7 +47,14 @@ class ProjectIntake < ApplicationRecord
   def client_message_count
     intake_messages.where(role: "client").count
   end
+  # The outbox entry shares the original intake's commit/rollback.
+  # Keep the existing after_commit activity for immediate, idempotent UX.
+  after_create :enqueue_intake_created
   after_create_commit :record_intake_created
+
+  def enqueue_intake_created
+    DomainOutboxEvent.enqueue_intake_created!(self)
+  end
 
   def record_intake_created
     Activity::Recorder.record!(workspace: workspace, subject: self,
