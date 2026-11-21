@@ -12,7 +12,15 @@ class IntakeRequirementSet < ApplicationRecord
     persisted?
   end
 
+  # Transactional enqueue: a saved immutable revision cannot commit without
+  # a durable replayable source reference. The legacy immediate projection is
+  # retained during staged rollout; replay uses the same idempotent event key.
+  after_create :enqueue_requirement_revision
   after_create_commit :record_requirement_revision
+
+  def enqueue_requirement_revision
+    DomainOutboxEvent.enqueue_requirement_revision!(self)
+  end
 
   def record_requirement_revision
     Activity::Recorder.record!(workspace: project_intake.workspace, subject: self,
