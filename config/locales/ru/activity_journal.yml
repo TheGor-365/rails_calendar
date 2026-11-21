@@ -23,6 +23,7 @@ ru:
       invitation_submitted: "Заявка отправлена клиентом"
       invitation_revoked: "Приглашение отозвано"
       intake_created: "Заявка создана"
+      scope_revision_saved: "Версия вводных проекта сохранена"
       requirements_saved: "Требования сохранены"
       ai_attempted: "ИИ: запрос зарегистрирован"
       ai_settled: "ИИ: результат получен"
