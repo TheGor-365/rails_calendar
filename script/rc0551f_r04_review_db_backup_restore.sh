@@ -193,7 +193,9 @@ diff -qr "$ROOT/storage" "$backup/media_restore/storage" \
   >"$backup/media_comparison_private.txt" 2>&1 ||
   die "Isolated media comparison failed; details kept in private backup."
 
-scratch="rails_calendar_r04_restore_${stamp}_$RANDOM"
+# UTC stamp contains uppercase T/Z; PostgreSQL scratch identifier must be lowercase.
+scratch_stamp="${stamp,,}"
+scratch="rails_calendar_r04_restore_${scratch_stamp}_$RANDOM"
 [[ "$scratch" != "$EXPECTED_DB" && "$scratch" =~ ^[a-z0-9_]+$ &&
    "${#scratch}" -le 63 ]] || die "Unsafe scratch database name."
 [[ "$(query "$EXPECTED_DB" "SELECT count(*) FROM pg_database WHERE datname='$scratch'")" == 0 ]] ||
