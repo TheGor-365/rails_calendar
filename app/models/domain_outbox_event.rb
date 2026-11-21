@@ -11,7 +11,9 @@ class DomainOutboxEvent < ApplicationRecord
     "ClientRequestInvitation" => %w[
       invitation_issued invitation_claimed invitation_submitted invitation_revoked
     ].freeze,
-    "ServiceOfferingPublication" => %w[service_published service_unpublished].freeze
+    "ServiceOfferingPublication" => %w[service_published service_unpublished].freeze,
+    "ProjectIntake" => "intake_created",
+    "IntakeScopeRevision" => "scope_revision_saved"
   }.freeze
   MAX_ATTEMPTS = 5
 
@@ -119,6 +121,34 @@ class DomainOutboxEvent < ApplicationRecord
       workspace_id: offering.workspace_id,
       source_type: "ServiceOfferingPublication", source_id: publication.id,
       source_version: 1, kind: kind, occurred_at: publication.created_at,
+      state: "pending", attempts: 0, created_at: now, updated_at: now
+    }], unique_by: :idx_domain_outbox_source_revision)
+  end
+
+  # The incoming intake is a source record, not a public notification.
+  # Do not enqueue unassigned legacy/demo intakes with workspace_id=NULL.
+  def self.enqueue_intake_created!(intake)
+    return unless intake.persisted? && intake.workspace_id.present?
+    now = Time.current
+    insert_all([{
+      workspace_id: intake.workspace_id, source_type: "ProjectIntake",
+      source_id: intake.id, source_version: 1, kind: "intake_created",
+      occurred_at: intake.created_at, state: "pending", attempts: 0,
+      created_at: now, updated_at: now
+    }], unique_by: :idx_domain_outbox_source_revision)
+  end
+
+  # Append-only 12-section snapshot, with author_role but no answer body.
+  # Owner and client revisions remain private inside the owner workspace.
+  def self.enqueue_scope_revision!(revision)
+    intake = revision.project_intake
+    return unless revision.persisted? && intake&.workspace_id.present?
+    return unless revision.author_role.in?(%w[client owner])
+    now = Time.current
+    insert_all([{
+      workspace_id: intake.workspace_id, source_type: "IntakeScopeRevision",
+      source_id: revision.id, source_version: revision.version,
+      kind: "scope_revision_saved", occurred_at: revision.created_at,
       state: "pending", attempts: 0, created_at: now, updated_at: now
     }], unique_by: :idx_domain_outbox_source_revision)
   end
