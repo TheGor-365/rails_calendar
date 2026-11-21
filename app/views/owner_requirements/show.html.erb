@@ -40,6 +40,49 @@
               <%= t("e23_requirements.source_version", version: revision.intake_scope_revision.version) %> ·
               <%= revision.requirements.length %> <%= t("e23_requirements.history_count") %>
             </span>
+            <% changes = @history_diffs[revision.version] %>
+            <% if changes %>
+              <details class="wa-req-history__diff mt-2" data-requirement-diff-version="<%= revision.version %>">
+                <summary class="rc-hint"><%= t("e24_requirements.diff_summary", count: changes.length) %></summary>
+                <% if changes.empty? %>
+                  <p class="rc-hint mt-2"><%= t("e24_requirements.no_changes") %></p>
+                <% else %>
+                  <ul class="list-unstyled mt-2 mb-0">
+                    <% changes.each do |change| %>
+                      <li class="border rounded-3 p-2 p-sm-3 mb-2" data-requirement-change-id="<%= change[:id] %>">
+                        <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                          <strong><%= change[:id] %></strong>
+                          <span class="rc-status-pill rc-status-pill--muted">
+                            <%= t("e24_requirements.kinds.#{change[:kind]}") %>
+                          </span>
+                        </div>
+                        <% change[:fields].each do |field| %>
+                          <div class="mb-2">
+                            <strong class="small"><%= t("e24_requirements.fields.#{field}") %></strong>
+                            <div class="row g-2 mt-1">
+                              <% if change[:before] %>
+                                <div class="col-12 col-md-6">
+                                  <span class="rc-hint"><%= t("e24_requirements.before") %></span>
+                                  <% value = change[:before].fetch(field) %>
+                                  <pre class="small mb-0 p-2 border rounded text-break" style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= value.is_a?(String) ? value : JSON.pretty_generate(value) %></pre>
+                                </div>
+                              <% end %>
+                              <% if change[:after] %>
+                                <div class="col-12 col-md-6">
+                                  <span class="rc-hint"><%= t("e24_requirements.after") %></span>
+                                  <% value = change[:after].fetch(field) %>
+                                  <pre class="small mb-0 p-2 border rounded text-break" style="white-space: pre-wrap; overflow-wrap: anywhere;"><%= value.is_a?(String) ? value : JSON.pretty_generate(value) %></pre>
+                                </div>
+                              <% end %>
+                            </div>
+                          </div>
+                        <% end %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              </details>
+            <% end %>
           </li>
         <% end %>
       </ol>
