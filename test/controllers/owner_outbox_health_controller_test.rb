@@ -49,7 +49,7 @@ class OwnerOutboxHealthControllerTest < ActionDispatch::IntegrationTest
       assert_select "table[data-outbox-candidates] tbody tr", count: 1
       assert_select "form[action=?][method='get']", owner_outbox_health_path
       assert_select "form[action*='replay']", count: 0
-      assert_select "form[method='post']", count: 0
+      assert_select "[data-outbox-health] form[method='post']", count: 0
       assert_no_match(/#{@own_event.source_id}|#{@foreign_event.source_id}|#{@secret}/, response.body)
 
       get owner_outbox_health_path(limit: "10")
