@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## R0.4b2 owner script retrieval & exact-SHA CI verified — 22 November 2026
+
+**Owner-terminal handoff (2026-11-22):** the owner ran a guarded `git fetch --no-tags` on the feature branch WITHOUT checkout, verified code commit `36859c3086f6ece81630703145a7e82e8cd56159` is an ancestor, checked `script/rc0551f_r04_resume_existing_archive_restore.sh` against Git blob `968ac8db697152f3193a3b9ba128df6bbab87362`, ran `bash -n` and `git hash-object`, installed via hard link and printed **`SCRIPT_READY_ONLY=PASS`**. Local `git status --short` printed ` M db/schema.rb`, `?? script/.r04-resume.ZWOUgxXC`, `?? script/rc0551f_r04_resume_existing_archive_restore.sh`, and `?? script/rc0551f_r04_review_db_backup_restore.sh`. The temporary `.r04-resume.*` entry was printed **BEFORE Bash EXIT trap ran**; it is expected to disappear after exit but **not yet independently confirmed**, so check read-only. No `createdb`, `pg_restore`, user-local migrations, production changes or archive deletion were performed by this retrieval. The old writer and modified schema were preserved.
+
+**Final exact-SHA GitHub checks (verified):** code SHA `36859c3086f6ece81630703145a7e82e8cd56159` — [Rails CI #44958765911](https://github.com/TheGor-365/rails_calendar/actions/runs/44958765911) SUCCESS and [Security #44958765901](https://github.com/TheGor-365/rails_calendar/actions/runs/44958765901) SUCCESS. Documentation HEAD `121a471c5edb512d59fbe8a0fbd44212345d1e99` — [Rails CI #44958923904](https://github.com/TheGor-365/rails_calendar/actions/runs/44958923904) SUCCESS and [Security #44958923951](https://github.com/TheGor-365/rails_calendar/actions/runs/44958923951) SUCCESS. These are CODE/CI gates, NOT live DB restore acceptance.
+
+**Next P0:** run one independent read-only owner-local preflight of installed script hash/mode, private archive and session count/checksums, process/PG16/source DB identity/space, and temporary file status. **Do not** infer permission to create/restore a DB from “continue plan”; obtain an explicit owner authorization for isolated `createdb` + `pg_restore` AFTER that preflight. Writer requires `RESTORE-EXISTING-ARCHIVE` interactively. No blind `git pull`, no replay of old writer, no source migration, no Railway action, no cleanup. R0.4b2: `ARCHIVE VERIFIED / CODE+CI VERIFIED / LOCAL HANDOFF PASS / SCRATCH RESTORE PENDING`.
+
+
 ## R0.4b2 recovery code checkpoint — 22 November 2026
 
 **Owner read-only terminal evidence (2026-11-22):** `READ_ONLY_PREFLIGHT=PASS`; local `c25be48`, ` M db/schema.rb` and existing untracked old writer, source `rails_calendar_rc0551f_c21b_review_20261117`, role `gor`, PostgreSQL 16.11 via Unix socket, `OTHER_SESSIONS=0`, `OUTBOX=false`, ~23 GiB free. No local database writes or new scratch DB.
