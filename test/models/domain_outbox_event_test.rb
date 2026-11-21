@@ -263,6 +263,101 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
     assert_equal "DomainOutbox::Replayer::SourceUnavailable", record.last_error_code
   end
 
+  def synthetic_approved_service
+    capability = @workspace.professional_profile.professional_capabilities.order(:id).first
+    catalogue = OwnerServices::Catalogue.new(workspace: @workspace)
+    offering = catalogue.create_draft!(
+      service_fields(capability, title: "Repair a fictional Rails endpoint")
+    )
+    version = offering.latest_version
+    version.update!(approved_at: Time.current)
+    offering.update!(approved_version: version)
+    [catalogue, offering, version]
+  end
+
+  test "C2.3b4 only owner-published service versions produce immutable source events" do
+    catalogue, offering, version = synthetic_approved_service
+    assert_no DomainOutboxEvent.where(source_type: "ServiceOfferingPublication").exists?
+
+    assert_difference(["DomainOutboxEvent.count", "ActivityEvent.count"], 1) do
+      catalogue.publish!(offering: offering, version_id: version.id,
+        digest: version.digest, confirmed: true, owner: @owner)
+    end
+    published = offering.publications.order(:id).last
+    assert_equal "publish", published.event
+    assert_equal version.id, published.service_offering_version_id
+    event = DomainOutboxEvent.find_by!(
+      workspace_id: @workspace.id, source_type: "ServiceOfferingPublication",
+      source_id: published.id, source_version: 1, kind: "service_published"
+    )
+    assert_equal "pending", event.state
+    assert_not_includes event.attributes.keys, "included_scope"
+    activity = ActivityEvent.find_by!(workspace_id: @workspace.id,
+      event_key: "ServiceOfferingPublication:#{published.id}:service_published")
+    assert_equal version.title, activity.title
+    assert_equal Rails.application.routes.url_helpers.owner_service_path(offering),
+      Activity::Presenter.display(activity)[:path]
+
+    assert_difference(["DomainOutboxEvent.count", "ActivityEvent.count"], 1) do
+      catalogue.unpublish!(offering: offering, owner: @owner, confirmed: true)
+    end
+    unpublished = offering.publications.order(:id).last
+    assert_equal "unpublish", unpublished.event
+    assert_equal "pending", DomainOutboxEvent.find_by!(
+      source_type: "ServiceOfferingPublication", source_id: unpublished.id,
+      kind: "service_unpublished").state
+
+    assert_no_difference(["DomainOutboxEvent.count", "ActivityEvent.count", "AiSpendEntry.count"]) do
+      assert_equal({ attempted: 2, delivered: 2, failed: 0 },
+        DomainOutbox::Replayer.run!(workspace: @workspace))
+      assert_equal({ attempted: 0, delivered: 0, failed: 0 },
+        DomainOutbox::Replayer.run!(workspace: @workspace))
+    end
+    assert_equal 2, @workspace.activity_events.where(
+      subject_type: "ServiceOfferingPublication",
+      subject_id: [published.id, unpublished.id]).count
+  end
+
+  test "C2.3b4 service replay restores missing activity without republishing service" do
+    catalogue, offering, version = synthetic_approved_service
+    catalogue.publish!(offering: offering, version_id: version.id,
+      digest: version.digest, confirmed: true, owner: @owner)
+    published = offering.publications.order(:id).last
+    key = "ServiceOfferingPublication:#{published.id}:service_published"
+    ActivityEvent.where(workspace_id: @workspace.id, event_key: key).delete_all
+
+    assert_equal({ attempted: 0, delivered: 0, failed: 0 },
+      DomainOutbox::Replayer.run!(workspace: @other_workspace))
+    assert_no_difference(["ServiceOfferingPublication.count", "AiSpendEntry.count"]) do
+      assert_equal 1, DomainOutbox::Replayer.run!(workspace: @workspace)[:delivered]
+    end
+    assert_equal version.id, offering.reload.published_version_id
+    assert_equal 1, ActivityEvent.where(workspace_id: @workspace.id, event_key: key).count
+    assert_equal 0, @other_workspace.activity_events.where(event_key: key).count
+  end
+
+  test "C2.3b4 rolled back publication has no outbox or activity" do
+    _catalogue, offering, version = synthetic_approved_service
+    assert_no_difference(["ServiceOfferingPublication.count", "DomainOutboxEvent.count",
+      "ActivityEvent.count"]) do
+      ServiceOfferingPublication.transaction do
+        offering.publications.create!(event: "publish",
+          service_offering_version: version, owner_user: @owner)
+        raise ActiveRecord::Rollback
+      end
+    end
+  end
+
+  test "C2.3b4 unapproved version is not a valid publication audit" do
+    capability = @workspace.professional_profile.professional_capabilities.order(:id).first
+    catalogue = OwnerServices::Catalogue.new(workspace: @workspace)
+    offering = catalogue.create_draft!(service_fields(capability))
+    assert_no_difference(["ServiceOfferingPublication.count", "DomainOutboxEvent.count"]) do
+      assert_not offering.publications.build(event: "publish",
+        service_offering_version: offering.latest_version, owner_user: @owner).valid?
+    end
+  end
+
   test "foreign workspace cannot replay and invalid source does not create an event" do
     original = new_revision
     outbox = DomainOutboxEvent.find_by!(source_id: original.id, source_type: "IntakeRequirementSet")
