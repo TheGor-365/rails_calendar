@@ -6,6 +6,7 @@ module Activity
       "invitation_issued" => "send-check", "invitation_claimed" => "envelope-check",
       "invitation_submitted" => "envelope-check", "invitation_revoked" => "envelope-x",
       "intake_created" => "clipboard2-check", "requirements_saved" => "list-check",
+      "scope_revision_saved" => "journal-text",
       "ai_attempted" => "stars", "ai_settled" => "stars",
       "ai_uncertain" => "exclamation-circle", "ai_cancelled" => "x-circle",
       "conversation_created" => "chat-dots",
@@ -19,6 +20,12 @@ module Activity
       path = case event.subject_type
       when "ClientRequestInvitation" then paths.owner_invitation_path(event.subject_id)
       when "ProjectIntake" then paths.project_intake_path(event.subject_id)
+      when "IntakeScopeRevision"
+        source = IntakeScopeRevision.joins(:project_intake)
+          .where(project_intakes: { workspace_id: event.workspace_id })
+          .find_by(id: event.subject_id)
+        source ? paths.owner_requirements_path(source.project_intake_id) :
+          paths.owner_artifacts_path
       when "IntakeRequirementSet"
         source = IntakeRequirementSet.joins(:project_intake)
           .where(project_intakes: { workspace_id: event.workspace_id })
@@ -53,7 +60,7 @@ module Activity
       else paths.owner_artifacts_path
       end
       { kind: event.kind.start_with?("ai_") ? :ai : event.kind.start_with?("invitation_") ? :invitation :
-          event.kind == "requirements_saved" ? :requirements :
+          event.kind.in?(%w[requirements_saved scope_revision_saved]) ? :requirements :
           event.kind == "conversation_created" ? :conversation :
           event.kind.start_with?("service_") ? :service : :request,
         icon: ICONS.fetch(event.kind, "activity"), title: event.title,
