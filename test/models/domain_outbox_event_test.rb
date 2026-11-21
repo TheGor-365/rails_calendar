@@ -126,7 +126,7 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
 
   test "settled AI response atomically enqueues a private source-only event" do
     conversation, ledger, reply = settled_ai_reply_fixture
-    assert_no DomainOutboxEvent.exists?(source_type: "OwnerAiMessage", source_id: reply.id)
+    assert_not DomainOutboxEvent.exists?(source_type: "OwnerAiMessage", source_id: reply.id)
 
     assert_difference(["DomainOutboxEvent.count", "ActivityEvent.count"], 1) do
       reply.update!(state: "settled", ai_spend_entry: ledger,
