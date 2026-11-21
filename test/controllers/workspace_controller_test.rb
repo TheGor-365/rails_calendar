@@ -19,7 +19,7 @@ class WorkspaceControllerTest < ActionDispatch::IntegrationTest
     assert_select ".ws-hub-tool[href=?]", root_path
     assert_select ".ws-hub-tool[href=?]", consultations_path
     assert_select ".ws-hub-tool[href=?]", admin_project_intakes_path
-    assert_select ".ws-hub-tool[href=?]", new_project_intake_path
+    assert_select ".ws-hub-tool[href=?]", owner_services_path
     assert_select ".app-brand[href=?]", workspace_path
     delete sign_out_url
     assert_redirected_to root_url
