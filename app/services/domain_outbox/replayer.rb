@@ -63,6 +63,21 @@ module DomainOutbox
           title: "#{source.project_intake.title} · v#{source.version}",
           metadata: { "version" => source.version }, occurred_at: event.occurred_at
         )
+      when ["ClientRequestInvitation", "invitation_issued"],
+           ["ClientRequestInvitation", "invitation_claimed"],
+           ["ClientRequestInvitation", "invitation_submitted"],
+           ["ClientRequestInvitation", "invitation_revoked"]
+        source = ClientRequestInvitation.where(workspace_id: workspace.id)
+          .find_by(id: event.source_id)
+        version_field = DomainOutboxEvent::INVITATION_EVENT_FIELDS[event.kind]
+        raise SourceUnavailable, "source not in workspace" unless source && version_field &&
+          version_field.first == event.source_version &&
+          source.public_send(version_field.last).present?
+
+        Activity::Recorder.record!(
+          workspace: workspace, subject: source, kind: event.kind,
+          title: source.seed_title, occurred_at: event.occurred_at
+        )
       when ["OwnerAiMessage", "ai_reply_saved"]
         source = OwnerAiMessage.joins(:owner_ai_conversation)
           .where(owner_ai_conversations: { workspace_id: workspace.id })
