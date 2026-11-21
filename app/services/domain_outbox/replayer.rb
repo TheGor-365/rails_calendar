@@ -16,33 +16,41 @@ module DomainOutbox
         event = DomainOutboxEvent.where(workspace_id: workspace.id).find_by(id: id)
         next unless event
 
+        attempts_before = nil
         begin
           event.with_lock do
             next unless event.state.in?(%w[pending failed]) &&
               event.attempts < DomainOutboxEvent::MAX_ATTEMPTS &&
               (event.next_attempt_at.nil? || event.next_attempt_at <= now)
 
+            attempts_before = event.attempts
             summary[:attempted] += 1
             deliver!(event, workspace: workspace)
             event.update!(
-              state: "delivered", attempts: event.attempts + 1,
+              state: "delivered", attempts: attempts_before + 1,
               next_attempt_at: nil, last_error_code: nil, delivered_at: now
             )
             summary[:delivered] += 1
           end
         rescue StandardError => error
-          # Failure metadata intentionally contains class names only, never
-          # source text or provider responses. Retrying does not spend tokens.
+          # Delivery ran inside the row transaction, so its projection was
+          # rolled back on failure. Recheck the row under lock: another worker
+          # may have completed/failed it between the rollback and this update.
+          # Never account for a second attempt on that worker's behalf.
           event.with_lock do
-            unless event.state == "delivered"
-              attempts = event.attempts + 1
-              event.update!(
-                state: "failed", attempts: attempts,
-                last_error_code: error.class.name.truncate(80),
-                next_attempt_at: now + [2**attempts, 3600].min.seconds
-              )
-              summary[:failed] += 1
-            end
+            next unless attempts_before &&
+              event.attempts == attempts_before &&
+              event.state.in?(%w[pending failed])
+
+            attempts = attempts_before + 1
+            event.update!(
+              state: "failed", attempts: attempts,
+              last_error_code: error.class.name.truncate(80),
+              # A terminal failure is not due at a fictional future time.
+              next_attempt_at: attempts < DomainOutboxEvent::MAX_ATTEMPTS ?
+                now + [2**attempts, 3600].min.seconds : nil
+            )
+            summary[:failed] += 1
           end
         end
       end
