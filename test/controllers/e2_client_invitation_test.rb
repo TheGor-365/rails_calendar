@@ -25,6 +25,47 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     @prior_ai.nil? ? ENV.delete("RC_GROK_ENABLED") : ENV["RC_GROK_ENABLED"] = @prior_ai
   end
 
+  test "month to day to hour surfaces the same owner AI activity and source without cross-workspace leak" do
+    conversation = @workspace.owner_ai_conversations.create!(
+      title: "Fictional calendar AI source", scope: "owner_general", state: "active"
+    )
+    occurred = conversation.created_at.in_time_zone
+    date = occurred.to_date.iso8601
+    source = owner_ai_conversation_path(conversation)
+
+    login(@owner)
+    assert_no_difference ["AiSpendEntry.count", "ActivityEvent.count"] do
+      get root_path(start_date: date)
+      assert_response :success
+      assert_select "a.calendar-event-link[href=?]", source, minimum: 1
+
+      get calendar_day_path(date: date)
+      assert_response :success
+      assert_select "[data-calendar-day-total]", minimum: 1
+      assert_select "li[data-calendar-activity-hour=?]", occurred.hour.to_s do
+        assert_select "a[href=?]", source, minimum: 1
+      end
+      assert_select "details[data-calendar-hour=?]", occurred.hour.to_s, minimum: 1
+
+      get calendar_hour_path(date: date, hour: occurred.hour)
+      assert_response :success
+      assert_select "[data-calendar-hour-total]", minimum: 1
+      assert_select "li[data-hour-activity-source='conversation_created']" do
+        assert_select "a[href=?]", source, minimum: 1
+      end
+    end
+
+    sign_out
+    login(@owner_b)
+    get calendar_day_path(date: date)
+    assert_response :success
+    assert_select "li[data-calendar-activity-hour=?]", occurred.hour.to_s, text: /Fictional calendar AI source/, count: 0
+    assert_select "a[href=?]", source, count: 0
+    get calendar_hour_path(date: date, hour: occurred.hour)
+    assert_response :success
+    assert_select "a[href=?]", source, count: 0
+  end
+
   test "artifact library indexes owner conversations and service revisions without leaking another workspace" do
     conversation = @workspace.owner_ai_conversations.create!(
       title: "Client proposal discovery", scope: "owner_general", state: "active"
