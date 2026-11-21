@@ -26,4 +26,5 @@ hy:
       ai_settled: "ԱԲ արդյունքը ստացվել է"
       ai_uncertain: "ԱԲ վճարումը ստուգման կարիք ունի"
       ai_cancelled: "ԱԲ հարցումը չեղարկվել է"
+      ai_reply_saved: "ԱԲ պատասխանը պահպանվել է"
       conversation_created: "Զրույց է ստեղծվել"
