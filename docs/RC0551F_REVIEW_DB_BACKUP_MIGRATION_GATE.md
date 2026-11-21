@@ -108,6 +108,22 @@ CI context: reviewed R0.4b1 writer code `15968f4` passed [Rails #44945367534](ht
 
 **Next user action READ-ONLY:** list each exact ancestor's full pathname, octal mode, owner/group, and whether missing or symlinked. No `chmod/chown`, no `sudo`, no `mkdir`, no file deletion, no backup retry until the actual directory's intended use/sharing is understood. If it is safely owner-private, consider a **narrow** reviewed permission correction, never blanket `chmod 700 ~`; otherwise select and re-test a different, truly private backup destination. In either case require fresh live DB/port/writer checks and new deliberate user authorization before running writer again. Preserve local ` M db/schema.rb`.
 
+## R0.4b2 offending archive ancestor confirmed; current-session PATH repaired (new terminal evidence)
+
+**Owner's read-only directory inventory (after fixing only the interactive zsh PATH):** initially `stat` and `clear` were not discoverable in shell; `typeset -U path` plus standard system directories and `rehash` restored command resolution. Confirmed `stat=/usr/bin/stat`, `git=/usr/bin/git`, `ruby=/home/gor/.asdf/shims/ruby`, `psql=/usr/bin/psql`, `bash=/usr/bin/bash`. This was a PATH problem, not missing files; shell-profile persistence has **not** been tested.
+
+| Existing backup-path ancestor | Owner/group | Mode | Status |
+| --- | --- | --- | --- |
+| `/home/gor` | `gor:gor` | `750` | safe against group/other writing |
+| `/home/gor/.local` | `gor:gor` | `755` | safe |
+| `/home/gor/.local/share` | `gor:gor` | `755` | safe |
+| `/home/gor/.local/share/rails-calendar` | `gor:gor` | **`775`** | **the offending group-writable ancestor** |
+| `/home/gor/.local/share/rails-calendar/review-backups-r04` | — | NOT EXISTS | expected before archive `mkdir` |
+
+The exact immutable script evaluates `(8#$mode & 0022) == 0` on each existing backup ancestor. Mode 775 fails because group write bit is set. This explains `STOP R0.4b: Backup ancestor is writable by group/others.`; no `pg_dump`, storage tar, scratch `createdb` or `pg_restore` happened during that attempt. The previously discussed `storage/` permissions (also group writable) are a separate already-reviewed directory, **not the cause** of this failure.
+
+**Minimal next action proposed, not yet executed or verified:** confirm the exact `gor:gor:775` mode and absence of symlink for `$HOME/.local/share/rails-calendar`, then run **only** `/usr/bin/chmod g-w -- "$HOME/.local/share/rails-calendar"` (expected 775→755, preserving directory contents, user read/write and group read/execute). No `sudo`, no chmod on `$HOME`, no recursion and no weakening of the script gate. If this directory is intentionally shared for group writes, halt and design a different private target instead. Await owner output showing 755. Revalidate backup path/permissions and all live source+writer checks before obtaining fresh explicit consent for backup+scratch writer attempt. Do not automatically re-run on failure. Preserve local `db/schema.rb M`.
+
 ## Phase C. Rehearsal/migration, only after explicit authorization
 1. Validate the exact Rails connection again (database, server, socket, user, environment), and ensure no pending unrelated migrations. Git code SHA and `schema_migrations` must correspond.
 2. On the **restored scratch DB only**, try the **specific** migration `20261121003000` with an isolated environment that cannot reach production; prove new constraints/table, run targeted tests/read-only outbox simulation, compare counts. Do NOT connect Rails process port 3002 to the scratch without a distinct port and documented isolation.
