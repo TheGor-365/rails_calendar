@@ -17,7 +17,7 @@
 
   <section class="ws-overview" aria-label="<%= t("calendar.overview_aria") %>">
     <article class="ws-metric">
-      <div><span class="ws-metric__eyebrow"><%= t("calendar.records_visible") %></span><strong class="ws-metric__number"><%= @consultations.size %></strong><span class="ws-metric__foot"><%= t("calendar.loaded_window") %></span></div>
+      <div><span class="ws-metric__eyebrow"><%= t("calendar.records_visible") %></span><strong class="ws-metric__number" data-calendar-month-total><%= @consultations.size + @month_activity.size %></strong><span class="ws-metric__foot"><%= t("calendar.loaded_window") %></span></div>
       <span class="ws-metric__icon" aria-hidden="true"><i class="bi bi-calendar2-check"></i></span>
     </article>
     <article class="ws-metric">
@@ -75,9 +75,9 @@
         </article>
       <% end %>
     <% end %>
-    <% if day_events.length > 2 %>
-      <%= link_to rc_icon_label("three-dots", t("calendar.more_count", count: day_events.length - 2)), calendar_day_path(date: date.iso8601),
-                  class: "calendar-more", aria: { label: t("calendar.view_all_on_date", count: day_events.length, date: date.iso8601) } %>
+    <% if day_events.length + day_actions.length > 2 %>
+      <%= link_to rc_icon_label("three-dots", t("calendar.more_count", count: day_events.length + day_actions.length - 2)), calendar_day_path(date: date.iso8601),
+                  class: "calendar-more", aria: { label: t("calendar.view_all_on_date", count: day_events.length + day_actions.length, date: date.iso8601) } %>
     <% end %>
   <% end %>
 
