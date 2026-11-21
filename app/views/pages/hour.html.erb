@@ -12,7 +12,8 @@
           <time datetime="<%= @selected_date.iso8601 %>"><%= rc_local_date(@selected_date, format: :rc_full) %></time>
           <span aria-hidden="true">·</span>
           <%= Time.zone.name %> <span aria-hidden="true">·</span>
-          <%= rc_count(@consultations.size, "calendar", "overlap") %>
+          <span data-calendar-hour-total><%= rc_count(@hour_total, "calendar", "event") %></span>
+          <span aria-hidden="true">·</span> <%= rc_count(@consultations.size, "calendar", "overlap") %>
         </p>
         <% if @hour_end.to_date > @selected_date %>
           <p class="rc-hint mt-1 mb-0"><%= t("calendar.hour_cross_midnight") %></p>
@@ -29,6 +30,30 @@
     </header>
 
     <section class="surface-panel" aria-label="<%= t("calendar.hour_section_aria") %>">
+      <% if owner_signed_in? && @hour_activity.any? %>
+        <h2 class="h5 mb-3"><i class="bi bi-activity" aria-hidden="true"></i> <%= t("calendar.hour_activity_heading") %></h2>
+        <ul class="wa-calendar-hour-details">
+          <% @hour_activity.each do |entry| %>
+            <% occurred = entry[:created_at].in_time_zone %>
+            <li class="wa-calendar-hour-details__item <%= 'wa-calendar-hour-details__item--past' if occurred < Time.current %>"
+                data-hour-activity-source="<%= entry[:status] %>">
+              <time datetime="<%= occurred.iso8601 %>"><%= occurred.strftime("%H:%M") %></time>
+              <div>
+                <strong><%= entry[:title] %></strong>
+                <small><%= t("calendar_actions.kinds.#{entry[:kind]}") %> · <%= t("calendar_actions.states.#{entry[:status]}", default: entry[:status]) %></small>
+              </div>
+              <%= link_to rc_icon_label("arrow-up-right", t("calendar.day_open_source")), entry[:path],
+                          class: "rc-action rc-action--quiet rc-action--small" %>
+            </li>
+          <% end %>
+        </ul>
+        <nav class="d-flex flex-wrap gap-2 mb-3" aria-label="<%= t("calendar.hour_activity_heading") %>">
+          <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path,
+                      class: "rc-action rc-action--quiet rc-action--small" %>
+          <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path,
+                      class: "rc-action rc-action--quiet rc-action--small" %>
+        </nav>
+      <% end %>
       <% if @consultations.any? %>
         <ul class="rc-record-list">
           <% @consultations.each do |event| %>
@@ -46,12 +71,11 @@
             </li>
           <% end %>
         </ul>
-      <% else %>
+      <% elsif @hour_activity.empty? %>
         <p class="rc-notice rc-notice--neutral" role="status">
-          <%= t("calendar.empty_hour") %>
+          <%= t("calendar.empty_hour_all") %>
         </p>
       <% end %>
     </section>
-    <%= render "activity_list", activities: @hour_activity %>
   </div>
 </div>
