@@ -5,7 +5,10 @@ class DomainOutboxEvent < ApplicationRecord
   belongs_to :workspace
 
   STATES = %w[pending delivered failed].freeze
-  SOURCES = { "IntakeRequirementSet" => "requirements_saved" }.freeze
+  SOURCES = {
+    "IntakeRequirementSet" => "requirements_saved",
+    "OwnerAiMessage" => "ai_reply_saved"
+  }.freeze
   MAX_ATTEMPTS = 5
 
   validates :source_type, inclusion: { in: SOURCES.keys }
@@ -39,6 +42,25 @@ class DomainOutboxEvent < ApplicationRecord
       source_version: revision.version, kind: "requirements_saved",
       occurred_at: revision.created_at, state: "pending", attempts: 0,
       created_at: now, updated_at: now
+    }], unique_by: :idx_domain_outbox_source_revision)
+  end
+
+  # Enqueue only an actual persisted, settled assistant reply in the same
+  # transaction as the status transition. Never queue a pending or uncertain
+  # provider attempt. No answer body or client information is copied.
+  def self.enqueue_settled_reply!(message)
+    return unless message.persisted? && message.role == "assistant" &&
+      message.state == "settled" && message.ai_spend_entry&.status == "settled"
+    workspace_id = message.owner_ai_conversation&.workspace_id
+    return unless workspace_id.present? &&
+      message.ai_spend_entry.professional_profile&.workspace_id == workspace_id
+
+    now = Time.current
+    insert_all([{
+      workspace_id: workspace_id, source_type: "OwnerAiMessage",
+      source_id: message.id, source_version: message.sequence,
+      kind: "ai_reply_saved", occurred_at: message.updated_at || now,
+      state: "pending", attempts: 0, created_at: now, updated_at: now
     }], unique_by: :idx_domain_outbox_source_revision)
   end
 
