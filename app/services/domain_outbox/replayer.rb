@@ -52,6 +52,28 @@ module DomainOutbox
 
     def self.deliver!(event, workspace:)
       case [event.source_type, event.kind]
+      when ["ProjectIntake", "intake_created"]
+        source = ProjectIntake.where(workspace_id: workspace.id).find_by(id: event.source_id)
+        raise SourceUnavailable, "intake not in workspace or changed" unless source &&
+          event.source_version == 1 && source.created_at.to_i == event.occurred_at.to_i
+
+        Activity::Recorder.record!(
+          workspace: workspace, subject: source, kind: "intake_created",
+          title: source.title, occurred_at: event.occurred_at
+        )
+      when ["IntakeScopeRevision", "scope_revision_saved"]
+        source = IntakeScopeRevision.joins(:project_intake)
+          .where(project_intakes: { workspace_id: workspace.id })
+          .find_by(id: event.source_id, version: event.source_version)
+        raise SourceUnavailable, "scope snapshot not in workspace or changed" unless source &&
+          source.created_at.to_i == event.occurred_at.to_i &&
+          source.author_role.in?(%w[client owner])
+
+        Activity::Recorder.record!(
+          workspace: workspace, subject: source, kind: "scope_revision_saved",
+          title: "#{source.author_role == 'client' ? 'Client' : 'Owner'} scope revision v#{source.version}",
+          metadata: { "version" => source.version }, occurred_at: event.occurred_at
+        )
       when ["IntakeRequirementSet", "requirements_saved"]
         source = IntakeRequirementSet.joins(:project_intake)
           .where(project_intakes: { workspace_id: workspace.id })
