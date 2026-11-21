@@ -191,6 +191,78 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
     assert_nil reply.reload.ai_spend_entry_id
   end
 
+  def synthetic_invitation
+    ClientRequestInvitation.create!(
+      workspace: @workspace, token_digest: SecureRandom.hex(32),
+      seed_title: "Fictional source replay",
+      seed_project_type: "rails_bugfix",
+      seed_goal: "Verify an invitation transition without real client information.",
+      expires_at: 48.hours.from_now, service_version_ids: []
+    )
+  end
+
+  test "C2.3b3.2 claimed and submitted transitions are immutable indexed activities" do
+    invitation = synthetic_invitation
+    client = make_test_client("outbox-claim-#{SecureRandom.hex(6)}@example.test")
+    claimed_at = Time.current.change(usec: 0)
+    submitted_at = claimed_at + 2.minutes
+
+    assert_difference(["DomainOutboxEvent.count", "ActivityEvent.count"], 2) do
+      invitation.update!(claimed_at: claimed_at, claimed_by_user: client,
+        project_intake: @intake)
+      invitation.update!(submitted_at: submitted_at)
+    end
+    rows = @workspace.domain_outbox_events.where(source_type: "ClientRequestInvitation",
+      source_id: invitation.id, kind: %w[invitation_claimed invitation_submitted]).order(:source_version)
+    assert_equal %w[invitation_claimed invitation_submitted], rows.pluck(:kind)
+    assert_equal [2, 3], rows.pluck(:source_version)
+    assert_equal [claimed_at.to_i, submitted_at.to_i], rows.pluck(:occurred_at).map(&:to_i)
+
+    assert_no_difference(["DomainOutboxEvent.count", "ActivityEvent.count", "AiSpendEntry.count"]) do
+      invitation.update!(claimed_at: claimed_at, submitted_at: submitted_at)
+      assert_equal({ attempted: 3, delivered: 3, failed: 0 },
+        DomainOutbox::Replayer.run!(workspace: @workspace))
+      assert_equal({ attempted: 0, delivered: 0, failed: 0 },
+        DomainOutbox::Replayer.run!(workspace: @workspace))
+    end
+  end
+
+  test "C2.3b3.2 rolled back revocation leaves no outbox or activity" do
+    invitation = synthetic_invitation
+    assert_no_difference(["DomainOutboxEvent.count", "ActivityEvent.count"]) do
+      ClientRequestInvitation.transaction do
+        invitation.update!(revoked_at: Time.current)
+        raise ActiveRecord::Rollback
+      end
+    end
+    assert_nil invitation.reload.revoked_at
+    assert_not @workspace.domain_outbox_events.where(source_type: "ClientRequestInvitation",
+      source_id: invitation.id, kind: "invitation_revoked").exists?
+  end
+
+  test "C2.3b3.2 replay refuses altered transition time and records a safe failure" do
+    invitation = synthetic_invitation
+    assert_equal 1, DomainOutbox::Replayer.run!(workspace: @workspace)[:delivered]
+    client = make_test_client("outbox-drift-#{SecureRandom.hex(6)}@example.test")
+    claimed_at = Time.current.change(usec: 0)
+    invitation.update!(claimed_at: claimed_at, claimed_by_user: client,
+      project_intake: @intake)
+    key = "ClientRequestInvitation:#{invitation.id}:invitation_claimed"
+    ActivityEvent.where(workspace_id: @workspace.id, event_key: key).delete_all
+    # Synthetic tampering: a replay must never silently reinterpret its
+    # immutable historical timestamp as a different real-world event.
+    invitation.update_columns(claimed_at: claimed_at + 1.hour)
+
+    assert_no_difference(["ActivityEvent.count", "AiSpendEntry.count"]) do
+      assert_equal({ attempted: 1, delivered: 0, failed: 1 },
+        DomainOutbox::Replayer.run!(workspace: @workspace))
+    end
+    record = DomainOutboxEvent.find_by!(source_type: "ClientRequestInvitation",
+      source_id: invitation.id, kind: "invitation_claimed")
+    assert_equal "failed", record.state
+    assert_equal "DomainOutbox::Replayer::SourceUnavailable", record.last_error_code
+  end
+
   test "foreign workspace cannot replay and invalid source does not create an event" do
     original = new_revision
     outbox = DomainOutboxEvent.find_by!(source_id: original.id, source_type: "IntakeRequirementSet")
