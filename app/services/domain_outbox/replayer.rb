@@ -72,7 +72,8 @@ module DomainOutbox
         version_field = DomainOutboxEvent::INVITATION_EVENT_FIELDS[event.kind]
         raise SourceUnavailable, "source not in workspace" unless source && version_field &&
           version_field.first == event.source_version &&
-          source.public_send(version_field.last).present?
+          source.public_send(version_field.last).present? &&
+          source.public_send(version_field.last).to_i == event.occurred_at.to_i
 
         Activity::Recorder.record!(
           workspace: workspace, subject: source, kind: event.kind,
