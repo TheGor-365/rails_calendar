@@ -102,6 +102,95 @@ class DomainOutboxEventTest < ActiveSupport::TestCase
     assert_equal existing.id, @workspace.activity_events.find_by!(event_key: key).id
   end
 
+  def settled_ai_reply_fixture
+    conversation = @workspace.owner_ai_conversations.create!(
+      title: "Synthetic source-linked AI reply", scope: "owner_general", state: "active"
+    )
+    ledger = AiSpendEntry.create!(
+      professional_profile: @workspace.professional_profile,
+      operation: OwnerAi::ConversationResponder::VERSION,
+      model: "local-synthetic", request_digest: Digest::SHA256.hexdigest(SecureRandom.hex(16)),
+      status: "settled", reserved_ticks: 0, charged_ticks: 0,
+      result: { "conversation_id" => conversation.id }
+    )
+    prompt = conversation.owner_ai_messages.create!(
+      role: "owner", state: "settled", sequence: 1,
+      body: "Explain the fictional request"
+    )
+    pending = conversation.owner_ai_messages.create!(
+      role: "assistant", state: "pending", sequence: 2,
+      body: "Pending synthetic response", parent_message: prompt
+    )
+    [conversation, ledger, pending]
+  end
+
+  test "settled AI response atomically enqueues a private source-only event" do
+    conversation, ledger, reply = settled_ai_reply_fixture
+    assert_no DomainOutboxEvent.exists?(source_type: "OwnerAiMessage", source_id: reply.id)
+
+    assert_difference(["DomainOutboxEvent.count", "ActivityEvent.count"], 1) do
+      reply.update!(state: "settled", ai_spend_entry: ledger,
+                    body: "Fictional test-only provider response.")
+    end
+    row = DomainOutboxEvent.find_by!(workspace: @workspace, source_type: "OwnerAiMessage",
+      source_id: reply.id, source_version: 2, kind: "ai_reply_saved")
+    assert_equal "pending", row.state
+    assert_not_includes row.attributes.values.map(&:to_s), reply.body
+    key = "OwnerAiMessage:#{reply.id}:ai_reply_saved"
+    event = @workspace.activity_events.find_by!(event_key: key)
+    assert_equal "AI reply saved", event.title
+    assert_equal({}, event.metadata)
+    assert_equal owner_ai_conversation_path(conversation), Activity::Presenter.display(event)[:path]
+
+    assert_no_difference(["DomainOutboxEvent.count", "ActivityEvent.count", "AiSpendEntry.count"]) do
+      reply.update!(body: "Fictional revised text, no automatic second delivery")
+    end
+  end
+
+  test "replaying settled AI source restores missing event without cost or tenant leak" do
+    conversation, ledger, reply = settled_ai_reply_fixture
+    reply.update!(state: "settled", body: "Synthetic saved answer", ai_spend_entry: ledger)
+    key = "OwnerAiMessage:#{reply.id}:ai_reply_saved"
+    ActivityEvent.where(workspace_id: @workspace.id, event_key: key).delete_all # isolated synthetic test
+    assert_equal({ attempted: 0, delivered: 0, failed: 0 },
+      DomainOutbox::Replayer.run!(workspace: @other_workspace))
+
+    assert_no_difference ["AiSpendEntry.count", "OwnerAiMessage.count"] do
+      result = DomainOutbox::Replayer.run!(workspace: @workspace)
+      assert_equal({ attempted: 1, delivered: 1, failed: 0 }, result)
+    end
+    assert_equal 1, @workspace.activity_events.where(event_key: key).count
+    assert_equal "delivered", DomainOutboxEvent.find_by!(
+      source_type: "OwnerAiMessage", source_id: reply.id
+    ).state
+    assert_no_difference ["AiSpendEntry.count", "ActivityEvent.count"] do
+      assert_equal({ attempted: 0, delivered: 0, failed: 0 },
+        DomainOutbox::Replayer.run!(workspace: @workspace))
+    end
+
+    assert_no_difference("ActivityEvent.count") do
+      Activity::Recorder.record!(workspace: @other_workspace, subject: reply,
+        kind: "ai_reply_saved", title: "Unauthorized synthetic foreign event")
+    end
+    assert_equal owner_ai_conversation_path(conversation),
+      Activity::Presenter.display(@workspace.activity_events.find_by!(event_key: key))[:path]
+  end
+
+  test "pending and rolled-back AI replies do not leave an outbox envelope" do
+    _conversation, ledger, reply = settled_ai_reply_fixture
+    assert_no_difference(["DomainOutboxEvent.count", "ActivityEvent.count"]) do
+      reply.update!(state: "uncertain")
+    end
+    assert_no_difference(["DomainOutboxEvent.count", "ActivityEvent.count"]) do
+      OwnerAiMessage.transaction do
+        reply.update!(state: "settled", ai_spend_entry: ledger)
+        raise ActiveRecord::Rollback
+      end
+    end
+    assert_equal "uncertain", reply.reload.state
+    assert_nil reply.reload.ai_spend_entry_id
+  end
+
   test "foreign workspace cannot replay and invalid source does not create an event" do
     original = new_revision
     outbox = DomainOutboxEvent.find_by!(source_id: original.id, source_type: "IntakeRequirementSet")
