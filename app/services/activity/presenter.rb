@@ -9,7 +9,9 @@ module Activity
       "ai_attempted" => "stars", "ai_settled" => "stars",
       "ai_uncertain" => "exclamation-circle", "ai_cancelled" => "x-circle",
       "conversation_created" => "chat-dots",
-      "ai_reply_saved" => "chat-left-text"
+      "ai_reply_saved" => "chat-left-text",
+      "service_published" => "briefcase",
+      "service_unpublished" => "briefcase-fill"
     }.freeze
 
     def self.display(event)
@@ -32,6 +34,12 @@ module Activity
           .find_by(id: event.subject_id)
         conversation && !conversation.removed? ?
           paths.owner_ai_conversation_path(conversation) : paths.owner_ai_conversations_path
+      when "ServiceOfferingPublication"
+        publication = ServiceOfferingPublication.joins(:service_offering)
+          .where(service_offerings: { workspace_id: event.workspace_id })
+          .find_by(id: event.subject_id)
+        publication ? paths.owner_service_path(publication.service_offering_id) :
+          paths.owner_artifacts_path
       when "OwnerAiMessage"
         reply = OwnerAiMessage.joins(:owner_ai_conversation)
           .where(owner_ai_conversations: { workspace_id: event.workspace_id })
@@ -46,7 +54,8 @@ module Activity
       end
       { kind: event.kind.start_with?("ai_") ? :ai : event.kind.start_with?("invitation_") ? :invitation :
           event.kind == "requirements_saved" ? :requirements :
-          event.kind == "conversation_created" ? :conversation : :request,
+          event.kind == "conversation_created" ? :conversation :
+          event.kind.start_with?("service_") ? :service : :request,
         icon: ICONS.fetch(event.kind, "activity"), title: event.title,
         created_at: event.occurred_at, path: path, status: event.kind,
         subject_type: event.subject_type, subject_id: event.subject_id }
