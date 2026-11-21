@@ -23,10 +23,6 @@ die() { printf 'STOP R0.4b: %s\n' "$1" >&2; exit 1; }
   die "DATABASE_URL is set; refusing inherited production connection."
 [[ -n "${RC_LOCAL_DEV_DATABASE_URL:-}" ]] ||
   die "Explicit RC_LOCAL_DEV_DATABASE_URL required (never print its value)."
-[[ "$(id -un)" == "$EXPECTED_ROLE" ]] ||
-  die "Expected the unprivileged local gor account."
-[[ "$ROOT" == "$HOME/rails_calendar_ai_c21c" ]] ||
-  die "Script must run from the exact reviewed local Rails checkout."
 [[ "${RC_CONFIRM_SOURCE_DB:-}" == "$EXPECTED_DB" ]] ||
   die "Explicit RC_CONFIRM_SOURCE_DB must equal the exact review database name."
 [[ "${RC_CONFIRM_WRITERS_STOPPED:-}" == YES ]] ||
@@ -36,6 +32,12 @@ die() { printf 'STOP R0.4b: %s\n' "$1" >&2; exit 1; }
 [[ "${RC_CONFIRM_STORAGE_GROUP_REVIEW:-}" == YES ]] ||
   die "Review storage group membership and set RC_CONFIRM_STORAGE_GROUP_REVIEW=YES."
 
+# After ALL mandatory consent gates, verify operator and exact checkout.
+# This ordering allows offline deny tests to run under a CI service account.
+[[ "$(id -un)" == "$EXPECTED_ROLE" ]] ||
+  die "Expected the unprivileged local gor account."
+[[ "$ROOT" == "$HOME/rails_calendar_ai_c21c" ]] ||
+  die "Script must run from the exact reviewed local Rails checkout."
 [[ -d "$ROOT/storage" && ! -L "$ROOT/storage" ]] ||
   die "storage/ missing or top-level symlink."
 [[ -S "$SOCKET/.s.PGSQL.$PORT" ]] ||
