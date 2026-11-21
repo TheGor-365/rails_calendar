@@ -2,6 +2,7 @@
 # R0.4b offline deny-path and structural tests. NEVER connect to a real database,
 # create a backup directory, or grant consent in GitHub CI.
 set -euo pipefail
+trap 'printf "R0.4b OFFLINE ASSERTION FAILED at test line %s (no secrets logged)\\n" "$LINENO" >&2' ERR
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 SCRIPT="$ROOT/script/rc0551f_r04_review_db_backup_restore.sh"
 bash -n "$SCRIPT"
