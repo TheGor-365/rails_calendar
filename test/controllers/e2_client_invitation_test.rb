@@ -351,6 +351,57 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", source, count: 0
   end
 
+  test "C2.3b3.1 invited and revoked transitions enqueue exactly once and replay without AI charges" do
+    login(@owner)
+    assert_difference("DomainOutboxEvent.count", 1) { issue_invitation }
+    invitation = @workspace.client_request_invitations.order(:id).last
+    issued = DomainOutboxEvent.find_by!(
+      workspace_id: @workspace.id, source_type: "ClientRequestInvitation",
+      source_id: invitation.id, source_version: 1, kind: "invitation_issued"
+    )
+    assert_equal "pending", issued.state
+    assert_equal invitation.created_at.to_i, issued.occurred_at.to_i
+    assert_not_includes issued.attributes.keys, "token_digest"
+    assert_equal 1, @workspace.activity_events.where(
+      event_key: "ClientRequestInvitation:#{invitation.id}:invitation_issued"
+    ).count
+
+    assert_difference("DomainOutboxEvent.count", 1) do
+      invitation.update!(revoked_at: Time.current)
+    end
+    revoked = DomainOutboxEvent.find_by!(
+      workspace_id: @workspace.id, source_type: "ClientRequestInvitation",
+      source_id: invitation.id, source_version: 4, kind: "invitation_revoked"
+    )
+    assert_equal invitation.revoked_at.to_i, revoked.occurred_at.to_i
+
+    assert_no_difference(["ActivityEvent.count", "AiSpendEntry.count"]) do
+      result = DomainOutbox::Replayer.run!(workspace: @workspace)
+      assert_equal 2, result[:delivered]
+      assert_equal 0, result[:failed]
+      assert_equal({ attempted: 0, delivered: 0, failed: 0 },
+        DomainOutbox::Replayer.run!(workspace: @workspace))
+    end
+    assert_equal %w[delivered delivered],
+      [issued.reload.state, revoked.reload.state]
+  end
+
+  test "C2.3b3.1 replays missing issued invitation activity from authorized source only" do
+    login(@owner)
+    issue_invitation
+    invitation = @workspace.client_request_invitations.order(:id).last
+    key = "ClientRequestInvitation:#{invitation.id}:invitation_issued"
+    ActivityEvent.where(workspace_id: @workspace.id, event_key: key).delete_all
+
+    assert_equal({ attempted: 0, delivered: 0, failed: 0 },
+      DomainOutbox::Replayer.run!(workspace: @workspace_b))
+    assert_no_difference("AiSpendEntry.count") do
+      assert_equal 1, DomainOutbox::Replayer.run!(workspace: @workspace)[:delivered]
+    end
+    assert_equal 1, @workspace.activity_events.where(event_key: key).count
+    assert_equal 0, @workspace_b.activity_events.where(event_key: key).count
+  end
+
   test "activity journal automatically records an invitation once and isolates owners" do
     login(@owner)
     assert_difference "ActivityEvent.where(workspace_id: @workspace.id, kind: 'invitation_issued').count", 1 do
