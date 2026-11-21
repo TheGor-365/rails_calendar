@@ -16,6 +16,8 @@ en:
     open: "Open"
     none: "No events match these filters."
     events:
+      service_published: "Service published"
+      service_unpublished: "Service unpublished"
       invitation_issued: "Invitation issued"
       invitation_claimed: "Invitation claimed"
       invitation_submitted: "Request submitted"
