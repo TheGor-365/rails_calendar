@@ -45,14 +45,14 @@ class DomainOutboxCrossFamilyBackfillDryRunTest < ActiveSupport::TestCase
       assert_not step.key?(:source_id)
       assert_kind_of String, step[:next_cursor]
 
-      travel 2.seconds
+      travel 3.seconds
       step = preview(cursor: step[:next_cursor])
       assert_equal 1, step[:inspected]
       assert_equal 3, step[:report].first[:already_indexed]
       assert_equal "ProjectIntake", step[:source_type]
 
       5.times do
-        travel 2.seconds
+        travel 3.seconds
         step = preview(cursor: step[:next_cursor])
       end
       assert step[:completed]
@@ -67,7 +67,9 @@ class DomainOutboxCrossFamilyBackfillDryRunTest < ActiveSupport::TestCase
     first = preview
     assert_raises(ArgumentError) { preview(cursor: first[:next_cursor]) }
     assert_raises(ArgumentError) do
-      travel 2.seconds { preview(owner: @other, cursor: first[:next_cursor]) }
+      travel 3.seconds do
+        preview(owner: @other, cursor: first[:next_cursor])
+      end
     end
     assert_raises(ArgumentError) { preview(owner: @client) }
     assert_raises(ArgumentError) { preview(owner: nil) }
@@ -78,7 +80,7 @@ class DomainOutboxCrossFamilyBackfillDryRunTest < ActiveSupport::TestCase
       assert_raises(ArgumentError) { preview(cursor: bad) }
     end
     other_family = DomainOutbox::BackfillDryRun.preview(owner: @owner, limit: 2)[:next_cursor]
-    travel 2.seconds do
+    travel 3.seconds do
       assert_raises(ArgumentError) { preview(cursor: other_family) }
     end
   end
@@ -87,8 +89,9 @@ class DomainOutboxCrossFamilyBackfillDryRunTest < ActiveSupport::TestCase
     first = preview(limit: 1)
     @source.first.update!(status: "interviewing", goal: "Changed private content in synthetic test")
     # status might have the same value, but updated_at changes on save.
-    travel 2.seconds do
-      assert_raises(ArgumentError) { preview(cursor: first[:next_cursor], limit: 1) }
+    travel 3.seconds do
+      error = assert_raises(ArgumentError) { preview(cursor: first[:next_cursor], limit: 1) }
+      assert_match(/source or projection changed/, error.message)
     end
   end
 
@@ -96,16 +99,18 @@ class DomainOutboxCrossFamilyBackfillDryRunTest < ActiveSupport::TestCase
     first = preview(limit: 1)
     DomainOutboxEvent.where(workspace_id: @workspace.id,
       source_type: "ProjectIntake", source_id: @source.first.id).update_all(source_version: 88)
-    travel 2.seconds do
-      assert_raises(ArgumentError) { preview(cursor: first[:next_cursor], limit: 1) }
+    travel 3.seconds do
+      error = assert_raises(ArgumentError) { preview(cursor: first[:next_cursor], limit: 1) }
+      assert_match(/source or projection changed/, error.message)
     end
     clean = preview(limit: 1)
     ActivityEvent.where(workspace_id: @workspace.id,
       event_key: "ProjectIntake:#{@source.first.id}:intake_created").update_all(
         occurred_at: 2.hours.ago
       )
-    travel 2.seconds do
-      assert_raises(ArgumentError) { preview(cursor: clean[:next_cursor], limit: 1) }
+    travel 3.seconds do
+      error = assert_raises(ArgumentError) { preview(cursor: clean[:next_cursor], limit: 1) }
+      assert_match(/source or projection changed/, error.message)
     end
   end
 
