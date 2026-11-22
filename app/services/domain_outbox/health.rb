@@ -45,12 +45,8 @@ module DomainOutbox
     end
 
     def self.scoped_events(owner)
-      unless owner.is_a?(User) && owner.persisted? && owner.role == "owner" &&
-          owner.owner_workspace&.persisted?
-        raise ArgumentError, "verified owner workspace required"
-      end
-
-      DomainOutboxEvent.where(workspace_id: owner.owner_workspace.id)
+      workspace = OperatorAccess.workspace_for!(owner: owner)
+      DomainOutboxEvent.where(workspace_id: workspace.id)
     end
     private_class_method :scoped_events
   end
