@@ -1,10 +1,10 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
-## C2.3b7a ProjectIntake-only bounded legacy backfill DRY-RUN — 22 Nov 2026
+## C2.3b7a ProjectIntake-only bounded legacy backfill DRY-RUN CODE + CI VERIFIED — 22 Nov 2026
 
 **New code [`4fd8822`](https://github.com/TheGor-365/rails_calendar/commit/4fd8822f2d2cacd40643a621a51f7fd76ab8b004):** `DomainOutbox::BackfillDryRun.preview(owner:,limit:,cursor:)` introduces the FIRST **source-to-outbox** legacy dry-run preview for canonical workspace-owned `ProjectIntake` v1 only. Distinct from existing due-queue `Health.preview`. Page limit strict 1..25, encrypted owner/workspace-scoped 15-minute keyset cursor, frozen ceiling source ID, max 250 inspected per scan chain. Only aggregated `already_indexed` / `projection_only` / `envelope_only` / `missing_both` counts, safe `has_more`/`scan_budget_exhausted`/opaque cursor returned; no title/body/answer/source ID in output. Synthetic negative tests check cross-tenant, malformed cursor/limit, four missing-record states, paging and no changes to outbox/ActivityEvent/AiSpendEntry/replay ledger. Test fixtures intentionally delete only synthetic CI records. **NO backfill insertion, migration, replay, POST/GET route, Railway or local DB read/write.** See [C2.3b7a design/test contract](RC0551F_C23B7A_LEGACY_BACKFILL_DRYRUN_2026-11-22.md).
 
-**CI checkpoint:** code SHA `4fd8822`, [Security #45028711042](https://github.com/TheGor-365/rails_calendar/actions/runs/45028711042) SUCCESS, [Rails CI #45028711017](https://github.com/TheGor-365/rails_calendar/actions/runs/45028711017) IN_PROGRESS at creation; do not mark full CI-verified until exact run concludes. Prior feature+docs SHA `e647739` Rails #45028245547 and Security #45028245575 SUCCESS. **Scope:** `C2.3b7a = CODE_COMMITTED / CI PENDING`; entire C2.3b7 remains **IN PROGRESS** with other sources/pacing/reconciliation and any writes gated.
+**Exact feature SHA `4fd8822` CI verified:** [Security #45028711042](https://github.com/TheGor-365/rails_calendar/actions/runs/45028711042) **SUCCESS**, [Rails CI #45028711017](https://github.com/TheGor-365/rails_calendar/actions/runs/45028711017) **SUCCESS** (model/controller, Chrome, PG18 fresh and deployed-upgrade). Prior head `e647739` Rails #45028245547 and Security #45028245575 SUCCESS. **Scope:** `C2.3b7a = CODE + CI VERIFIED (READ-ONLY, ProjectIntake only)`; entire C2.3b7 still **IN PROGRESS** for other source families, pacing/resume and reconciliation approval. No actual backfill or user-local DB execution.
 
 
 ## C2.3b6b2.4b preflight CSRF-on TEST-ONLY HTTP route CODE + CI VERIFIED — 22 Nov 2026
@@ -393,7 +393,7 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 | `C2.3b6b2.4b` Actual owner replay POST with CSRF + release | **NOT IMPLEMENTED / NOT AUTHORIZED** | Existing GET-only diagnostic/disabled panel; no route or executor call | Separate owner DB scope/migration approval, CSRF-on negative tests, confirmation UX and manual browser acceptance mandatory. |
 
 
-| `C2.3b7a` ProjectIntake-only source-to-envelope reconciliation DRY-RUN | **CODE_COMMITTED / CI PENDING; READ-ONLY** | Code `4fd8822`: bound 25/page, 250/chain, encrypted scoped 15-min cursor, four aggregate reconciliation states, no-write synthetic tests; Security #45028711042 SUCCESS | Rails CI #45028711017 pending; no HTTP route; other source mappings not audited, no actual backfill. |
+| `C2.3b7a` ProjectIntake-only source-to-envelope reconciliation DRY-RUN | **CODE + CI VERIFIED (READ-ONLY; ONE SOURCE)** | SHA `4fd8822`, Rails CI #45028711017 and Security #45028711042 SUCCESS incl. Chrome and PG18 fresh/upgrade; 25/page, 250/chain, encrypted owner-scoped cursor and four aggregate states | No HTTP route, local/production source scan or backfill writer; other immutable source mappings and pace/reconciliation remain unverified. |
 | `C2.3b7b+` Additional canonical source backfill policies, bounded pacing and authorized writer | **NOT IMPLEMENTED / NOT AUTHORIZED** | Single ProjectIntake preview only | No automatic source scan, retry, API, provider usage or production release. |
 
 | `C2.3c.1–c6` Deterministic projection registry and consistency | **PARTIAL legacy projections** | Calendar OwnerActivity, OwnerArtifacts, Activity Inbox | generalized subscription/rebuild/lag metrics not done |
@@ -411,7 +411,7 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 ## 4. Immediate next *unverified* step
 
 1. **R0.4c4/R0.4c5 `DB_VERIFIED_SCRATCH`, protected**: local scratch has ONLY the two approved outbox+ledger migrations, original source review DB has neither. No further local migration, recovery writer, replay, Railway or schema cleanup.
-2. **C2.3b7a ProjectIntake-only read-only dry-run `4fd8822` CODE_COMMITTED**: inspect exact Rails CI #45028711017/Security #45028711042; fix any failure before calling CI VERIFIED. 25/page, 250 per cursor chain, 4 aggregate classifications with encrypted scoped cursor. This is NOT a backfill writer and has no endpoint.
+2. **C2.3b7a ProjectIntake-only read-only dry-run `4fd8822` CODE + CI VERIFIED:** Rails CI #45028711017 and Security #45028711042 SUCCESS (model/controller, Chrome, PG18); 25/page, 250 per cursor chain, encrypted owner/workspace cursor and 4 aggregate classifications. No endpoint, local scan, or writer. Check subsequent doc SHA CI separately.
 3. **NEXT after green:** extend source mappings and version/timestamp eligibility one family at a time in ephemeral CI synthetic tests. Add bounded operator pacing/resume policy and explicit reconciliation before/after acceptance; scan only a separately approved environment. The real owner-only POST remains unimplemented/unapproved.
 4. **Roadmap later:** C2.3c deterministic projections → C2.4 human-reviewed AI actions → E1–E2.5 → M6–M8; separate local C2.2 browser role/viewport QA still pending.
 
