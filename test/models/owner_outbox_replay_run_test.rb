@@ -75,7 +75,7 @@ class OwnerOutboxReplayRunTest < ActiveSupport::TestCase
     assert_not duplicate.valid?
     assert_raises(ActiveRecord::RecordNotUnique) do
       OwnerOutboxReplayRun.transaction(requires_new: true) do
-        OwnerOutboxReplayRun.create!(attrs.merge(request_digest: first.request_digest))
+        OwnerOutboxReplayRun.new(attrs).save!(validate: false)
       end
     end
   end
