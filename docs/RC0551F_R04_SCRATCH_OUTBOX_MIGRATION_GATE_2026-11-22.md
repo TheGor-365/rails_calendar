@@ -1,6 +1,6 @@
 # R0.4c / C2.3b1 — isolated PG16 scratch migration gate (2026-11-22)
 
-**State 2026-11-22:** SCRATCH RESTORE + INDEPENDENT PG16 PARITY + DETACHED WORKTREE + RAILS EFFECTIVE READ-ONLY CONNECTION VERIFIED. ONE scratch-only migration `20261121003000` now EXPLICITLY AUTHORIZED by owner but NOT EXECUTED or verified. Preserve existing private backup, the restored scratch and original review DB. This is a runbook, not executable permission.
+**State 2026-11-22:** SCRATCH RESTORE + independent PG16 parity + detached worktree + Rails read-only target verified. The explicitly authorized ONE scratch migration `20261121003000` has now EXECUTED with primary local checks PASS; independently validated catalog/constraint audit PENDING. Preserve existing private backup, the restored scratch and original review DB. This is a runbook, not executable permission.
 
 ## 1. Grounded evidence
 
@@ -64,3 +64,9 @@ Operator contract: recheck original checkout/schema, pinned migration hash and d
 Owner verified `RAILS_EFFECTIVE_SCRATCH_PREWRITE=PASS`, but answered `MIGRATE-ONE-SCRATCH` instead of the expected `MIGRATE-ONE-SCRATCH-20261121003000`. The command returned `STOP: Confirmation refused` **before** `PREWRITE_GATES=PASS`, `MIGRATION_STARTED_SCRATCH_ONLY` and `bin/rails db:migrate:up`; thus this execution did not attempt DB writes. Do not classify as a migration failure or a successful DB change. No new independent psql after-check has been submitted yet.
 
 Prior explicit owner permission is scoped to one scratch-only version `20261121003000`; repeat only after fresh read-only PG16 source/scratch identity/session/schema check, exact Git SHA and blob verification, and Rails read-only scratch target inspection; shorter interactive token `MIGRATE` replaces the previous long input to avoid accidental truncation. On any failure AFTER writer begins, stop and preserve both DBs and archives for investigation. Migration still NOT EXECUTED at this checkpoint.
+
+## R0.4c4 scratch migration executed — owner terminal PASS, 22 November 2026
+
+With explicit prior owner authorization, the guarded Rails command printed `RAILS_EFFECTIVE_SCRATCH_PREWRITE=PASS`, `PREWRITE_READ_ONLY=PASS`, accepted owner token `MIGRATE`, `PREWRITE_GATES=PASS`, `MIGRATION_STARTED_SCRATCH_ONLY`. Rails output shows only `20261121003000 CreateDomainOutboxEvents` and successful CREATE TABLE, unique revision index, delivery queue index and three CHECK statements; final markers: `MIGRATION_20261121003000_SCRATCH=PASS`, `SOURCE_OUTBOX=ABSENT`, `ORIGINAL_SCHEMA_CONTENT=PRESERVED`. Migration was executed on `rails_calendar_r04_restore_20261121t231331z_27407` from detached code `36859c3`; private archive, original review DB and original checkout remain outside the migration target. This is owner-terminal primary post-check evidence, NOT independent catalog verification.
+
+**NEXT ONLY:** independent pinned PG16 local `psql` read-only audit for source absence of table/version, scratch presence exactly once, `schema_migrations` baseline parity after subtracting target, table counts source+1, six core row totals, zero outbox rows, correct NOT NULL columns, unique source-revision index, queue index, validated workspace FK and 3 named validated CHECK constraints. Do not rerun migration, restore, reset, rollback or cleanup, even if isolated `db/schema.rb` shows local modifications. On unexpected state keep scratch and investigate.
