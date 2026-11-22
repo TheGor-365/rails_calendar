@@ -1,6 +1,6 @@
 # C2.3b7e — Immutable ServiceOfferingPublication read-only reconciliation
 
-**2026-11-22 · Draft [PR #81](https://github.com/TheGor-365/rails_calendar/pull/81) · CODE_COMMITTED / CI_PENDING · NO BACKFILL WRITER**
+**2026-11-22 · Draft [PR #81](https://github.com/TheGor-365/rails_calendar/pull/81) · CODE + CI VERIFIED (READ-ONLY, synthetic CI) · NO BACKFILL WRITER**
 
 ## Canonical evidence and identity
 
@@ -20,4 +20,4 @@ Strict bounds: integer 1..25 publication rows per page, <=250 rows per cursor ch
 
 Tests cover publication+unpublication histories referring to one offering despite current published pointer NIL; all four presence statuses; foreign owner exclusion, mismatched version/offering association, unapproved draft version, contradictory nonempty unpublish version, outbox version and projection time drift, opposite kind artifacts, malformed/foreign cursor, invalid actors and batch limit, total budget stop, no outbox/journal/activity/AI writes during preview. The preview does not invoke Activity::Recorder, Replayer, paid AI, scheduler or any HTTP route.
 
-Exact feature SHA `cc8efdd`: [Rails CI #45051804505](https://github.com/TheGor-365/rails_calendar/actions/runs/45051804505), [Security Audit #45051804560](https://github.com/TheGor-365/rails_calendar/actions/runs/45051804560) are **PENDING at initial checkpoint**. Do not label CI verified until all exact SHA checks finish green. b7d docs SHA `65bca63` Rails #45051106255 and Security #45051106240 SUCCESS. No local PG16 review or scratch DB read/write, schema change, private backup cleanup, Railway/main change or replay. Next b7f settled AI reply linkage; then global pacing/resume/reconciliation, any writer separately authorized.
+Exact feature SHA `cc8efdd`: [Rails CI #45051804505](https://github.com/TheGor-365/rails_calendar/actions/runs/45051804505) **SUCCESS** including model/controller, Chrome browser and both PostgreSQL 18 fresh+upgrade jobs; [Security Audit #45051804560](https://github.com/TheGor-365/rails_calendar/actions/runs/45051804560) **SUCCESS**. **C2.3b7e CODE + CI VERIFIED for synthetic read-only metadata preview only**, NOT actual owner DB scan, backfill/replay authorization or a production HTTP release. b7d docs SHA `65bca63` Rails #45051106255 and Security #45051106240 SUCCESS. No local PG16 review or scratch DB read/write, schema change, private backup cleanup, Railway/main change or replay. Next b7f settled AI reply linkage; then global pacing/resume/reconciliation, any writer separately authorized.
