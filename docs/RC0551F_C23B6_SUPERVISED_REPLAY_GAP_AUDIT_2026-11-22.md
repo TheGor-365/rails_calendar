@@ -21,3 +21,7 @@
 ## Release sequence
 
 Code + synthetic tests → exact SHA Rails/Chrome/PG18/Security → owner/browser role and viewport QA → separately authorized local review DB migration if needed → M8 staged release/rollback. Original source review DB, private archive, scratch, original `db/schema.rb M`, port :3001, Railway/main not to be touched without new permission. No real replay has been invoked.
+
+## C2.3b6b2.1 implementation checkpoint — 22 Nov 2026
+
+Code commit [`a3b4f83`](https://github.com/TheGor-365/rails_calendar/commit/a3b4f83a287983e6cc3de1a54d42d4f5d64aae1e) added `DomainOutbox::OperatorAccess` with fail-closed persisted owner/workspace authorization, explicit association owner ID comparison, and stricter allowlisted manual batch size 1/5/10/25. `DomainOutbox::Health.scoped_events` now shares this same gate; read-only HTTP remains GET-only. `test/services/domain_outbox/operator_access_test.rb` covers two owners/workspaces, nil/client/owner-no-workspace and invalid request limit, and asserts no changes to outbox, ActivityEvent or AiSpendEntry. Code/tests committed; full exact-SHA Rails CI pending at checkpoint; Security Audit SUCCESS. NO replay route or service writer or audit DB introduced. This completes only code preparation b6b2.1, not operator POST/actor audit/concurrency.

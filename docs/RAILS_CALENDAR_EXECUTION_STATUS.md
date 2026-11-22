@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## C2.3b6b2.1 fail-closed operator authority CODE_COMMITTED — 22 November 2026
+
+**Feature code SHA:** `a3b4f83a287983e6cc3de1a54d42d4f5d64aae1e` in existing Draft PR #81. Added `app/services/domain_outbox/operator_access.rb`: `workspace_for!(owner:)` verifies persisted owner user, exact owned persisted workspace and matching owner_user_id, raising `ArgumentError` on nil/client/no-workspace/foreign invalid actor; `replay_limit!(limit:)` accepts ONLY integer [1,5,10,25], with no ability to start replay. Updated `DomainOutbox::Health.scoped_events` to reuse the same owner/workspace gate, preserving GET-only privacy. Added focused test `test/services/domain_outbox/operator_access_test.rb` for owner/other workspace, invalid actors, size bounds and no mutations to outbox/activity/AI ledger.
+
+**Classification:** `C2.3b6b2.1 = CODE_COMMITTED; CI PENDING` at record time. Security for exact feature SHA [#44972568903](https://github.com/TheGor-365/rails_calendar/actions/runs/44972568903) SUCCESS; [Rails CI #44972568880](https://github.com/TheGor-365/rails_calendar/actions/runs/44972568880) still in progress (model/controller, browser and PG18 checks). Do not call full CI green until conclusion. No new route, controller replay POST, batch execution, DB migration, paid AI, production change or automated scheduler. This is a preparatory authorization primitive, **not** operator replay DONE.
+
+**Next missing code:** design actor audit and workspace-wide replay invocation idempotency/concurrency BEFORE any POST is enabled. Follow [C2.3b6 gap audit](RC0551F_C23B6_SUPERVISED_REPLAY_GAP_AUDIT_2026-11-22.md), then add bounded supervised service and synthetic owner/CSRF/parallel denial tests. Any future schema migration requires distinct local/production authorization. R0.4c4 scratch DB already independently VERIFIED; source DB remains untouched. Local detached `db/schema.rb` change still needs READ-ONLY diff inspection.
+
+
 ## R0.4c4 independent PG16 catalog audit PASS + C2.3b6 gap review — 22 November 2026
 
 **Primary evidence: owner terminal (22 November 2026).** After correcting the earlier typo pointing to a directory rather than the PG16 `psql` executable, the user ran an entirely READ-ONLY independent catalog check on exact PostgreSQL 16 Unix-socket databases `rails_calendar_rc0551f_c21b_review_20261117` (source) and `rails_calendar_r04_restore_20261121t231331z_27407` (scratch). Terminal outputs ALL PASS: `PG_PSQL_EXECUTABLE`, both `DB_IDENTITY`, `SCRATCH_CATALOG_UNIQUE`, `SOURCE_OUTBOX_ABSENT`, `SCRATCH_OUTBOX_AND_VERSION`, `PUBLIC_TABLE_DELTA_PLUS_ONE`, `FIVE_CORE_ROW_COUNTS`, `MIGRATION_BASELINE_EXACT`, `OUTBOX_ROWS_ZERO`, `REQUIRED_COLUMNS_NOT_NULL`, `UNIQUE_SOURCE_INDEX`, `QUEUE_INDEX`, `WORKSPACE_FK_VALID`, `CHECK_CONSTRAINTS_VALID`, **`R0_4C4_INDEPENDENT_READ_ONLY_DB_AUDIT=PASS`**, and **`NO_DATABASE_WRITES=TRUE`**.
@@ -245,7 +254,8 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 | `C2.3b6a` Owner outbox aggregates and bounded candidate preview | **CODE + CI VERIFIED** | `981ebf1`, [Rails CI #44914065690](https://github.com/TheGor-365/rails_calendar/actions/runs/44914065690), [Security #44914065635](https://github.com/TheGor-365/rails_calendar/actions/runs/44914065635) SUCCESS; [contract](RC0551F_C23B6A_OUTBOX_HEALTH_DRYRUN_2026-11-21.md) | local user DB not migrated; no production; pure read-only health API |
 | `C2.3b6b1` Owner-only GET diagnostics UI | **CODE + CI VERIFIED** | `306fdc1`; [Rails #44922808417](https://github.com/TheGor-365/rails_calendar/actions/runs/44922808417) & [Security #44922808402](https://github.com/TheGor-365/rails_calendar/actions/runs/44922808402) **SUCCESS**; [UI contract](RC0551F_C23B6B1_OUTBOX_OPERATOR_READONLY_UI_2026-11-21.md) | local browser role/viewport QA, local DB migration, PROD NOT DONE |
 | `C2.3b6c1` Stale failure/terminal retry accounting + regression tests | **CODE + CI VERIFIED** | `39e8096`; [Rails #44923093762](https://github.com/TheGor-365/rails_calendar/actions/runs/44923093762) SUCCESS (391/6390 Rails; 47/726 Chrome; PG18 fresh+upgrade PASS), [Security #44923093845](https://github.com/TheGor-365/rails_calendar/actions/runs/44923093845) SUCCESS; [contract](RC0551F_C23B6C1_OUTBOX_RETRY_SAFETY_2026-11-21.md) | live parallel-worker stress, local DB migration/browser QA, PROD NOT DONE |
-| `C2.3b6b2/C2.3b6c2` Supervised replay action and concurrency/actor audit | **NOT IMPLEMENTED · BLOCKED BY R0.4** | no POST replay endpoint/scheduler or new AI charge | private backup+scratch restore, explicit owner action, CSRF/rate/concurrency/limits |
+| `C2.3b6b2.1` Shared fail-closed owner replay gate | **CODE_COMMITTED; CI PENDING** | SHA `a3b4f83`, `DomainOutbox::OperatorAccess`, Health reuse and new negative tests; Security #44972568903 SUCCESS | Check exact SHA Rails CI #44972568880; no route or replay enabled; actor audit and concurrency gate missing. |
+| `C2.3b6b2.2/C2.3b6c2` Supervised POST and concurrency/actor audit | **NOT IMPLEMENTED / DISABLED** | No POST endpoint or replay job, no new AI billing | Durable actor record, idempotency/rate/lease, CSRF, explicit confirmation and synthetic parallel tests required before enabling. |
 
 
 | `C2.3b7` Dry-run backfill, bounded pacing and reconciliation | **NOT IMPLEMENTED / NOT VERIFIED** | future substep | no production scans or auto-backfill |
@@ -264,10 +274,10 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 
 ## 4. Immediate next *unverified* step
 
-1. **R0.4c4 = DB_VERIFIED_SCRATCH** via independent read-only PG16 catalog audit; do not replay migrate/restore or delete archive/scratch, touch source review DB, main or Railway.
-2. **NEXT C2.3b6b2.1**: review owner-scoped replay authorization and duplicate-invocation contract; existing `Replayer.run!`, `Health`, GET UI and retry code are already implemented. Prepare smallest non-public server gate and negative tests, or continue with explicit code implementation in remote Draft PR after verifying current SHA/CI. Read [C2.3b6 gap audit](RC0551F_C23B6_SUPERVISED_REPLAY_GAP_AUDIT_2026-11-22.md). Do not expose a POST endpoint before actor audit/concurrency safety.
-3. **C2.3b6b2.2 / c2**: owner-only CSRF POST, typed confirmation, allowlisted limit, actor audit, anti-duplicate/rate lock, no cost, concurrent regression tests and browser role acceptance. Original review DB not migrated: no local live POST test without new authorization.
-4. **Remaining:** C2.3b7 dry-run backfill → C2.3c projections → C2.4 AI Action Engine → E1–E2.5 → M6–M8, plus independent C2.2 browser QA and isolated schema diff review.
+1. **R0.4c4 = DB_VERIFIED_SCRATCH** with source review DB preserved; no more local migrations, restore, cleanup, Railway or paid AI without distinct permission.
+2. **C2.3b6b2.1 CODE_COMMITTED on `a3b4f83`.** Check exact-sha Rails CI #44972568880 and Security #44972568903. Code: shared owner/workspace gate and allowlisted future replay batch size; no POST or replay enabled. Repair any CI failure before further code.
+3. **NEXT C2.3b6b2.2/C2.3b6c2:** prepare actor-audited, bounded supervised replay with idempotent duplicate POST and workspace-wide concurrency lease; synthetic denial, CSRF, 2-worker and no-paid-AI tests. Do not enable endpoint without completed actor-audit design/coverage. Existing read-only Health remains available.
+4. **Parallel:** inspect isolated worktree `db/schema.rb` changed status READ-ONLY (never reset); C2.2 browser acceptance on real isolated environment with role testing when authorized; C2.3b7 → C2.3c → C2.4 → E1–E2.5 → M6–M8 after current gate.
 
 ## 5. Registry update rule (mandatory after any code work)
 
