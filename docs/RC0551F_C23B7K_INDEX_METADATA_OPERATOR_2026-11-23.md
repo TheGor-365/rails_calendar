@@ -1,6 +1,6 @@
 # C2.3b7k — invitation index metadata-only triage operator
 
-**Date:** 2026-11-23; existing Draft PR #81. **Code submitted, exact-SHA CI pending; no new owner PG16 query authorized or executed. G5 remains BLOCKED.**
+**Date:** 2026-11-23; existing Draft PR #81. **Functional SHA `7353cbfaf33ca259a3122336db4e90bcdc510514`, exact-SHA Rails CI #45077259295 and #45077254872 SUCCESS; Security #45077259351 and #45077254901 SUCCESS. No new owner PG16 query authorized or executed. G5 remains BLOCKED.**
 
 ## Evidence and scope
 
@@ -24,3 +24,11 @@ Forbidden: source/review DB, business table-row scans, DDL/DML, migration, index
 ## Current release ledger
 
 Pre-change HEAD \`f665215ff30af47fd3f60371ff1a4980cfa4313c\`: Rails CI #45075893071 SUCCESS, Security #45075893120 SUCCESS, PG18 fresh/upgrade SUCCESS. New code commit SHA and corresponding workflow results must be recorded **after** independently checking GitHub. C2.2 QA, G3/G4/G6 backup/media/source/tenant gates, production and main merge remain OPEN.
+
+## Exact functional SHA CI (verified)
+
+- PR Rails CI: https://github.com/TheGor-365/rails_calendar/actions/runs/45077259295 — SUCCESS, model/controller + browser tests and PostgreSQL 18 fresh/upgrade jobs.
+- PR Security: https://github.com/TheGor-365/rails_calendar/actions/runs/45077259351 — SUCCESS.
+- Push Rails CI: https://github.com/TheGor-365/rails_calendar/actions/runs/45077254872 — SUCCESS.
+- Push Security: https://github.com/TheGor-365/rails_calendar/actions/runs/45077254901 — SUCCESS.
+- Do not carry these successes to a subsequent docs-only HEAD without new exact-SHA observation.
