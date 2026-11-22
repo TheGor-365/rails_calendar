@@ -40,3 +40,9 @@ Printed: `LOCAL_HEAD=c25be48`, `REMOTE_MIGRATION_BLOB=VERIFIED`, `HEAD_MIGRATION
 GitHub comparison of code SHA `36859c3` to docs SHA `5f594b6` showed only documentation changes. Pin a dedicated detached Git worktree to **exact commit `36859c3086f6ece81630703145a7e82e8cd56159`**, not a moving branch. A worktree under `~/rails_calendar_r04_scratch_worktree_20261122` is deliberately separate from the owner's dirty original checkout and is not an SQL action.
 
 **NEXT:** create that isolated worktree only if its path does not exist and all preflight guards pass; verify clean status, pinned migration hash and that the original checkout/scheme stays unchanged. Then perform a distinct read-only Rails scratch-connection gate. Migration requires another affirmative authorization; no `bin/rails db:migrate:up` yet, no `db:prepare` and no source DB writes.
+
+## R0.4c2 separate detached worktree — owner terminal PASS, 22 November 2026
+
+`ISOLATED_WORKTREE=PASS`, `MIGRATION_FILE=VERIFIED`, `ORIGINAL_CHECKOUT=PRESERVED`, `DATABASE_WRITES=NONE`. Created `~/rails_calendar_r04_scratch_worktree_20261122`, detached at exact `36859c3086f6ece81630703145a7e82e8cd56159`, clean; required migration blob matches pinned `b1175a8ab37c5726fcaaae269adc7b1ea16892c7`. Original `~/rails_calendar_ai_c21c` and `db/schema.rb M` preserved. `git diff --summary/--raw` blank; treat M as unexplained index state, do not reset or normalize.
+
+**NEXT:** no checkout/restore repeat. With explicit scratch-only `RC_LOCAL_DEV_DATABASE_URL` built for local Unix socket, `DATABASE_URL` absent and `PGOPTIONS=-c default_transaction_read_only=on`, run Rails runner in the new worktree to confirm effective local PG16 scratch identity and migration pre-state. Check Ruby 3.4.13, runner code SHA and no Grok. If runner fails due gem/runtime/boot, capture sanitized error and STOP; do not install gems or mutate original checkout reflexively. No permission for actual migration.
