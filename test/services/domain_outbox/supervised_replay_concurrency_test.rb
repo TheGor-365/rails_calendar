@@ -20,7 +20,12 @@ class DomainOutboxSupervisedReplayConcurrencyTest < ActiveSupport::TestCase
 
     OwnerOutboxReplayRun.where(workspace_id: @workspace.id).delete_all
     @workspace.destroy!
-    @owner.destroy! if @owner&.persisted?
+    # create_owner_workspace! cached the association on the owner.
+    # Clear the stale reference before dependent: :restrict_with_exception.
+    if @owner&.persisted?
+      @owner.reload
+      @owner.destroy!
+    end
   end
 
   test "C2.3b6c2.2 two real PG sessions prevent duplicate and parallel owner replay" do
