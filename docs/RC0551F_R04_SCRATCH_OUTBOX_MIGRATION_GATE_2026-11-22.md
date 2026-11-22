@@ -1,6 +1,6 @@
 # R0.4c / C2.3b1 — isolated PG16 scratch migration gate (2026-11-22)
 
-**State 2026-11-22:** SCRATCH RESTORE + INDEPENDENT PG16 PARITY + DETACHED WORKTREE + RAILS EFFECTIVE READ-ONLY CONNECTION VERIFIED. Migration NOT AUTHORIZED and NOT APPLIED. Preserve existing private backup, the restored scratch and original review DB. This is a runbook, not executable permission.
+**State 2026-11-22:** SCRATCH RESTORE + INDEPENDENT PG16 PARITY + DETACHED WORKTREE + RAILS EFFECTIVE READ-ONLY CONNECTION VERIFIED. ONE scratch-only migration `20261121003000` now EXPLICITLY AUTHORIZED by owner but NOT EXECUTED or verified. Preserve existing private backup, the restored scratch and original review DB. This is a runbook, not executable permission.
 
 ## 1. Grounded evidence
 
@@ -52,3 +52,9 @@ GitHub comparison of code SHA `36859c3` to docs SHA `5f594b6` showed only docume
 Owner ran `bin/rails runner` in detached `~/rails_calendar_r04_scratch_worktree_20261122` at `36859c3` with Ruby 3.4.13, development, Grok off, `DATABASE_URL` absent, `PGOPTIONS='-c default_transaction_read_only=on'` and scratch-only `RC_LOCAL_DEV_DATABASE_URL`. Rails ActiveRecord returned `RAILS_EFFECTIVE_DB=rails_calendar_r04_restore_20261121t231331z_27407`, `PG16_LOCAL_SOCKET=PASS`, `PG_TRANSACTION_READ_ONLY=PASS`, `OUTBOX_TABLE=ABSENT`, `MIGRATION_20261121003000=PENDING`, `RAILS_SCRATCH_CONNECTION_GATE=PASS`. This is a read-only PASS, not permission or evidence of DB migration.
 
 **Explicit owner signoff is now the next gate.** Only authorize one isolated migration `20261121003000` on that scratch DB. Before execution recheck exact code/blob, scratch/source identity, version/table absence, source sessions and safety. Confirm the Rails process is constrained to scratch, not production/source. Migration invocation uses writable database session by design; validations default read-only. `db:migrate:up VERSION=20261121003000` may update the isolated worktree's `db/schema.rb`; NEVER touch original checkout's modified schema. On STOP or partial failure inspect and preserve the scratch; never auto-rerun or cleanup.
+
+## R0.4c4 explicit write authorization — 22 November 2026
+
+Owner approved one migration `20261121003000` exclusively to `rails_calendar_r04_restore_20261121t231331z_27407`, after fresh preflight, with original review DB, private archives, original `db/schema.rb` and Railway untouched. Authorization recorded; it is NOT a claim of execution.
+
+Operator contract: recheck original checkout/schema, pinned migration hash and detached clean worktree, correct PG16 Unix socket source+scratch identities and no active writers, exactly one existing scratch, no outbox table/version and workspaces present; read-only Rails runner prove exact effective scratch target. Interactive typed local confirmation before the **single permitted writer**: `bin/rails db:migrate:up VERSION=20261121003000` with `RC_LOCAL_DEV_DATABASE_URL` scratch-only and `DATABASE_URL` unset. PGOPTIONS read-only for all guards and after-checks; unset ONLY for the approved DB schema writer. A schema dump (if Rails performs one) can modify `db/schema.rb` INSIDE the detached worktree only, never the original. Preserve private backup and scratch, no blind retry/rollback on failure. After owner terminal result, independent read-only index/FK/check constraints/table/row parity verification is mandatory before marking completed.
