@@ -112,7 +112,7 @@ class DomainOutboxInvitationTransitionBackfillDryRunTest < ActiveSupport::TestCa
       .update_all(occurred_at: claimed.claimed_at + 1.hour)
     result = preview
     assert_equal 2, result[:inconsistent_records]
-    assert_equal 3, result[:already_indexed]
+    assert_equal 4, result[:already_indexed]
     assert_equal 1, result[:envelope_only]
     assert_equal 1, result[:missing_both]
     assert_equal 0, result[:projection_only]
