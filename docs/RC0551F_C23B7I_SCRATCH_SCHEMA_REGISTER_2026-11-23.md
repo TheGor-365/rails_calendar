@@ -84,6 +84,9 @@ The new `DomainOutbox::SixFamilyScratchSchemaContract.violations(catalog)` accep
 
 Passing CI = CODE-STATIC/CI-TEST SCHEMA VERIFIED, not owner PG16 scratch acceptance. PG18 fresh/upgrade CI jobs establish migration path on **synthetic** GitHub Actions DB, not recovery of owner archives. Do not create a CLI command that connects to scratch in this stage.
 
+
+**C2.3b7j follow-on (23 November):** [Pinned local PG16 scratch metadata-only probe and operator gate](RC0551F_C23B7J_READONLY_SCRATCH_METADATA_GATE_2026-11-23.md) now CODE+CI VERIFIED on **synthetic CI only** (functional `64bde014`; Rails CI #45072613127 and Security #45072613171 SUCCESS). It adds a static PG catalog SQL/guarded optional user-local wrapper but HAS NOT connected to the historical scratch. G5 remains LOCAL_CATALOG_PENDING; do not infer restore/tenant/client scan/write approval. See canonical execution status.
+
 ## 6. Next accountable action
 
 1. [x] Functional [SHA 9db6f0e0](https://github.com/TheGor-365/rails_calendar/commit/9db6f0e00de88046d736778995d0b7ca79a3e229): [Rails CI #45071359034](https://github.com/TheGor-365/rails_calendar/actions/runs/45071359034) SUCCESS (482 model/controller tests, 7390 assertions; 49 Chrome, 755 assertions; PG18 fresh+upgrade SUCCESS), [Security Audit #45071359111](https://github.com/TheGor-365/rails_calendar/actions/runs/45071359111) SUCCESS. Earlier initial code SHA `60bfd9b2` failed one catalog test, superseded by migration-history repair; no suppressions or database changes.
