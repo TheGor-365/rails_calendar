@@ -57,7 +57,7 @@ module DomainOutbox
     CURSOR_SALT = "rc:outbox:cross-family-dry-run:key:v1"
     COUNT_KEYS = %w[already_indexed projection_only envelope_only missing_both
       inconsistent_records ineligible_sources unexpected_artifacts
-      manual_review_required].freeze
+      manual_review_required expected_transitions].freeze
 
     def self.preview(owner:, limit: MAX_PAGE_SIZE, cursor: nil)
       workspace = OperatorAccess.workspace_for!(owner: owner)
@@ -85,6 +85,13 @@ module DomainOutbox
       ceiling_id = before && before.fetch("ceiling_id")
 
       page = klass.preview(owner: owner, limit: limit, cursor: family_cursor)
+      # Invitations count source invitations AND their expected transitions.
+      # The other five services expose :inspected directly.
+      inspected = source_type == "ClientRequestInvitation" ?
+        page.fetch(:inspected_invitations) : page.fetch(:inspected)
+      unless inspected.is_a?(Integer) && inspected.between?(0, limit)
+        raise ArgumentError, "invalid source-family inspection result"
+      end
       # Confirm the actual bounded source prefix selected by the child.
       next_child = page.fetch(:next_cursor)
       next_child_state = next_child && klass.send(:read_cursor!, next_child, owner: owner, workspace: workspace)
@@ -94,15 +101,15 @@ module DomainOutbox
       window = scope.where(id_column.gt(after_id))
       window = window.where(id_column.lteq(ceiling_id)) if ceiling_id
       ids = window.order(id_column.asc)
-        .limit(page.fetch(:inspected)).pluck(id_column)
-      if ids.length != page.fetch(:inspected) ||
+        .limit(inspected).pluck(id_column)
+      if ids.length != inspected ||
          (next_child_state && ids.last != next_child_state.fetch("after_id"))
         raise ArgumentError, "source page changed during inspection; manual review required"
       end
 
       totals = state.fetch("totals")
       family_total = totals.fetch(index)
-      family_total["inspected"] += page.fetch(:inspected)
+      family_total["inspected"] += inspected
       COUNT_KEYS.each { |key| family_total[key] += page.fetch(key.to_sym, 0) }
       family_total["budget_exhausted"] ||= page.fetch(:scan_budget_exhausted)
 
@@ -126,7 +133,7 @@ module DomainOutbox
 
       {
         source_type: source_type, family_number: index + 1,
-        inspected: page.fetch(:inspected),
+        inspected: inspected,
         page_counts: COUNT_KEYS.to_h { |key| [key.to_sym, page.fetch(key.to_sym, 0)] },
         has_more_in_family: page.fetch(:has_more),
         family_budget_exhausted: page.fetch(:scan_budget_exhausted),
