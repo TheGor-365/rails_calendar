@@ -92,6 +92,12 @@ module DomainOutbox
       unless inspected.is_a?(Integer) && inspected.between?(0, limit)
         raise ArgumentError, "invalid source-family inspection result"
       end
+      # Historical invitation diagnostics use :ineligible_invitations rather
+      # than :ineligible_sources. Never drop that category in the summary.
+      normalized = page.dup
+      if source_type == "ClientRequestInvitation"
+        normalized[:ineligible_sources] = page.fetch(:ineligible_invitations)
+      end
       # Confirm the actual bounded source prefix selected by the child.
       next_child = page.fetch(:next_cursor)
       next_child_state = next_child && klass.send(:read_cursor!, next_child, owner: owner, workspace: workspace)
@@ -110,7 +116,7 @@ module DomainOutbox
       totals = state.fetch("totals")
       family_total = totals.fetch(index)
       family_total["inspected"] += inspected
-      COUNT_KEYS.each { |key| family_total[key] += page.fetch(key.to_sym, 0) }
+      COUNT_KEYS.each { |key| family_total[key] += normalized.fetch(key.to_sym, 0) }
       family_total["budget_exhausted"] ||= page.fetch(:scan_budget_exhausted)
 
       last_id = ids.last || after_id
@@ -134,7 +140,7 @@ module DomainOutbox
       {
         source_type: source_type, family_number: index + 1,
         inspected: inspected,
-        page_counts: COUNT_KEYS.to_h { |key| [key.to_sym, page.fetch(key.to_sym, 0)] },
+        page_counts: COUNT_KEYS.to_h { |key| [key.to_sym, normalized.fetch(key.to_sym, 0)] },
         has_more_in_family: page.fetch(:has_more),
         family_budget_exhausted: page.fetch(:scan_budget_exhausted),
         completed: finished, min_resume_seconds: MIN_PACE_SECONDS,

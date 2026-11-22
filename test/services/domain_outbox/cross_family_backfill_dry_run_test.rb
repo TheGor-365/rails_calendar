@@ -120,4 +120,39 @@ class DomainOutboxCrossFamilyBackfillDryRunTest < ActiveSupport::TestCase
       assert_raises(ArgumentError) { preview(cursor: step[:next_cursor], limit: 1) }
     end
   end
+  test "C2.3b7g maps invitation and transition counters without hiding ineligible sources" do
+    valid = @workspace.client_request_invitations.create!(
+      token_digest: Digest::SHA256.hexdigest(SecureRandom.hex(32)),
+      seed_title: "Fictional invitation", seed_project_type: "rails_bugfix",
+      seed_goal: "A deliberately synthetic invitation for inspection.",
+      service_version_ids: [], client_fact_reviews: {},
+      brief_selections: {}, brief_decisions: {},
+      expires_at: 48.hours.from_now
+    )
+    invalid = @workspace.client_request_invitations.create!(
+      token_digest: Digest::SHA256.hexdigest(SecureRandom.hex(32)),
+      seed_title: "Fictional invalid invitation", seed_project_type: "rails_bugfix",
+      seed_goal: "Synthetic invalid chronology; no real invited client.",
+      service_version_ids: [], client_fact_reviews: {},
+      brief_selections: {}, brief_decisions: {},
+      expires_at: 48.hours.from_now
+    )
+    # Corrupt ONLY a disposable CI fixture to exercise the ineligible alias.
+    invalid.update_columns(revoked_at: 3.days.ago)
+    step = preview(limit: 25)
+    3.times do
+      travel 3.seconds
+      step = preview(limit: 25, cursor: step[:next_cursor])
+    end
+    assert_equal "ClientRequestInvitation", step[:source_type]
+    assert_equal 2, step[:inspected]
+    assert_equal 1, step[:page_counts][:already_indexed]
+    assert_equal 1, step[:page_counts][:ineligible_sources]
+    assert_equal 1, step[:page_counts][:expected_transitions]
+    assert_equal 2, step[:report][3][:inspected]
+    assert_equal 1, step[:report][3][:ineligible_sources]
+    assert_not_includes step.to_json, valid.token_digest
+    assert_not_includes step.to_json, invalid.seed_goal
+  end
+
 end
