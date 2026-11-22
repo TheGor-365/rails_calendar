@@ -1,6 +1,43 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## 2026-11-23 C2.3b7l CODE+CI VERIFIED and production-MVP roadmap checkpoint
+
+**LIVE VERIFIED before this status commit:** existing [Draft PR #81](https://github.com/TheGor-365/rails_calendar/pull/81) OPEN, feature branch `feat/rc0551f-c21c-live-owner-ai-chat-2026-11-18`, functional HEAD [`b381bf419a3e969d59fbcad6593e0190bb0ac858`](https://github.com/TheGor-365/rails_calendar/commit/b381bf419a3e969d59fbcad6593e0190bb0ac858). Four exact-code-SHA jobs COMPLETED **SUCCESS**: [PR Rails CI #45078911430](https://github.com/TheGor-365/rails_calendar/actions/runs/45078911430), [PR Security #45078911405](https://github.com/TheGor-365/rails_calendar/actions/runs/45078911405), [push Rails CI #45078905966](https://github.com/TheGor-365/rails_calendar/actions/runs/45078905966), [push Security #45078906041](https://github.com/TheGor-365/rails_calendar/actions/runs/45078906041). Prior documentation ledger commit [`cbaf430`](https://github.com/TheGor-365/rails_calendar/commit/cbaf430df94d3b3c454af35f15395c8826114abc) also passed all four exact-SHA checks. THIS new checkpoint commit requires its own exact-SHA observations; do not transfer green status automatically.
+
+**C2.3b7l implementation:** four verified files added on functional SHA: pure `lib/domain_outbox/invitation_index_metadata_discriminator.rb`, guarded manual `script/rc0551f_c23b7l_invitation_index_readonly.rb`, synthetic/denial-only tests `test/lib/domain_outbox/invitation_index_metadata_discriminator_test.rb`, and [runbook](RC0551F_C23B7L_INDEX_DISCRIMINATOR_2026-11-23.md). This differentiates expected-name index-definition drift vs alternate index name (valid+ready or not) and multiple candidates, from the previously reviewed fixed `pg_catalog` catalog SELECT. CI only; **NO owner database query performed for C2.3b7l**. Existing consumed C2.3b7k read classified `INDEX_NAME_OR_DEFINITION_DRIFT`, **G5 BLOCKED**, exact cause not yet verified.
+
+**NEXT HARD GATE:** create ONE **new**, detached, clean, SHA-pinned local worktree for the verified C2.3b7l revision; receive owner terminal `LOCAL_WORKTREE_VERIFIED=PASS`, then seek **fresh, separate explicit authorization** for exactly ONE metadata-only PG16 scratch query. Prior C2.3b7j/C2.3b7k permissions are CONSUMED. The user should NOT run C2.3b7l operator until asked with full guard command after approval. Preserve the original dirty checkout (`db/schema.rb` modified), old worktrees, review/source DB `rails_calendar_rc0551f_c21b_review_20261117`, historical scratch `rails_calendar_r04_restore_20261121t231331z_27407`, original backup/media archives, Railway production. No migrations, reindex, data scans, replay, deploy or merge.
+
+**MVP progress map (evidence-gated, NOT percent complete; full DoD/subitems in [MVP roadmap](RAILS_CALENDAR_MVP_EXECUTION_ROADMAP.md)):**
+
+| Roadmap ID | Current evidence/state | Remaining completion gate |
+|---|---|---|
+| R0.1–R0.3 | GitHub HEAD/CI audited, local PG16 DB identity historically owner-verified; original `db/schema.rb M` | Reconfirm target/effective Rails connection before any DB change; preserve dirty trees |
+| R0.4 | Private DB+storage backup and isolated scratch restore plus R0.4c4/c5 independent audits owner-reported PASS | **17-table G5 catalog mismatch BLOCKED** (b7j/k); full source/media/tenant/prod restore conditions not all verified |
+| R0.5–R0.6 | CI and Security for functional C2.3b7l SHA verified; safety gates/runbooks exist | Owner browser role/viewport QA, release config and rollback signoff |
+| C2.2.1–C2.2.6 | Month/day/hour/source calendar code + CI | Owner manual browser signoff; responsive/accessibility/locales and anchor UX acceptance |
+| C2.3a.1–a.4 | Source event recorder/links code and historic CI | Browser source/ACL/deleted-source validation |
+| C2.3b1–b5 | Requirements/AI/invite/published-service/intake and scope transaction-outbox adapters code+CI | Local review DB not migrated, no global replay/production release |
+| C2.3b6 | Health, diagnostics, guarded replay service and synthetic CSRF tests code+CI in slices | Live owner HTTP POST still DISABLED; concurrent/operational/recovery release gates |
+| C2.3b7a–f | Six source-family read-only reconciliation tooling code+CI (historical ledger evidence); no real owner source scan | No legacy backfill writer, new authorization needed for any owner DB read |
+| C2.3b7g–l | Offline operator rehearsal + catalog contracts; b7j one local read BLOCKED, b7k local drift classified, b7l code+CI verified | G5 remains BLOCKED; new worktree and independent consent for C2.3b7l only after gates |
+| C2.3c1–c6 | Legacy calendar/library/inbox projections partial | Authorized general registry, deterministic idempotent rebuild and lag/consistency metrics |
+| C2.4.1–c8 | Existing AI conversation/provider work only; full reviewed Action Engine not verified | Typed proposals, budget/consent, preview/approve/apply/version/rollback and multi-target source projections |
+| E1.1–1.2, E2.1–E2.3 | Substantial existing client cabinet/requests/invites/discovery/R-ID versions | Complete current-code gap audit + owner/client real-browser negative/positive acceptance |
+| E2.4a–f | E2.4c immutable diff code + historic CI; remainder partial | Precise answer provenance, dependency/unknowns, 12-section client+owner views, real versioned private exports |
+| E2.5.1–5 | Not verified as end-to-end | Independent owner+client approval exact immutable spec/digest, change requests, ACL/audit |
+| M6.1–5 | Not verified as integrated workflow | Authorized spec→project/tasks/milestones/calendar/R-ID execution |
+| M7.1–5 | Not verified as end-to-end | Durable private artifacts, commits/tests/QA, handoff, explicit client delivery acceptance |
+| M8.1–7 | No current release claim; blocked | PG18 restore and media, security/roles, staging, Railway owner-approved deploy, monitoring/smoke/rollback, consented real pilot/payment separately |
+
+**Important distinction:** `CODE_COMMITTED`/`CI_VERIFIED` for multiple slices do NOT equal `LOCAL_BROWSER_VERIFIED`, `DB_VERIFIED` for main review DB, `DEPLOYED` or actual client revenue. Do not count fictional synthetic work as commercial success. Keep PR Draft; no main merge, Railway deploy, paid provider calls, real invitations or business data until separately authorized.
+
+**Next sequence after the current safety gate:** finish C2.3b7l root-cause identification and independently reviewed backup-safe remediation (if necessary) → close C2.3b6/b7 replay/backfill permissions and R0 restore/source consistency → C2.2 manual UX acceptance → C2.3c projections → C2.4 human-reviewed AI actions → audit E1–E2.3 existing client workflow → finish E2.4 provenance/12-section spec → E2.5 dual approval → M6 delivery plan → M7 artifacts and client acceptance → M8 security, restore, deploy and real authorized pilot.
+
+
+
+
 ## C2.3b7k one-shot PG16 index metadata result — 23 November 2026 (OWNER TERMINAL)
 
 **Latest confirmed evidence (supersedes earlier C2.3b7k NOT AUTHORIZED/PENDING notes below):** the owner separately approved exactly ONE catalog-only PostgreSQL 16 read for scratch `rails_calendar_r04_restore_20261121t231331z_27407`; consent was recorded in [PR #81 approval checkpoint](https://github.com/TheGor-365/rails_calendar/pull/81#issuecomment-7086899439). Owner terminal confirmed clean detached worktree `/home/gor/rails_calendar_c23b7k_index_worktree_20261123` pinned to `cc5bd7aeaa99b03392072444dd2a613309fef527`. The guarded script `script/rc0551f_c23b7k_invitation_index_readonly.rb` ran once under direct Ruby 3.4.13, using the fixed `pg_catalog`-only PostgreSQL 16 SELECT and readonly socket-bound connection. The owner-reported stdout was:
