@@ -1,0 +1,25 @@
+# C2.3b7d — ClientRequestInvitation transition-version read-only dry-run
+
+**2026-11-22 | Draft [PR #81](https://github.com/TheGor-365/rails_calendar/pull/81) | CODE_COMMITTED / EXACT-SHA CI_PENDING | NO REPLAY OR BACKFILL WRITES**
+
+## Authoritative transition mapping and exclusions
+
+`DomainOutboxEvent::INVITATION_EVENT_FIELDS` maps four distinct lifecycle events, not four versions of the same event: `invitation_issued` version **1** at `created_at`; `invitation_claimed` version **2** at `claimed_at`; `invitation_submitted` version **3** at `submitted_at`; `invitation_revoked` version **4** at `revoked_at`. `ClientRequestInvitation` initial create/after_update callbacks persist source envelope and ActivityEvent with event key `ClientRequestInvitation:<id>:<kind>`. The invitation's `state` may report `expired` based on current time, but **expiration does not create an outbox event**; never invent a fifth `expired` backfill event.
+
+Source chronology is not interchangeable: issued only, issued then claimed, issued+claimed then submitted, or issued then revoked before claim. `claimed_at` must have claimed_by_user and linked `ProjectIntake` in the SAME workspace; `submitted_at` without `claimed_at`, claim preceding creation, revoked before creation, or revoked alongside claim/submission is an invalid source history requiring human review. A DB CHECK protects the claim triplet but not every historical chronology or workspace link. **The code classifies violations, never repairs them.**
+
+## Implemented read-only inspection
+
+[Code `0de7817`](https://github.com/TheGor-365/rails_calendar/commit/0de7817b4486ba4345572b2eaefae097ecf482bb) adds `DomainOutbox::InvitationTransitionBackfillDryRun.preview(owner:,limit:,cursor:)`; [synthetic test correction `af3e7ef`](https://github.com/TheGor-365/rails_calendar/commit/af3e7ef7f817db24c07dce58942764a39bac0d53). Scoped to persisted owner/workspace via `OperatorAccess`, SELECT-only invite/linked intake metadata: numeric IDs/workspace IDs, `created_at`, `claimed_at`, `submitted_at`, `revoked_at`. No raw invitation bearer, token_digest, seed_goal, seed_title, client answers or AI data is plucked or returned.
+
+For EACH ELIGIBLE present lifecycle timestamp, uniquely match outbox source ID/type, per-kind `source_version`, kind, exact event timestamp (seconds), and ActivityEvent key/subject/kind/timestamp/empty metadata. Four ordinary statuses (`already_indexed`, `projection_only`, `envelope_only`, `missing_both`) plus `inconsistent_records`, `ineligible_invitations`, `unexpected_artifacts`. **Unexpected artifacts** count absent transition kinds for which outbox or activity nevertheless exists; they are not repair candidates. Bad lineage/chronology causes the invitation source to be ineligible, excluded from expected event counts. No raw source IDs or user content in response.
+
+Returned fields: `source_type`, `inspected_invitations`, `expected_transitions`, seven aggregate categories, `has_more`, `scan_budget_exhausted`, encrypted `next_cursor`. A page is bounded at 25 invitations (up to 100 per-kind checks), a cursor chain at 250 invitation sources, 15-minute AES-256-GCM owner/workspace/family-bound keyset cursor with initial maximum source ID ceiling; data across pages may change, no serializable snapshot or global reconciliation is asserted.
+
+Tests create fictional invitation issued/claimed/submitted/revoked lifecycle histories in ephemeral GitHub Actions DB, simulate missing synthetic envelopes/projections to cover 4 categories, wrong envelope version and activity timestamp, submitted without claim, revoked after claim, foreign linked intake, extra historical event with absent transition, owner/client/guest denial, wrong-family/tampered cursor and 250 invitation scan budget; assert zero DB/outbox/activity/journal/AI changes DURING read-only preview.
+
+## CI, non-goals and next work
+
+Corrected functional SHA `af3e7ef`: check exact [Rails CI](https://github.com/TheGor-365/rails_calendar/actions?query=branch%3Afeat%2Frc0551f-c21c-live-owner-ai-chat-2026-11-18) and Security workflows for full model/controller, Chrome, PG18 fresh/upgrade and security success before setting `CI_VERIFIED`. Source original SHA `0de7817` may have superseded CI. No test-only DELETE/UPDATE operation runs against a user's data; fixture modifications are isolated to ephemeral CI test DB. No HTTP route, scheduler, real replay, outbox writer/backfill, AI charges, Railway, `main` or local PG16 DB access.
+
+After b7d CI gate: ServiceOfferingPublication publish/unpublish metadata/approval and OwnerAiMessage settled-spend linkage. Then bounded operator pacing, cross-family before/after summary, source stability and human approval. Prior scratch migration authorization did NOT authorize actual historical data scan or mutation.
