@@ -95,7 +95,7 @@ An aggregated 0-anomaly comparison by itself cannot certify historical correctne
 - [x] Inspect latest six-family scanner and prior owner-terminal R0.4 restore/migration evidence.
 - [x] Publish no-execution runbook, go/no-go matrix, anomaly routing and report shape.
 - [x] Add model-free pure Ruby aggregate report validator/comparator and hermetic negative synthetic tests.
-- [ ] Verify exact feature SHA Rails CI / Security Audit; update canonical execution status with links.
+- [x] Exact functional SHA [573e2f3](https://github.com/TheGor-365/rails_calendar/commit/573e2f3c21e244f2aa98bf7ca0046dba7878f4d9): [Rails CI #45068355550](https://github.com/TheGor-365/rails_calendar/actions/runs/45068355550) SUCCESS (478 model/controller tests / 7214 assertions; 49 Chrome tests / 755 assertions; PG18 fresh/upgrade SUCCESS) and [Security Audit #45068355582](https://github.com/TheGor-365/rails_calendar/actions/runs/45068355582) SUCCESS. Canonical execution status update is tracked in its separate documentation commit.
 - [ ] Separate owner approval for any isolated non-synthetic DB restore, read-only historical scan or writer.
 - [ ] Independent same-cohort and backup/restore attestation; real before/after; manual C2.2 QA; release/production gates.
 
