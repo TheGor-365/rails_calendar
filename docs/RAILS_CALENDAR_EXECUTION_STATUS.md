@@ -1,6 +1,27 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## 2026-11-23 C2.3b7l owner worktree verified — OWNER TERMINAL
+
+**Direct evidence (owner terminal, 2026-11-23):** ran the guarded Git-only fetch and detached worktree creation from the existing R0.4 scratch checkout. Fetched branch `feat/rc0551f-c21c-live-owner-ai-chat-2026-11-18`; command verified remote documentation HEAD `d129bdafd1f64a4a3e2e7c8b2810922496b5ed67` and that prior code SHA `b381bf419a3e969d59fbcad6593e0190bb0ac858` is its ancestor and the index discriminator/operator/test code did not differ. Created NEW detached clean worktree `/home/gor/rails_calendar_c23b7l_index_worktree_20261123` at **pinned functional code SHA `b381bf419a3e969d59fbcad6593e0190bb0ac858`** (NOT the latest docs SHA). Output confirmed:
+
+```text
+C23B7L_WORKTREE=PASS
+PINNED_CODE_HEAD=b381bf419a3e969d59fbcad6593e0190bb0ac858
+WORKTREE_CLEAN=PASS
+DATABASE_NOT_ACCESSED=TRUE
+C23B7L_QUERY_NOT_AUTHORIZED=TRUE
+```
+
+**Exact-SHA CI status verified from GitHub:** functional `b381bf4` all 4 workflows SUCCESS (PR Rails #45078911430; PR Security #45078911405; push Rails #45078905966; push Security #45078906041). Prior documentation `d129bda` also all 4 workflows SUCCESS: [PR Rails #45079421014](https://github.com/TheGor-365/rails_calendar/actions/runs/45079421014), [PR Security #45079421046](https://github.com/TheGor-365/rails_calendar/actions/runs/45079421046), [push Rails #45079416574](https://github.com/TheGor-365/rails_calendar/actions/runs/45079416574), [push Security #45079416603](https://github.com/TheGor-365/rails_calendar/actions/runs/45079416603). This new status-only commit has its own independent CI checks; do not claim its checks green before verification.
+
+**Current gate:** `C2.3b7l CODE+CI=VERIFIED; LOCAL_WORKTREE_VERIFIED=PASS (owner terminal); OWNER_APPROVAL=NOT_YET_RECEIVED; C2.3b7l ONE_PG16_CATALOG_READ=NOT_EXECUTED; G5=BLOCKED`. Historic C2.3b7j/C2.3b7k owner-query authorizations are consumed. Prior C2.3b7k classification `INDEX_NAME_OR_DEFINITION_DRIFT` remains the only live observation; precise index name/validity/definition cause unknown. No new DB access occurred in this step. Safe operator uses pg_catalog-only fixed SELECT, exact role/database/socket/PG16/read-only/clean SHA guards and no raw metadata display. New explicit owner authorization required for exactly ONE query to historical scratch `rails_calendar_r04_restore_20261121t231331z_27407` before providing a runnable local operator command.
+
+**Preservation:** existing dirty `rails_calendar_ai_c21c` checkout (`db/schema.rb`), previous operator worktrees, review/source DB, scratch, private database/media backups, Railway and main not touched by the worktree creation. No migrations, index correction/reindex, raw source rows, replay/writer, production or paid provider calls authorized. Next: obtain owner consent for ONE C2.3b7l bounded catalog read, then assess result and record in this ledger and PR; any repair requires a different review/backup and owner authorization.
+
+
+
+
 ## 2026-11-23 C2.3b7l CODE+CI VERIFIED and production-MVP roadmap checkpoint
 
 **LIVE VERIFIED before this status commit:** existing [Draft PR #81](https://github.com/TheGor-365/rails_calendar/pull/81) OPEN, feature branch `feat/rc0551f-c21c-live-owner-ai-chat-2026-11-18`, functional HEAD [`b381bf419a3e969d59fbcad6593e0190bb0ac858`](https://github.com/TheGor-365/rails_calendar/commit/b381bf419a3e969d59fbcad6593e0190bb0ac858). Four exact-code-SHA jobs COMPLETED **SUCCESS**: [PR Rails CI #45078911430](https://github.com/TheGor-365/rails_calendar/actions/runs/45078911430), [PR Security #45078911405](https://github.com/TheGor-365/rails_calendar/actions/runs/45078911405), [push Rails CI #45078905966](https://github.com/TheGor-365/rails_calendar/actions/runs/45078905966), [push Security #45078906041](https://github.com/TheGor-365/rails_calendar/actions/runs/45078906041). Prior documentation ledger commit [`cbaf430`](https://github.com/TheGor-365/rails_calendar/commit/cbaf430df94d3b3c454af35f15395c8826114abc) also passed all four exact-SHA checks. THIS new checkpoint commit requires its own exact-SHA observations; do not transfer green status automatically.
