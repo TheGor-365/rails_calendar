@@ -33,7 +33,10 @@ class DomainOutboxSettledAiReplyBackfillDryRunTest < ActiveSupport::TestCase
       professional_profile: profile, operation: operation, model: "synthetic-no-provider",
       request_digest: Digest::SHA256.hexdigest(SecureRandom.uuid),
       status: status, reserved_ticks: 0, charged_ticks: status == "settled" ? 0 : nil,
-      resolved_at: status == "settled" ? Time.current : nil
+      # Direct-create settled fixtures, like the existing outbox model test,
+      # have no recorded resolution transition; don't fabricate one a few
+      # microseconds BEFORE ActiveRecord sets ledger created_at.
+      resolved_at: nil
     )
   end
 
