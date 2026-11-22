@@ -1,0 +1,23 @@
+# C2.3b7e — Immutable ServiceOfferingPublication read-only reconciliation
+
+**2026-11-22 · Draft [PR #81](https://github.com/TheGor-365/rails_calendar/pull/81) · CODE_COMMITTED / CI_PENDING · NO BACKFILL WRITER**
+
+## Canonical evidence and identity
+
+`ServiceOfferingPublication` is an immutable audit with two kinds, `event=publish` -> outbox `kind=service_published` or `event=unpublish` -> `kind=service_unpublished`. Each publication row is a distinct immutable source ID and always `source_version=1`, `occurred_at=publication.created_at`. `after_create` enqueues an outbox envelope in the same source transaction; `after_create_commit` records an ActivityEvent keyed `ServiceOfferingPublication:<id>:<kind>`. Source model validation guarantees owner identity, approved same-offering version for publish and NULL version for unpublish at normal create. Historical corruption, a direct SQL change or a missing source reference must NOT be treated as safe to rebuild.
+
+**Critical historical distinction:** `ServiceOffering.published_version_id` and `ServiceOffering.approved_version_id` are mutable current presentation/approval pointers; old publication rows remain canonical after later unpublishing, reapproving or changing offering. The preview MUST NOT validate against the current published pointer; instead it checks the immutable publication row's owner, event, exact approved **version association** and `created_at`. `publish` is eligible only when version belongs to the exact offering, has `approved_at` and that approval preceded publication. `unpublish` is eligible only with NULL version reference. Both require source owner ID equals workspace owner ID.
+
+## Implementation
+
+[Feature SHA `cc8efdd`](https://github.com/TheGor-365/rails_calendar/commit/cc8efdd6da815c39661308bdec29c63ae3949979): `app/services/domain_outbox/publication_backfill_dry_run.rb` and `test/services/domain_outbox/publication_backfill_dry_run_test.rb`. Persisted authenticated owner checked by `OperatorAccess.workspace_for!`; all DB queries filtered by same workspace's offering join. SELECT only audit row id, event kind, owner, related offering/version ids, approval and publication timestamps, plus matching outbox and ActivityEvent identity/version/time/empty metadata. NOT SELECTed: title/summary/scope description, client content, prompts/files, provider outputs, costs or any token.
+
+Expected successful presence classifications: `already_indexed`, `projection_only`, `envelope_only`, `missing_both`. `inconsistent_records` flags wrong outbox version/time and invalid ActivityEvent identity/time/metadata or contradictory opposite kind. `ineligible_sources` counts invalid source owner/event/approval/association/chronology (excluded from expected output); `unexpected_artifacts` separately counts extraneous opposite kind outbox/projection. Returned fields are aggregate counts, `inspected`, `has_more`, `scan_budget_exhausted` and opaque encrypted `next_cursor`. No per-source ID or text in the result.
+
+Strict bounds: integer 1..25 publication rows per page, <=250 rows per cursor chain, initial MAX(source.id) ceiling, 15-minute purpose-separated AES-GCM owner/workspace/type-bound cursor, no renewal at exhaustion; no cross-page transactional snapshot. A preview call is SELECT-only. Synthetic test setup may create/update/delete only fictional fixture records in ephemeral CI test DB; test assertions verify zero actual changes during the service calls.
+
+## Tests and status gates
+
+Tests cover publication+unpublication histories referring to one offering despite current published pointer NIL; all four presence statuses; foreign owner exclusion, mismatched version/offering association, unapproved draft version, contradictory nonempty unpublish version, outbox version and projection time drift, opposite kind artifacts, malformed/foreign cursor, invalid actors and batch limit, total budget stop, no outbox/journal/activity/AI writes during preview. The preview does not invoke Activity::Recorder, Replayer, paid AI, scheduler or any HTTP route.
+
+Exact feature SHA `cc8efdd`: [Rails CI #45051804505](https://github.com/TheGor-365/rails_calendar/actions/runs/45051804505), [Security Audit #45051804560](https://github.com/TheGor-365/rails_calendar/actions/runs/45051804560) are **PENDING at initial checkpoint**. Do not label CI verified until all exact SHA checks finish green. b7d docs SHA `65bca63` Rails #45051106255 and Security #45051106240 SUCCESS. No local PG16 review or scratch DB read/write, schema change, private backup cleanup, Railway/main change or replay. Next b7f settled AI reply linkage; then global pacing/resume/reconciliation, any writer separately authorized.
