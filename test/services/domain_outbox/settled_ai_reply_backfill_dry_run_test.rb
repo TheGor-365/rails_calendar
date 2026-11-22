@@ -143,12 +143,15 @@ class DomainOutboxSettledAiReplyBackfillDryRunTest < ActiveSupport::TestCase
   end
 
   test "C2.3b7f contradictory artifacts are not treated as canonical activity" do
-    DomainOutboxEvent.create!(
+    # A conflicting kind violates normal validations. Corrupt ONLY the
+    # synthetic test row via direct column update to simulate historical drift.
+    extra = DomainOutboxEvent.create!(
       workspace: @workspace, source_type: "OwnerAiMessage",
-      source_id: @complete.id, source_version: @complete.sequence,
-      kind: "unrelated_kind", occurred_at: @complete.created_at,
+      source_id: @complete.id, source_version: @complete.sequence + 1,
+      kind: "ai_reply_saved", occurred_at: @complete.created_at,
       state: "pending", attempts: 0
     )
+    extra.update_columns(kind: "unrelated_kind")
     result = preview
     assert_equal 1, result[:unexpected_artifacts]
     assert_equal 1, result[:inconsistent_records]
