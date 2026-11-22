@@ -18,6 +18,7 @@ class OwnerOutboxReplayRun < ApplicationRecord
     format: { with: /\A[A-Za-z0-9_:]+\z/ }, allow_nil: true
   validates(*COUNTERS, numericality: { only_integer: true, greater_than_or_equal_to: 0 })
   validate :owner_workspace_matches
+  validate :strict_limit_input, if: -> { new_record? || will_save_change_to_requested_limit? }
   validate :run_timing_and_counts
 
   private
@@ -28,6 +29,14 @@ class OwnerOutboxReplayRun < ApplicationRecord
       workspace.persisted? && workspace.owner_user_id == owner_user.id
 
     errors.add(:owner_user, "must own the replay workspace")
+  end
+
+  # PostgreSQL integer casting accepts "10" -> 10. A privileged replay
+  # command must still refuse a string input, not silently normalize it.
+  def strict_limit_input
+    return if requested_limit_before_type_cast.is_a?(Integer)
+
+    errors.add(:requested_limit, "must be an explicit integer")
   end
 
   def run_timing_and_counts
