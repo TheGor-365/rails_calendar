@@ -50,6 +50,8 @@ class OwnerOutboxHealthControllerTest < ActionDispatch::IntegrationTest
       assert_select "form[action=?][method='get']", owner_outbox_health_path
       assert_select "form[action*='replay']", count: 0
       assert_select "[data-outbox-health] form[method='post']", count: 0
+      assert_select "[data-outbox-operator-preparation][data-replay-enabled='false']", count: 1
+      assert_select "[data-outbox-operator-preparation] button", count: 0
       assert_no_match(/#{@own_event.source_id}|#{@foreign_event.source_id}|#{@secret}/, response.body)
 
       get owner_outbox_health_path(limit: "10")
@@ -89,6 +91,15 @@ class OwnerOutboxHealthControllerTest < ActionDispatch::IntegrationTest
     get owner_outbox_health_path
     assert_response :not_found
     assert_select "[data-outbox-health]", count: 0
+  end
+
+  test "C2.3b6b2.4a replay POST route remains absent for all actor roles" do
+    assert_raises(ActionController::RoutingError) do
+      Rails.application.routes.recognize_path("/workspace/outbox/replay", method: :post)
+    end
+    assert_raises(ActionController::RoutingError) do
+      Rails.application.routes.recognize_path("/workspace/outbox/health", method: :post)
+    end
   end
 
   test "C2.3b6b newly registered owner without workspace is denied" do

@@ -27,3 +27,8 @@ en:
       age: "Age"
     empty: "No candidates currently due."
     no_replay: "Read-only dashboard. No replay, publication or AI generation is available here."
+    operator_gate:
+      title: "Operator replay — not enabled"
+      description: "A future action will require owner authentication, a CSRF-protected POST, a strictly scoped batch and an explicit typed confirmation."
+      limits: "Planned manual batch sizes: 1, 5, 10 or 25."
+      disabled: "No replay action is available on this page. Preview does not execute events."

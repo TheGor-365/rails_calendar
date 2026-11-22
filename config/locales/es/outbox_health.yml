@@ -27,3 +27,8 @@ es:
       age: "Edad"
     empty: "No hay candidatos disponibles."
     no_replay: "Panel de solo lectura. No permite recuperar, publicar ni generar con IA."
+    operator_gate:
+      title: "Repetición manual — desactivada"
+      description: "La futura acción requerirá autenticación del propietario, POST protegido contra CSRF, lote limitado y confirmación escrita exacta."
+      limits: "Tamaños previstos de lote: 1, 5, 10 o 25."
+      disabled: "No hay opción de ejecutar aquí. La vista previa no procesa eventos."

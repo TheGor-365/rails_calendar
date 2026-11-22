@@ -74,4 +74,12 @@
     <% end %>
     <p class="rc-notice rc-notice--neutral mt-3 mb-0"><%= t("outbox_health.no_replay") %></p>
   </section>
+
+  <section class="surface-panel p-3 p-sm-4 mt-4" aria-labelledby="outbox-operator-gate-title"
+           data-outbox-operator-preparation data-replay-enabled="false">
+    <h2 class="h5" id="outbox-operator-gate-title"><%= t("outbox_health.operator_gate.title") %></h2>
+    <p class="rc-muted"><%= t("outbox_health.operator_gate.description") %></p>
+    <p class="rc-muted"><%= t("outbox_health.operator_gate.limits") %></p>
+    <p class="rc-notice rc-notice--neutral mb-0"><%= t("outbox_health.operator_gate.disabled") %></p>
+  </section>
 </div>
