@@ -1,6 +1,6 @@
 # C2.3b7b — IntakeScopeRevision immutable version dry-run (READ-ONLY)
 
-**Date:** 2026-11-22 | Draft [PR #81](https://github.com/TheGor-365/rails_calendar/pull/81). **Status:** CODE_COMMITTED / EXACT-SHA CI PENDING. NO BACKFILL WRITES.
+**Date:** 2026-11-22 | Draft [PR #81](https://github.com/TheGor-365/rails_calendar/pull/81). **Status:** CODE + CI VERIFIED (READ-ONLY scope-revision first slice). NO BACKFILL WRITES.
 
 ## Authoritative existing contract
 
@@ -20,6 +20,6 @@ Tests exercise the four source/envelope/projected categories, distinct owner iso
 
 ## Release boundary and follow-up
 
-Functional exact code SHA `73e608a` [Rails CI #45031103806](https://github.com/TheGor-365/rails_calendar/actions/runs/45031103806), [Security #45031103830](https://github.com/TheGor-365/rails_calendar/actions/runs/45031103830): **check exact completed result before marking CI VERIFIED**. Previous docs SHA `2949d89` Rails #45029051422 and Security #45029051469 SUCCESS.
+Functional exact corrected code SHA `73e608a` [Rails CI #45031103806](https://github.com/TheGor-365/rails_calendar/actions/runs/45031103806) **SUCCESS** across model/controller, Chrome and PG18 fresh/deployed-upgrade; [Security #45031103830](https://github.com/TheGor-365/rails_calendar/actions/runs/45031103830) **SUCCESS**. **CI_VERIFIED for private read-only `IntakeScopeRevision` reconciliation in synthetic CI only**; NOT production scan, approval of missing-event repair or real backfill writer. Previous docs SHA `2949d89` Rails #45029051422 and Security #45029051469 SUCCESS.
 
 Remaining C2.3b7: `IntakeRequirementSet` source version/lineage, `ClientRequestInvitation` transition time/version mapping, `ServiceOfferingPublication` immutable published-version authority, `OwnerAiMessage` settled+ledger linkage; independent rate/pacing, resume, before/after evidence, unexpected-row handling and scope-specific operator approval for any actual backfill. Old R0.4c4/c5 scratch DB verification is independent and DOES NOT grant permission to backfill, replay, scan owner data or release an HTTP POST. Original review DB, scratch, private backup, 3 dirty schema files, Railway/main protected.
