@@ -74,3 +74,9 @@ With explicit prior owner authorization, the guarded Rails command printed `RAIL
 ## First independent audit invocation STOP — correct psql executable path (22 Nov 2026)
 
 Operator attempted read-only SQL audit but the supplied audit shell used `psql_bin='/usr/lib/postgresql/16/bin'` (directory); immediate first helper call printed `main: строка 17: /usr/lib/postgresql/16/bin: Это каталог` then `STOP: IDENTITY_20261117 query failed`. Neither SQL inspection nor any DB writer was performed in this invocation. This is an assistant command bug, not a database test failure; **independent audit is still PENDING**. Next run uses `psql_bin='/usr/lib/postgresql/16/bin/psql'` and `[[ -f "$psql_bin" && -x "$psql_bin" ]]` before queries. Do not rerun migration/restore or change private data. All SQL remains `default_transaction_read_only=on`.
+
+## Independent scratch migration catalog audit PASS — 22 Nov 2026
+
+Operator independently verified PG16 source/scratch identities, original lacks outbox, scratch has table/version once, baseline migrations identical after excluding target, public table delta +1, five non-migration row counts equal, outbox 0 rows, eight NOT NULL fields, valid unique and queue indexes, valid workspace FK and all three named CHECK constraints. Terminal concluded `R0_4C4_INDEPENDENT_READ_ONLY_DB_AUDIT=PASS` and `NO_DATABASE_WRITES=TRUE`. **R0.4c4 = DB_VERIFIED_SCRATCH only**; source review DB and Railway were not migrated. Private archive and scratch retained, isolated Git tree's `db/schema.rb` not to be reset.
+
+Product follow-on: [C2.3b6 supervised replay gap audit](RC0551F_C23B6_SUPERVISED_REPLAY_GAP_AUDIT_2026-11-22.md).
