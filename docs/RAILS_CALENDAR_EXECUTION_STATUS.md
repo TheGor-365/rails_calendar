@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## C2.3b7a ProjectIntake-only bounded legacy backfill DRY-RUN — 22 Nov 2026
+
+**New code [`4fd8822`](https://github.com/TheGor-365/rails_calendar/commit/4fd8822f2d2cacd40643a621a51f7fd76ab8b004):** `DomainOutbox::BackfillDryRun.preview(owner:,limit:,cursor:)` introduces the FIRST **source-to-outbox** legacy dry-run preview for canonical workspace-owned `ProjectIntake` v1 only. Distinct from existing due-queue `Health.preview`. Page limit strict 1..25, encrypted owner/workspace-scoped 15-minute keyset cursor, frozen ceiling source ID, max 250 inspected per scan chain. Only aggregated `already_indexed` / `projection_only` / `envelope_only` / `missing_both` counts, safe `has_more`/`scan_budget_exhausted`/opaque cursor returned; no title/body/answer/source ID in output. Synthetic negative tests check cross-tenant, malformed cursor/limit, four missing-record states, paging and no changes to outbox/ActivityEvent/AiSpendEntry/replay ledger. Test fixtures intentionally delete only synthetic CI records. **NO backfill insertion, migration, replay, POST/GET route, Railway or local DB read/write.** See [C2.3b7a design/test contract](RC0551F_C23B7A_LEGACY_BACKFILL_DRYRUN_2026-11-22.md).
+
+**CI checkpoint:** code SHA `4fd8822`, [Security #45028711042](https://github.com/TheGor-365/rails_calendar/actions/runs/45028711042) SUCCESS, [Rails CI #45028711017](https://github.com/TheGor-365/rails_calendar/actions/runs/45028711017) IN_PROGRESS at creation; do not mark full CI-verified until exact run concludes. Prior feature+docs SHA `e647739` Rails #45028245547 and Security #45028245575 SUCCESS. **Scope:** `C2.3b7a = CODE_COMMITTED / CI PENDING`; entire C2.3b7 remains **IN PROGRESS** with other sources/pacing/reconciliation and any writes gated.
+
+
 ## C2.3b6b2.4b preflight CSRF-on TEST-ONLY HTTP route CODE + CI VERIFIED — 22 Nov 2026
 
 **Implementation code SHA:** [`9793d2a`](https://github.com/TheGor-365/rails_calendar/commit/9793d2a76096c6b6ed8e6961598084b06435649c) added ONLY `test/controllers/owner_outbox_replay_csrf_preflight_test.rb`, a **test-only controller** inheriting `ApplicationController` and a temporary isolated `ActionDispatch::Routing::RouteSet` for `/__test_only__/outbox/intent`; the application `config/routes.rb` is UNCHANGED and still lacks `POST /workspace/outbox/replay`. In tests the controller has `protect_from_forgery with: :exception`, with forgery protection explicitly enabled and restored after the test. It checks real Rails authenticity token accept/reject, authenticated owner session via a synthetic DB-backed `UserSession`, exact owner/workspace+batch+phrase via the existing `OperatorConfirmation`, guest/client denial and zero DB deltas for ledger/outbox/ActivityEvent/AI spend. It **NEVER** calls `SupervisedReplay.run!`, `Replayer.run!`, scheduler, external AI, or production DB. Synthetic users and ephemeral CI databases only. This is *preflight* CSRF evidence, NOT replay action CSRF acceptance or HTTP execution authorization.
@@ -386,7 +393,8 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 | `C2.3b6b2.4b` Actual owner replay POST with CSRF + release | **NOT IMPLEMENTED / NOT AUTHORIZED** | Existing GET-only diagnostic/disabled panel; no route or executor call | Separate owner DB scope/migration approval, CSRF-on negative tests, confirmation UX and manual browser acceptance mandatory. |
 
 
-| `C2.3b7` Dry-run backfill, bounded pacing and reconciliation | **NOT IMPLEMENTED / NOT VERIFIED** | future substep | no production scans or auto-backfill |
+| `C2.3b7a` ProjectIntake-only source-to-envelope reconciliation DRY-RUN | **CODE_COMMITTED / CI PENDING; READ-ONLY** | Code `4fd8822`: bound 25/page, 250/chain, encrypted scoped 15-min cursor, four aggregate reconciliation states, no-write synthetic tests; Security #45028711042 SUCCESS | Rails CI #45028711017 pending; no HTTP route; other source mappings not audited, no actual backfill. |
+| `C2.3b7b+` Additional canonical source backfill policies, bounded pacing and authorized writer | **NOT IMPLEMENTED / NOT AUTHORIZED** | Single ProjectIntake preview only | No automatic source scan, retry, API, provider usage or production release. |
 
 | `C2.3c.1–c6` Deterministic projection registry and consistency | **PARTIAL legacy projections** | Calendar OwnerActivity, OwnerArtifacts, Activity Inbox | generalized subscription/rebuild/lag metrics not done |
 | `C2.4.1–c8` Validated AI ActionProposal and approved multi-target apply | **NOT VERIFIED** | earlier AI chat/composer ≠ Action Engine | schema/preview/ACL/cost/apply/version/rollback |
@@ -402,10 +410,10 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 
 ## 4. Immediate next *unverified* step
 
-1. **R0.4c4 & R0.4c5 `DB_VERIFIED_SCRATCH`.** Exact PG16 owner independent audit confirmed two added tables/migrations on isolated scratch only; source review unmigrated, backups+three local schema worktrees preserved. Do not rerun either migration or invoke live replay.
-2. **C2.3b6b2.4b CSRF-on preflight CODE + CI VERIFIED (TEST-ONLY):** exact SHA `9793d2a`, Rails #45027895477 and Security #45027895486 SUCCESS including real CSRF-on verification, Chrome/PG18; only temporary CI test routes exist. **Do NOT enable actual `POST /workspace/outbox/replay` based on this result.**
-3. **Actual owner replay POST still DISABLED / NOT AUTHORIZED**: separate owner signoff for route activation, explicit CSRF-on HTTP/browser positive and negative test, persisted actor audit, duplicate/cooldown/failed-run semantics and no surprises with local schema. Do not open writer based on scratch migration alone.
-4. **Next independent no-write code:** C2.3b7 bounded replay/backfill dry-run preview design and synthetic tests (existing Health/preview stay read-only); then C2.3c → C2.4 → E1–E2.5 → M6–M8 after gates.
+1. **R0.4c4/R0.4c5 `DB_VERIFIED_SCRATCH`, protected**: local scratch has ONLY the two approved outbox+ledger migrations, original source review DB has neither. No further local migration, recovery writer, replay, Railway or schema cleanup.
+2. **C2.3b7a ProjectIntake-only read-only dry-run `4fd8822` CODE_COMMITTED**: inspect exact Rails CI #45028711017/Security #45028711042; fix any failure before calling CI VERIFIED. 25/page, 250 per cursor chain, 4 aggregate classifications with encrypted scoped cursor. This is NOT a backfill writer and has no endpoint.
+3. **NEXT after green:** extend source mappings and version/timestamp eligibility one family at a time in ephemeral CI synthetic tests. Add bounded operator pacing/resume policy and explicit reconciliation before/after acceptance; scan only a separately approved environment. The real owner-only POST remains unimplemented/unapproved.
+4. **Roadmap later:** C2.3c deterministic projections → C2.4 human-reviewed AI actions → E1–E2.5 → M6–M8; separate local C2.2 browser role/viewport QA still pending.
 
 ## 5. Registry update rule (mandatory after any code work)
 
