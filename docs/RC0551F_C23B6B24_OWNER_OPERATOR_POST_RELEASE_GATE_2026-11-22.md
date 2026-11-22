@@ -23,3 +23,7 @@
 `test/services/domain_outbox/operator_confirmation_test.rb` checks exact accepted/rejected owner/HTTP batch/phrase and zero writes. `test/controllers/owner_outbox_health_controller_test.rb` checks read-only info panel and **no routable POST**. These are NOT CSRF-on, not the owner POST action and not a release. Future tests must explicitly enable forgery protection and exercise real POST with valid/invalid CSRF tokens, replay noop on denied requests, same-token duplicate semantics, two users/tenants, browser refresh, and any failure conditions with audit trail.
 
 **DoD for stage a:** exact-SHA model/controller/Chrome/PG18/Security CI success, source+CI only. **DoD for stage b:** separately authorized DB/release scope, actual POST controller/UI implementation, CSRF-on testing and live role browser acceptance; no silent transition.
+
+## Disabled owner-readiness browser acceptance, stage a
+
+Code [`8655419`](https://github.com/TheGor-365/rails_calendar/commit/86554193bd6b561a26fab6ea4289b6a00938a7d0) adds real Chrome owner 1400/390/320 layout and no-action assertions, plus guest/client denial of the informational panel, and checks unchanged OwnerOutboxReplayRun/DomainOutboxEvent/ActivityEvent/AiSpendEntry counts. This is positive proof only after exact SHA Rails CI #45025611706 succeeds. It does NOT simulate CSRF because the POST route intentionally does not exist. Future stage-b POST must test CSRF with forgery protection explicitly enabled; continue to deny any replay writer before explicit owner release and DB migration approval.
