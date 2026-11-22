@@ -1,5 +1,10 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## C2.3b7f next-chat handoff verified — 22 Nov 2026
+
+**Handoff only — no application code or local DB operations.** Next chat continuation is prepared as [RC0551F_C23B7F_NEXT_CHAT_HANDOFF_2026-11-22.md](RC0551F_C23B7F_NEXT_CHAT_HANDOFF_2026-11-22.md). At verified pre-handoff PR #81 HEAD `e360455` both [Rails CI #45052205224](https://github.com/TheGor-365/rails_calendar/actions/runs/45052205224) and [Security #45052205241](https://github.com/TheGor-365/rails_calendar/actions/runs/45052205241) **SUCCESS**. Five read-only C2.3b7a-e source families CODE+CI VERIFIED; next unimplemented C2.3b7f settled OwnerAiMessage/AiSpendEntry lineage. **Critical historical timestamp trap:** settled answer can undergo a later body edit without new outbox or ActivityEvent, so current `OwnerAiMessage.updated_at` may differ from original settlement event time. Next chat must account for this uncertainty explicitly; never automatically synthesize missing event timestamp, charge provider, run replay or write user DB. This handoff docs commit has its OWN CI gate; it does not declare b7f implementation.
+
+
 ## C2.3b7e ServiceOfferingPublication immutable read-only reconciliation CODE + CI VERIFIED — 22 November 2026
 
 **Functional code [`cc8efdd`](https://github.com/TheGor-365/rails_calendar/commit/cc8efdd6da815c39661308bdec29c63ae3949979)** introduces private `DomainOutbox::PublicationBackfillDryRun.preview(owner:, limit:, cursor:)` with synthetic `test/services/domain_outbox/publication_backfill_dry_run_test.rb` on Draft [PR #81](https://github.com/TheGor-365/rails_calendar/pull/81). **No HTTP route, writer, replay, job, paid provider or local/production data scan.** The owner only grants a persisted workspace through `OperatorAccess.workspace_for!`; source authority is immutable `ServiceOfferingPublication` joined to its `ServiceOffering.workspace_id`, never `ServiceOffering.published_version_id` (mutable after historic transitions).
