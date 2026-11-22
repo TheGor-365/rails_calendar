@@ -1,6 +1,6 @@
 # R0.4c / C2.3b1 — isolated PG16 scratch migration gate (2026-11-22)
 
-**State:** READ-ONLY PREPARATION ONLY. Migration NOT AUTHORIZED and NOT APPLIED. Preserve existing private backup, the restored scratch and original review DB. This is a runbook, not executable permission.
+**State 2026-11-22:** SCRATCH RESTORE + INDEPENDENT PG16 PARITY + DETACHED WORKTREE + RAILS EFFECTIVE READ-ONLY CONNECTION VERIFIED. Migration NOT AUTHORIZED and NOT APPLIED. Preserve existing private backup, the restored scratch and original review DB. This is a runbook, not executable permission.
 
 ## 1. Grounded evidence
 
@@ -46,3 +46,9 @@ GitHub comparison of code SHA `36859c3` to docs SHA `5f594b6` showed only docume
 `ISOLATED_WORKTREE=PASS`, `MIGRATION_FILE=VERIFIED`, `ORIGINAL_CHECKOUT=PRESERVED`, `DATABASE_WRITES=NONE`. Created `~/rails_calendar_r04_scratch_worktree_20261122`, detached at exact `36859c3086f6ece81630703145a7e82e8cd56159`, clean; required migration blob matches pinned `b1175a8ab37c5726fcaaae269adc7b1ea16892c7`. Original `~/rails_calendar_ai_c21c` and `db/schema.rb M` preserved. `git diff --summary/--raw` blank; treat M as unexplained index state, do not reset or normalize.
 
 **NEXT:** no checkout/restore repeat. With explicit scratch-only `RC_LOCAL_DEV_DATABASE_URL` built for local Unix socket, `DATABASE_URL` absent and `PGOPTIONS=-c default_transaction_read_only=on`, run Rails runner in the new worktree to confirm effective local PG16 scratch identity and migration pre-state. Check Ruby 3.4.13, runner code SHA and no Grok. If runner fails due gem/runtime/boot, capture sanitized error and STOP; do not install gems or mutate original checkout reflexively. No permission for actual migration.
+
+## R0.4c3 Rails effective read-only scratch gate — owner terminal PASS, 22 November 2026
+
+Owner ran `bin/rails runner` in detached `~/rails_calendar_r04_scratch_worktree_20261122` at `36859c3` with Ruby 3.4.13, development, Grok off, `DATABASE_URL` absent, `PGOPTIONS='-c default_transaction_read_only=on'` and scratch-only `RC_LOCAL_DEV_DATABASE_URL`. Rails ActiveRecord returned `RAILS_EFFECTIVE_DB=rails_calendar_r04_restore_20261121t231331z_27407`, `PG16_LOCAL_SOCKET=PASS`, `PG_TRANSACTION_READ_ONLY=PASS`, `OUTBOX_TABLE=ABSENT`, `MIGRATION_20261121003000=PENDING`, `RAILS_SCRATCH_CONNECTION_GATE=PASS`. This is a read-only PASS, not permission or evidence of DB migration.
+
+**Explicit owner signoff is now the next gate.** Only authorize one isolated migration `20261121003000` on that scratch DB. Before execution recheck exact code/blob, scratch/source identity, version/table absence, source sessions and safety. Confirm the Rails process is constrained to scratch, not production/source. Migration invocation uses writable database session by design; validations default read-only. `db:migrate:up VERSION=20261121003000` may update the isolated worktree's `db/schema.rb`; NEVER touch original checkout's modified schema. On STOP or partial failure inspect and preserve the scratch; never auto-rerun or cleanup.
