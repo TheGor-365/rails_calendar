@@ -1,6 +1,8 @@
 # C2.3b7i — six-family scratch schema compatibility register and independent restore acceptance
 
 **Date: 2026-11-23 · target: Draft PR #81 · evidence level: SOURCE STATIC + CI SYNTHETIC ONLY.**
+
+**Functional code+test CI evidence:** `9db6f0e00de88046d736778995d0b7ca79a3e229`, Rails CI #45071359034 SUCCESS and Security #45071359111 SUCCESS. This remains **NOT** local PG16 scratch acceptance. Documentation successor needs own exact-SHA CI.
 This is a **preparatory inventory**, not a local scratch audit, not a run instruction, not permission to inspect customer tables, and not evidence that the restored PG16 scratch meets these requirements. Read together with [C2.3b7h operator SOP](RC0551F_C23B7H_OPERATOR_REHEARSAL_RUNBOOK_2026-11-22.md), [R0.4b2 restore checkpoint](RC0551F_R04_EXISTING_ARCHIVE_RESTORE_RUNBOOK_2026-11-22.md), [R0.4c4 one-off migration audit](RC0551F_R04_SCRATCH_OUTBOX_MIGRATION_GATE_2026-11-22.md) and the [canonical execution ledger](RAILS_CALENDAR_EXECUTION_STATUS.md).
 
 ## 1. Material schema drift at the current GitHub HEAD
@@ -66,7 +68,7 @@ A mere column name match is NOT enough for final owner DB acceptance: operator m
 
 | Gate | Expected operator-proof artifact | Status now |
 |---|---|---|
-| G0 code/current CI | exact feature and docs SHA, both workflows | **C2.3b7i CI pending** until exact run verifies |
+| G0 code/current CI | exact feature and docs SHA, both workflows | **C2.3b7i CODE + CI VERIFIED on synthetic CI schema** until exact run verifies |
 | G1 owner permission for new scan | explicit approved read-only target/scope | **NOT GRANTED** |
 | G2 isolate PG16 target | independent effective Rails+psql identity and sessions | **NOT RECHECKED for C2.3b7i** |
 | G3 historic archive/media | older private checksum/snapshot evidence | **R0.4b2 historical PASS, not revalidated now** |
@@ -84,7 +86,7 @@ Passing CI = CODE-STATIC/CI-TEST SCHEMA VERIFIED, not owner PG16 scratch accepta
 
 ## 6. Next accountable action
 
-1. Exact SHA Rails CI + Security Audit for C2.3b7i code (including new test).
+1. [x] Functional [SHA 9db6f0e0](https://github.com/TheGor-365/rails_calendar/commit/9db6f0e00de88046d736778995d0b7ca79a3e229): [Rails CI #45071359034](https://github.com/TheGor-365/rails_calendar/actions/runs/45071359034) SUCCESS (482 model/controller tests, 7390 assertions; 49 Chrome, 755 assertions; PG18 fresh+upgrade SUCCESS), [Security Audit #45071359111](https://github.com/TheGor-365/rails_calendar/actions/runs/45071359111) SUCCESS. Earlier initial code SHA `60bfd9b2` failed one catalog test, superseded by migration-history repair; no suppressions or database changes.
 2. Commit a new canonical `RAILS_CALENDAR_EXECUTION_STATUS.md` checkpoint and update this SOP with exact-SHA evidence, then verify documentation SHA CI too.
 3. Continue with **read-only audit design and owner approval proposal** (exact isolated DB identity, no writes), not real inspection until separately authorized.
 

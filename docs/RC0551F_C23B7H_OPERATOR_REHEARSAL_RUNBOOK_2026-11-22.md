@@ -99,4 +99,4 @@ An aggregated 0-anomaly comparison by itself cannot certify historical correctne
 - [ ] Separate owner approval for any isolated non-synthetic DB restore, read-only historical scan or writer.
 - [ ] Independent same-cohort and backup/restore attestation; real before/after; manual C2.2 QA; release/production gates.
 
-**Next safe stage after CODE+CI VERIFIED:** design a *non-executable*, operator-reviewed sandbox acceptance checklist with current six-family schema inventory and independently verifiable restore/media parity. Do not confuse this SOP with permission to run it.
+**C2.3b7i follow-on (23 November 2026):** the planned non-executable [six-family schema register and independent restore/media parity criteria](RC0551F_C23B7I_SCRATCH_SCHEMA_REGISTER_2026-11-23.md) are now CODE+CI VERIFIED at functional `9db6f0e0`; see canonical execution ledger for exact workflows. Next gate is still separate owner authorization for a pinned READ-ONLY scratch catalog audit, **not** execution or writer permission. Do not confuse this SOP or the new register with approval to run it.
