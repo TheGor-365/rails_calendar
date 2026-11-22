@@ -1,6 +1,6 @@
 # C2.3b7c — IntakeRequirementSet immutable lineage/read-only dry-run
 
-**22 Nov 2026 | Draft [PR #81](https://github.com/TheGor-365/rails_calendar/pull/81) | CODE_COMMITTED / exact-SHA CI_PENDING.**
+**22 Nov 2026 | Draft [PR #81](https://github.com/TheGor-365/rails_calendar/pull/81) | CODE + CI VERIFIED for private READ-ONLY metadata dry-run.**
 
 ## Authoritative source and version mapping
 
@@ -20,4 +20,4 @@ Tests use fictional ephemeral CI database fixtures with a requirement set of ver
 
 ## Remaining gates
 
-Exact code SHA `d684873`: [Rails CI #45032613260](https://github.com/TheGor-365/rails_calendar/actions/runs/45032613260), [Security #45032613322](https://github.com/TheGor-365/rails_calendar/actions/runs/45032613322) pending at initial checkpoint. Do not say CI_VERIFIED until both exact SHA workflows succeed (model/controller, browser, PostgreSQL 18 fresh and upgrade). Next slice `C2.3b7d`: read-only eligibility for `ClientRequestInvitation` per event kind/version/timestamp, then remaining families and global pacing/reconciliation. Real owner POST/replay/backfill execution requires separate explicit authorization; previous R0.4c5 approval applied **only** the single ledger migration in isolated scratch. Source review, archives, 3 dirty schema files, Railway/main protected.
+Exact code SHA `d684873`: [Rails CI #45032613260](https://github.com/TheGor-365/rails_calendar/actions/runs/45032613260) **SUCCESS** including model/controller, Chrome system, PostgreSQL 18 fresh & upgrade; [Security #45032613322](https://github.com/TheGor-365/rails_calendar/actions/runs/45032613322) **SUCCESS**. This establishes CODE+CI verification for synthetic metadata-only *IntakeRequirementSet* inspection, NOT operator authorization for a real scan or event repair. Next slice `C2.3b7d`: read-only eligibility for `ClientRequestInvitation` per event kind/version/timestamp, then remaining families and global pacing/reconciliation. Real owner POST/replay/backfill execution requires separate explicit authorization; previous R0.4c5 approval applied **only** the single ledger migration in isolated scratch. Source review, archives, 3 dirty schema files, Railway/main protected.
