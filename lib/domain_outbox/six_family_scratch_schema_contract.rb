@@ -87,7 +87,7 @@ module DomainOutbox
       "intake_scope_revisions" => { "idx_intake_scope_revisions_version" => true },
       "intake_requirement_sets" => {
         "idx_intake_requirement_sets_version" => true,
-        "idx_intake_requirement_sets_source" => true
+        "idx_intake_requirement_sets_source" => false
       },
       "client_request_invitations" => {
         "index_client_request_invitations_on_workspace_id_and_created_at" => false
@@ -132,7 +132,7 @@ module DomainOutbox
     REQUIRED_MIGRATIONS = %w[
       20261108120000 20261113213000 20261115190000
       20261117030000 20261119000500 20261120120000
-      20261120183000 20261121003000 20261121120000
+      20261120183000 20261120204500 20261121003000 20261121120000
     ].freeze
 
     # Catalog uses public table/column/index/check names and migration versions,

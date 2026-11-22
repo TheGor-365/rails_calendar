@@ -82,6 +82,13 @@ class DomainOutboxSixFamilyScratchSchemaContractTest < ActiveSupport::TestCase
       "missing CHECK domain_outbox_events.chk_domain_outbox_valid_state"
 
     catalog = synthetic_catalog
+    source_indexes = catalog.fetch("tables").fetch("intake_requirement_sets").fetch("indexes")
+    source_indexes.delete(["idx_intake_requirement_sets_source", false])
+    source_indexes << ["idx_intake_requirement_sets_source", true]
+    assert_includes CONTRACT.violations(catalog),
+      "missing index intake_requirement_sets.idx_intake_requirement_sets_source unique=false"
+
+    catalog = synthetic_catalog
     indexes = catalog.fetch("tables").fetch("activity_events").fetch("indexes")
     indexes.delete(["idx_activity_events_workspace_key", true])
     indexes << ["idx_activity_events_workspace_key", false]

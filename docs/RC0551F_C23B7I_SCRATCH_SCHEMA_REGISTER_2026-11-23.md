@@ -35,11 +35,11 @@ Sources below are from the six child scanners + `CrossFamilyBackfillDryRun::FIEL
 
 ## 3. Version, index and constraint gates
 
-Static version prerequisites, in chronological order: `20261108120000` workspace ownership, `20261113213000` AI spending, `20261115190000` service offering/publication lineage, `20261117030000` owner conversations/messages, `20261119000500` invitations, `20261120120000` scope, `20261120183000` requirements, `20261121003000` outbox, `20261121120000` activity. Later migrations can coexist; do not claim a specific target has any version before querying its **own** `schema_migrations` read-only under approved scope.
+Static version prerequisites, in chronological order: `20261108120000` workspace ownership, `20261113213000` AI spending, `20261115190000` service offering/publication lineage, `20261117030000` owner conversations/messages, `20261119000500` invitations, `20261120120000` scope, `20261120183000` initial requirements table, `20261120204500` non-unique source lookup for multiple owner review versions, `20261121003000` outbox, `20261121120000` activity. Later migrations can coexist; do not claim a specific target has any version before querying its **own** `schema_migrations` read-only under approved scope.
 
 Named invariants in `lib/domain_outbox/six_family_scratch_schema_contract.rb`:
 - Scope: unique `idx_intake_scope_revisions_version`; `chk_intake_scope_version_positive`, `chk_intake_scope_author_role`; FK to intake.
-- Requirements: unique `idx_intake_requirement_sets_version` and `idx_intake_requirement_sets_source`; `chk_intake_requirement_set_version`; two distinct FKs (intake + revision).
+- Requirements: unique `idx_intake_requirement_sets_version` and **non-unique** `idx_intake_requirement_sets_source` (migration `20261120204500` deliberately replaces the original unique source index); `chk_intake_requirement_set_version`; two distinct FKs (intake + revision).
 - Invitations: `index_client_request_invitations_on_workspace_id_and_created_at`; `chk_client_invite_claim_triplet` and workspace/intake FKs.
 - Publications: `idx_service_offerings_workspace_key` unique, `idx_service_offering_versions_unique` unique, `chk_service_publication_event`, owner/offering/version FKs.
 - AI: `idx_owner_ai_message_sequence` unique, `chk_owner_ai_settled_requires_spend`; spending exactly-one-subject + nonnegative ticks; profile+conversation workspace links.
@@ -48,6 +48,9 @@ Named invariants in `lib/domain_outbox/six_family_scratch_schema_contract.rb`:
 - Backup media: attachment `blob_id -> active_storage_blobs` FK, unique blob key and attachment identity indexes; **these catalog checks do not read/private-verify file bytes**.
 
 A mere column name match is NOT enough for final owner DB acceptance: operator must inspect PostgreSQL types, `attnotnull`, FK `convalidated`, check expression and validation, index `indisvalid/indisready`, unique key column order, ACL, cross-tenant lineage and effective owner scope. The CI test only checks minimum catalog **presence**, FK targets, index names/unique flags, check names and required migration versions on its ephemeral PG15 test DB; it is not a proof of constraint validation or privacy of an actual restore.
+
+
+**Schema-history correction discovered by actual CI:** the first C2.3b7i code SHA `60bfd9b2` FAILED one new test (not an owner DB failure): the initial inventory wrongly classified `idx_intake_requirement_sets_source` as UNIQUE because the creation migration `20261120183000` contains that constraint. The later committed `20261120204500_allow_requirement_set_review_versions.rb` explicitly **removes and recreates the same named index without UNIQUE**, allowing multiple requirement-set review versions per scope revision. Canonical uniqueness remains `(project_intake_id, version)`. This is a real migration-chain correction: register both versions, require the final index `unique=false`, and add a negative test for incorrectly unique historical lookup. Do not suppress the failing test or change the migrations.
 
 ## 4. Fail-closed *future* independent PG16 scratch acceptance
 
