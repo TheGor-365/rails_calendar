@@ -12,6 +12,7 @@ class DomainOutboxScopeRevisionBackfillDryRunTest < ActiveSupport::TestCase
     @workspace, = approved_profile_for(@owner)
     @other_workspace, = approved_profile_for(@other)
     @intake = create_intake(@workspace)
+    @spare_intake = create_intake(@workspace) # ensures distinct-family cursor exists
     @revisions = (1..4).map { |version| create_revision(@intake, version) }
     @foreign = create_revision(create_intake(@other_workspace), 1)
 
@@ -84,7 +85,7 @@ class DomainOutboxScopeRevisionBackfillDryRunTest < ActiveSupport::TestCase
 
   test "C2.3b7b version and occurred_at metadata drift must never be marked indexed" do
     first = @revisions.first
-    other = @revisions[2]
+    other = @revisions[1] # projection exists here (envelope was deleted)
     assert_equal 1, preview[:already_indexed]
     DomainOutboxEvent.where(workspace_id: @workspace.id,
       source_type: "IntakeScopeRevision", source_id: first.id)
@@ -99,8 +100,31 @@ class DomainOutboxScopeRevisionBackfillDryRunTest < ActiveSupport::TestCase
       result = preview
       assert_equal 2, result.fetch(:inconsistent_records)
       assert_equal 0, result.fetch(:already_indexed)
-      assert_equal 1, result.fetch(:projection_only)
-      assert_equal 0, result.fetch(:envelope_only)
+      assert_equal 0, result.fetch(:projection_only)
+      assert_equal 1, result.fetch(:envelope_only)
+      assert_equal 1, result.fetch(:missing_both)
+    end
+  end
+
+  test "C2.3b7b source/envelope or activity timestamp drift is inconsistent" do
+    first = @revisions.first
+    projection_only = @revisions[1]
+    DomainOutboxEvent.where(workspace_id: @workspace.id,
+      source_type: "IntakeScopeRevision", source_id: first.id)
+      .update_all(occurred_at: first.created_at + 1.hour)
+    ActivityEvent.where(workspace_id: @workspace.id,
+      event_key: activity_key(projection_only))
+      .update_all(occurred_at: projection_only.created_at + 1.hour)
+
+    assert_no_difference([
+      "IntakeScopeRevision.count", "DomainOutboxEvent.count",
+      "ActivityEvent.count", "OwnerOutboxReplayRun.count", "AiSpendEntry.count"
+    ]) do
+      result = preview
+      assert_equal 2, result.fetch(:inconsistent_records)
+      assert_equal 0, result.fetch(:already_indexed)
+      assert_equal 0, result.fetch(:projection_only)
+      assert_equal 1, result.fetch(:envelope_only)
       assert_equal 1, result.fetch(:missing_both)
     end
   end
@@ -129,9 +153,8 @@ class DomainOutboxScopeRevisionBackfillDryRunTest < ActiveSupport::TestCase
       preview(limit: 2, cursor: first.fetch(:next_cursor).reverse)
     end
     intake_cursor = DomainOutbox::BackfillDryRun.preview(owner: @owner, limit: 1)[:next_cursor]
-    if intake_cursor
-      assert_raises(ArgumentError) { preview(limit: 2, cursor: intake_cursor) }
-    end
+    assert_kind_of String, intake_cursor
+    assert_raises(ArgumentError) { preview(limit: 2, cursor: intake_cursor) }
   end
 
   test "C2.3b7b denies invalid actors page sizes and malformed cursors" do
