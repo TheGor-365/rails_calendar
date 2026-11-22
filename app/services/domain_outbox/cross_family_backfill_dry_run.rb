@@ -90,10 +90,11 @@ module DomainOutbox
       next_child_state = next_child && klass.send(:read_cursor!, next_child, owner: owner, workspace: workspace)
       ceiling_id ||= next_child_state && next_child_state.fetch("ceiling_id")
       scope = source_scope(workspace: workspace, source_type: source_type)
-      window = scope.where("#{table}.id > ?", after_id)
-      window = window.where("#{table}.id <= ?", ceiling_id) if ceiling_id
-      ids = window.order(Arel.sql("#{table}.id ASC"))
-        .limit(page.fetch(:inspected)).pluck("#{table}.id")
+      id_column = scope.klass.arel_table[:id]
+      window = scope.where(id_column.gt(after_id))
+      window = window.where(id_column.lteq(ceiling_id)) if ceiling_id
+      ids = window.order(id_column.asc)
+        .limit(page.fetch(:inspected)).pluck(id_column)
       if ids.length != page.fetch(:inspected) ||
          (next_child_state && ids.last != next_child_state.fetch("after_id"))
         raise ArgumentError, "source page changed during inspection; manual review required"
@@ -176,9 +177,10 @@ module DomainOutbox
 
     def self.fingerprint(workspace:, index:, last_id:, count:)
       _, source_type, table = FAMILIES.fetch(index)
-      rows = source_scope(workspace: workspace, source_type: source_type)
-        .where("#{table}.id <= ?", last_id)
-        .order(Arel.sql("#{table}.id ASC"))
+      scope = source_scope(workspace: workspace, source_type: source_type)
+      id_column = scope.klass.arel_table[:id]
+      rows = scope.where(id_column.lteq(last_id))
+        .order(id_column.asc)
         .limit(MAX_FAMILY_SCAN + 1).pluck(*FIELDS.fetch(source_type))
       raise ArgumentError, "source population changed; manual review required" unless rows.length == count
 
