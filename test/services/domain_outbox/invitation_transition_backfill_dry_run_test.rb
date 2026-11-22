@@ -134,11 +134,30 @@ class DomainOutboxInvitationTransitionBackfillDryRunTest < ActiveSupport::TestCa
     ]) do
       result = preview
       assert_equal 2, result[:ineligible_invitations]
-      assert_equal 2, result[:inspected_invitations]
+      assert_equal 4, result[:inspected_invitations]
       # Every invalid source consumes one invitation scan slot but is NOT
       # counted as an eligible transition.
       assert_equal 3, result[:expected_transitions]
       assert_equal 2, result[:already_indexed]
+      assert_equal 1, result[:missing_both]
+    end
+  end
+
+  test "C2.3b7d cannot invent submit without claim or revoke after claim" do
+    # Intentional fictional historical corruption in ephemeral CI DB only.
+    @issued.update_columns(submitted_at: Time.current)
+    @claimed.update_columns(revoked_at: Time.current)
+
+    assert_no_difference([
+      "ClientRequestInvitation.count", "DomainOutboxEvent.count",
+      "ActivityEvent.count", "OwnerOutboxReplayRun.count", "AiSpendEntry.count"
+    ]) do
+      result = preview
+      assert_equal 2, result[:ineligible_invitations]
+      assert_equal 4, result[:inspected_invitations]
+      assert_equal 5, result[:expected_transitions]
+      assert_equal 3, result[:already_indexed]
+      assert_equal 1, result[:envelope_only]
       assert_equal 1, result[:missing_both]
     end
   end
