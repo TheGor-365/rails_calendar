@@ -1,6 +1,33 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7k one-shot PG16 index metadata result — 23 November 2026 (OWNER TERMINAL)
+
+**Latest confirmed evidence (supersedes earlier C2.3b7k NOT AUTHORIZED/PENDING notes below):** the owner separately approved exactly ONE catalog-only PostgreSQL 16 read for scratch `rails_calendar_r04_restore_20261121t231331z_27407`; consent was recorded in [PR #81 approval checkpoint](https://github.com/TheGor-365/rails_calendar/pull/81#issuecomment-7086899439). Owner terminal confirmed clean detached worktree `/home/gor/rails_calendar_c23b7k_index_worktree_20261123` pinned to `cc5bd7aeaa99b03392072444dd2a613309fef527`. The guarded script `script/rc0551f_c23b7k_invitation_index_readonly.rb` ran once under direct Ruby 3.4.13, using the fixed `pg_catalog`-only PostgreSQL 16 SELECT and readonly socket-bound connection. The owner-reported stdout was:
+
+```text
+Syntax OK
+C23B7K_LOCAL_PREFLIGHT=PASS
+STARTING_ONE_AUTHORIZED_INDEX_METADATA_READ
+C2.3B7K_INDEX_CLASSIFICATION=INDEX_NAME_OR_DEFINITION_DRIFT
+G5=BLOCKED
+DATABASE_WRITES_AND_APPLICATION_ROW_READS=NOT_PERFORMED_BY_THIS_TOOL
+BACKUP_MEDIA_TENANCY_AND_REMEDIATION=NOT_AUTHORIZED
+OPERATOR_EXIT_CODE=2
+NO_AUTOMATIC_RETRY=TRUE
+```
+
+**Interpretation (source-verified):** The classifier in `lib/domain_outbox/invitation_index_metadata_triage.rb` emits `INDEX_NAME_OR_DEFINITION_DRIFT` if an expected-name, valid/ready, non-unique index has an unexpected key/method/INCLUDE/expression/predicate definition **OR** the expected name is absent while another non-unique index has a matching key/method/shape definition. In the alternate-name branch the classifier does **not** separately assert `indisvalid/indisready`, so do not assume usability. Thus **the exact index name, physical validity, and divergence mechanism are NOT yet independently established.** The owner terminal result supports local role/database/version/socket/readonly/no-other-sessions gate via the classifier, but no raw pg_catalog values were exposed or retained. It does not imply data corruption. The historical C2.3b7j 17-table name-level G5 failure is **NOT** cured or reassessed by this narrow read.
+
+**Permission and impact:** This C2.3b7k one-query authorization is now **CONSUMED**. Exit code 2 is deliberate (the tool always keeps `G5=BLOCKED`); it is not by itself a failed SQL call. The guarded tool performed no write, application-row read, restore, migration, index correction, source/media/archive access, writer/replay, Railway deployment, merge or production action. Evidence source = owner's pasted terminal output, not assistant's direct access to their computer. No automatic retry is permitted.
+
+**State ledger:** `C2.3b7k LOCAL_WORKTREE_VERIFIED=PASS` (owner terminal), `OWNER_APPROVAL=RECEIVED_AND_CONSUMED`, `ONE_INDEX_CATALOG_READ=COMPLETED`, `INDEX_CLASSIFICATION=INDEX_NAME_OR_DEFINITION_DRIFT`, `ROOT_CAUSE=UNRESOLVED`, `G5=BLOCKED`. G3/G4/G6, R0.4 backup/media/restore, C2.2 manual acceptance, writer/replay and release still OPEN. Earlier exact-SHA `cc5bd7aeaa99b03392072444dd2a613309fef527` PR/push CI+Security passed: [PR Rails #45077630173](https://github.com/TheGor-365/rails_calendar/actions/runs/45077630173), [PR Security #45077630193](https://github.com/TheGor-365/rails_calendar/actions/runs/45077630193), [push Rails #45077625300](https://github.com/TheGor-365/rails_calendar/actions/runs/45077625300), [push Security #45077625357](https://github.com/TheGor-365/rails_calendar/actions/runs/45077625357). This **new documentation commit** needs its own exact-SHA CI check. The user's clean detached operator worktree remains pinned to the previous SHA; do not reset, pull or modify it just because the remote PR HEAD advances.
+
+**Next safe gate:** offline design/test a new bounded discriminator for *which metadata property differs* (or an equally safe metadata-only investigation), review all guardrails and CI, provision a fresh clean SHA-pinned worktree, and obtain **new explicit owner approval** before any second catalog read. Before any DDL/reindex/repair, independently verify restore/backup provenance and agree on a separate remediation plan. Never assume this classification authorizes mutations.
+
+
+
+
 ## C2.3b7k single-index metadata triage code+CI VERIFIED — 23 November 2026 (OFFLINE ONLY)
 
 **GitHub evidence:** in existing [Draft PR #81](https://github.com/TheGor-365/rails_calendar/pull/81), functional code [SHA \`7353cbfaf33ca259a3122336db4e90bcdc510514\`](https://github.com/TheGor-365/rails_calendar/commit/7353cbfaf33ca259a3122336db4e90bcdc510514) added \`lib/domain_outbox/invitation_index_metadata_triage.rb\`, \`script/rc0551f_c23b7k_invitation_index_readonly.rb\`, \`test/lib/domain_outbox/invitation_index_metadata_triage_test.rb\`, and [C2.3b7k operator runbook](RC0551F_C23B7K_INDEX_METADATA_OPERATOR_2026-11-23.md). Source readback on GitHub verified. The isolated CI SQL reads only pg_catalog of the invitation table's indexes and uses synthetic role/database identity; **NO new user PG16 scratch query occurred**.
