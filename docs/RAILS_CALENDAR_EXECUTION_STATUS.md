@@ -1,5 +1,16 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## R0.4c1 owner local Git migration preflight PASS — 22 November 2026
+
+**Owner terminal evidence (2026-11-22):** `LOCAL_HEAD=c25be48`, `REMOTE_MIGRATION_BLOB=VERIFIED`, `HEAD_MIGRATION=ABSENT`, `WORKTREE_MIGRATION=ABSENT`, `SCHEMA_STATUS: M db/schema.rb`, `SCHEMA_DIFF_UNSTAGED:` empty, `SCHEMA_DIFF_STAGED:` empty, **`READ_ONLY_CODE_GATE=PASS`**. This proves the exact remote migration Git object is available and matches SHA `b1175a8ab37c5726fcaaae269adc7b1ea16892c7`, but that migration is NOT in local checkout. The schema file reports modified even though `git diff --numstat` showed nothing; cause remains uncertain (e.g. mode-only change) until `git diff --raw/--summary` and index metadata are examined. DO NOT reset, chmod or overwrite it.
+
+**Remote code comparison:** GitHub compare code SHA `36859c3086f6ece81630703145a7e82e8cd56159` → docs HEAD `5f594b6da3a12c94861f4541d973eab92176eddf`: seven commits, only 3 `docs/` paths changed; the code tree including exact outbox migration has NOT changed. Recovery/code SHA `36859c3` previously passed [Rails CI #44958765911](https://github.com/TheGor-365/rails_calendar/actions/runs/44958765911) and [Security #44958765901](https://github.com/TheGor-365/rails_calendar/actions/runs/44958765901); latest previous docs SHA `5f594b6` passed [Rails CI #44964050972](https://github.com/TheGor-365/rails_calendar/actions/runs/44964050972) and [Security #44964050886](https://github.com/TheGor-365/rails_calendar/actions/runs/44964050886). The next documentation commit requires its own CI. PR #81 remains Draft/open.
+
+**Next safe local operation (NO DB WRITE):** create a NEW, separate, guarded Git worktree at `~/rails_calendar_r04_scratch_worktree_20261122` detached at exact code commit `36859c3`, after checking destination nonexistence, owner's original checkout and free space. This only creates isolated files plus Git worktree metadata and does not change `db/schema.rb`, start Rails or connect to any DB. Verify pinned migration blob in the isolated worktree and clean Git status. Do not copy private backup/media, .env, credentials or untracked scripts. This operation is PREPARED, NOT YET EXECUTED on owner's machine.
+
+**Next after the new worktree is confirmed:** independently verify Rails effective connection **read-only** to exact existing scratch `rails_calendar_r04_restore_20261121t231331z_27407` using `RC_LOCAL_DEV_DATABASE_URL` and PG16 Unix socket. Review migration execution and no schema-dump drift; ask new explicit owner permission for the targeted `db:migrate:up VERSION=20261121003000` to scratch only. This approval has not been granted and migration NOT APPLIED. Source review DB, archive, original app :3001, Railway and main preserved.
+
+
 ## R0.4b3 independent post-restore SQL validation PASS — 22 November 2026
 
 **Primary owner-terminal proof:** the separate, all-read-only PostgreSQL 16.11 audit printed:
@@ -172,10 +183,11 @@ Run `get_pr_info #81`, obtain HEAD, check newest commits, look up exact commit w
 
 ## 4. Immediate next *unverified* step
 
-1. **R0.4b2/b3 RESTORE VERIFIED, DO NOT REPEAT.** Original local review DB, 0700 private archive, recovered scratch `rails_calendar_r04_restore_20261121t231331z_27407` preserved; no source outbox migration, production or cleanup.
-2. **P0 R0.4c / C2.3b1 scratch-only migration readiness (NEXT, READ-ONLY):** detect current local checkout SHA, `db/schema.rb` staged/unstaged changes, exact availability/hash of remote migration `20261121003000_create_domain_outbox_events.rb` (blob `b1175a8...`), Ruby/Bundler and roles, remaining local scratch identity. Do not modify files. Prepare a single-version, guarded scratch-only migration procedure that cannot silently connect to source, edit local schema or apply unrelated migrations.
-3. **P1 AFTER SEPARATE OWNER APPROVAL:** run targeted migration VERSION=20261121003000 on scratch only; validate constraints/indices, schema_migrations and preserved core rows independently. No automatic restore/migration retry or scratch cleanup.
-4. **P2 code and feature roadmap:** `C2.3b6b2/C2.3b6c2` supervised replay + concurrency, `C2.3b7` dry-run backfill, `C2.3c` projections, `C2.4` action engine, `E1–E2.5`, `M6–M8`; independently complete local C2.2 browser/ACL acceptance, then Railway release only after owner-approved M8 gates. No misleading DONE labels.
+1. **R0.4b2/b3 COMPLETE at local backup/scratch parity boundaries.** Private archive, original review database and scratch preserved. Do not rerun recovery.
+2. **R0.4c1 code preflight PASS; P0 NEXT:** original local checkout still at `c25be48`, outbox migration absent there, required blob verified as remote Git object. Under guarded read-only preconditions create a SEPARATE detached worktree for exact code SHA `36859c3`; verify migration file hash and clean worktree. This worktree has NOT been created by the assistant; the user must execute the command. Investigate original `db/schema.rb M` (empty numstat) with `git diff --raw` and `git diff --summary`, do not modify it.
+3. **P1 READ-ONLY Rails effective DB/scratch gate:** with fresh isolated checkout prove app points to exact scratch `rails_calendar_r04_restore_20261121t231331z_27407` and not the source, with no paid model or writes. Check local env and version.
+4. **P2 AFTER separate owner permission (NOT granted):** targeted one migration `db:migrate:up VERSION=20261121003000` in scratch only, then independent source/scratch constraints/row integrity verification. NO full migrate, source DB migration, cleanup, Railway or merge.
+5. **Remaining product stages:** C2.2 local browser/ACL QA, C2.3b6 supervised replay, C2.3b7 dry-run backfill, C2.3c projections, C2.4 AI proposal/action engine, E1–E2.5, M6–M8 per [roadmap](RAILS_CALENDAR_MVP_EXECUTION_ROADMAP.md).
 
 ## 5. Registry update rule (mandatory after any code work)
 

@@ -32,3 +32,11 @@
 `C2.3b6b2/C2.3b6c2` controlled POST replay, actor audit and concurrency/rate safety → `C2.3b7` bounded dry-run backfill and reconciliation → `C2.3c` deterministic projection registry → `C2.4` validated human-approved AI Action Engine → `E1/E2.1–E2.5` real role-based client intake and exact-version approval → `M6/M7` project delivery/acceptance → `M8` gated PG18/Railway release and consented commercial pilot. Parallel owner UI QA of C2.2/C2.3 still needed.
 
 Canonical [execution status](RAILS_CALENDAR_EXECUTION_STATUS.md) · [MVP roadmap](RAILS_CALENDAR_MVP_EXECUTION_ROADMAP.md) · [Draft PR #81](https://github.com/TheGor-365/rails_calendar/pull/81).
+
+## R0.4c1 local code preflight — owner terminal PASS, 22 November 2026
+
+Printed: `LOCAL_HEAD=c25be48`, `REMOTE_MIGRATION_BLOB=VERIFIED`, `HEAD_MIGRATION=ABSENT`, `WORKTREE_MIGRATION=ABSENT`, `SCHEMA_STATUS: M db/schema.rb`, empty `SCHEMA_DIFF_UNSTAGED` and `SCHEMA_DIFF_STAGED`, `READ_ONLY_CODE_GATE=PASS`. Exact migration content is available as Git blob `b1175a8ab37c5726fcaaae269adc7b1ea16892c7` under commit `36859c3` but is not in the original local checkout. Mode-only change to `db/schema.rb` is only a HYPOTHESIS; inspect `git diff --raw/--summary` without changes. No local files or DB written during this preflight.
+
+GitHub comparison of code SHA `36859c3` to docs SHA `5f594b6` showed only documentation changes. Pin a dedicated detached Git worktree to **exact commit `36859c3086f6ece81630703145a7e82e8cd56159`**, not a moving branch. A worktree under `~/rails_calendar_r04_scratch_worktree_20261122` is deliberately separate from the owner's dirty original checkout and is not an SQL action.
+
+**NEXT:** create that isolated worktree only if its path does not exist and all preflight guards pass; verify clean status, pinned migration hash and that the original checkout/scheme stays unchanged. Then perform a distinct read-only Rails scratch-connection gate. Migration requires another affirmative authorization; no `bin/rails db:migrate:up` yet, no `db:prepare` and no source DB writes.
