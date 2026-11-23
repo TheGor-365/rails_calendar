@@ -74,6 +74,10 @@ application.register("wa-requests", WaRequestsController)
 import WaLibraryController from "./wa_library_controller"
 application.register("wa-library", WaLibraryController)
 
+// Private read-only service preview in a native dialog, sourced from a Turbo Frame.
+import WaServicePreviewController from "./wa_service_preview_controller"
+application.register("wa-service-preview", WaServicePreviewController)
+
 // Fluid progressive enhancement of artifact accordion cards.
 import WaAccordionController from "./wa_accordion_controller"
 application.register("wa-accordion", WaAccordionController)
