@@ -269,7 +269,8 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     assert_no_difference("AiSpendEntry.count") do
       get owner_cabinet_path
       assert_response :success
-      assert_select "a.ws-account-tool[href=?]", owner_ai_assistant_path
+      assert_select "a.ws-account-tool[href=?]", owner_ai_assistant_path, count: 0
+      assert_select "header.app-header a[href=?]", owner_ai_assistant_path, minimum: 1
 
       get owner_practice_path
       assert_response :success
