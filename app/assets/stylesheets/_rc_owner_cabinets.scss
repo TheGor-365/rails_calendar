@@ -424,7 +424,7 @@
   background: var(--ws-teal-wash);
   color: var(--ws-teal-deep);
 }
-.ws-account-page :is(#cabinet-profile, #cabinet-tools, #cabinet-privacy, #cabinet-work) {
+.ws-account-page :is(#cabinet-profile, #cabinet-tools, #cabinet-privacy) {
   scroll-margin-top: 1.5rem;
 }
 @media (min-width: 1200px) {
@@ -446,10 +446,22 @@
 }
 
 /* C2.5a1 — correct owner cabinet anchor offset and show active local section. */
-.ws-account-content--rail :is(#cabinet-profile, #cabinet-tools, #cabinet-privacy, #cabinet-work) {
+.ws-account-content--rail :is(#cabinet-profile, #cabinet-tools, #cabinet-privacy) {
   scroll-margin-top: calc(var(--wa-section-nav-sticky-top, 1.5rem) + .75rem);
 }
 .wa-cabinet-rail a[aria-current="location"] {
   background: var(--ws-teal-wash);
   color: var(--ws-teal-deep);
+}
+
+/* C2.5b focused cabinet: three identity/settings actions, no duplicate app hub. */
+#owner-cabinet .ws-account-tool { min-height: 132px; }
+@media (min-width: 640px) {
+  #owner-cabinet .ws-account-link-grid > .ws-account-tool:last-child {
+    grid-column: 1 / -1;
+    min-height: 110px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #owner-cabinet .ws-account-tool { transition: none; transform: none; }
 }
