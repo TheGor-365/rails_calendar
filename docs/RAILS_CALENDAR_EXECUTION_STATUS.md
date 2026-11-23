@@ -1,6 +1,19 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## A1 local browser boot blocked by Ruby 3.4.12 vs required 3.4.13 — 23 November 2026
+
+**OWNER TERMINAL EVIDENCE:** after earlier disconnected browser `ERR_CONNECTION_REFUSED` and graceful Rails server termination, owner attempted the previously reviewed `script/rc0551f_c21c_local_grok_server.sh` from original checkout `~/rails_calendar_ai_c21c`, local branch `local/rc0551f-c21c`. Script stopped before Rails could serve because Bundler reported verbatim: `Your Ruby version is 3.4.12, but your Gemfile specified 3.4.13`. App, owner page and client page remain **MANUAL_BROWSER=BLOCKED_BOOT**, not verified broken UI.
+
+**Verified tracked code at PR #81 SHA `97189db84b237c5cae485425e6a464d21c704e7b`:** `.ruby-version` = `ruby-3.4.13`, `Gemfile` = `ruby "3.4.13"`, `Gemfile.lock` = `ruby 3.4.13p195`; `script/rc0551f_c21c_local_grok_server.sh` requires a local explicit `RC_LOCAL_DEV_DATABASE_URL`, private AI env file and actual DB identity check before binding 127.0.0.1:3002. Active owner Ruby 3.4.12, not yet known whether asdf Ruby 3.4.13 is installed.
+
+**Next owner-only step:** inspect local `/home/gor/.asdf/installs/ruby/3.4.13/bin/ruby` availability. If present, run local Grok launch in an isolated shell with exact 3.4.13 install's bin at the front of PATH, `ASDF_RUBY_VERSION=3.4.13`, `RAILS_ENV=development`, `RACK_ENV=development`, `DATABASE_URL` unset and previous pinned review DB URI/identity. Fail closed if exact interpreter unavailable; no Gemfile/lock edits, git reset/checkout, DB migrations/restore, archive/media writes or production deployment. Once running, return sanitized terminal output and owner AI Chat screenshot. Do **NOT** click paid `Ask AI` or submit synthetic writes to the historical review DB until test database safety is confirmed.
+
+**No production impact.** Release R1A PR #82 remains Draft, exact SHA `558cf80be59fd317aaaf18c41c4cd38e773f919c`, 6/6 earlier exact-SHA CI PASS; still not deployed. C2.3b7 one-shot historical DB/media permissions remain consumed. New docs-only SHA requires separate CI and must not be considered browser tested.
+
+
+
+
 ## Owner requested browser-first complete feature acceptance; no production backup — 23 November 2026
 
 **New user instruction:** no Railway production backups exist; accepts proceeding without backup, but first manually verify all current browser functionality (incl. AI), then decide for each verified change what to fix or release incrementally. This is owner preference, **not verification of database safety and not an exact irreversible migration approval**. No backup = possible irreversible loss; code rollback is not DB/file restore. Railway web currently has `preDeployCommand=[bin/rails db:migrate]`, so each production release requires named SHA/migration and explicit go/no-go.
