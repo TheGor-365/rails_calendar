@@ -459,7 +459,7 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "owner can locate sent invitations in workspace, inbox and cabinet without a guessed URL" do
+  test "owner can locate invitations in Workspace and Requests without a guessed URL" do
     login(@owner)
     issue_invitation
     invitation = @workspace.client_request_invitations.order(:id).last
@@ -481,7 +481,8 @@ class E2ClientInvitationTest < ActionDispatch::IntegrationTest
 
     get owner_cabinet_path
     assert_response :success
-    assert_select "a[href=?]", owner_invitation_path(invitation), minimum: 1
+    assert_select "a[href=?]", owner_invitation_path(invitation), count: 0
+    assert_select "header.app-header a[href=?]", admin_project_intakes_path, minimum: 1
 
     get owner_artifacts_path
     assert_response :success
