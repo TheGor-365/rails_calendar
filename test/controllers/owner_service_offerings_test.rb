@@ -135,6 +135,9 @@ class OwnerServiceOfferingsTest < ActionDispatch::IntegrationTest
     get owner_services_path
     assert_response :success
     assert_select "a[href=?][data-turbo-frame='wa-owner-service-preview']", owner_service_path(offer)
+    assert_select ".wa-services__hero-symbol", count: 1
+    assert_select ".wa-services__card .wa-services__cover-fallback", minimum: 1
+    assert_select ".wa-services__tools summary", count: 1
 
     assert_no_difference("ServiceOfferingVersion.count") do
       get owner_service_path(offer), headers: { "Turbo-Frame" => "wa-owner-service-preview" }
@@ -143,7 +146,8 @@ class OwnerServiceOfferingsTest < ActionDispatch::IntegrationTest
     assert_match(/private, no-store/, response.headers.fetch("Cache-Control"))
     assert_select "turbo-frame#wa-owner-service-preview" do
       assert_select "h2", text: offer.draft_version.title
-      assert_select "dl dt", text: I18n.t("owner_services.included_scope")
+      assert_select ".wa-services__preview-heading h2", text: offer.draft_version.title
+      assert_select ".wa-services__preview-fact h3", text: /#{Regexp.escape(I18n.t("owner_services.included_scope"))}/
       assert_select "form", count: 0
       assert_select "a[data-turbo-frame='_top'][href=?]", owner_service_path(offer)
     end
@@ -170,7 +174,8 @@ class OwnerServiceOfferingsTest < ActionDispatch::IntegrationTest
     %i[en ru hy es].each do |locale|
       I18n.with_locale(locale) do
         %w[title private_title summary capability category approval_title confirm_approval
-           publication_title confirm_publication new_revision history stale review_required].each do |key|
+           publication_title confirm_publication new_revision history stale review_required
+           catalogue_tools quick_preview close_preview cover_placeholder preview_private_hint].each do |key|
           assert I18n.exists?("owner_services.#{key}"), "Missing #{locale}.owner_services.#{key}"
         end
       end
