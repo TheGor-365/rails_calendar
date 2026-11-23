@@ -77,3 +77,10 @@ Do not alter schema, existing private databases, migrations, storage, payments, 
 - **No new JavaScript controllers, translations, Rails controllers/actions, routes, DB objects or migrations.** Responsive acceptance is pending. This code is not in owner's currently running `aecbe5e` checkout.
 - The owner's new screenshots and exact running local launch are separately recorded in `docs/RC0551F_C24A_WHITE_ATLAS_COMMERCIAL_UI_BROWSER_FIXES_2026-11-23.md`: C2.4a partial browser evidence, not global acceptance.
 - Future slices for top navigation consolidation, reducing duplicate tools, Turbo Frame sheets and source-aware breadcrumbs remain **PLAN_ONLY** until actually tested. Do not assert a seven-tab UI already exists.
+
+
+## 8. Owner terminal follow-up — isolated C2.5a local review block
+
+Owner tried the exact `9f7a6028997fdbe9df01f478884a3efcd73f8e8d` UI-review worktree on 2026-11-23: `git fetch` succeeded, detached `~/rails_calendar_c25a_ia_review_20261123` was created at the expected SHA, `BUNDLE_FROZEN=true bundle install` succeeded (92 gems). The next command failed **before** npm dependencies or frontend compilation: `/home/gor/.asdf/shims/npm: ... exec: asdf: не найден`. This is a broken/asdf-unavailable Node shim, not a Rails/Gemfile failure. **C2.5a local build and manual browser acceptance remain NOT_TESTED**; do not recreate the worktree or rerun Bundler. The next owner's command locates a verified directly installed `node` and `npm` pair, prepends its real `bin` directory to PATH to bypass the shim, and then runs lockfile-free npm install + JS/CSS build and the existing guarded localhost review server on :3003. Stop with a clear diagnostic if no direct Node executable exists; do not alter shell global config or other checkouts.
+
+**Automated evidence:** exact code-and-doc SHA `9f7a602`: **Rails Calendar CI SUCCESS** (run `45259267279`) and **Rails Calendar Security Audit SUCCESS** (run `45259267373`), confirmed via GitHub Actions. These are automated checks only; no acceptance of new left-rail design, no production deployment or database writes.
