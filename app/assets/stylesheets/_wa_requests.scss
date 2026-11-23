@@ -76,3 +76,65 @@
   .wa-requests .wa-requests__tab, .wa-requests .wa-requests__record, .wa-requests .wa-requests__chevron { transition: none; }
   .wa-requests .wa-requests__panel.is-active, .wa-requests .wa-requests__detail { animation: none; }
 }
+
+
+/* C2.5c — canonical Requests: one primary action and explicit secondary menu.
+   Scoped to the existing White Atlas surface and its token palette. */
+.wa-requests .rc-page-hero {
+  position: relative;
+  z-index: 3;
+}
+.wa-requests .wa-requests__intro {
+  max-width: 64ch;
+  margin: .55rem 0 0;
+  font-size: .87rem;
+  line-height: 1.6;
+}
+.wa-requests .wa-requests__more {
+  position: relative;
+  min-width: 0;
+}
+.wa-requests .wa-requests__more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  cursor: pointer;
+  list-style: none;
+}
+.wa-requests .wa-requests__more > summary::-webkit-details-marker { display: none; }
+.wa-requests .wa-requests__more > summary::marker { content: ""; }
+.wa-requests .wa-requests__more[open] > summary {
+  background: var(--ws-teal-wash, var(--rc-accent-wash));
+  color: var(--ws-teal-deep, var(--rc-accent-dark));
+}
+.wa-requests .wa-requests__more > summary:focus-visible {
+  outline: 3px solid var(--ws-teal, var(--rc-accent));
+  outline-offset: 2px;
+}
+.wa-requests .wa-requests__more-panel {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + .5rem);
+  right: 0;
+  width: min(280px, calc(100vw - 2rem));
+  padding: .7rem;
+  display: grid;
+  gap: .5rem;
+  background: var(--ws-paper, #fff);
+  border: 1px solid var(--ws-border, var(--rc-line));
+  border-radius: 14px;
+  box-shadow: var(--ws-shadow-up, var(--rc-shadow));
+}
+.wa-requests .wa-requests__more-panel .rc-action {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+@media (max-width: 575px) {
+  .wa-requests .rc-page-hero__actions { width: 100%; }
+  .wa-requests .wa-requests__more-panel {
+    right: auto;
+    left: 0;
+    width: min(280px, calc(100vw - 2rem));
+  }
+}
