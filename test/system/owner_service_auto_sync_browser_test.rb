@@ -21,9 +21,11 @@ class OwnerServiceAutoSyncBrowserTest < ApplicationSystemTestCase
 
     visit owner_services_path
     assert_selector ".wa-services__card", count: 0
+    find(".wa-services__tools > summary").click
     click_button "Generate from profile"
     assert_selector ".wa-services__card", count: 2
     assert_selector ".wa-services__state--draft", count: 2
+    find(".wa-services__tools > summary").click
     click_button "Generate from profile"
     assert_selector ".wa-services__card", count: 2
     assert_equal 2, @workspace.service_offerings.count
