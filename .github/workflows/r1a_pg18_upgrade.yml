@@ -1,0 +1,79 @@
+name: R1A PG18 deployed-baseline synthetic upgrade
+on:
+  push:
+    branches: [release/rc-r1a-ai-spend-2026-11-23]
+  pull_request:
+    branches: [feat/client-owner-pilot-2026-11-13]
+permissions:
+  contents: read
+jobs:
+  pg18-upgrade:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 18
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rc_r1a_pg18_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s
+          --health-timeout 5s --health-retries 12
+    env:
+      RAILS_ENV: test
+      PGHOST: 127.0.0.1
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      RC_LOCAL_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/rc_r1a_pg18_test
+      DEPLOYED_SHA: 90d7a817651ba1bffe174d3f800d32988a664169
+      R1A_MIGRATION: "20261113213000"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+      - name: Check exact deployed ancestry and single migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git cat-file -e "${DEPLOYED_SHA}^{commit}"
+          git merge-base --is-ancestor "$DEPLOYED_SHA" HEAD
+          test "$(git diff --name-only "$DEPLOYED_SHA" HEAD -- 'db/migrate/*.rb')" = "db/migrate/20261113213000_create_ai_spend_entries.rb"
+      - name: Restore deployed schema into ephemeral PG18 and add synthetic rows
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp db/schema.rb "$RUNNER_TEMP/r1a_candidate_schema.rb"
+          git show "$DEPLOYED_SHA:db/schema.rb" > db/schema.rb
+          bundle exec rails db:schema:load
+          cp "$RUNNER_TEMP/r1a_candidate_schema.rb" db/schema.rb
+          git diff --quiet -- db/schema.rb
+          test "$(psql -XAt -d rc_r1a_pg18_test -c "SELECT to_regclass('public.ai_spend_entries') IS NULL")" = t
+          psql -X -v ON_ERROR_STOP=1 -d rc_r1a_pg18_test <<'SQL'
+          INSERT INTO users(email, password_digest, role, created_at, updated_at)
+          VALUES ('synthetic-r1a@example.test', 'no-valid-password', 'owner', NOW(), NOW());
+          INSERT INTO project_intakes(title, project_type, goal, status, demo_consent_at, created_at, updated_at)
+          VALUES ('R1A synthetic fixture', 'website', 'Old row must survive additive upgrade', 'interviewing', NOW(), NOW(), NOW());
+          SQL
+          psql -XAt -d rc_r1a_pg18_test -c "SELECT COUNT(*) FROM schema_migrations" > "$RUNNER_TEMP/r1a_before"
+      - name: Apply only RC051 and prove synthetic user and intake persisted
+        shell: bash
+        run: |
+          set -euo pipefail
+          bundle exec rails db:migrate
+          before="$(cat "$RUNNER_TEMP/r1a_before")"
+          after="$(psql -XAt -d rc_r1a_pg18_test -c "SELECT COUNT(*) FROM schema_migrations")"
+          test "$after" -eq "$((before + 1))"
+          test "$(psql -XAt -d rc_r1a_pg18_test -c "SELECT COUNT(*) FROM schema_migrations WHERE version = '$R1A_MIGRATION'")" = 1
+          test "$(psql -XAt -d rc_r1a_pg18_test -c "SELECT COUNT(*) FROM users WHERE email = 'synthetic-r1a@example.test'")" = 1
+          test "$(psql -XAt -d rc_r1a_pg18_test -c "SELECT COUNT(*) FROM project_intakes WHERE title = 'R1A synthetic fixture'")" = 1
+          test "$(psql -XAt -d rc_r1a_pg18_test -c "SELECT COUNT(*) FROM ai_spend_entries")" = 0
+          echo "R1A_EPHEMERAL_PG18_UPGRADE=PASS"
+          echo "REAL_PRODUCTION_DB_ACCESSED=FALSE"
+          echo "PAID_AI_CALLS=ZERO"
