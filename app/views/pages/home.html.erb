@@ -7,6 +7,9 @@
     <div class="d-flex flex-wrap align-items-center gap-2">
       <%= link_to rc_icon_label("calendar3", t("calendar.today_24")), calendar_day_path(date: Time.zone.today.iso8601),
                   class: "rc-action rc-action--quiet" %>
+      <%# Appointments live under Calendar, not as a second owner top-nav destination. %>
+      <%= link_to rc_icon_label("journal-text", t("nav.consultations")), consultations_path,
+                  class: "rc-action rc-action--quiet" if owner_signed_in? %>
       <%= link_to rc_icon_label("list-ul", t("calendar.events_by_date")), "#month-events", class: "rc-action rc-action--quiet calendar-mobile-agenda-trigger" %>
       <% if admin_signed_in? %>
         <%= render "creation_menu", start_at: (Time.zone.today.beginning_of_month == @displayed_month.beginning_of_month ? Time.zone.local(Time.zone.today.year, Time.zone.today.month, Time.zone.today.day, Time.zone.now.hour) : Time.zone.local(@displayed_month.year, @displayed_month.month, 1, 10)) %>
