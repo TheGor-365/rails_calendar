@@ -95,12 +95,12 @@
     </div>
   </section>
 
-  <div class="ws-account-content ws-account-content--rail">
+  <div class="ws-account-content ws-account-content--rail" data-controller="wa-section-nav">
     <nav class="wa-cabinet-rail" aria-label="<%= t("nav.workspace_sections") %>">
-      <a href="#cabinet-profile"><i class="bi bi-person-vcard" aria-hidden="true"></i><%= t("account_hub.professional_profile") %></a>
-      <a href="#cabinet-tools"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= t("account_hub.owner_tools") %></a>
-      <a href="#cabinet-privacy"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.storage_heading") %></a>
-      <a href="#cabinet-work"><i class="bi bi-clipboard-check" aria-hidden="true"></i><%= t("account_hub.work_overview") %></a>
+      <a href="#cabinet-profile" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-person-vcard" aria-hidden="true"></i><%= t("account_hub.professional_profile") %></a>
+      <a href="#cabinet-tools" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= t("account_hub.owner_tools") %></a>
+      <a href="#cabinet-privacy" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.storage_heading") %></a>
+      <a href="#cabinet-work" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-clipboard-check" aria-hidden="true"></i><%= t("account_hub.work_overview") %></a>
     </nav>
     <section class="ws-account-main">
       <div class="ws-account-section-heading" id="cabinet-profile">
