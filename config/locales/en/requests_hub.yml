@@ -1,8 +1,8 @@
 en:
   requests_hub:
-    eyebrow: "PROJECTS / MANAGEMENT"
+    eyebrow: "REQUESTS / CLIENT WORK"
     title: "Requests"
-    subtitle: "Manage incoming requests and outgoing invitations in one place."
+    subtitle: "Review incoming enquiries and client invitations without switching between workspaces."
     switch_label: "Request direction"
     incoming: "Incoming"
     outgoing: "Outgoing"
@@ -11,6 +11,7 @@ en:
     incoming_hint: "Client submissions and internal requests."
     outgoing_hint: "Proposals and invitations sent to clients."
     new_outgoing: "New invitation"
+    more_actions: "More actions"
     new_request: "New request"
     new_label: "New"
     sender: "Sender"
