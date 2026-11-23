@@ -1,6 +1,36 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7n owner one-shot 17-table catalog PASS — 23 November 2026
+
+**Direct owner-terminal report (2026-11-23), NOT remote inspection of private PostgreSQL:** owner executed exactly ONE explicitly authorized C2.3b7n PG16 read-only `pg_catalog` 17-table + `public.schema_migrations.version` observation, from previously verified clean detached worktree `~/rails_calendar_c23b7n_catalog_worktree_20261123` pinned to exact code SHA `cdf09a245573c1872beb38d76d563e9622d17abf` (operator blob `f7f866a19b7e1bcc5bacb4c0c373106a7c0d5bcd`) against *only* historical scratch `rails_calendar_r04_restore_20261121t231331z_27407`. This was separately approved in the conversation and [logged in PR #81](https://github.com/TheGor-365/rails_calendar/pull/81#issuecomment-7088625226). Owner-provided bounded stdout:
+
+```text
+Syntax OK
+C23B7N_PREFLIGHT=PASS
+STARTING_ONE_AUTHORIZED_17_TABLE_METADATA_QUERY
+C2.3B7N_17_TABLE_CATALOG=PASS
+SCHEMA_MIGRATIONS_AND_17_TABLE_METADATA=PASS
+G5=BLOCKED
+SOURCE_MEDIA_TENANCY_AND_SCAN_AUTHORIZATION=NOT_VERIFIED
+DATABASE_WRITES_AND_APPLICATION_ROW_READS=NOT_PERFORMED_BY_THIS_TOOL
+OPERATOR_EXIT_CODE=2
+NO_AUTOMATIC_RETRY=TRUE
+```
+
+**Interpretation:** the corrected, fixed minimum schema contract for 17 allowlisted tables and the allowlisted migration versions returned PASS for this specific historical scratch at the moment of the observation. The previously sole detected discrepancy, exact invitation-index name, no longer fails because C2.3b7m supports the observed valid+ready Rails-generated name `idx_on_workspace_id_created_at_2c68e09548` in addition to one literal legacy alias. This is *metadata-only minimum compatibility*, not verification of column types/null constraints, all FK/index definitions, row lineage, tenant isolation, application runtime, source-to-scratch parity, source DB state, media consistency, backup restore evidence, operator write safety, replay effects, or readiness for Railway production. This does NOT authorize scans or changes.
+
+**Current gate classification (newest checkpoint overrides stale earlier sections):** `C2.3b7n MINIMUM_17_TABLE_CATALOG=PASS`, `CONSENT=CONSUMED`, `ONE_QUERY=EXECUTED_ONCE`, `NO_AUTOMATIC_RETRY=TRUE`, `C2.3b7m/n FUNCTIONAL_SHA_CI=SUCCESS`, `G5_OVERALL=BLOCKED`, `G3/G4/G6=OPEN`, `OWNER_REPLAY_AND_WRITES=NOT_AUTHORIZED`, `RELEASE=NOT_AUTHORIZED`. Operator exit 2 is deliberate even after PASS. Earlier b7j/b7k/b7l approvals likewise remain consumed. No additional SQL operator, migrations, index DDL/reindex, row-level scans, source DB reads, backup/media operations, restore, replay/writer, paid provider invocation, Railway deploy or PR merge has been authorized.
+
+**Verified repository evidence:** Draft PR #81 OPEN at docs HEAD `1d2810f428ce65dff4708ed482bdd500740b7717` before this checkpoint. All four exact-SHA CI/Security workflows for the previously current docs SHA completed SUCCESS: PR Rails #45090499765, PR Security #45090499754, push Rails #45090494656, push Security #45090494675. Independent functional code SHA `cdf09a2` also had four successful exact-SHA CI/Security runs. This new documentation-only checkpoint will trigger *its own* CI; no green assertion for it until confirmed.
+
+**Next independent stage — offline, no operator approval implied:** build an evidence/gate checklist for R0/G3/G4/G6 with exact source/review/scratch DB identities, a protected PostgreSQL + Active Storage backup/restore manifest and checksums, schema drift reconciliation (`db/schema.rb` is modified in owner's existing checkout), private media/source parity, tenancy/ACL and source-family lineage controls, an owner-reviewed bounded *dry-run-only* plan for C2.3b7 replay. First inspect existing committed runbooks/CI evidence and do not duplicate completed steps. Only after a separately approved and fully bounded plan may a **new** read-only preflight access the appropriate isolated environment. No customer rows or credentials in GitHub. Separate explicit owner authorization is required for each change or new DB read.
+
+**Preservation:** original dirty checkout and `db/schema.rb`, all older named worktrees, source/review DB `rails_calendar_rc0551f_c21b_review_20261117`, historical scratch, existing PostgreSQL backups + private Active Storage media, Railway production, main branch, live users and providers are unchanged by assistant actions. Do not delete, reset, overwrite or expose them.
+
+
+
+
 ## C2.3b7n owner-local clean worktree preflight PASS — 23 November 2026
 
 **New owner-terminal evidence (2026-11-23):** from the historical `rails_calendar_r04_scratch_worktree_20261122` shell, owner ran guarded Git-only preflight against separately identified `~/rails_calendar_ai_c21c`. Remote feature HEAD at fetch was documentation SHA `67c262a43872ffb9686f603b5b0e882c15640e9b`. Git verified `cdf09a245573c1872beb38d76d563e9622d17abf` is an ancestor of that HEAD and guarded operator/contract/probe/test files match the code SHA. **NEW** clean detached worktree `~/rails_calendar_c23b7n_catalog_worktree_20261123` created pinned to code `cdf09a245573c1872beb38d76d563e9622d17abf`. Fixed operator blob verified as `f7f866a19b7e1bcc5bacb4c0c373106a7c0d5bcd`; direct Ruby 3.4.13 syntax check `Syntax OK`. Owner stdout:
