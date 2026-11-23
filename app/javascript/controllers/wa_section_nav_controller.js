@@ -11,6 +11,17 @@ export default class extends Controller {
     window.addEventListener("scroll", this.onPositionChanged, { passive: true })
     window.addEventListener("resize", this.onPositionChanged, { passive: true })
     window.addEventListener("hashchange", this.onHashChanged)
+
+    // The White Atlas header is sticky on desktop and may wrap to two rows.
+    // A fixed 20px top hides the section rail behind it. Measure actual height.
+    this.header = document.querySelector(".app-header")
+    this.syncHeaderOffset = this.syncHeaderOffset.bind(this)
+    window.addEventListener("resize", this.syncHeaderOffset, { passive: true })
+    if (this.header && typeof ResizeObserver !== "undefined") {
+      this.headerObserver = new ResizeObserver(this.syncHeaderOffset)
+      this.headerObserver.observe(this.header)
+    }
+    this.syncHeaderOffset()
     this.update()
   }
 
@@ -18,6 +29,14 @@ export default class extends Controller {
     window.removeEventListener("scroll", this.onPositionChanged)
     window.removeEventListener("resize", this.onPositionChanged)
     window.removeEventListener("hashchange", this.onHashChanged)
+    window.removeEventListener("resize", this.syncHeaderOffset)
+    this.headerObserver?.disconnect()
+  }
+
+  syncHeaderOffset() {
+    const sticky = this.header && ["sticky", "fixed"].includes(getComputedStyle(this.header).position)
+    const height = sticky ? Math.ceil(this.header.getBoundingClientRect().height) : 0
+    this.element.style.setProperty("--wa-section-nav-sticky-top", `${height + 16}px`)
   }
 
   activate(event) {
