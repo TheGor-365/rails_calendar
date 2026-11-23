@@ -6,7 +6,6 @@
         <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-inboxes"></i></span>
         <h1 class="page-title"><%= t("requests_hub.title") %></h1>
       </div>
-      <p class="rc-muted"><%= t("requests_hub.subtitle") %></p>
     </div>
     <div class="rc-page-hero__actions">
       <%= link_to rc_icon_label("send-plus", t("requests_hub.new_outgoing")), owner_invitations_path, class: "rc-action rc-action--primary" if owner_signed_in? %>

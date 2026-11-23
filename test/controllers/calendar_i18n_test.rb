@@ -2,10 +2,10 @@ require "test_helper"
 
 class CalendarI18nTest < ActionDispatch::IntegrationTest
   LANGUAGES = {
-    "en" => ["Consultations", "New consultation", "January", "Title contains"],
-    "ru" => ["Консультации", "Новая консультация", "январь", "Поиск по названию"],
-    "hy" => ["Խորհրդատվություններ", "Նոր խորհրդատվություն", "հունվար", "Վերնագրով որոնում"],
-    "es" => ["Consultas", "Nueva consulta", "enero", "Buscar por título"]
+    "en" => ["Events", "New consultation", "January", "Title contains"],
+    "ru" => ["События", "Новая консультация", "январь", "Поиск по названию"],
+    "hy" => ["Իրադարձություններ", "Նոր խորհրդատվություն", "հունվար", "Վերնագրով որոնում"],
+    "es" => ["Eventos", "Nueva consulta", "enero", "Buscar por título"]
   }.freeze
 
   test "all languages keep the same calendar structure and link semantics" do

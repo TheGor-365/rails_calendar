@@ -27,6 +27,32 @@ class WorkspaceControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to sign_in_url
   end
 
+  test "owner mobile dock has five links with logout in the header" do
+    owner = User.create!(email: "qa-mobile-owner@example.test", role: "owner",
+                         password: "qa-mobile-owner-password-2026")
+    post account_session_url, params: {email: owner.email, password: "qa-mobile-owner-password-2026"}
+    assert_redirected_to workspace_url
+    get workspace_url
+    assert_response :success
+    assert_select "nav.rc-mobile-dock--owner a.rc-mobile-dock-item", count: 5
+    assert_select "nav.rc-mobile-dock--owner form[action=?]", sign_out_path, count: 0
+    assert_select "header.app-header form[action=?]", sign_out_path, count: 1
+  end
+
+  test "client dock has three links and sign-out remains in the header" do
+    client = User.create!(email: "qa-mobile-client@example.test", role: "client",
+                          password: "qa-mobile-client-password-2026",
+                          email_verified_at: Time.current, signup_consent_at: Time.current,
+                          signup_policy_version: "qa-mobile-2026")
+    post account_session_url, params: {email: client.email, password: "qa-mobile-client-password-2026"}
+    assert_redirected_to client_home_path
+    get client_cabinet_path
+    assert_response :success
+    assert_select "nav.rc-mobile-dock--client a.rc-mobile-dock-item", count: 3
+    assert_select "nav.rc-mobile-dock--client form[action=?]", sign_out_path, count: 0
+    assert_select "header.app-header form[action=?]", sign_out_path, count: 1
+  end
+
   test "guest public services has no owner workspace links" do
     get services_url
     assert_response :success

@@ -10,7 +10,6 @@
         <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-file-earmark-text" aria-hidden="true"></i><%= t("intake.spec_eyebrow", version: @latest_spec.version) %></span>
       <% end %>
     </div>
-    <p class="rc-hint"><%= t("intake.show_hint") %></p>
     <% if owner_signed_in? %>
       <% quiz_questions = Intake::QuizCatalog.for(@intake.project_type) %>
       <% quiz_saved = @intake.intake_answers.where(question_key: quiz_questions.map { |question| question.fetch(:key) }).count %>

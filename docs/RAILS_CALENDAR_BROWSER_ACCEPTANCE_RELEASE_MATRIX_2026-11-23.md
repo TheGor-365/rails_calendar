@@ -67,3 +67,7 @@
 1. Open `http://localhost:3002/workspace/assistant/conversations` in the existing local owner session. Screenshot the full UI with any sensitive identifiers redacted. No Ask AI, no file uploads, no new notes yet.
 2. Report whether `#owner-ai-conversations`, new-thread action, message composer, consent notice and responsive layout appear. If local server is down, return the exact browser error, no DB/migration commands.
 3. Based on screenshot, mark `A1 MANUAL_BROWSER_PASS` or `DEFECT` in canonical status and move to B1 free-note retention test. Then A2 and A3; each successful feature informs release selection. Current production stays unchanged until R1A release signoff.
+
+## 2026-11-23 owner screenshot QA and C2.4a retest
+
+Owner and fictional client render at local 3002. Calendar mobile 400px cluttered, past-month grid faint; owner activities around 22:37 present in month but not visible as typed cards in hour; redundant bottom dock Sign out and native + custom disclosure arrows; noncommercial demo boilerplate. **C2.4a source prepared** (scoped styles, views, i18n, tests) in feature PR #81. **NO new browser verification or production deployment yet.** Retest 1440/400/320, 2026-11-13 22h, owner/client header sign-out, one-chevron accordions. Paid AI and recorded review DB writes are not part of this UI retest.

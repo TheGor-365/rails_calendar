@@ -18,7 +18,11 @@
   </section>
   <section class="ws-hub-section" aria-labelledby="ws-outgoing">
     <div class="ws-hub-section-head">
-      <h2 id="ws-outgoing"><i class="bi bi-send-check" aria-hidden="true"></i> <%= t("owner_activity.outgoing") %> (<%= @outgoing_count %>)</h2>
+      <h2 id="ws-outgoing" class="ws-hub-section-title">
+        <span class="ws-hub-section-title__icon"><i class="bi bi-send-check" aria-hidden="true"></i></span>
+        <span><%= t("owner_activity.outgoing") %></span>
+        <span class="ws-hub-section-title__count"><%= @outgoing_count %></span>
+      </h2>
       <%= link_to rc_icon_label("arrow-up-right", t("owner_activity.all_outgoing")), owner_invitations_path(anchor: "invitation-history"), class: "rc-action rc-action--quiet rc-action--small" %>
     </div>
     <% if @outgoing_invitations.any? %>
@@ -48,7 +52,12 @@
     <% end %>
   </section>
   <section class="ws-hub-section" aria-labelledby="ws-tools">
-    <div class="ws-hub-section-head"><h2 id="ws-tools"><%= t("workspace.tools_heading") %></h2><span><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("workspace.owner_only") %></span></div>
+    <div class="ws-hub-section-head">
+      <h2 id="ws-tools" class="ws-hub-section-title">
+        <span class="ws-hub-section-title__icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span>
+        <span><%= t("workspace.tools_heading") %></span>
+      </h2>
+    </div>
     <div class="ws-hub-tools">
       <%= link_to owner_notifications_path, class: "ws-hub-tool" do %>
         <span class="ws-hub-tool-icon"><i class="bi bi-bell" aria-hidden="true"></i></span>

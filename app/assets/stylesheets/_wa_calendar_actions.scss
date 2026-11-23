@@ -371,3 +371,74 @@
   .wa-calendar-day-recap__description, .wa-calendar-hour-details__item > div { flex-basis: calc(100% - 70px); }
   .wa-calendar-day-recap__source, .wa-calendar-hour-details__item > .rc-action { margin-left: auto; }
 }
+
+
+// Commercial White Atlas calendar refinement, 2026-11-23.
+// Semantic visibility only: preserve the 24-hour 42px grid, record ACLs and layout.
+.wa-calendar {
+  .calendar-grid {
+    background: #aac8bf;
+    border-color: #aac8bf;
+    border-spacing: 1px;
+    tbody td { box-shadow: inset -1px 0 #b6cdc6, inset 0 -1px #b6cdc6; }
+    tbody td:has(.wa-calendar-date--past) { box-shadow: inset -1px 0 #adc4bc, inset 0 -1px #adc4bc; }
+    td:has(.wa-calendar-date--today) {
+      box-shadow: inset 0 3px 0 var(--ws-teal), inset -1px 0 #8fbcaf, inset 0 -1px #8fbcaf;
+    }
+    .wa-calendar-event--ai, .wa-calendar-event--conversation {
+      border-left-color: var(--ws-teal);
+      background: var(--ws-teal-wash);
+    }
+    .wa-calendar-event--invitation { border-left-style: dashed; }
+    .wa-calendar-event--requirements { border-left-width: 4px; }
+  }
+  .rc-hour-band { display: flex; align-items: center; min-width: 0; padding: 3px 8px; }
+  .wa-calendar-hour-preview {
+    display: flex; align-items: center; gap: .4rem;
+    width: min(47%, 460px); max-width: 100%; min-width: 0;
+    padding: .2rem .4rem;
+    border: 1px solid #badad1;
+    border-left: 3px solid var(--ws-teal);
+    border-radius: 7px;
+    background: var(--ws-teal-wash);
+    color: var(--ws-ink);
+  }
+  .wa-calendar-hour-preview > .bi { flex: 0 0 auto; font-size: .82rem; color: var(--ws-teal); }
+  .wa-calendar-hour-preview__content { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.1; }
+  .wa-calendar-hour-preview__content strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .69rem; }
+  .wa-calendar-hour-preview__content small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--ws-muted); font-size: .57rem; }
+  .wa-calendar-hour-preview__extra { flex: 0 0 auto; font-size: .65rem; font-weight: 800; }
+  .wa-calendar-hour-preview--invitation { border-left-style: dashed; }
+  .wa-calendar-hour-preview--requirements { border-left-width: 4px; }
+  .wa-calendar-hour-preview--service { border-left-width: 5px; }
+  .wa-calendar-hour-preview--conversation { border-left-style: double; border-left-width: 4px; }
+}
+
+// Hide native summary triangle only where a custom disclosure chevron exists.
+details:has(> summary .bi-chevron-down) > summary { list-style: none; }
+details:has(> summary .bi-chevron-down) > summary::-webkit-details-marker { display: none; }
+details:has(> summary .bi-chevron-down) > summary::marker { content: ""; }
+.wa-calendar-activity__summary { display: flex; align-items: center; min-height: 54px; }
+.wa-calendar-activity__heading { flex: 1; min-width: 0; flex-wrap: nowrap; gap: .75rem; }
+.wa-calendar-activity__title { min-width: 0; }
+.wa-calendar-activity__chevron { margin-left: auto; flex: 0 0 auto; }
+
+@media (max-width: 767.98px) {
+  .wa-calendar .calendar-grid tbody td { height: 60px; padding: 0; }
+  .wa-calendar .calendar-grid .calendar-date-heading { height: 60px; padding: 0; margin: 0; border-bottom: 0; }
+  .wa-calendar .calendar-grid .calendar-day-link { padding-top: .27rem; }
+  .wa-calendar .calendar-grid .calendar-day-label { width: 27px; height: 27px; font-size: .78rem; }
+  .wa-calendar .calendar-grid .calendar-day-count { top: 34px; min-width: 19px; height: 18px; font-size: .62rem; }
+  .wa-calendar .wa-calendar-cell-add { display: none; }
+  .wa-calendar .calendar-grid thead th { font-size: .61rem; }
+}
+@media (max-width: 575.98px) {
+  .rc-mobile-dock--client { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .wa-calendar .rc-hour-band { padding: 2px 4px; }
+  .wa-calendar .wa-calendar-hour-preview { width: 43%; padding: .15rem .25rem; gap: .2rem; }
+  .wa-calendar .wa-calendar-hour-preview__content strong { font-size: .59rem; }
+  .wa-calendar .wa-calendar-hour-preview__content small { font-size: .5rem; }
+  .wa-calendar-hour-activity { width: min(54%, 360px); right: 3px; }
+  .wa-calendar-activity__summary { padding: .8rem; }
+  .wa-calendar-activity__title > strong { font-size: .88rem; }
+}

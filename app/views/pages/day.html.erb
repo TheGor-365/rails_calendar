@@ -42,7 +42,6 @@
       <header class="wa-calendar-day-recap__header">
         <div>
           <h2 class="h6 mb-1"><i class="bi bi-clock-history" aria-hidden="true"></i> <%= t("calendar.day_activity_heading") %></h2>
-          <p class="rc-hint mb-0"><%= t("calendar.day_activity_hint") %></p>
         </div>
         <span class="wa-calendar-day-recap__total"><%= @day_activity.size %></span>
       </header>
@@ -115,6 +114,17 @@
                 <span class="visually-hidden">
                   <%= from_label %>–<%= to_label %>, <%= rc_count(slot[:count], "calendar", "event") %>
                 </span>
+              <% if owner_signed_in? && (entries = @day_activity_by_hour[slot[:hour]]).present? %>
+                <% entry = entries.first %>
+                <span class="wa-calendar-hour-preview wa-calendar-hour-preview--<%= entry[:kind] %>" data-calendar-event-kind="<%= entry[:kind] %>">
+                  <i class="bi bi-<%= entry[:icon] %>" aria-hidden="true"></i>
+                  <span class="wa-calendar-hour-preview__content">
+                    <strong><%= truncate(entry[:title], length: 42) %></strong>
+                    <small><%= entry[:created_at].in_time_zone.strftime("%H:%M") %> · <%= t("calendar_actions.kinds.#{entry[:kind]}") %></small>
+                  </span>
+                  <% if entries.size > 1 %><span class="wa-calendar-hour-preview__extra">+<%= entries.size - 1 %></span><% end %>
+                </span>
+              <% end %>
               <% end %>
             <% end %>
           </div>
@@ -190,9 +200,6 @@
     </div>
   </section>
 
-  <p class="rc-hint mt-3">
-    <%= t("calendar.day_help", zone: Time.zone.name) %>
-  </p>
   <%= render "activity_list", activities: @day_activity %>
   <%= render "slot_menu" %>
   <%= render "creation_dialog" %>

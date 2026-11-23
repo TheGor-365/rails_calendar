@@ -138,7 +138,7 @@ class DayCalendarTest < ActionDispatch::IntegrationTest
     get root_url(start_date: "2023-01-19")
 
     assert_response :success
-    assert_select "section.calendar-mobile-agenda[aria-label='Consultations in the displayed month']", count: 1
+    assert_select "section.calendar-mobile-agenda[aria-label='Events in the displayed month']", count: 1
     assert_select ".calendar-mobile-agenda-title", text: "Events in January 2023"
     assert_select "a.calendar-mobile-date-link[href=?]", calendar_day_path(date: "2023-01-19"), count: 1
     assert_select "a.calendar-mobile-event-link[href=?]", consultation_path(consultations(:one)), count: 1

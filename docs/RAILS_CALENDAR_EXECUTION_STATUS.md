@@ -1,6 +1,19 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.4a browser screenshot defect corrections — 23 November 2026
+
+**User owner screenshots verified locally:** Ruby 3.4.13 server now renders owner and verified client, month/day/hour calendar, owner workspace/cabinet, library, requests and AI assistant. Earlier BLOCKED_BOOT at Ruby 3.4.12 was resolved by owner, but no paid AI call or synthetic data persistence tested. New manual UI defects: faint grid/mobile overlapping plus buttons, no legible type-specific activity in real hourly band, duplicate native disclosure marker, redundant bottom logout (6 owner items/5-column grid), noncommercial learner strings and inconsistent owner section headings.
+
+**New product-first scoped code C2.4a:** [runbook](RC0551F_C24A_WHITE_ATLAS_COMMERCIAL_UI_BROWSER_FIXES_2026-11-23.md), White Atlas token-only SCSS, typed hour preview and month icons, more visible calendar cell boundaries, 7-column mobile 60px month cells without competing inline plus buttons, native details-marker suppressed only alongside a custom chevron, owner/client footer sign-out removed while header sign-out preserved, consistent owner workspace headings, general Events calendar title in all four locales, removed selected demo instructional paragraphs and reworded 19 intake strings per locale. Rails tests cover typed activity/owner-client dock. **The code is NOT owner-browser accepted or deployed; CI must be verified on NEW SHA.**
+
+**Important scoped exception to remove-all-checkboxes instruction:** DO NOT delete model-required external Grok data-transfer authorization, explicit paid AI consent, client signup/terms or public-share consent merely for visual polish. Reworded generic creation form checkbox to a short actual AI data-transfer statement, pending a later backend refactor to authorize at the real paid/provider action. No provider flags, paid API, migrations, source/scratch DB or Railway production changes.
+
+**Next:** exact SHA CI/Security; owner uses separate clean worktree and CSS rebuild to examine calendar at 1440/400/320 with 2026-11-13 22h event, accordion single arrow, mobile owner/client dock and request hero; report PASS/DEFECT. Continue source-wide text/consent UX audit in a distinct approved functional slice. R1A Draft release PR #82 6/6 previous SHA PASS but remains NOT_DEPLOYED; no automatic production migration or historical replay.
+
+
+
+
 ## A1 local browser boot blocked by Ruby 3.4.12 vs required 3.4.13 — 23 November 2026
 
 **OWNER TERMINAL EVIDENCE:** after earlier disconnected browser `ERR_CONNECTION_REFUSED` and graceful Rails server termination, owner attempted the previously reviewed `script/rc0551f_c21c_local_grok_server.sh` from original checkout `~/rails_calendar_ai_c21c`, local branch `local/rc0551f-c21c`. Script stopped before Rails could serve because Bundler reported verbatim: `Your Ruby version is 3.4.12, but your Gemfile specified 3.4.13`. App, owner page and client page remain **MANUAL_BROWSER=BLOCKED_BOOT**, not verified broken UI.
