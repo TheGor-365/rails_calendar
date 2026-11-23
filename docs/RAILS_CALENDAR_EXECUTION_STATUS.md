@@ -1,6 +1,29 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.5d detached-worktree missing private media resilience — 24 November 2026
+
+**Verified owner local run (read-only evidence):** user switched only isolated `~/rails_calendar_c25a_ia_review_20261123` from `7246d054fa7c556ec9b3cc5921b2dcc7c0194cf2` to exact CI-verified `b91ab7b3dc1778177d6b55138aa21e8e01b7e0ad`. `script/rc0551f_c25a1_preview.sh` printed `C25A1_ASSETS_READY=PASS`, `C21C_LOCAL_GROK_READY (no provider call, no DB write)`, `C21C_DATABASE=verified_local_review`; Rails 8.1.4.1/Puma 8.0.4 listening on localhost :3003. No migration, paid AI provider call, or production deployment reported.
+
+**Browser evidence (screenshots RU, ~1649px desktop):** `/admin/project_intakes?view=outgoing` shows active Outgoing with 2 sent invitations; `?view=incoming` shows active Incoming with 2 incoming requests. Both incoming/outgoing row accordions open on their own screen without full-page navigation, showing factual status/details and their source actions. **C2.5c desktop incoming/outgoing navigation and open-row rendering observed; limited positive confirmation.** The user did **not** supply an open `More actions` popover at 400/320px or the revised Workspace/Cabinet screens. Those are **OWNER_BROWSER_NOT_TESTED**, despite CI mobile checks; the screenshot is not a global UX sign-off. The private example records expose mixed RU/EN owner-authored text and old training/test instructions in a Description body; *do not silently rewrite persisted owner/client content as if locale strings*.
+
+**Real error in pasted local server trace:** `OwnerServiceMediaItemsController#file` called `blob.download` against an Active Storage metadata row whose blob key has no corresponding file under `~/rails_calendar_c25a_ia_review_20261123/storage/...`; Rails returned **500 ActiveStorage::FileNotFoundError / Errno::ENOENT**. Private owner avatar file `/workspace/avatar/12` similarly lacked disk bytes and already returned protected **404**, but its `<img>` remained visibly broken. This is detached-worktree / storage-path mismatch *evidence*, NOT proof the image is permanently lost. No file restoration/move, DB mutation, cleanup or alternate storage symlink authorized.
+
+**C2.5d code applied to Draft PR #81, candidate SHA `694e383a39733fdcb14134b1c7b0c1a2625ff925` (exact CI pending):**
+- `OwnerServiceMediaItemsController#file`: rescue **only** `ActiveStorage::FileNotFoundError` and return protected `404`; retain existing private owner/workspace/media authorization and no-store/no-sniff headers. No metadata or file deletion. Does not expose public blob routes.
+- `test/controllers/owner_service_media_items_test.rb`: upload a synthetic banner in isolated test storage, delete **only synthetic test bytes**, request owner scoped media, assert 404 and attachment row retained.
+- New Stimulus `wa-private-image` controller: on native image error (or already failed cached image) hides broken `<img>` and reveals pre-rendered White Atlas fallback icon. Applied only to header owner avatar and owner Cabinet avatar; it makes no network calls and does not recreate files or change persisted data. Avatar private-serving action already returns 404 for missing file.
+- Scoped `_rc_owner_cabinets.scss` rules preserve existing loaded images, honor HTML `hidden`, style fallback tokenized avatar icon. Existing upload/edit popover remains intact.
+- Updated controller tests plus owner avatar browser scenario to check missing-byte error/fallback while retaining attachment metadata. All synthetic fixture deletions occur in **CI-only test storage**, not the user's local review or production.
+
+**Status:** C2.5c `AUTOMATED_CI_VERIFIED` at prior exact SHA `b91ab7b`; owner desktop partial confirmation. C2.5d `CODE_COMMITTED`, `CI_PENDING`, `OWNER_BROWSER_NOT_TESTED`, `NOT_DEPLOYED`. Do not mark C2.5d PASS before exact new SHA CI and fresh owner screenshot.
+
+**Next actions (after exact SHA CI PASS):** (1) owner stops only localhost :3003 Puma and advances existing clean detached worktree, guarding original HEAD `b91ab7b` and target exact SHA; (2) run guarded preview script, verify owner avatar fallback/404 (no browser broken icon), Requests 400/320px expanded menu and Workspace/Cabinet screenshots; (3) record explicit acceptance/blockers in this repo. No Railway, backup, DB, real media or paid AI work authorized.
+
+---
+
+
+
 ## C2.5c1 Requests mobile overflow CI regression — 24 November 2026
 
 **Base exact-SHA GH Actions:** C2.5c docs HEAD `31b479018cca0c7923edb45aaa9fa1329d328d93`; Rails CI [45286977993](https://github.com/TheGor-365/rails_calendar/actions/runs/45286977993) **FAILURE**; Security Audit [45286978763](https://github.com/TheGor-365/rails_calendar/actions/runs/45286978763) **SUCCESS**. PG18 new schema and synthetic deployed-upgrade jobs passed; 515 Rails tests / 7938 assertions **0 failures**; 52 Chrome browser cases / 802 assertions **1 failure**. The new `StickyRequestSideNavigationTest#test_owner_Requests_hub_has_one_primary_action,_accessible_tools_and_deep-link_tabs` at 390px with opened `More actions` menu found `documentElement.scrollWidth=449` vs `innerWidth=390`. This is a **real responsive defect**, not a stale assertion.
