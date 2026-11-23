@@ -1,6 +1,16 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7t 17-table typed G5 static contract and synthetic tests — 23 November 2026
+
+**OFFLINE ONLY, no DB access / approval.** New strict pure typed catalog spec + synthetic negative tests for 17 tables and 94 selected columns; 19 indexes including unique and partial predicate/ordered keys; 15 named CHECK source expressions; allowlisted validated FK source/target keys and prior required migrations. Derived from tracked schema and creation migrations for 4 newer tables missing in `db/schema.rb`. No mutation or restoration of the owner's locally modified schema. Future PG16 expression canonicalization needed; synthetic PASS is NOT owner scratch PASS. [Runbook](RC0551F_C23B7T_POST_AGGREGATE_G5_G6_GATE_2026-11-23.md).
+
+**CI incident:** prior exact SHA `5da06fb` PR Rails CI #45200221282 FAILED at `OwnerServiceMediaBrowserTest` expected “Reviewed”, observed empty text after media approval. Model suite 504 tests / 7740 assertions PASS; PG18 schema+upgrade and both Security audits PASS; push Rails CI #45200208386 SUCCESS. Browser failure cause not proven; do not claim 4/4 green. New SHA CI pending until checked.
+
+**Gates:** old C2.3b7s user DB read permission CONSUMED, historical aggregate parity owner-reported; G3 archive SHA/format scoped PASS, G4 filesystem MATCH and aggregates PARITY only at observation, G5 MINIMUM CATALOG PASS but TYPED OWNER DB NOT VERIFIED and FULL BLOCKED, G6 WRITER/TENANT NOT VERIFIED, G7 no scan/replay authorization. No new SQL, media reads, restore/migration/writer/deploy/merge.
+
+
+
 ## C2.3b7s owner Active Storage aggregates PARITY, approval CONSUMED; G5/G6 next — 23 November 2026
 
 **Direct owner-terminal result (2026-11-23):** clean detached C2.3b7s source/scratch operator worktree created pinned to functional SHA `a35bf496f2446f6f52b6c543a25c935f322761b1`; 3 Ruby syntax checks `Syntax OK`, `C23B7S_PREFLIGHT=PASS`, `WORKTREE_CLEAN=PASS`. Owner executed exactly ONE separately consented up-to-six-SELECT PG16 Unix-socket read-only aggregate operation across the exact source `rails_calendar_rc0551f_c21b_review_20261117` and historical scratch `rails_calendar_r04_restore_20261121t231331z_27407`. Sanitized stdout:
