@@ -1,11 +1,11 @@
 es:
   owner_services:
-    eyebrow: "PRÁCTICA / SERVICIOS / PROPIETARIO"
+    eyebrow: "ESPACIO PRIVADO / CATÁLOGO DE SERVICIOS"
     title: "Mis servicios"
-    intro: "Las capacidades y ofertas comerciales están separadas; cada revisión requiere aprobación."
+    intro: "Gestiona servicios, alcance del trabajo y revisiones desde un solo lugar."
     owner_only_help: "Borradores, aprobación y activación"
     private_title: "Catálogo interno"
-    private_help: "Los servicios no son visibles a clientes ni en /services hasta RC055.2."
+    private_help: "Estas ofertas solo están disponibles en tu espacio privado. Activar una versión no la publica para los clientes."
     new_action: "Nuevo servicio"
     need_profile: "No hay perfil aprobado"
     need_profile_help: "Aprueba primero tu perfil profesional y capacidades."
