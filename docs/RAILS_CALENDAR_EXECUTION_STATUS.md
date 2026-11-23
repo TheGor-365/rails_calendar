@@ -1,6 +1,17 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7n exact-SHA CI fully VERIFIED — 23 November 2026
+
+**PR #81 OPEN/DRAFT; functional HEAD `cdf09a245573c1872beb38d76d563e9622d17abf` source-readback verified.** Exactly FOUR independent exact-SHA workflow runs all completed **SUCCESS**: [PR Rails CI #45089853984](https://github.com/TheGor-365/rails_calendar/actions/runs/45089853984), [PR Security Audit #45089853996](https://github.com/TheGor-365/rails_calendar/actions/runs/45089853996), [push Rails CI #45089849927](https://github.com/TheGor-365/rails_calendar/actions/runs/45089849927), [push Security #45089849917](https://github.com/TheGor-365/rails_calendar/actions/runs/45089849917). All Rails jobs including PG18 fresh/upgrade, model/controller and Chrome completed green. The preceding C2.3b7m contract correction SHA [`b20d968`](https://github.com/TheGor-365/rails_calendar/commit/b20d968195acc7e5b2e90ff26f1a68f8e8c9ba08) also passed its four exact-SHA workflows: PR Rails #45089674437, PR Security #45089674465, push Rails #45089669263 and push Security #45089669261.
+
+**C2.3b7n current state:** `CODE_COMMITTED=TRUE`, `EXACT_SHA_CI_VERIFIED=TRUE`, `OWNER_LOCAL_WORKTREE=NOT_YET_CREATED`, `ONE_17_TABLES_CATALOG_QUERY=NOT_AUTHORIZED_NOT_EXECUTED`, `G5=BLOCKED`. The operator may *only* be prepared on a new, verified clean worktree at exact functional SHA `cdf09a245573c1872beb38d76d563e9622d17abf`. It reads pg_catalog metadata of 17 allowlisted tables plus `public.schema_migrations.version` (no customer rows) from the existing named PG16 scratch, requiring a **new separate explicit owner consent** after local preflight. Prior b7j/b7k/b7l approvals remain consumed. Do not issue executable SQL operator command with this checkpoint.
+
+**Do not mutate** the physical index, original review DB, historical scratch, private backups/media, dirty local `db/schema.rb`, prior worktrees or Railway. No migration, backfill, replay, restore, main merge, deploy or paid AI is authorized. Even a future catalog PASS cannot independently clear source/media/tenancy/rollback gates. Note: this new documentation-only commit will trigger separate exact-SHA CI, which is not yet verified by this paragraph.
+
+
+
+
 ## C2.3b7n independent 17-table PG16 catalog revalidation offline prepared — 23 November 2026
 
 **C2.3b7n CODE_PREPARED; CI_PENDING; OWNER_APPROVAL_NOT_RECEIVED; LOCAL_DB_NOT_ACCESSED.** After C2.3b7l established valid+ready alternate-name `idx_on_workspace_id_created_at_2c68e09548` and C2.3b7m repaired the static name contract offline, new `script/rc0551f_c23b7n_scratch_catalog_readonly.rb` provides an independent future, strictly guarded, ONE-shot **17-table catalog + `public.schema_migrations.version` metadata** revalidation. Fixed existing SQL, no app/customer rows; requires OS/PG `gor`, exact scratch `rails_calendar_r04_restore_20261121t231331z_27407`, local PG16 socket, clean pinned SHA, fresh uniquely named approval token and read-only timeout restrictions. The script always emits `G5=BLOCKED` and exits 2 even if bounded `C2.3B7N_17_TABLE_CATALOG=PASS`; this is never authorization to scan, replay, repair or deploy. Synthetic CI/negative tests at `test/lib/domain_outbox/six_family_scratch_catalog_revalidation_test.rb`; [operator runbook](RC0551F_C23B7N_17_TABLE_CATALOG_REVALIDATION_2026-11-23.md). **No current consent for C2.3b7n**, older b7j/b7k/b7l permissions consumed.
