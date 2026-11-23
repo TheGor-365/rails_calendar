@@ -1,6 +1,19 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7l one-shot result and C2.3b7m offline name-contract correction — 23 November 2026
+
+**Owner terminal, 2026-11-23:** The separately approved C2.3b7l ONE PG16 scratch catalog read completed with `C23B7L_PREFLIGHT=PASS`, `C2.3B7L_INDEX_VARIANT=ALTERNATE_NAME_VALID_READY`, `C2.3B7L_INDEX_NAME=idx_on_workspace_id_created_at_2c68e09548`, `C2.3B7L_DIFFERENCES=NAME`, `G5=BLOCKED`, `DATABASE_WRITES_AND_APPLICATION_ROW_READS=NOT_PERFORMED_BY_THIS_TOOL`, `BACKUP_MEDIA_TENANCY_AND_REMEDIATION=NOT_AUTHORIZED`, `OPERATOR_EXIT_CODE=2` (deliberate), `NO_AUTOMATIC_RETRY=TRUE`. This is owner-reported bounded stdout, NOT assistant DB access. **OWNER_APPROVAL=CONSUMED; DO NOT RE-RUN.**
+
+**OFFLINE ROOT CAUSE:** Rails 8.1 index-name auto-generation uses max 62 bytes. The migration for `client_request_invitations(workspace_id,created_at)` has NO explicit name. Its conventional name is 63 bytes; SHA-256 fallback generates exactly `idx_on_workspace_id_created_at_2c68e09548`. The physical index observed by C2.3b7l is valid+ready, nonunique B-tree on expected ordered columns, no include/predicate/expression. The previous 17-table G5 failure was an **over-strict literal-name contract** (`index_client_request_invitations_on_workspace_id_and_created_at`), NOT evidence of a missing physical index. Tracked `db/schema.rb` still carries the older name; preserve owner's dirty local schema and avoid a blind schema overwrite.
+
+**C2.3b7m repository-only remediation:** `lib/domain_outbox/six_family_scratch_schema_contract.rb` now targets the exact Rails-generated name while admitting *only* the single legacy name for compatibility with tracked schema.rb; it preserves pre-existing valid+ready filtering and nonunique requirement. `test/lib/domain_outbox/six_family_scratch_schema_contract_test.rb` adds synthetic fallback-hash/alias/wrong-name/wrong-unique regression. [Dedicated runbook](RC0551F_C23B7M_RAILS_GENERATED_INDEX_NAME_2026-11-23.md). **NO DB read/write, migrations, schema.rb rewrite, index DDL, backup/media access, paid AI, replay, production, or merge performed in this code step.**
+
+**CURRENT GATES:** C2.3b7l `ONE_CATALOG_READ=COMPLETED, CONSENT=CONSUMED`; C2.3b7m `CODE_COMMITTED, EXACT_SHA_CI=PENDING` until independent workflow checks on the new commit; `G5=BLOCKED` pending **separate explicit owner permission** and fresh full 17-table catalog verification on scratch with new pinned clean checkout. Even full catalog PASS is not media/source/tenant/write authorization; G3/G4/G6 remain OPEN. Next after code+CI: review physical/schema naming discrepancy and design a new bounded independent *catalog-only* revalidation; don't run the old one-shot scripts again.
+
+
+
+
 ## 2026-11-23 C2.3b7l owner worktree verified — OWNER TERMINAL
 
 **Direct evidence (owner terminal, 2026-11-23):** ran the guarded Git-only fetch and detached worktree creation from the existing R0.4 scratch checkout. Fetched branch `feat/rc0551f-c21c-live-owner-ai-chat-2026-11-18`; command verified remote documentation HEAD `d129bdafd1f64a4a3e2e7c8b2810922496b5ed67` and that prior code SHA `b381bf419a3e969d59fbcad6593e0190bb0ac858` is its ancestor and the index discriminator/operator/test code did not differ. Created NEW detached clean worktree `/home/gor/rails_calendar_c23b7l_index_worktree_20261123` at **pinned functional code SHA `b381bf419a3e969d59fbcad6593e0190bb0ac858`** (NOT the latest docs SHA). Output confirmed:

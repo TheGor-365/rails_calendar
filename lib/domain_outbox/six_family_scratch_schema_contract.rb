@@ -90,7 +90,7 @@ module DomainOutbox
         "idx_intake_requirement_sets_source" => false
       },
       "client_request_invitations" => {
-        "index_client_request_invitations_on_workspace_id_and_created_at" => false
+        "idx_on_workspace_id_created_at_2c68e09548" => false
       },
       "service_offerings" => { "idx_service_offerings_workspace_key" => true },
       "service_offering_versions" => { "idx_service_offering_versions_unique" => true },
@@ -111,6 +111,13 @@ module DomainOutbox
         "index_active_storage_attachments_uniqueness" => true
       }
     }.freeze
+
+    # C2.3b7m: allow exactly one legacy physical name as a compatibility
+    # alias for the Rails 8.1 generated 62-byte-safe invitation index.
+    # The ordinary 17-table probe already filters invalid/not-ready indexes
+    # and checks uniqueness. Do not allow arbitrary names or other tables.
+    LEGACY_INVITATION_INDEX = "index_client_request_invitations_on_workspace_id_and_created_at"
+    RAILS_GENERATED_INVITATION_INDEX = "idx_on_workspace_id_created_at_2c68e09548"
 
     CHECKS = {
       "intake_scope_revisions" => %w[chk_intake_scope_version_positive chk_intake_scope_author_role],
@@ -170,7 +177,11 @@ module DomainOutbox
           end
         end
         INDEXES.fetch(table, {}).each do |name, unique|
-          unless entry.fetch("indexes").include?([name, unique])
+          allowed = [name]
+          if table == "client_request_invitations" && name == RAILS_GENERATED_INVITATION_INDEX
+            allowed << LEGACY_INVITATION_INDEX
+          end
+          unless allowed.any? { |candidate| entry.fetch("indexes").include?([candidate, unique]) }
             errors << "missing index #{table}.#{name} unique=#{unique}"
           end
         end

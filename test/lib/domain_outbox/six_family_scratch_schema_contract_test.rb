@@ -96,6 +96,37 @@ class DomainOutboxSixFamilyScratchSchemaContractTest < ActiveSupport::TestCase
       "missing index activity_events.idx_activity_events_workspace_key unique=true"
   end
 
+  test "C2.3b7m accepts only both verified Rails invitation index names" do
+    require "digest"
+
+    full = CONTRACT::LEGACY_INVITATION_INDEX
+    generated = CONTRACT::RAILS_GENERATED_INVITATION_INDEX
+
+    assert_equal 63, full.bytesize
+    assert_equal 62, ActiveRecord::Base.connection.max_index_name_size
+    assert_equal "idx_on_workspace_id_created_at_#{Digest::SHA256.hexdigest(full).first(10)}",
+      generated
+
+    for_name = lambda do |name, unique|
+      catalog = synthetic_catalog
+      indexes = catalog.fetch("tables").fetch("client_request_invitations").fetch("indexes")
+      indexes.reject! { |item| [full, generated].include?(item[0]) }
+      indexes << [name, unique]
+      catalog
+    end
+
+    assert_empty CONTRACT.violations(for_name.call(generated, false))
+    assert_empty CONTRACT.violations(for_name.call(full, false))
+
+    unknown = for_name.call("idx_on_workspace_id_created_at_arbitrary", false)
+    assert_includes CONTRACT.violations(unknown),
+      "missing index client_request_invitations.#{generated} unique=false"
+
+    wrong_unique = for_name.call(generated, true)
+    assert_includes CONTRACT.violations(wrong_unique),
+      "missing index client_request_invitations.#{generated} unique=false"
+  end
+
   test "C2.3b7i contract requires explicit catalog shape and emits no DB acceptance" do
     assert_raises(ArgumentError) { CONTRACT.violations({}) }
     assert_raises(ArgumentError) do
