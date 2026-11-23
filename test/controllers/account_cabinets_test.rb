@@ -24,9 +24,11 @@ class AccountCabinetsTest < ActionDispatch::IntegrationTest
     assert_select "#owner-cabinet h1", text: I18n.t("account_hub.owner_title")
     assert_select ".ws-account-tool[href=?]", owner_setup_path(step: "A")
     assert_select ".ws-account-tool[href=?]", owner_capabilities_path
-    assert_select ".ws-account-tool[href=?]", owner_services_path
     assert_select ".ws-account-tool[href=?]", owner_ai_activity_path
-    assert_select ".ws-account-tool[href=?]", workspace_path
+    assert_select ".ws-account-tool", count: 3
+    assert_select ".ws-account-tool[href=?]", owner_services_path, count: 0
+    assert_select ".ws-account-tool[href=?]", workspace_path, count: 0
+    assert_select ".wa-cabinet-rail a", count: 3
     assert_select "a[href=?]", owner_cabinet_path
     assert_no_match(/cabinet-client@example.test/, response.body)
     get workspace_path
