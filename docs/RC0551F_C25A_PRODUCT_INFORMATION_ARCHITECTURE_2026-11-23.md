@@ -67,3 +67,13 @@ Do not alter schema, existing private databases, migrations, storage, payments, 
 
 **C2.4a browser screen results:** local owner month/day/hour, cabinet, workspace, assistant, notifications, library, consultations, new intake, requests are visually present; 400px guest month/day and 1440-ish owner calendar states seen. Specific 13 Nov 22:37 *hour* and authenticated 320px remain not explicitly screen-confirmed; do not call whole F0 complete.  
 **Next owner request:** verify staged **left rail** in AI draft screen at 1440 and mobile fallback at 400, and report screenshots. No payment, production or DB writes.
+
+
+## 7. Implementation checkpoint — reversible first left-rail slice
+
+**CODE_COMMITTED (not owner browser accepted):**
+- `app/views/owner_ai_assistant/show.html.erb`: the existing four section destinations were retained verbatim inside an added two-column `wa-ai-page__screen-grid`, with content wrapped in `wa-ai-page__screen-body`; desktop sticky left wayfinder in scoped `_rc_owner_ai_assistant.scss` at >=1200px, original layout at smaller widths.
+- `app/views/owner_setup/cabinet.html.erb`: introduced read-only, accessible in-page links to existing Profile, Tools, Data/Privacy and Work overview sections (all existing translation keys and Bootstrap Icons), adding stable anchor IDs without moving or changing protected forms; scoped `_rc_owner_cabinets.scss` sets left sticky 168px rail >=1200px, flexible inline links on narrower widths.
+- **No new JavaScript controllers, translations, Rails controllers/actions, routes, DB objects or migrations.** Responsive acceptance is pending. This code is not in owner's currently running `aecbe5e` checkout.
+- The owner's new screenshots and exact running local launch are separately recorded in `docs/RC0551F_C24A_WHITE_ATLAS_COMMERCIAL_UI_BROWSER_FIXES_2026-11-23.md`: C2.4a partial browser evidence, not global acceptance.
+- Future slices for top navigation consolidation, reducing duplicate tools, Turbo Frame sheets and source-aware breadcrumbs remain **PLAN_ONLY** until actually tested. Do not assert a seven-tab UI already exists.
