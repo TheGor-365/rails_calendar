@@ -93,6 +93,11 @@ class StickyRequestSideNavigationTest < ApplicationSystemTestCase
       page.driver.browser.manage.window.resize_to(width, 932)
       bounds = page.evaluate_script("({page: document.documentElement.scrollWidth, viewport: innerWidth})")
       assert_operator bounds["page"], :<=, bounds["viewport"] + 1
+
+      # The open popover must stay fully visible, not merely be clipped offscreen.
+      popover = page.evaluate_script("(() => { const r = document.querySelector('.wa-requests__more-panel').getBoundingClientRect(); return {left: r.left, right: r.right, viewport: innerWidth}; })()")
+      assert_operator popover["left"], :>=, -1
+      assert_operator popover["right"], :<=, popover["viewport"] + 1
     end
     assert_equal 0, AiSpendEntry.count
   ensure
