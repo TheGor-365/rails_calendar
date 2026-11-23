@@ -15,15 +15,15 @@
                   owner_cabinet_path, class: "rc-action rc-action--quiet" %>
     </div>
   </header>
-  <div class="wa-ai-page__screen-grid">
+  <div class="wa-ai-page__screen-grid" data-controller="wa-section-nav">
   <nav class="wa-ai-page__wayfinder" aria-label="<%= t("owner_ai_assistant.section_navigation") %>">
-    <a href="#wa-ai-compose-heading" class="wa-ai-page__wayfinder-link">
+    <a href="#wa-ai-compose-heading" class="wa-ai-page__wayfinder-link" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate">
       <i class="bi bi-pencil-square" aria-hidden="true"></i><%= t("owner_ai_assistant.section_create") %>
     </a>
-    <a href="#owner-ai-knowledge" class="wa-ai-page__wayfinder-link">
+    <a href="#owner-ai-knowledge" class="wa-ai-page__wayfinder-link" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate">
       <i class="bi bi-diagram-3" aria-hidden="true"></i><%= t("owner_ai_assistant.section_knowledge") %>
     </a>
-    <a href="#owner-ai-draft-library" class="wa-ai-page__wayfinder-link">
+    <a href="#owner-ai-draft-library" class="wa-ai-page__wayfinder-link" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate">
       <i class="bi bi-archive" aria-hidden="true"></i><%= t("owner_ai_assistant.section_library") %>
     </a>
     <%= link_to owner_services_path, class: "wa-ai-page__wayfinder-link wa-ai-page__wayfinder-link--external" do %>
