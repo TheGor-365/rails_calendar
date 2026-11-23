@@ -1,6 +1,15 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7n independent 17-table PG16 catalog revalidation offline prepared — 23 November 2026
+
+**C2.3b7n CODE_PREPARED; CI_PENDING; OWNER_APPROVAL_NOT_RECEIVED; LOCAL_DB_NOT_ACCESSED.** After C2.3b7l established valid+ready alternate-name `idx_on_workspace_id_created_at_2c68e09548` and C2.3b7m repaired the static name contract offline, new `script/rc0551f_c23b7n_scratch_catalog_readonly.rb` provides an independent future, strictly guarded, ONE-shot **17-table catalog + `public.schema_migrations.version` metadata** revalidation. Fixed existing SQL, no app/customer rows; requires OS/PG `gor`, exact scratch `rails_calendar_r04_restore_20261121t231331z_27407`, local PG16 socket, clean pinned SHA, fresh uniquely named approval token and read-only timeout restrictions. The script always emits `G5=BLOCKED` and exits 2 even if bounded `C2.3B7N_17_TABLE_CATALOG=PASS`; this is never authorization to scan, replay, repair or deploy. Synthetic CI/negative tests at `test/lib/domain_outbox/six_family_scratch_catalog_revalidation_test.rb`; [operator runbook](RC0551F_C23B7N_17_TABLE_CATALOG_REVALIDATION_2026-11-23.md). **No current consent for C2.3b7n**, older b7j/b7k/b7l permissions consumed.
+
+**Next owner-independent gate:** exact-SHA Rails/Security CI for this new functional commit, then one new worktree pinned to verified SHA and owner-reported clean preflight; only afterward ask owner for *new explicit* authorization for ONE fixed 17-table catalog+schema_migrations.version metadata query. All DB repair/migration/index DDL and source/private backup/media/replay/production remain outside scope. Preserve original owner local modified schema and existing review/scratch worktrees.
+
+
+
+
 ## C2.3b7l one-shot result and C2.3b7m offline name-contract correction — 23 November 2026
 
 **Owner terminal, 2026-11-23:** The separately approved C2.3b7l ONE PG16 scratch catalog read completed with `C23B7L_PREFLIGHT=PASS`, `C2.3B7L_INDEX_VARIANT=ALTERNATE_NAME_VALID_READY`, `C2.3B7L_INDEX_NAME=idx_on_workspace_id_created_at_2c68e09548`, `C2.3B7L_DIFFERENCES=NAME`, `G5=BLOCKED`, `DATABASE_WRITES_AND_APPLICATION_ROW_READS=NOT_PERFORMED_BY_THIS_TOOL`, `BACKUP_MEDIA_TENANCY_AND_REMEDIATION=NOT_AUTHORIZED`, `OPERATOR_EXIT_CODE=2` (deliberate), `NO_AUTOMATIC_RETRY=TRUE`. This is owner-reported bounded stdout, NOT assistant DB access. **OWNER_APPROVAL=CONSUMED; DO NOT RE-RUN.**
