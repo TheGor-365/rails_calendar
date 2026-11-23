@@ -131,10 +131,25 @@
   width: 100%;
 }
 @media (max-width: 575px) {
-  .wa-requests .rc-page-hero__actions { width: 100%; }
+  /* Two equal action cells keep the popover's right edge inside the viewport.
+     Previously left:0 anchored the 280px panel after the primary CTA and
+     overflowed the 390px viewport when the tools menu was expanded. */
+  .wa-requests .rc-page-hero__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+  }
+  .wa-requests .rc-page-hero__actions > .rc-action,
+  .wa-requests .wa-requests__more,
+  .wa-requests .wa-requests__more > summary {
+    min-width: 0;
+    width: 100%;
+  }
+  .wa-requests .wa-requests__more > summary { justify-content: center; }
   .wa-requests .wa-requests__more-panel {
-    right: auto;
-    left: 0;
+    right: 0;
+    left: auto;
     width: min(280px, calc(100vw - 2rem));
   }
 }
