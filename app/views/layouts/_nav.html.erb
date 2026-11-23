@@ -23,7 +23,7 @@
          controller_path == "admin/project_intakes" && action_name == "index" ||
          controller_path == "owner_invitations" ||
          controller_path == "owner_requirements" ||
-         controller_path == "project_intakes" && action_name == "show"
+         controller_path == "project_intakes" && %w[new show].include?(action_name)
        ) %>
     <% owner_notifications_active = owner_signed_in? && controller_path == "owner_notifications" %>
     <% owner_library_active = owner_signed_in? && controller_path == "owner_artifacts" %>
@@ -59,11 +59,13 @@
                     class: "rc-nav-link #{'active' if owner_library_active}",
                     aria: { current: ("page" if owner_library_active) } %>
       <% end %>
+      <%# Owner uses one Calendar entry; day/hour/appointments are in-area views. %>
       <%= link_to root_path,
-                  class: "rc-nav-link #{'active' if controller_name == 'pages' && action_name == 'home'}",
-                  aria: { current: ("page" if controller_name == 'pages' && action_name == 'home') } do %>
+                  class: "rc-nav-link #{'active' if controller_name == 'pages' || (owner_signed_in? && controller_name == 'consultations')}",
+                  aria: { current: ("page" if controller_name == 'pages' || (owner_signed_in? && controller_name == 'consultations')) } do %>
         <%= rc_icon_label("calendar3", t("nav.calendar")) %>
       <% end %>
+      <% unless owner_signed_in? %>
       <%= link_to calendar_day_path(date: Time.zone.today.iso8601),
                   class: "rc-nav-link #{'active' if controller_name == 'pages' && %w[day hour].include?(action_name)}",
                   aria: { current: ("page" if controller_name == 'pages' && %w[day hour].include?(action_name)) } do %>
@@ -74,10 +76,12 @@
                   aria: { current: ("page" if controller_name == 'consultations') } do %>
         <%= rc_icon_label("journal-text", t("nav.consultations")) %>
       <% end %>
-      <% if admin_signed_in? || ENV["RC_INTAKE_PUBLIC_DEMO"] == "true" %>
+      <% end %>
+      <% if !owner_signed_in? && (admin_signed_in? || ENV["RC_INTAKE_PUBLIC_DEMO"] == "true") %>
         <%= link_to rc_icon_label("clipboard2-plus", t("nav.ai_request")), new_project_intake_path,
                     class: "rc-nav-link #{'active' if controller_path == 'project_intakes' && action_name == 'new'}" %>
-        <% if admin_signed_in? %>
+      <% end %>
+      <% if admin_signed_in? %>
           <%= link_to admin_project_intakes_path,
                       class: "rc-nav-link wa-inbox-nav #{'active' if owner_requests_active}", aria: { current: ("page" if owner_requests_active) } do %>
             <%= rc_icon_label("inboxes", t("requests_hub.title")) %>
@@ -85,7 +89,6 @@
               <span class="wa-unread-count" aria-label="<%= t("intake.unread_count", count: owner_unread_intake_count) %>"><%= owner_unread_badge_label %></span>
             <% end %>
           <% end %>
-        <% end %>
       <% end %>
       <% end %>
     </div>
