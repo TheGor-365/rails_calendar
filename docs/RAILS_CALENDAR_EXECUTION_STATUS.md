@@ -1,6 +1,15 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7p private archive/process metadata-only preflight prepared — 23 November 2026
+
+**G0 current docs HEAD `c9949f5` all four exact-SHA workflows SUCCESS:** PR Rails #45091252217, PR Security #45091252316, push Rails #45091245070, push Security #45091245051. The already completed C2.3b7n owner one-shot catalog PASS remains accepted only as minimum 17-table structural compatibility; authorization remains CONSUMED, and full G5/BACKUP/MEDIA/TENANCY/WRITER/RELEASE gates remain OPEN.
+
+**Next practical action PREPARED, not yet run:** [C2.3b7p owner-private backup metadata/process inventory](RC0551F_C23B7P_PRIVATE_METADATA_PREFLIGHT_2026-11-23.md) documents a single fail-closed Bash command limited to OS `id/stat`, directory entry type/symlink/owner-only modes for the existing historical private R0.4 backup session and extracted media directory, plus `ss` port 3001/3002 and `ps` short process-name indications. No archive bytes, SHA-256 read, filename dump, DB/SQL/Rails boot, file modifications, process stop, backup/media extraction, schema rewrites, replay or Railway. Future terminal result must be recorded by owner before elevating *any* metadata substatus. A PASS cannot verify G3 digest integrity, G4 source/media-byte parity or G6 writer quiescence; those need independent review/permission. Never display private names/paths/checksums/process arguments in public repo. New docs SHA CI is unverified until separately observed.
+
+
+
+
 ## C2.3b7o offline recovery evidence/gate matrix prepared — 23 November 2026
 
 **OFFLINE ONLY — NO NEW DATABASE ACTION OR CONSENT:** following the observed C2.3b7n one-shot 17-table minimum catalog PASS (authorization CONSUMED), audited already committed R0.4b2 private archive/restore evidence, R0.4c5 scratch-only migration, C2.3b7g/h six-family synthetic operator SOP and C2.3b7i schema register. Prepared [C2.3b7o recovery evidence and G0–G7 gate matrix](RC0551F_C23B7O_POST_CATALOG_RECOVERY_GATE_2026-11-23.md). It distinguishes historical owner-verified scratch restore/core parity from **unverified full media/source/tenant and latest-cohort parity**; G5 minimal catalog PASS from full G5 BLOCKED; separate G6 privacy/quiescence and G7 historical-read approvals. No new operator, SQL, backup/media access, source row read, migration, replay or production change. This new docs-only SHA requires independent CI/Security observation.
