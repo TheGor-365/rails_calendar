@@ -416,6 +416,7 @@
    Scoped to the owner catalogue and reuses rc/ws tokens and existing icon font. */
 .wa-services#owner-services .wa-services__hero {
   position: relative;
+  z-index: 3; /* keep the native tools menu above the following status panel */
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
