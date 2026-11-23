@@ -1,0 +1,22 @@
+<%= turbo_frame_tag "wa-owner-service-preview" do %>
+  <article class="wa-services__preview-detail">
+    <p class="eyebrow"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.private_title") %></p>
+    <h2 id="wa-owner-service-preview-title"><%= version.title %></h2>
+    <p class="rc-hint"><%= t("owner_services.version", version: version.version) %></p>
+    <p class="wa-services__preview-summary"><%= version.summary %></p>
+    <dl class="wa-services__preview-facts">
+      <dt><%= t("owner_services.included_scope") %></dt>
+      <dd><%= version.included_scope %></dd>
+      <dt><%= t("owner_services.excluded_scope") %></dt>
+      <dd><%= version.excluded_scope %></dd>
+      <% if version.requirements_prompt.present? %>
+        <dt><%= t("owner_services.requirements_prompt") %></dt>
+        <dd><%= version.requirements_prompt %></dd>
+      <% end %>
+    </dl>
+    <div class="wa-services__preview-actions">
+      <%= link_to rc_icon_label("arrow-up-right", t("owner_services.open")), owner_service_path(offering),
+            class: "rc-action rc-action--primary", data: { turbo_frame: "_top" } %>
+    </div>
+  </article>
+<% end %>
