@@ -13,7 +13,7 @@ export default class extends Controller {
   }
 
   select(event) {
-    this.activate(event.currentTarget.dataset.view)
+    this.activate(event.currentTarget.dataset.view, { syncUrl: true })
   }
 
   keyboard(event) {
@@ -24,11 +24,11 @@ export default class extends Controller {
     const next = event.key === "Home" ? 0 :
       event.key === "End" ? tabs.length - 1 :
       (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length
-    this.activate(tabs[next].dataset.view)
+    this.activate(tabs[next].dataset.view, { syncUrl: true })
     tabs[next].focus()
   }
 
-  activate(view) {
+  activate(view, { syncUrl = false } = {}) {
     const chosen = this.panelTargets.some(panel => panel.dataset.view === view) ? view : "incoming"
     this.tabTargets.forEach(tab => {
       const active = tab.dataset.view === chosen
@@ -42,5 +42,12 @@ export default class extends Controller {
       panel.classList.toggle("is-active", active)
     })
     try { window.localStorage.setItem(this.keyValue, chosen) } catch (_) {}
+    // Explicitly selected tab is a shareable, same-page URL state.
+    // Preserve other query parameters; never cause a new GET or new history entry.
+    if (syncUrl) {
+      const url = new URL(window.location.href)
+      url.searchParams.set("view", chosen)
+      window.history.replaceState(window.history.state, "", url)
+    }
   }
 }
