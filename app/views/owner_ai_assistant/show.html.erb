@@ -15,6 +15,7 @@
                   owner_cabinet_path, class: "rc-action rc-action--quiet" %>
     </div>
   </header>
+  <div class="wa-ai-page__screen-grid">
   <nav class="wa-ai-page__wayfinder" aria-label="<%= t("owner_ai_assistant.section_navigation") %>">
     <a href="#wa-ai-compose-heading" class="wa-ai-page__wayfinder-link">
       <i class="bi bi-pencil-square" aria-hidden="true"></i><%= t("owner_ai_assistant.section_create") %>
@@ -29,6 +30,7 @@
       <%= rc_icon_label("arrow-up-right", t("owner_ai_assistant.section_services")) %>
     <% end %>
   </nav>
+  <div class="wa-ai-page__screen-body">
 
   <p class="wa-ai-page__thread-entry">
     <%= link_to rc_icon_label("chat-square-text", t("owner_ai_conversations.title")),
@@ -386,5 +388,6 @@
       <p class="rc-hint"><%= t("owner_ai_assistant.library_empty") %></p>
     <% end %>
   </section>
-
+  </div>
+  </div>
 </div>
