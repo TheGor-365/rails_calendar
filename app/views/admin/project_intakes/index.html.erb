@@ -11,7 +11,7 @@
       <% if owner_signed_in? %>
         <%= link_to rc_icon_label("send-plus", t("requests_hub.new_outgoing")), owner_invitations_path, class: "rc-action rc-action--primary" %>
         <%= link_to rc_icon_label("clipboard2-plus", t("client_requests.new_action")), new_project_intake_path, class: "rc-action rc-action--quiet" %>
-        <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path, class: "rc-action rc-action--quiet" %>
+        <%= link_to rc_icon_label("briefcase", t("owner_services.title")), owner_services_path, class: "rc-action rc-action--quiet" %>
       <% end %>
     </div>
   </header>
