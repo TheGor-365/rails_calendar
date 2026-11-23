@@ -465,3 +465,22 @@
 @media (prefers-reduced-motion: reduce) {
   #owner-cabinet .ws-account-tool { transition: none; transform: none; }
 }
+
+
+/* C2.5d missing-private-image visual fallback, without modifying any blob.
+   An existing image overlays the icon; only a failed request reveals it. */
+.ws-account-avatar[hidden],
+.ws-account-avatar-placeholder[hidden],
+.ws-nav-avatar[hidden],
+.ws-nav-avatar-placeholder[hidden] { display: none !important; }
+.ws-nav-avatar-placeholder {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  color: var(--ws-teal-deep);
+  background: var(--ws-teal-wash);
+  border: 1px solid var(--ws-border);
+  border-radius: 10px;
+}
