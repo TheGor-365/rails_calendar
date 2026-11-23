@@ -55,6 +55,17 @@ class OwnerAvatarEditorBrowserTest < ApplicationSystemTestCase
       assert_operator bounds["page"], :<=, bounds["viewport"] + 1
       find("summary.ws-avatar-edit-trigger").click
     end
+
+    # The review DB can retain this attachment without its original disk file.
+    # A missing avatar must show the branded fallback, without deleting the row.
+    page.driver.browser.manage.window.resize_to(1400, 900)
+    blob.service.delete(blob.key)
+    visit owner_cabinet_path
+    assert_selector ".ws-account-avatar[hidden]", visible: :all
+    assert_selector ".ws-account-avatar-placeholder:not([hidden])", visible: true
+    assert_selector ".ws-nav-avatar[hidden]", visible: :all
+    assert_selector ".ws-nav-avatar-placeholder:not([hidden])", visible: true
+    assert_equal 1, owner.reload.owner_avatars_attachments.count
   ensure
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
