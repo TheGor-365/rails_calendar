@@ -1,6 +1,31 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7r owner current Active Storage MATCH; C2.3b7s DB-reference gate prepared — 23 November 2026
+
+**OWNER TERMINAL EVIDENCE (2026-11-23), not direct assistant filesystem inspection:** previously consented exactly ONE C2.3b7r read-only current media tree vs restored R0.4 media tree check returned:
+
+```text
+C23B7R_PREFLIGHT=PASS
+C23B7R_CURRENT_MEDIA_VS_R04_SNAPSHOT=MATCH
+G4_DB_ATTACHMENT_PARITY=NOT_VERIFIED
+G6_WRITER_QUIESCENCE=NOT_VERIFIED
+SOURCE_OR_DB_QUERIES=NOT_PERFORMED
+NO_EXPLICIT_FILE_WRITES=TRUE
+NO_AUTOMATIC_RETRY=TRUE
+```
+
+**Interpretation:** current filesystem tree at owner original checkout `storage/` and historical extracted R0.4 private `media_restore/storage` matched by recursive relative file path and file content at the time of the one read-only comparison. Prior `C2.3b7q` already proved manifest-relative SHA256 plus parseability of the existing PG custom + media tar; R0.4b2 previously demonstrated isolated historical restore/core count/schema parity, and `C2.3b7n` passed the minimum 17-table scratch metadata contract. This convergence strengthens evidence for R0.4 **filesystem recovery** but is not a frozen snapshot, Active Storage blob-key and attachment/variant row verification, present source/scratch DB parity, actor quiescence, privacy/ACL proof or production readiness. All `C2.3b7j/k/l/n/q/r` one-shot permissions are **CONSUMED** and must not be reused; no extra database or media reads authorized.
+
+**GATES (latest):** `C2.3b7r MEDIA_TREE=MATCH`, `G3 EXISTING_ARCHIVE_SHA_AND_FORMAT=PASS (saved manifest)`, `G4 HISTORICAL_DB_RESTORE=OLDER_NARROW_PASS`, `G4 CURRENT_MEDIA_TREE=MATCH_AT_INSTANT`, `G4 ACTIVE_STORAGE_DB_REFERENCES=UNVERIFIED`, `G5 MIN_17_TABLE_CATALOG=PASS`, `G5_FULL=BLOCKED`, `G6 WRITER_QUIESCENCE_AND_TENANT_ACL=NOT_VERIFIED`, `G7 SIX_FAMILY_READ_ONLY_SCAN=NOT_AUTHORIZED`, `REPLAY_WRITES_MIGRATIONS_PRODUCTION=NOT_AUTHORIZED`.
+
+**CI baseline:** all four GitHub Actions for immediately preceding docs SHA `799e0620f766f3d3d9c6c63ff8089231492cd36b` verified SUCCESS: PR Rails #45195471811, PR Security #45195471634, push Rails #45195453937, push Security #45195453999. This new docs-only commit must have its own exact-SHA CI observed separately.
+
+**NEXT independent stage C2.3b7s — OFFLINE PLAN ONLY:** [read-only source/scratch PostgreSQL 16 Active Storage blob/attachment reference + G6 session aggregate gate](RC0551F_C23B7S_ACTIVE_STORAGE_DB_REFERENCE_GATE_2026-11-23.md), grounded in tracked `db/schema.rb`, `config/storage.yml` and existing R0.4 evidence. No operator/query has been created or executed for it. A new detailed command/synthetic review and *separate explicit owner permission* are prerequisites to any application-row count/DB session read. Fixed targets source/review `rails_calendar_rc0551f_c21b_review_20261117` and scratch `rails_calendar_r04_restore_20261121t231331z_27407`, no client data output; no media comparison rerun or restore. Do not reset original owner's dirty schema or previous worktrees.
+
+
+
+
 ## C2.3b7q owner archive integrity PASS; C2.3b7r media-parity plan prepared — 23 November 2026
 
 **Direct owner-terminal evidence, 2026-11-23:** User ran exactly ONE explicitly approved C2.3b7q private-archive read-only check. Status output (redacted, no hash/path/PII emitted):
