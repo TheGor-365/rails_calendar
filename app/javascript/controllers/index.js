@@ -37,6 +37,10 @@ application.register("wa-section-nav", WaSectionNavController)
 import WaAvatarEditorController from "./wa_avatar_editor_controller"
 application.register("wa-avatar-editor", WaAvatarEditorController)
 
+// Read-only image fallback for missing private disk bytes in detached previews.
+import WaPrivateImageController from "./wa_private_image_controller"
+application.register("wa-private-image", WaPrivateImageController)
+
 // Global owner-only AI assistant; native details remains usable without JS.
 import WaAiDockController from "./wa_ai_dock_controller"
 application.register("wa-ai-dock", WaAiDockController)
