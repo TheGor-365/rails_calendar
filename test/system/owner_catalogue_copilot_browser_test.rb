@@ -17,6 +17,7 @@ class OwnerCatalogueCopilotBrowserTest < ApplicationSystemTestCase
     assert_current_path workspace_path
 
     visit owner_services_path
+    find(".wa-services__tools > summary").click
     click_link "AI catalogue review"
     assert_current_path owner_catalogue_ai_path
     assert_selector "#owner-catalogue-copilot"
