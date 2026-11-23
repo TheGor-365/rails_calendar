@@ -2,7 +2,8 @@ es:
   workspace:
     eyebrow: "ESPACIO DEL PROPIETARIO"
     title: "Espacio de trabajo"
-    description: "Calendario, consultas y solicitudes internas."
+    description: "Resumen del propietario: solicitudes, próximas consultas y asuntos pendientes de revisión."
+    open_requests: "Revisar solicitudes"
     new_consultation: "Nueva consulta"
     summary_aria: "Resumen"
     upcoming_metric: "Consultas próximas"
