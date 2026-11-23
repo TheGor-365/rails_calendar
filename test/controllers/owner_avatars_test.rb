@@ -81,6 +81,16 @@ class OwnerAvatarsTest < ActionDispatch::IntegrationTest
     get owner_avatar_file_path(attachment)
     assert_response :not_found
     assert_equal 1, @owner.owner_avatars_attachments.count
+
+    get owner_cabinet_path
+    assert_response :success
+    assert_select ".ws-account-avatar[data-wa-private-image-target=image]", count: 1
+    assert_select ".ws-account-avatar-placeholder[data-wa-private-image-target=fallback][hidden]", count: 1
+
+    get workspace_path
+    assert_response :success
+    assert_select ".ws-nav-avatar-link[data-controller=wa-private-image]", count: 1
+    assert_select ".ws-nav-avatar-placeholder[data-wa-private-image-target=fallback][hidden]", count: 1
   end
 
   test "wrong file extension and MIME are rejected" do
