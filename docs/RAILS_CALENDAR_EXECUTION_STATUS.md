@@ -1,6 +1,21 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## Owner requested browser-first complete feature acceptance; no production backup — 23 November 2026
+
+**New user instruction:** no Railway production backups exist; accepts proceeding without backup, but first manually verify all current browser functionality (incl. AI), then decide for each verified change what to fix or release incrementally. This is owner preference, **not verification of database safety and not an exact irreversible migration approval**. No backup = possible irreversible loss; code rollback is not DB/file restore. Railway web currently has `preDeployCommand=[bin/rails db:migrate]`, so each production release requires named SHA/migration and explicit go/no-go.
+
+**Browser evidence:** connected browser tabs show prior production `/workspace` older owner shell and local `localhost:3002/` newer White Atlas menu, but these are *read-only tab snapshots* from earlier visits, not live interactive acceptance. Never publish/copy their hidden CSRF fields, emails, cookies or tokens. Browser connector in Chat can READ tabs only; user must click locally or use Work mode for controlled browser.
+
+**New [complete browser acceptance/release matrix](RAILS_CALENDAR_BROWSER_ACCEPTANCE_RELEASE_MATRIX_2026-11-23.md):** A0-A14 read-only owner/client/guest route sweep, B1-B9 synthetic writable local scenarios including no-cost free chat, four AI actions, separately approved paid AI, service publication, invitation→intake→spec, calendar and privacy. A1 new owner chat starts immediately; screenshot manual checkpoint required. Feature status code/CI/manual/production/real-paid tracked independently.
+
+**Automated coverage:** added a targeted CI `test/system/owner_ai_conversations_browser_test.rb` on *isolated test DB only*: owner login→new thread→free note→reload→desktop+390+320 width→archive→restore→guest and client denial, assert AiSpendEntry never changes. This is **not** a real Grok call and not owner manual acceptance. Its new exact-SHA CI has not yet been verified; no local/production DB read or modified.
+
+**Release:** R1A PR #82 exact code SHA `558cf80be59fd317aaaf18c41c4cd38e773f919c`, 6/6 CI+synthetic PG18 upgrade SUCCESS, one additive migration. Still NOT_DEPLOYED. No production backups; require explicit loss-risk consent for exact migration, public browser baseline, no paid AI default and no media data risk. Later releases one by one; no bulk PR #81 or historical replay.
+
+
+
+
 ## Release R1A exact SHA 6/6 CI PASS; production approval held — 23 November 2026
 
 **FIRST REAL RELEASE CANDIDATE:** Dedicated [Draft PR #82](https://github.com/TheGor-365/rails_calendar/pull/82), branch `release/rc-r1a-ai-spend-2026-11-23`, **SHA `558cf80be59fd317aaaf18c41c4cd38e773f919c`**, exact base production `90d7a817651ba1bffe174d3f800d32988a664169`. Contains RC051 Grok intake accounting/manual fallback, Ruby 3.4.13 + Puma 8.0.4 security remediation and independent synthetic PG18 upgrade test; only **one** additive schema migration `20261113213000_create_ai_spend_entries.rb`. No full PR #81 or its 20 extra migrations.
