@@ -127,6 +127,45 @@ class OwnerServiceOfferingsTest < ActionDispatch::IntegrationTest
     assert_equal "Fictional Rails 500 fix with unit tests", offer.reload.draft_version.title
   end
 
+  test "Turbo service quick view is private, read-only, and preserves the full-page route" do
+    offer = OwnerServices::Catalogue.new(workspace: @workspace)
+      .create_draft!(service_fields(@capabilities.first))
+    sign_in(@owner)
+
+    get owner_services_path
+    assert_response :success
+    assert_select "a[href=?][data-turbo-frame='wa-owner-service-preview']", owner_service_path(offer)
+
+    assert_no_difference("ServiceOfferingVersion.count") do
+      get owner_service_path(offer), headers: { "Turbo-Frame" => "wa-owner-service-preview" }
+    end
+    assert_response :success
+    assert_match(/private, no-store/, response.headers.fetch("Cache-Control"))
+    assert_select "turbo-frame#wa-owner-service-preview" do
+      assert_select "h2", text: offer.draft_version.title
+      assert_select "dl dt", text: I18n.t("owner_services.included_scope")
+      assert_select "form", count: 0
+      assert_select "a[data-turbo-frame='_top'][href=?]", owner_service_path(offer)
+    end
+
+    get owner_service_path(offer)
+    assert_response :success
+    assert_select "#offering-draft-form", count: 1
+
+    delete sign_out_path
+    get owner_service_path(offer), headers: { "Turbo-Frame" => "wa-owner-service-preview" }
+    assert_redirected_to sign_in_path
+
+    sign_in(@client)
+    get owner_service_path(offer), headers: { "Turbo-Frame" => "wa-owner-service-preview" }
+    assert_redirected_to sign_in_path
+
+    delete sign_out_path
+    sign_in(@other_owner)
+    get owner_service_path(offer), headers: { "Turbo-Frame" => "wa-owner-service-preview" }
+    assert_response :not_found
+  end
+
   test "all locales have the review labels used by the service forms" do
     %i[en ru hy es].each do |locale|
       I18n.with_locale(locale) do
