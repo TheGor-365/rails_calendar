@@ -1,22 +1,34 @@
 <%= turbo_frame_tag "wa-owner-service-preview" do %>
   <article class="wa-services__preview-detail">
-    <p class="eyebrow"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.private_title") %></p>
-    <h2 id="wa-owner-service-preview-title"><%= version.title %></h2>
-    <p class="rc-hint"><%= t("owner_services.version", version: version.version) %></p>
+    <header class="wa-services__preview-heading">
+      <span class="wa-services__preview-symbol" aria-hidden="true"><i class="bi <%= service_offering_icon(offering) %>"></i></span>
+      <div>
+        <p class="eyebrow"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.private_title") %></p>
+        <h2 id="wa-owner-service-preview-title"><%= version.title %></h2>
+        <span class="wa-services__preview-version"><i class="bi bi-layers" aria-hidden="true"></i> <%= t("owner_services.version", version: version.version) %></span>
+      </div>
+    </header>
     <p class="wa-services__preview-summary"><%= version.summary %></p>
-    <dl class="wa-services__preview-facts">
-      <dt><%= t("owner_services.included_scope") %></dt>
-      <dd><%= version.included_scope %></dd>
-      <dt><%= t("owner_services.excluded_scope") %></dt>
-      <dd><%= version.excluded_scope %></dd>
+    <div class="wa-services__preview-facts">
+      <section class="wa-services__preview-fact">
+        <h3><i class="bi bi-check2-circle" aria-hidden="true"></i> <%= t("owner_services.included_scope") %></h3>
+        <p><%= version.included_scope %></p>
+      </section>
+      <section class="wa-services__preview-fact">
+        <h3><i class="bi bi-slash-circle" aria-hidden="true"></i> <%= t("owner_services.excluded_scope") %></h3>
+        <p><%= version.excluded_scope %></p>
+      </section>
       <% if version.requirements_prompt.present? %>
-        <dt><%= t("owner_services.requirements_prompt") %></dt>
-        <dd><%= version.requirements_prompt %></dd>
+        <section class="wa-services__preview-fact">
+          <h3><i class="bi bi-list-check" aria-hidden="true"></i> <%= t("owner_services.requirements_prompt") %></h3>
+          <p><%= version.requirements_prompt %></p>
+        </section>
       <% end %>
-    </dl>
-    <div class="wa-services__preview-actions">
+    </div>
+    <footer class="wa-services__preview-actions">
+      <span class="rc-hint"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("owner_services.preview_private_hint") %></span>
       <%= link_to rc_icon_label("arrow-up-right", t("owner_services.open")), owner_service_path(offering),
             class: "rc-action rc-action--primary", data: { turbo_frame: "_top" } %>
-    </div>
+    </footer>
   </article>
 <% end %>
