@@ -10,12 +10,16 @@
       </div>
     </div>
     <div class="ws-account-hero-symbol ws-account-avatar-frame" id="owner-avatar"
-         data-controller="wa-avatar-editor"
+         data-controller="wa-avatar-editor wa-private-image"
          data-wa-avatar-editor-success-value="<%= t("account_hub.avatar_crop_ready") %>"
          data-wa-avatar-editor-failure-value="<%= t("account_hub.avatar_crop_failed") %>">
       <% if (avatar = local_owner_avatar_attachment(current_user)) %>
         <%= image_tag owner_avatar_file_path(avatar), class: "ws-account-avatar",
-              alt: t("account_hub.avatar_alt"), loading: "lazy" %>
+              alt: t("account_hub.avatar_alt"), loading: "lazy",
+              data: { wa_private_image_target: "image",
+                      action: "error->wa-private-image#failed" } %>
+        <i class="bi bi-person-workspace ws-account-avatar-placeholder" aria-hidden="true"
+           data-wa-private-image-target="fallback" hidden></i>
       <% else %>
         <i class="bi bi-person-workspace ws-account-avatar-placeholder" aria-hidden="true"></i>
       <% end %>
