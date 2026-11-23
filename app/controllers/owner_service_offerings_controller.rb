@@ -70,6 +70,17 @@ class OwnerServiceOfferingsController < ApplicationController
     @eligible = current_capability?(@draft || @approved)
     @media_enabled = Rails.env.test? || (Rails.env.development? && request.local?)
     @media_items = @media_enabled ? @offering.media_items.visible.includes(:service_offering_version).to_a : []
+
+    # Render a short, read-only owner-scoped preview into the catalog's Turbo
+    # Frame. Ordinary GET /workspace/services/:id remains the full edit page.
+    if turbo_frame_request? && request.headers["Turbo-Frame"] == "wa-owner-service-preview"
+      version = @draft || @approved || @published
+      return head :not_found unless version
+
+      response.headers["Cache-Control"] = "private, no-store"
+      response.headers["X-Robots-Tag"] = "noindex, nofollow"
+      return render partial: "preview", locals: { offering: @offering, version: version }
+    end
   end
 
   def update_draft
