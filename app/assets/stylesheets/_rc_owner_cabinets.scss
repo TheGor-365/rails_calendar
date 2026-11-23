@@ -433,7 +433,9 @@
   }
   .wa-cabinet-rail {
     position: sticky;
-    top: 1.25rem;
+    top: var(--wa-section-nav-sticky-top, 10rem);
+    max-height: calc(100dvh - var(--wa-section-nav-sticky-top, 10rem) - 1rem);
+    overflow-y: auto;
     grid-column: auto;
     align-self: start;
     flex-direction: column;
@@ -441,4 +443,13 @@
     padding: .7rem;
   }
   .wa-cabinet-rail a { width: 100%; }
+}
+
+/* C2.5a1 — correct owner cabinet anchor offset and show active local section. */
+.ws-account-content--rail :is(#cabinet-profile, #cabinet-tools, #cabinet-privacy, #cabinet-work) {
+  scroll-margin-top: calc(var(--wa-section-nav-sticky-top, 1.5rem) + .75rem);
+}
+.wa-cabinet-rail a[aria-current="location"] {
+  background: var(--ws-teal-wash);
+  color: var(--ws-teal-deep);
 }
