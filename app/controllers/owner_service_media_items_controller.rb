@@ -65,6 +65,10 @@ class OwnerServiceMediaItemsController < ApplicationController
               type: @media.image? ? blob.content_type : "application/octet-stream",
               disposition: @media.image? ? "inline" : "attachment",
               filename: blob.filename.to_s
+  rescue ActiveStorage::FileNotFoundError
+    # Isolated review checkouts may have attachment metadata without its disk
+    # file. Keep the private owner scope and return 404; do not erase metadata.
+    head :not_found
   end
 
   private
