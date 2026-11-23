@@ -7,6 +7,7 @@ class ProjectIntake < ApplicationRecord
   has_many :intake_messages, dependent: :restrict_with_exception
   has_many :intake_answers, dependent: :restrict_with_exception
   has_many :intake_spec_versions, dependent: :restrict_with_exception
+  has_many :ai_spend_entries, dependent: :restrict_with_exception
   has_many :project_milestones, dependent: :restrict_with_exception
 
   validates :title, presence: true, length: { maximum: 120 }

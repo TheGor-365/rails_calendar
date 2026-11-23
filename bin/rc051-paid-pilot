@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# Explicit ONE-TIME real xAI call against the isolated system PostgreSQL MVP preview.
+# Never runs against Railway, Docker QA, or a non-local database.
+set -euo pipefail
+set +x
+
+if [[ "${RC051_PAY_REAL:-}" != "YES" ]]; then
+  echo "STOP: SET_RC051_PAY_REAL_YES_FOR_ONE_PAID_REQUEST" >&2
+  exit 64
+fi
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_dir"
+preview="$HOME/.config/rails-calendar/preview-3012.env"
+secret="$HOME/.config/rails-calendar/calendar-ai.dev.env"
+[[ -r "$preview" && -r "$secret" ]] || { echo "STOP: LOCAL_ENV_FILE_MISSING" >&2; exit 65; }
+
+# shellcheck disable=SC1090
+source "$preview"
+# shellcheck disable=SC1090
+source "$secret"
+export RAILS_ENV=development
+export RC_GROK_ENABLED=true
+
+bin/rails runner - <<'RUBY'
+abort "STOP: NOT_DEVELOPMENT" unless Rails.env.development?
+abort "STOP: GLOBAL_DATABASE_URL_PRESENT" if ENV["DATABASE_URL"].present?
+abort "STOP: API_KEY_NOT_LOADED" unless ENV["XAI_API_KEY"].to_s.start_with?("xai-") &&
+                                      ENV["XAI_API_KEY"].to_s.length >= 20
+
+db = ActiveRecord::Base.connection
+cfg = ActiveRecord::Base.connection_db_config.configuration_hash
+identity = db.select_one(<<~SQL)
+  SELECT current_database() AS db_name,
+         current_user AS db_role,
+         (inet_server_addr() IS NULL) AS via_socket
+SQL
+
+correct =
+  cfg[:host] == "/var/run/postgresql" &&
+  identity["db_name"] == "rails_calendar_mvp_preview_20261112" &&
+  identity["db_role"] == "gor" &&
+  [true, "t", "true"].include?(identity["via_socket"]) &&
+  User.where(role: "owner").count == 1 &&
+  User.where(role: "client").count == 1 &&
+  AiSpendEntry.table_exists?
+
+abort "STOP: PREVIEW_DATABASE_IDENTITY_MISMATCH" unless correct
+
+intake = ProjectIntake.find_by(id: 1)
+abort "STOP: WRONG_INTAKE" unless intake&.title == "Booking API — Rails 500 error"
+abort "STOP: NO_CLIENT_QUESTION" unless intake.client_message_count.positive?
+abort "STOP: SPEC_ALREADY_EXISTS" unless intake.status == "interviewing" &&
+                                           intake.latest_spec.nil?
+
+puts "RC051_PREVIEW_IDENTITY_PASS"
+puts "GROK_PAID_REQUEST_STARTING: one synthetic Rails intake, provider grok-4.3"
+
+document, source = Intake::Grok.new(intake).draft_spec
+entry = AiSpendEntry.where(project_intake_id: intake.id, operation: "website_spec_draft").order(id: :desc).first
+puts "AI_RESULT_SOURCE=#{source}"
+puts "AI_LEDGER_STATUS=#{entry&.status || 'none'}"
+puts "AI_COST_TICKS=#{entry&.charged_ticks || 0}"
+abort "STOP: GROK_DRAFT_NOT_AVAILABLE_CHECK_LEDGER" unless source == "grok"
+
+intake.with_lock do
+  abort "STOP: CONCURRENT_SPEC_EXISTS" unless intake.status == "interviewing" &&
+                                                intake.latest_spec.nil?
+  version = intake.intake_spec_versions.maximum(:version).to_i + 1
+  intake.intake_spec_versions.create!(version: version, document: document, source: "grok")
+  intake.update!(status: "draft_spec")
+  puts "AI_DRAFT_SAVED_VERSION=#{version}"
+end
+
+puts "RC051_REAL_PAID_AI_DRAFT_PASS"
+puts "NEXT: owner reviews, edits, approves; client sees only the approved version"
+RUBY
