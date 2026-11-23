@@ -19,10 +19,12 @@ class OwnerAiConversationsBrowserTest < ApplicationSystemTestCase
     visit owner_ai_conversations_path
     assert_selector "#owner-ai-conversations"
     within(".wa-threads__new-form") { find("button[type='submit']").click }
+    # Wait for the browser's asynchronous POST + Turbo navigation before
+    # reading database state; otherwise the first query can race the submit.
+    assert_selector ".wa-threads__composer"
     conversation = owner.owner_workspace.owner_ai_conversations.order(:id).last
     assert conversation
     assert_current_path owner_ai_conversation_path(conversation)
-    assert_selector ".wa-threads__composer"
 
     synthetic_note = "SYNTHETIC BROWSER QA: preserve one unpaid owner note"
     within(".wa-threads__composer") do
@@ -82,7 +84,9 @@ class OwnerAiConversationsBrowserTest < ApplicationSystemTestCase
     assert_current_path client_home_path
 
     visit owner_ai_conversation_path(private_thread)
-    assert_current_path sign_in_path
+    # AccountSessions#new redirects an already signed-in client back to
+    # their client cabinet; the owner thread must stay completely invisible.
+    assert_current_path client_home_path
     assert_no_text "SYNTHETIC OWNER PRIVATE CHAT"
   end
 end
