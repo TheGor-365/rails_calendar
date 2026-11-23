@@ -61,6 +61,38 @@ class StickyRequestSideNavigationTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1440, 900)
   end
 
+  test "owner Requests hub has one primary action, accessible tools and deep-link tabs" do
+    sign_in_as(@owner)
+    visit admin_project_intakes_path
+
+    assert_selector ".wa-requests .rc-page-hero__actions > a.rc-action--primary", count: 1
+    assert_selector ".wa-requests__more > summary", count: 1
+    assert_selector ".wa-requests__tab[data-view='incoming'][aria-selected='true']"
+    assert_selector "#wa-requests-incoming:not([hidden])"
+
+    click_button "Outgoing"
+    assert_selector ".wa-requests__tab[data-view='outgoing'][aria-selected='true']"
+    assert_selector "#wa-requests-outgoing:not([hidden])"
+    assert_equal "outgoing", page.evaluate_script("new URLSearchParams(window.location.search).get('view')")
+
+    click_button "Incoming"
+    assert_selector "#wa-requests-incoming:not([hidden])"
+    assert_equal "incoming", page.evaluate_script("new URLSearchParams(window.location.search).get('view')")
+
+    find(".wa-requests__more > summary").click
+    assert_selector ".wa-requests__more-panel a[href='#{owner_services_path}']"
+    assert_selector ".wa-requests__more-panel a[href='#{new_project_intake_path}']"
+
+    [390, 320].each do |width|
+      page.driver.browser.manage.window.resize_to(width, 932)
+      bounds = page.evaluate_script("({page: document.documentElement.scrollWidth, viewport: innerWidth})")
+      assert_operator bounds["page"], :<=, bounds["viewport"] + 1
+    end
+    assert_equal 0, AiSpendEntry.count
+  ensure
+    page.driver.browser.manage.window.resize_to(1440, 900)
+  end
+
   test "client rail has only available links, reply navigation, and no horizontal overflow" do
     sign_in_as(@client)
     visit client_request_path(@intake)
