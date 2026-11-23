@@ -1,6 +1,22 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.5b canonical owner surfaces / CI repair — 24 November 2026
+
+**Latest code/test commit before this status update:** `f4b8679d143910ca2da77f5928aff358619bb7d7` in active Draft PR #81 (`feat/rc0551f-c21c-live-owner-ai-chat-2026-11-18`); **CI for this exact SHA is pending** at checkpoint, Security Audit pending. No production deployment and no new owner browser run on this SHA.
+
+**Owner screenshot evidence:** previous local `:3003` service catalogue at `7246d05` showed 9 private offers, White Atlas 3-column RU layout, translation of preview and category-icon fallbacks for missing local media. Owner responded OK to continue. This is *partial desktop RU UI acceptance only*, not full mobile/modal/locale or data-media acceptance.
+
+**C2.5b CODE_COMMITTED:** `/workspace` now only real activity records/KPIs, quick review of invitations/appointments/requests, clear canonical Requests header action; redundant eight-tile app launcher removed; profile onboarding panel only if no approved professional snapshot. `/workspace/cabinet` now restricted to identity, approved context, interview, skills, private data and AI spending; removed duplicated operational launchers and second workload panel; sticky left rail now exactly three live section links. Canonical owner Services link added under `/admin/project_intakes` Requests header; all original routes remain. All changes use existing White Atlas tokens/icons, EN/RU/HY/ES workspace key(s), EN/RU cabinet copy, and existing ACL. No schema, DB, file, billable provider or production actions.
+
+**Exact CI findings and corrections:** `7246d05` Rails CI failed two Chrome cases because catalogue AI-review and auto-sync moved into native `<details>`; all 515 Rails tests passed. Browser tests updated to open tools first. Newer `6273942` Rails CI failed three previously hardcoded expectations: owner Services as a Workspace eight-tile; invitation links directly in Cabinet; AI assistant link directly in Cabinet. Those assumptions conflict with the new canonical areas; updated `owner_quiz_i18n_test.rb` to resolve Services via Requests, `e2_client_invitation_test.rb` to find invites from Workspace/Requests rather than Cabinet and `owner_ai_assistant_test.rb` to use preserved top-level AI navigation. No permission checks removed, no business state changed. **Do not mark CI repaired until exact `f4b8679` succeeds.**
+
+**Owner browser next:** preserve running isolated `:3003` / old checkout; only after exact reviewed SHA CI and security, stop that preview server, advance `~/rails_calendar_c25a_ia_review_20261123` via guarded detached ref with clean diff, rebuild with `script/rc0551f_c25a1_preview.sh`, and verify `/workspace`, `/workspace/cabinet`, `/admin/project_intakes` at desktop and 400px. Check owner Services discoverability under Requests, three Cabinet tools, real 3-anchor rail, and maintained owner/client isolation. Refer to `docs/RC0551F_C25A_PRODUCT_INFORMATION_ARCHITECTURE_2026-11-23.md` §§14–15 for source analysis.
+
+---
+
+
+
 ## C2.4a browser screenshot defect corrections — 23 November 2026
 
 **User owner screenshots verified locally:** Ruby 3.4.13 server now renders owner and verified client, month/day/hour calendar, owner workspace/cabinet, library, requests and AI assistant. Earlier BLOCKED_BOOT at Ruby 3.4.12 was resolved by owner, but no paid AI call or synthetic data persistence tested. New manual UI defects: faint grid/mobile overlapping plus buttons, no legible type-specific activity in real hourly band, duplicate native disclosure marker, redundant bottom logout (6 owner items/5-column grid), noncommercial learner strings and inconsistent owner section headings.
