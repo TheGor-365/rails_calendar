@@ -1,6 +1,34 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7p owner metadata PASS and C2.3b7q archive integrity gate prepared — 23 November 2026
+
+**2026-11-23, owner terminal output, not remotely inspected private files:** the already documented single C2.3b7p metadata-only Bash preflight (from any old shell; no DB access) returned exactly:
+
+```text
+C23B7P_METADATA_PREFLIGHT=PASS
+G3_PRIVATE_BACKUP_CONTAINER=OWNER_ONLY_PRESENT
+G3_ARCHIVE_FILES=OWNER_ONLY_PRESENT
+G3_ARCHIVE_HASHES=NOT_RECHECKED
+G4_RESTORED_MEDIA_PATH=METADATA_PRESENT
+G4_CONTENT_AND_SOURCE_PARITY=NOT_VERIFIED
+G6_PORTS_3001_3002=NONE_OBSERVED
+G6_RAILS_PROCESS_SIGNATURES=NONE_OBSERVED
+G6_WRITER_QUIESCENCE=NOT_VERIFIED
+G5_FULL=BLOCKED
+NO_DATABASE_OR_BACKUP_BYTES_READ=TRUE
+NO_MUTATIONS=TRUE
+```
+
+**C2.3b7p state = LOCAL_METADATA_PREFLIGHT_PASS (owner-reported), no reads of archive/media bytes, SQL or source rows, no mutations.** Existing private R0.4 session: directory and named archive/manifest files exist and passed ownership, owner-only and basic type checks; `media_restore/storage` path exists. No listeners on 3001/3002 nor gor short process names matched at the observed instant; **not proof of G6 quiescence**. No present SHA256, archive format, TOC, tar or restored media bytes checked, and no present source-to-scratch parity. All previous historic R0.4b2 verified facts remain historical, not current acceptance.
+
+**G0 CI:** all four workflows for exact preceding documentation HEAD `7f7adf97aeb8a11d78dc406616ee4804d0f25cfe` completed **SUCCESS** (PR Rails #45192299506, PR Security #45192299542, push Rails #45192286800, push Security #45192286683). New documentation commit from this update requires independent CI verification.
+
+**Next distinct gate C2.3b7q = OFFLINE PLAN ONLY / owner consent NOT received:** [existing-private-archive read-only SHA256 and format validation proposal](RC0551F_C23B7Q_PRIVATE_ARCHIVE_INTEGRITY_GATE_2026-11-23.md). Designed single guarded operation would read only already created owner-private `SHA256SUMS` + `review.pgcustom` + `storage.tar`, check exact two-entry manifest, hash equality and structural parser success with redacted flags, but must NOT run until **new, separate, explicit owner approval** for reading archive bytes. No DB connection, extraction, source/current media comparison, new backup, restore, replay, writer, Railway, migration, modification, raw output or secret transfer. Even an integrity PASS would prove only those archived bytes match their stored manifest and are parseable, not current media/source parity or full recovery. `G3 CURRENT HASH/FORMAT=NOT_RECHECKED`, `G4 SOURCE/MEDIA PARITY=NOT_VERIFIED`, `G5 FULL=BLOCKED`, `G6 QUIESCENCE=NOT_VERIFIED`, `G7 SCAN=NOT_AUTHORIZED`.
+
+
+
+
 ## C2.3b7p private archive/process metadata-only preflight prepared — 23 November 2026
 
 **G0 current docs HEAD `c9949f5` all four exact-SHA workflows SUCCESS:** PR Rails #45091252217, PR Security #45091252316, push Rails #45091245070, push Security #45091245051. The already completed C2.3b7n owner one-shot catalog PASS remains accepted only as minimum 17-table structural compatibility; authorization remains CONSUMED, and full G5/BACKUP/MEDIA/TENANCY/WRITER/RELEASE gates remain OPEN.
