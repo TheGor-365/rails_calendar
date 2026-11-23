@@ -1,6 +1,19 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## Release R1A exact SHA 6/6 CI PASS; production approval held — 23 November 2026
+
+**FIRST REAL RELEASE CANDIDATE:** Dedicated [Draft PR #82](https://github.com/TheGor-365/rails_calendar/pull/82), branch `release/rc-r1a-ai-spend-2026-11-23`, **SHA `558cf80be59fd317aaaf18c41c4cd38e773f919c`**, exact base production `90d7a817651ba1bffe174d3f800d32988a664169`. Contains RC051 Grok intake accounting/manual fallback, Ruby 3.4.13 + Puma 8.0.4 security remediation and independent synthetic PG18 upgrade test; only **one** additive schema migration `20261113213000_create_ai_spend_entries.rb`. No full PR #81 or its 20 extra migrations.
+
+**SIX EXACT-SHA WORKFLOWS COMPLETED SUCCESS:** PR Rails #45219787387, PR Security #45219787427, PR PG18 deployed-baseline synthetic upgrade #45219787547; push Rails #45219773800, push Security #45219773455, push PG18 upgrade #45219773370. The PG18 exercise loaded `db/schema.rb` from the exact currently deployed source into ephemeral GitHub PG18, inserted synthetic old rows, applied one migration and retained those rows. No connection to owner/local/production databases, no real customer data, no paid provider.
+
+**RELEASE GATE STILL OPEN:** Actual Railway production Postgres `postgres-volume` last snapshot, independent tested restore path, published owner browser smoke and exact target owner approval are unverified. Production web has pre-deploy `bin/rails db:migrate`, which will run against the actual DB before cutover; do NOT switch Railway source/merge PR #82 without an approved, current backup+restore and exact migration review. Web lacks persistent storage mount, so media/avatar rollout cannot be presumed safe. Production remains deployed on old branch SHA `90d7a817` status SLEEPING; project and current DB unchanged. Code rollback is not automatic schema rollback. Current live Grok paid feature not enabled or tested; do not change secrets/flags without new scope.
+
+**NEXT OWNER ACTION (one page):** Railway → project `rails-calendar-ai-workspace` → `Postgres` → `Backups`: show newest backup status/date or absence (no credentials/data); do not click Restore or pay for a new backup without separate approval. Then published web baseline browser smoke and exact SHA `558cf80` release authorization; only then perform controlled production deploy. No G5/G6 historical replay is authorized.
+
+
+
+
 ## Railway production staged release R1A: dedicated PR #82, PG18 rehearsal — 23 November 2026
 
 **Owner instruction:** shift implementation backlog into progressively published Railway releases. This checkpoint records REAL preparation and release CI, not a production deployment.
