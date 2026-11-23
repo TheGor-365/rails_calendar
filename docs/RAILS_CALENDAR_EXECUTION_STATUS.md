@@ -1,6 +1,15 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7s dual-db aggregate operator CODE PREPARED — 23 November 2026
+
+**OFFLINE CODE ONLY**: prepared [fixed pure Active Storage aggregate SQL/contract](../lib/domain_outbox/active_storage_reference_probe.rb), [fail-closed six-SELECT local PG16 source+scratch operator](../script/rc0551f_c23b7s_dual_db_aggregates_readonly.rb), synthetic [negative tests](../test/lib/domain_outbox/active_storage_reference_probe_test.rb), and updated [C2.3b7s runbook](RC0551F_C23B7S_ACTIVE_STORAGE_DB_REFERENCE_GATE_2026-11-23.md). Exact source/review `rails_calendar_rc0551f_c21b_review_20261117` and scratch `rails_calendar_r04_restore_20261121t231331z_27407`. The operator enforces new independent approval token, OS gor, verified clean pinned checkout, local PG16 socket/role, development-only, sanitized environment, readonly/timeouts; identity checked twice on both databases, integer-only count and orphan-blob aggregates, no source-row IDs/keys/filenames output. Six SELECTs total *if ever separately approved*. The pure contract cannot assert current media key/file/tenant parity or true writer quiescence; all gates remain BLOCKED/OPEN.
+
+**CURRENT STATUS:** `C2.3b7r OWNER_MEDIA_TREE_MATCH=PASS, APPROVAL=CONSUMED`; `C2.3b7s CODE_PREPARED, EXACT_SHA_CI=PENDING, OWNER_APPROVAL=NOT_RECEIVED, LOCAL_WORKTREE=NOT_PREPARED, DATABASE_READ=NOT_EXECUTED`; all historical b7j/k/l/n/q consent CONSUMED. No new SQL, restore, media byte reads, application rows, writes, migrations, replay, paid AI, Railway, main merge or deploy. A fresh exact-SHA CI+Security green, clean detached owner worktree, and *new specific owner approval for six bounded read-only SQL SELECTs on exactly two DBs* are required before any runnable command. This code commit triggers its own CI and cannot be called verified yet.
+
+
+
+
 ## C2.3b7r owner current Active Storage MATCH; C2.3b7s DB-reference gate prepared — 23 November 2026
 
 **OWNER TERMINAL EVIDENCE (2026-11-23), not direct assistant filesystem inspection:** previously consented exactly ONE C2.3b7r read-only current media tree vs restored R0.4 media tree check returned:
