@@ -95,9 +95,15 @@
     </div>
   </section>
 
-  <div class="ws-account-content">
+  <div class="ws-account-content ws-account-content--rail">
+    <nav class="wa-cabinet-rail" aria-label="<%= t("nav.workspace_sections") %>">
+      <a href="#cabinet-profile"><i class="bi bi-person-vcard" aria-hidden="true"></i><%= t("account_hub.professional_profile") %></a>
+      <a href="#cabinet-tools"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= t("account_hub.owner_tools") %></a>
+      <a href="#cabinet-privacy"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.storage_heading") %></a>
+      <a href="#cabinet-work"><i class="bi bi-clipboard-check" aria-hidden="true"></i><%= t("account_hub.work_overview") %></a>
+    </nav>
     <section class="ws-account-main">
-      <div class="ws-account-section-heading">
+      <div class="ws-account-section-heading" id="cabinet-profile">
         <div><p class="eyebrow"><%= t("account_hub.profile_eyebrow") %></p><h2><%= t("account_hub.professional_profile") %></h2></div>
         <%= link_to rc_icon_label("arrow-up-right", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet rc-action--small" %>
       </div>
@@ -113,7 +119,7 @@
         </div>
       </div>
 
-      <div class="ws-account-section-heading ws-account-section-heading--later">
+      <div class="ws-account-section-heading ws-account-section-heading--later" id="cabinet-tools">
         <div><p class="eyebrow"><%= t("account_hub.tools_eyebrow") %></p><h2><%= t("account_hub.owner_tools") %></h2></div>
       </div>
       <div class="ws-account-link-grid">
@@ -151,7 +157,7 @@
       </div>
     </section>
     <aside class="ws-account-aside">
-      <div class="ws-account-side-panel">
+      <div class="ws-account-side-panel" id="cabinet-privacy">
         <span class="ws-account-side-icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
         <h2><%= t("account_hub.storage_heading") %></h2>
         <p><%= t("account_hub.storage_explanation") %></p>
@@ -159,7 +165,7 @@
         <div class="ws-account-fact"><span><%= t("account_hub.public_visibility") %></span><strong><%= t("account_hub.not_published") %></strong></div>
         <div class="ws-account-fact"><span><%= t("account_hub.approval") %></span><strong><%= t("account_hub.owner_approval") %></strong></div>
       </div>
-      <div class="ws-account-side-panel ws-account-side-panel--soft">
+      <div class="ws-account-side-panel ws-account-side-panel--soft" id="cabinet-work">
         <h2><%= t("account_hub.work_overview") %></h2>
         <div class="ws-account-fact"><span><%= t("account_hub.intake_drafts") %></span><strong><%= @open_intakes %></strong></div>
         <div class="ws-account-fact"><span><%= t("account_hub.upcoming_consultations") %></span><strong><%= @upcoming_consultations %></strong></div>
