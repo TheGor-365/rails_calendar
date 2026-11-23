@@ -73,6 +73,15 @@ class DomainOutboxActiveStorageReferenceProbeTest < ActiveSupport::TestCase
     assert_equal "PRESENT", r.fetch(:orphan_blob_references)
     blank = aggregate.merge("blank_blob_keys" => 1)
     assert_equal "DELTA_REVIEW", P.assess(source: blank, scratch: aggregate).fetch(:status)
+    nonlocal = aggregate.merge("nonlocal_blobs" => 2)
+    # Equal source/scratch counts are not a safe local DiskService recovery.
+    assert_equal "DELTA_REVIEW",
+      P.assess(source: nonlocal, scratch: nonlocal).fetch(:status)
+    assert_equal "DELTA_REVIEW",
+      P.assess(source: nonlocal, scratch: aggregate).fetch(:status)
+    assert_raises(ArgumentError) {
+      P.validate_aggregate!(aggregate.merge("nonlocal_blobs" => 13))
+    }
     assert_raises(ArgumentError) { P.validate_aggregate!(aggregate.merge("extra" => 1)) }
     assert_raises(ArgumentError) { P.validate_aggregate!(aggregate.merge("blob_count" => -1)) }
     assert_raises(ArgumentError) { P.validate_aggregate!(aggregate.merge("orphan_variants" => 3)) }

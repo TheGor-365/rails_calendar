@@ -93,7 +93,11 @@ module DomainOutbox
       equal = KEYS.all? { |key| a.fetch(key) == b.fetch(key) }
       orphans = a.fetch("orphan_attachments") + a.fetch("orphan_variants") +
         b.fetch("orphan_attachments") + b.fetch("orphan_variants")
-      anomalies = orphans + a.fetch("blank_blob_keys") + b.fetch("blank_blob_keys")
+      # Both databases may agree on *unexpected* non-local services.
+      # Equal counts do not make a DiskService snapshot recoverable.
+      anomalies = orphans +
+        a.fetch("blank_blob_keys") + b.fetch("blank_blob_keys") +
+        a.fetch("nonlocal_blobs") + b.fetch("nonlocal_blobs")
       {
         status: equal && anomalies.zero? ? "AGGREGATE_PARITY" : "DELTA_REVIEW",
         orphan_blob_references: orphans.zero? ? "ZERO" : "PRESENT",

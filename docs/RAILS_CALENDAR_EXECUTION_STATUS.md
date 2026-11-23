@@ -1,6 +1,34 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7s owner Active Storage aggregates PARITY, approval CONSUMED; G5/G6 next — 23 November 2026
+
+**Direct owner-terminal result (2026-11-23):** clean detached C2.3b7s source/scratch operator worktree created pinned to functional SHA `a35bf496f2446f6f52b6c543a25c935f322761b1`; 3 Ruby syntax checks `Syntax OK`, `C23B7S_PREFLIGHT=PASS`, `WORKTREE_CLEAN=PASS`. Owner executed exactly ONE separately consented up-to-six-SELECT PG16 Unix-socket read-only aggregate operation across the exact source `rails_calendar_rc0551f_c21b_review_20261117` and historical scratch `rails_calendar_r04_restore_20261121t231331z_27407`. Sanitized stdout:
+
+```text
+C2.3B7S_DB_AGGREGATES=AGGREGATE_PARITY
+G4_ORPHAN_BLOB_REFS=ZERO
+G4_MEDIA_KEY_FILE_REFERENCES=NOT_PROVED
+G6_DB_OTHER_SESSIONS=ZERO_OBSERVED_AT_CHECKS
+G6_WRITER_QUIESCENCE=NOT_VERIFIED
+G5_FULL=BLOCKED
+G7_REPLAY_AND_SCAN=NOT_AUTHORIZED
+NO_WRITES_BY_THIS_TOOL=TRUE
+OPERATOR_EXIT_CODE=2
+NO_AUTOMATIC_RETRY=TRUE
+```
+
+**Exact interpretation:** same 7 aggregate values and no counted orphan references/blank blob keys at the observation instant. `G4_ACTIVE_STORAGE_AGGREGATE_SUBGATE=PASS (owner terminal)`, not per-record/blob file/polymorphic correctness. C2.3b7s **OWNER_PERMISSION=CONSUMED**, 6 SELECT limit satisfied according to checked operator code and terminal output, no automatic retry; prior C2.3b7j/k/l/n/q/r all consumed. No new SQL, client rows, DB writes, media, restore, migration, replay, provider/Railway or deployment authorized. `G6` zero other sessions observed in identity checks is NOT full quiescence. Operator exit 2 intentional.
+
+**Important limitation found after review:** C2.3b7s immutable code at a35bf49 counted `nonlocal_blobs` but would have returned AGGREGATE_PARITY for equal positive counts; raw values were intentionally not logged. **Do not claim nonlocal_blobs=0.** Synthetic-only pure comparison tightened to classify any nonlocal blob positive as DELTA_REVIEW in this new code SHA with negative tests, but this is NOT evidence about previously observed local databases and the old approval cannot be reused. Current service `local` declared in `config/storage.yml` is only code configuration, not actual row proof.
+
+**G0:** four exact-SHA workflows for prior functional SHA `a35bf496f2446f6f52b6c543a25c935f322761b1` confirmed SUCCESS: PR Rails #45198024935, PR Security #45198024699, push Rails #45198010053, push Security #45198010388. This new code/docs commit has separate CI, not yet verified.
+
+**Next offline stage:** [C2.3b7t G5/G6 metadata and tenant gate design](RC0551F_C23B7T_POST_AGGREGATE_G5_G6_GATE_2026-11-23.md) — full 17-table type/notnull, validated FK/actual key, index key-order/predicate/uniqueness and CHECK expression verification in isolated scratch, then bounded tenant lineage/role/quiescence proof only under future separate authorization. `G3 EXISTING ARCHIVE SHA/FORMAT=OWNER PASS`; `G4 MEDIA_TREE=MATCH_AT_INSTANT`; `G4 ACTIVE_STORAGE AGGREGATES=PARITY_AT_INSTANT`; `G4 EXACT_FILE_AND_RECORD_LINKS=NOT_PROVED`; `G5 MIN_CATALOG=PASS, FULL=BLOCKED`; `G6 TENANCY/WRITER/LEAST_PRIVILEGE=NOT_VERIFIED`; `G7 SCAN=NOT_AUTHORIZED`, `REPLAY/PRODUCTION=BLOCKED`. Preserve old dirty checkout, previous worktrees, source/scratch/backup/media and Railway.
+
+
+
+
 ## C2.3b7s dual-db aggregate operator CODE PREPARED — 23 November 2026
 
 **OFFLINE CODE ONLY**: prepared [fixed pure Active Storage aggregate SQL/contract](../lib/domain_outbox/active_storage_reference_probe.rb), [fail-closed six-SELECT local PG16 source+scratch operator](../script/rc0551f_c23b7s_dual_db_aggregates_readonly.rb), synthetic [negative tests](../test/lib/domain_outbox/active_storage_reference_probe_test.rb), and updated [C2.3b7s runbook](RC0551F_C23B7S_ACTIVE_STORAGE_DB_REFERENCE_GATE_2026-11-23.md). Exact source/review `rails_calendar_rc0551f_c21b_review_20261117` and scratch `rails_calendar_r04_restore_20261121t231331z_27407`. The operator enforces new independent approval token, OS gor, verified clean pinned checkout, local PG16 socket/role, development-only, sanitized environment, readonly/timeouts; identity checked twice on both databases, integer-only count and orphan-blob aggregates, no source-row IDs/keys/filenames output. Six SELECTs total *if ever separately approved*. The pure contract cannot assert current media key/file/tenant parity or true writer quiescence; all gates remain BLOCKED/OPEN.
