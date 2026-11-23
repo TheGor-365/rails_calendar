@@ -9,6 +9,15 @@ export default class extends Controller {
     this.opener = event.currentTarget
   }
 
+  // Isolated review worktrees may have database metadata but no local media
+  // bytes. Show the real category-icon placeholder instead of a broken image.
+  // Never delete, overwrite or re-upload the original attachment.
+  imageFailed(event) {
+    const cover = event.currentTarget.closest(".wa-services__cover-wrap")
+    if (cover) cover.classList.add("wa-services__cover-wrap--unavailable")
+    event.currentTarget.hidden = true
+  }
+
   loaded(event) {
     if (event.target !== this.frameTarget) return
     if (!this.dialogTarget.open) this.dialogTarget.showModal()
