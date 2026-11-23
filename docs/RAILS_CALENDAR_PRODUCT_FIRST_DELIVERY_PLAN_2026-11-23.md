@@ -1,7 +1,7 @@
 # Rails Calendar / White Atlas — PRODUCT-FIRST delivery plan
 
 **Decision checkpoint: 2026-11-23 | Owner-requested change of priority.**
-**STATUS: PLAN APPROVED FOR NEXT IMPLEMENTATION PRIORITIES, NOT FEATURE ACCEPTANCE OR PRODUCTION RELEASE.**
+**STATUS: PROPOSED IMPLEMENTATION PRIORITIES FOR OWNER REVIEW, NOT FEATURE ACCEPTANCE OR PRODUCTION RELEASE.**
 Reference: [original production-MVP roadmap](RAILS_CALENDAR_MVP_EXECUTION_ROADMAP.md); [latest evidence](RAILS_CALENDAR_EXECUTION_STATUS.md). This plan is an execution overlay; it does not erase or falsely close R0, G5/G6, M8, privacy, security or user consent.
 
 ## 1. What materially changed in priority
