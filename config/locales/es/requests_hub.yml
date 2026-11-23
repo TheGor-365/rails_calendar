@@ -1,8 +1,8 @@
 es:
   requests_hub:
-    eyebrow: "PROYECTOS / GESTIÓN"
+    eyebrow: "SOLICITUDES / CLIENTES"
     title: "Solicitudes"
-    subtitle: "Solicitudes recibidas e invitaciones enviadas en un solo lugar."
+    subtitle: "Consultas recibidas e invitaciones a clientes, en una sola sección."
     switch_label: "Dirección de solicitudes"
     incoming: "Recibidas"
     outgoing: "Enviadas"
@@ -11,6 +11,7 @@ es:
     incoming_hint: "Solicitudes de clientes y solicitudes internas."
     outgoing_hint: "Propuestas e invitaciones enviadas a clientes."
     new_outgoing: "Nueva invitación"
+    more_actions: "Más acciones"
     new_request: "Nueva solicitud"
     new_label: "Nueva"
     sender: "Remitente"
