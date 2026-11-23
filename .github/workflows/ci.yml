@@ -70,7 +70,9 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: browser
         with:
-          chrome-version: stable
+          # Chrome 158 Capybara CDP session-clear incompatibility still under review;
+          # use exact Chrome 157 browser already green at feature HEAD.
+          chrome-version: '157.0.8103.78'
           install-chromedriver: true
 
       - name: Configure matching ChromeDriver

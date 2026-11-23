@@ -28,3 +28,8 @@
 - R3 — private AI Chat и C2.3 outbox из PR #79–81; G5/G6 обязательны для исторического backfill/replay, не для всех UI-исправлений.
 
 Запрещено автоматическое применение всех 20 новых миграций из HEAD PR #81 за один релиз. Сохранить оригинальные рабочие деревья, PostgreSQL, media, backups и Railway.
+## Release R1A security remediation (23.11.2026)
+
+**First security run on release commit `84a1137` FAILED for verified issues:** Brakeman flagged Ruby 3.4.12 critical CVE-2026-132825; `bundle-audit` reported multiple Puma 8.0.2 vulnerabilities. No suppression or waiver. This release-only follow-up raises runtime to Ruby 3.4.13 and Puma 8.0.4, exact versions known to be used on the newer CI-verified feature branch, with matching Gemfile/Gemfile.lock. It also pins CI Chrome 157.0.8103.78 because the pre-existing Capybara Chrome 158 CDP reset issue makes browser tests fail before meaningful assertions. This is a temporary CI browser compatibility gate, not a Chrome 158 fix.
+
+**State:** new exact SHA Rails/Security and R1A PostgreSQL 18 upgrade tests must complete successfully before release readiness. No Railway config/variables/deployment, real DB, backup, migration or paid provider changes were made.
