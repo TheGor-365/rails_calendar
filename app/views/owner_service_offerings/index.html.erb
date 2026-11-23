@@ -1,4 +1,6 @@
-<div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-services">
+<div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-services"
+     data-controller="wa-service-preview"
+     data-action="turbo:before-cache@document->wa-service-preview#close">
   <header class="ws-owner-hero wa-services__hero">
     <div class="ws-owner-hero-copy">
       <p class="eyebrow"><i class="bi bi-boxes" aria-hidden="true"></i> <%= t("owner_services.eyebrow") %></p>
@@ -101,6 +103,11 @@
                         params: { version: latest.version, digest: latest.digest, confirm: "1", return_to_catalog: "1" },
                         form: { class: "wa-services__inline-form" }, class: "rc-action rc-action--soft rc-action--small" %>
                 <% end %>
+                <%= link_to rc_icon_label("eye", t("e2_handoff.owner_preview")), owner_service_path(offering),
+                      class: "rc-action rc-action--soft rc-action--small",
+                      data: { turbo_frame: "wa-owner-service-preview",
+                              turbo_prefetch: false,
+                              action: "click->wa-service-preview#remember" } %>
                 <%= link_to rc_icon_label("arrow-up-right", t("owner_services.open")), owner_service_path(offering),
                       class: "rc-action rc-action--quiet rc-action--small wa-services__open" %>
               </div>
@@ -110,4 +117,24 @@
       </div>
     <% end %>
   <% end %>
+  <%# The full owner service page remains the no-JS and direct-URL fallback. %>
+  <dialog class="wa-services__preview-dialog" aria-label="<%= t("e2_handoff.owner_preview") %>"
+          data-wa-service-preview-target="dialog"
+          data-action="click->wa-service-preview#backdrop close->wa-service-preview#restoreFocus">
+    <div class="wa-services__preview-shell">
+      <div class="wa-services__preview-toolbar">
+        <span><i class="bi bi-eye" aria-hidden="true"></i> <%= t("e2_handoff.owner_preview") %></span>
+        <button type="button" class="rc-action rc-action--quiet rc-action--small"
+                aria-label="<%= t("e2_handoff.back") %>"
+                data-action="click->wa-service-preview#close">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <%= turbo_frame_tag "wa-owner-service-preview",
+            data: { wa_service_preview_target: "frame",
+                    action: "turbo:frame-load->wa-service-preview#loaded" } do %>
+        <p class="rc-hint"><%= t("owner_services.private_help") %></p>
+      <% end %>
+    </div>
+  </dialog>
 </div>
