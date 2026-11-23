@@ -1287,3 +1287,35 @@
 .wa-req-review__acceptance {display:flex;align-items:start;gap:.45rem;font-size:.75rem;color:var(--ws-muted);border-top:1px solid var(--ws-border);margin:1rem 0 0;padding-top:.75rem;line-height:1.6;}
 .wa-req-review__acceptance .bi {color:var(--ws-teal);}
 @media(max-width:760px){.wa-req-review__items {grid-template-columns:1fr;}}
+
+
+/* C2.5a — in-page wayfinding on the long AI draft screen.
+   This is a layout-only addition: White Atlas palette, routes and forms
+   stay untouched. Existing compact wayfinder remains on narrow viewports. */
+.wa-ai-page__screen-body { min-width: 0; }
+@media (min-width: 1200px) {
+  .wa-ai-page__screen-grid {
+    display: grid;
+    grid-template-columns: 176px minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+  .wa-ai-page__screen-grid > .wa-ai-page__wayfinder {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 1.25rem;
+    align-self: start;
+    gap: .55rem;
+    margin-bottom: 0;
+  }
+  .wa-ai-page__screen-grid > .wa-ai-page__wayfinder .wa-ai-page__wayfinder-link {
+    width: 100%;
+    justify-content: flex-start;
+    min-height: 46px;
+    white-space: normal;
+  }
+  .wa-ai-page__screen-grid > .wa-ai-page__wayfinder .wa-ai-page__wayfinder-link .bi {
+    flex: 0 0 auto;
+  }
+}
