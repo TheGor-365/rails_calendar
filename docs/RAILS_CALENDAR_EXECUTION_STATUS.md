@@ -1,6 +1,28 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7n owner-local clean worktree preflight PASS — 23 November 2026
+
+**New owner-terminal evidence (2026-11-23):** from the historical `rails_calendar_r04_scratch_worktree_20261122` shell, owner ran guarded Git-only preflight against separately identified `~/rails_calendar_ai_c21c`. Remote feature HEAD at fetch was documentation SHA `67c262a43872ffb9686f603b5b0e882c15640e9b`. Git verified `cdf09a245573c1872beb38d76d563e9622d17abf` is an ancestor of that HEAD and guarded operator/contract/probe/test files match the code SHA. **NEW** clean detached worktree `~/rails_calendar_c23b7n_catalog_worktree_20261123` created pinned to code `cdf09a245573c1872beb38d76d563e9622d17abf`. Fixed operator blob verified as `f7f866a19b7e1bcc5bacb4c0c373106a7c0d5bcd`; direct Ruby 3.4.13 syntax check `Syntax OK`. Owner stdout:
+
+```text
+Syntax OK
+C23B7N_WORKTREE=PASS
+PINNED_CODE_HEAD=cdf09a245573c1872beb38d76d563e9622d17abf
+WORKTREE_CLEAN=PASS
+DATABASE_NOT_ACCESSED=TRUE
+C23B7N_QUERY_NOT_AUTHORIZED=TRUE
+```
+
+**Current gates:** `C2.3b7n CODE+exact-SHA CI=VERIFIED` (four successful runs listed below), `LOCAL_WORKTREE_VERIFIED=PASS` (owner-reported), `OWNER_APPROVAL=NOT_RECEIVED`, `17_TABLE_CATALOG_AND_SCHEMA_MIGRATIONS_VERSION_QUERY=NOT_EXECUTED`, `G5=BLOCKED`. Prior C2.3b7j/k/l one-shot approvals were **CONSUMED** and cannot be reused. The C2.3b7n query is a **distinct future operation**: fixed `pg_catalog` metadata of 17 allowlisted relations plus only `public.schema_migrations.version` (migration metadata rows), no business/customer table rows, against only scratch `rails_calendar_r04_restore_20261121t231331z_27407`, role gor and Unix socket PostgreSQL 16 in read-only mode. A new separate and explicit owner authorization for **exactly ONE** such query is required *before any runnable operator command is provided*. The probe always keeps `G5=BLOCKED`, even on catalog-only PASS.
+
+**Preservation:** The Git preparation did NOT query or modify PostgreSQL, main review/source database, historical scratch, private backup/media, modified `db/schema.rb`, earlier operator worktrees, Railway/production or any external API. No migration, DDL, reindex, replay/writer, restore, paid provider call, merge or deploy. Previous documented root cause remains name-only contract mismatch for the invitation index, corrected offline at b7m; full independent 17-table scratch catalog verification has not been executed. As checked before this checkpoint, the prior documentation SHA `67c262a` Security Audit had passed while its Rails CI was in progress; this new status-only SHA needs its own exact-SHA checks.
+
+**Next action:** obtain explicit owner approval for one C2.3b7n catalog+schema_migrations.version read. If approved, independently inspect exact checked-out script SHA, operators' no-write guards and fresh CI before giving the one-shot invocation. After user posts bounded stdout, record the result and maintain separate G3/G4/G6, tenant, media, app runtime and release gates.
+
+
+
+
 ## C2.3b7n exact-SHA CI fully VERIFIED — 23 November 2026
 
 **PR #81 OPEN/DRAFT; functional HEAD `cdf09a245573c1872beb38d76d563e9622d17abf` source-readback verified.** Exactly FOUR independent exact-SHA workflow runs all completed **SUCCESS**: [PR Rails CI #45089853984](https://github.com/TheGor-365/rails_calendar/actions/runs/45089853984), [PR Security Audit #45089853996](https://github.com/TheGor-365/rails_calendar/actions/runs/45089853996), [push Rails CI #45089849927](https://github.com/TheGor-365/rails_calendar/actions/runs/45089849927), [push Security #45089849917](https://github.com/TheGor-365/rails_calendar/actions/runs/45089849917). All Rails jobs including PG18 fresh/upgrade, model/controller and Chrome completed green. The preceding C2.3b7m contract correction SHA [`b20d968`](https://github.com/TheGor-365/rails_calendar/commit/b20d968195acc7e5b2e90ff26f1a68f8e8c9ba08) also passed its four exact-SHA workflows: PR Rails #45089674437, PR Security #45089674465, push Rails #45089669263 and push Security #45089669261.
