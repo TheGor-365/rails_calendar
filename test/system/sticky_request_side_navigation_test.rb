@@ -79,6 +79,12 @@ class StickyRequestSideNavigationTest < ApplicationSystemTestCase
     assert_selector "#wa-requests-incoming:not([hidden])"
     assert_equal "incoming", page.evaluate_script("new URLSearchParams(window.location.search).get('view')")
 
+    # The explicit URL state must win over any previously saved tab preference.
+    visit admin_project_intakes_path(view: "outgoing")
+    assert_selector ".wa-requests__tab[data-view='outgoing'][aria-selected='true']"
+    visit admin_project_intakes_path(view: "incoming")
+    assert_selector ".wa-requests__tab[data-view='incoming'][aria-selected='true']"
+
     find(".wa-requests__more > summary").click
     assert_selector ".wa-requests__more-panel a[href='#{owner_services_path}']"
     assert_selector ".wa-requests__more-panel a[href='#{new_project_intake_path}']"
