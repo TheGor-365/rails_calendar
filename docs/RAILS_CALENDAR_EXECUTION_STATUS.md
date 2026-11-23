@@ -1,6 +1,20 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.5c canonical Requests UI — 24 November 2026
+
+**New code/test SHA:** `93553db9dcf3869e3bca5a7d37fe448a400ced80`, `feat/rc0551f-c21c-live-owner-ai-chat-2026-11-18`, Draft PR #81. **Current status:** `CODE_COMMITTED`; `CI_PENDING` on subsequent documentation SHA, `LOCAL_OWNER_QA_NOT_TESTED`, `PRODUCTION_NOT_DEPLOYED`. Recheck exact SHA using live Actions before asserting PASS. Link to [design/implementation record](RC0551F_C25A_PRODUCT_INFORMATION_ARCHITECTURE_2026-11-23.md#16-c25c-canonical-requests-view--24-november-2026).
+
+**Verified previous CI failure and repair:** SHA `e0f5d2a` Rails CI [45285979793](https://github.com/TheGor-365/rails_calendar/actions/runs/45285979793) failed only in browser `OwnerServiceMediaBrowserTest` because it expected a duplicate My Services link inside owner Cabinet. All 515 model/controller cases passed (7938 assertions), PostgreSQL18 schema and synthetic deployed-upgrade jobs succeeded, Security Audit succeeded. Updated that browser scenario to use the actual `Requests -> More actions -> My services` path before performing its existing private media review assertions. Recheck updated exact-SHA CI, don't claim green ahead of results.
+
+**C2.5c implemented:** existing owner `/admin/project_intakes` remains the sole Requests hub; headline now states purpose, one primary CTA `New invitation`, secondary protected `New request` and `My services` in a White Atlas `<details>` tools menu. Existing incoming/outgoing server-side counts, cards, provenance, status, owner-specific links and role gates remain intact. Stimulus tabs can be directly revisited at `?view=incoming` / `?view=outgoing` without a full-page reload, preserving other query params; explicit URL overrides local tab preference. New headings/actions translated to RU/EN/HY/ES. CSS is namespaced to Requests, respects focus and reduced motion. Browser test covers single primary action, menu reachability, tab URL state and desktop/mobile 390/320 overflow. No changes to Rails routes, controllers, DB, client data, media files, provider consent, budgets or Railway.
+
+**Next:** resolve exact latest CI results; if green, owner stops only local `:3003` guarded preview and updates the isolated `~/rails_calendar_c25a_ia_review_20261123` worktree to a reviewed exact SHA; runs existing `script/rc0551f_c25a1_preview.sh`; checks Workspace, Cabinet and Requests at 1440/400/320, including Requests incoming/outgoing, owner Services menu and broken-media-free catalog. If CI red, inspect job log and repair exact failing assertion/behavior; keep all status layers separate.
+
+---
+
+
+
 ## C2.5b canonical owner surfaces / CI repair — 24 November 2026
 
 **Latest code/test commit before this status update:** `f4b8679d143910ca2da77f5928aff358619bb7d7` in active Draft PR #81 (`feat/rc0551f-c21c-live-owner-ai-chat-2026-11-18`); **CI for this exact SHA is pending** at checkpoint, Security Audit pending. No production deployment and no new owner browser run on this SHA.
