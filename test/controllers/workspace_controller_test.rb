@@ -16,10 +16,11 @@ class WorkspaceControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: "Workspace"
     assert_select ".ws-hub-metric", count: 3
-    assert_select ".ws-hub-tool[href=?]", root_path
-    assert_select ".ws-hub-tool[href=?]", consultations_path
-    assert_select ".ws-hub-tool[href=?]", admin_project_intakes_path
-    assert_select ".ws-hub-tool[href=?]", owner_services_path
+    assert_select ".ws-hub-tools", count: 0
+    assert_select ".ws-hub-header a[href=?]", admin_project_intakes_path, count: 1
+    assert_select ".ws-hub-panel a[href=?]", consultations_path
+    assert_select ".app-header a[href=?]", root_path
+    assert_select ".app-header a[href=?]", admin_project_intakes_path
     assert_select ".app-brand[href=?]", workspace_path
     delete sign_out_url
     assert_redirected_to root_url
