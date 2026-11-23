@@ -1,6 +1,20 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.5c1 Requests mobile overflow CI regression — 24 November 2026
+
+**Base exact-SHA GH Actions:** C2.5c docs HEAD `31b479018cca0c7923edb45aaa9fa1329d328d93`; Rails CI [45286977993](https://github.com/TheGor-365/rails_calendar/actions/runs/45286977993) **FAILURE**; Security Audit [45286978763](https://github.com/TheGor-365/rails_calendar/actions/runs/45286978763) **SUCCESS**. PG18 new schema and synthetic deployed-upgrade jobs passed; 515 Rails tests / 7938 assertions **0 failures**; 52 Chrome browser cases / 802 assertions **1 failure**. The new `StickyRequestSideNavigationTest#test_owner_Requests_hub_has_one_primary_action,_accessible_tools_and_deep-link_tabs` at 390px with opened `More actions` menu found `documentElement.scrollWidth=449` vs `innerWidth=390`. This is a **real responsive defect**, not a stale assertion.
+
+**Targeted implementation:** `_wa_requests.scss` mobile `@media(max-width:575px)` now gives hero actions a two-column `minmax(0,1fr)` grid and aligns the native `More actions` popover to its right edge, preventing the old `left:0` menu from extending to viewport x=449. No global `overflow-x:hidden` workaround. `sticky_request_side_navigation_test.rb` keeps the width/scrollWidth assertion and additionally checks that the expanded popover rectangle stays fully within the viewport at both 390px and 320px. Existing one CTA, keyboard tabs, direct `?view=` state and owner menu-link tests remain unchanged; no production / DB / model / paid AI action.
+
+**Repair commits:** CSS `297cf793e7b72cf3846b7c1d3059decb75dd5eba`; stronger real-visibility browser test `7fe180f80a67e47b3d8f530ff5c5731aa3faa350`. **New exact-SHA CI/Security not verified yet** at this checkpoint; keep C2.5c/C2.5c1 `CODE_COMMITTED; CI_PENDING; OWNER_BROWSER_NOT_TESTED; NOT_DEPLOYED` until live Actions and owner screenshots. Owner's separate `~/rails_calendar_c25a_ia_review_20261123` running `:3003` remains at the earlier visually accepted catalogue version unless user explicitly changes it.
+
+**Next required owner gate after green exact-SHA CI:** stop *only* :3003 Puma, advance isolated detached worktree with a clean-diff and old-HEAD guard, then invoke `RC_C25A1_EXPECTED_SHA=<new_sha> bash script/rc0551f_c25a1_preview.sh`. Visually inspect Workspace, Cabinet, Requests (incoming/outgoing), and expanded Requests actions at 1440/400/320px, ensuring owner Services still accessible and menu is not clipped. No production rollout or historical DB operations.
+
+---
+
+
+
 ## C2.5c canonical Requests UI — 24 November 2026
 
 **New code/test SHA:** `93553db9dcf3869e3bca5a7d37fe448a400ced80`, `feat/rc0551f-c21c-live-owner-ai-chat-2026-11-18`, Draft PR #81. **Current status:** `CODE_COMMITTED`; `CI_PENDING` on subsequent documentation SHA, `LOCAL_OWNER_QA_NOT_TESTED`, `PRODUCTION_NOT_DEPLOYED`. Recheck exact SHA using live Actions before asserting PASS. Link to [design/implementation record](RC0551F_C25A_PRODUCT_INFORMATION_ARCHITECTURE_2026-11-23.md#16-c25c-canonical-requests-view--24-november-2026).
