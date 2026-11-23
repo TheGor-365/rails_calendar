@@ -34,6 +34,12 @@ class AccountCabinetsTest < ActionDispatch::IntegrationTest
     get workspace_path
     assert_response :success
     assert_select "a[href=?]", owner_setup_path
+
+    # Service management remains discoverable under the canonical Requests
+    # area after removing duplicate app links from the cabinet.
+    get admin_project_intakes_path
+    assert_response :success
+    assert_select ".rc-page-hero__actions a[href=?]", owner_services_path, count: 1
   end
 
   test "client cabinet remains private and shows verified identity without owner context" do
