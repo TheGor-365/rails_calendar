@@ -48,9 +48,20 @@ class WorkspaceControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to client_home_path
     get client_cabinet_path
     assert_response :success
-    assert_select "nav.rc-mobile-dock--client a.rc-mobile-dock-item", count: 3
+    assert_select "nav.rc-mobile-dock--client a.rc-mobile-dock-item", count: 2
     assert_select "nav.rc-mobile-dock--client form[action=?]", sign_out_path, count: 0
     assert_select "header.app-header form[action=?]", sign_out_path, count: 1
+
+    old_pilot = ENV["RC_LOCAL_CLIENT_REQUESTS_ENABLED"]
+    begin
+      ENV["RC_LOCAL_CLIENT_REQUESTS_ENABLED"] = "true"
+      get client_cabinet_path
+      assert_response :success
+      assert_select "nav.rc-mobile-dock--client a.rc-mobile-dock-item", count: 3
+      assert_select "nav.rc-mobile-dock--client form[action=?]", sign_out_path, count: 0
+    ensure
+      ENV["RC_LOCAL_CLIENT_REQUESTS_ENABLED"] = old_pilot
+    end
   end
 
   test "guest public services has no owner workspace links" do
