@@ -1,6 +1,15 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7o offline recovery evidence/gate matrix prepared — 23 November 2026
+
+**OFFLINE ONLY — NO NEW DATABASE ACTION OR CONSENT:** following the observed C2.3b7n one-shot 17-table minimum catalog PASS (authorization CONSUMED), audited already committed R0.4b2 private archive/restore evidence, R0.4c5 scratch-only migration, C2.3b7g/h six-family synthetic operator SOP and C2.3b7i schema register. Prepared [C2.3b7o recovery evidence and G0–G7 gate matrix](RC0551F_C23B7O_POST_CATALOG_RECOVERY_GATE_2026-11-23.md). It distinguishes historical owner-verified scratch restore/core parity from **unverified full media/source/tenant and latest-cohort parity**; G5 minimal catalog PASS from full G5 BLOCKED; separate G6 privacy/quiescence and G7 historical-read approvals. No new operator, SQL, backup/media access, source row read, migration, replay or production change. This new docs-only SHA requires independent CI/Security observation.
+
+**Next action:** collect privacy-preserving PRIVATE-only yes/no existence/provenance flags for G3/G4/G6, source/review/scratch isolation and schema-drift review, then design a specific future read-only evidence gate for owner review. No fresh request to read app rows, sources or backups yet. Keep old `db/schema.rb` edits, source/scratch/backup worktrees and Railway unchanged.
+
+
+
+
 ## C2.3b7n owner one-shot 17-table catalog PASS — 23 November 2026
 
 **Direct owner-terminal report (2026-11-23), NOT remote inspection of private PostgreSQL:** owner executed exactly ONE explicitly authorized C2.3b7n PG16 read-only `pg_catalog` 17-table + `public.schema_migrations.version` observation, from previously verified clean detached worktree `~/rails_calendar_c23b7n_catalog_worktree_20261123` pinned to exact code SHA `cdf09a245573c1872beb38d76d563e9622d17abf` (operator blob `f7f866a19b7e1bcc5bacb4c0c373106a7c0d5bcd`) against *only* historical scratch `rails_calendar_r04_restore_20261121t231331z_27407`. This was separately approved in the conversation and [logged in PR #81](https://github.com/TheGor-365/rails_calendar/pull/81#issuecomment-7088625226). Owner-provided bounded stdout:
