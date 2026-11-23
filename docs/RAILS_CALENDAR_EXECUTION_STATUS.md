@@ -1,6 +1,17 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## Product-first delivery plan: functional next, historical replay isolated — 23 November 2026
+
+**OWNER-REQUESTED PRIORITY RESET:** excessive time on C2.3b7 infrastructure checks; focus on functional AI/client/browser value starting NEXT operational slice. New [PRODUCT-FIRST execution plan](RAILS_CALENDAR_PRODUCT_FIRST_DELIVERY_PLAN_2026-11-23.md) aligns with existing MVP roadmap but changes work order: F0 real local browser/first defect, F1 live consented owner AI conversations, F2 owner-service→invitation→verified-client intake, F3 C2.4 safe AI proposal/apply, F4 E2.4/2.5 12-section specification and approvals, F5 M6/M7 project/tasks/delivery. QA and staging/release operate in parallel. Avoid further PG16 metadata gates for unrelated UI work.
+
+**VERIFIED on 2026-11-23:** PR #81 exact SHA `2cc62619b4b74bcb9709a67033e4b10ebb2b9d82` OPEN/DRAFT with all four exact-SHA Rails CI/Security workflows COMPLETED SUCCESS. Railway `rails-calendar-ai-workspace` production web `rails-calendar-ai-web` points to branch `feat/client-owner-pilot-2026-11-13`, deployed SHA `90d7a817651ba1bffe174d3f800d32988a664169` on 2026-11-13; deployment `SLEEPING`, PG18 with existing `postgres-volume`, no staged changes. GitHub Compare between deployed and current feature SHA ~1166 ahead commits: DO NOT blind-merge/deploy. Current live AI/provider/browser acceptance NOT VERIFIED. No user DB/backup/production changes.
+
+**NEXT** F0/F1 working browser and AI first. Release R1 requires isolated staging or independently verified disposable target, production-backup+schema compatibility, exact SHA CI, owner signoff, user/browser smoke and explicit deploy permission. G5/G6 full still needed for historical six-family replay and risky source/production operations, but no longer blocks independent UI/feature work. Do not touch original dirty `db/schema.rb` or prior worktrees. This plan is source/control policy, not completed-feature or production evidence.
+
+
+
+
 ## C2.3b7t 17-table typed G5 static contract and synthetic tests — 23 November 2026
 
 **OFFLINE ONLY, no DB access / approval.** New strict pure typed catalog spec + synthetic negative tests for 17 tables and 94 selected columns; 19 indexes including unique and partial predicate/ordered keys; 15 named CHECK source expressions; allowlisted validated FK source/target keys and prior required migrations. Derived from tracked schema and creation migrations for 4 newer tables missing in `db/schema.rb`. No mutation or restoration of the owner's locally modified schema. Future PG16 expression canonicalization needed; synthetic PASS is NOT owner scratch PASS. [Runbook](RC0551F_C23B7T_POST_AGGREGATE_G5_G6_GATE_2026-11-23.md).
