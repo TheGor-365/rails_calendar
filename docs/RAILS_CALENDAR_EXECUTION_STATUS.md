@@ -1,6 +1,34 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.3b7q owner archive integrity PASS; C2.3b7r media-parity plan prepared — 23 November 2026
+
+**Direct owner-terminal evidence, 2026-11-23:** User ran exactly ONE explicitly approved C2.3b7q private-archive read-only check. Status output (redacted, no hash/path/PII emitted):
+
+```text
+C23B7Q_PREFLIGHT=PASS
+C23B7Q_PRIVATE_ARCHIVE_INTEGRITY=PASS
+G3_ARCHIVE_SHA256=PASS
+G3_PGCUSTOM_PARSE=PASS
+G3_MEDIA_TAR_PARSE=PASS
+G4_CURRENT_MEDIA_BYTES=NOT_COMPARED
+G6_WRITER_QUIESCENCE=NOT_VERIFIED
+SOURCE_OR_DB_QUERIES=NOT_PERFORMED
+NO_MUTATIONS=TRUE
+NO_AUTOMATIC_RETRY=TRUE
+```
+
+**CURRENT EVIDENCE:** Exactly two entries of the owner-private `SHA256SUMS` manifest matched the bytes of existing `review.pgcustom` PostgreSQL custom dump and `storage.tar` archive, and PostgreSQL 16 `pg_restore --list` and tar `--list` successfully parsed them without exposing entries, extraction, SQL, new DB/archive, media modification or Railway activity. This verifies **current integrity of stored bytes relative to the existing manifest and parser readability**, NOT independent manifest authenticity, complete restorability, present source/media parity, tenant isolation or original backup capture consistency.
+
+**Approval:** new one-shot C2.3b7q permission was individually obtained and [logged in PR #81](https://github.com/TheGor-365/rails_calendar/pull/81#issuecomment-7104070121). It is now **CONSUMED**, as are preceding C2.3b7j/k/l/n database metadata permissions. No repeat attempt, no additional archive/media/SQL access authorized by user general continuation.
+
+**Next independent step prepared OFFLINE:** [C2.3b7r current source `storage/` vs restored historical R0.4 media comparison proposal](RC0551F_C23B7R_CURRENT_MEDIA_PARITY_GATE_2026-11-23.md). 2026-11-22 R0.4b2 archive restore already included a private media `diff -qr` for its **then-current snapshot** (do NOT rerun restore). New proposal, if separately authorized, would read-only compare **current** original `~/rails_calendar_ai_c21c/storage` tree to the extracted `media_restore/storage` under the single private R0.4 session with no filenames/bytes exposed in output. Explicit fresh owner approval required before supplying a runnable command; distinguish normal post-snapshot changes from corruption and avoid claiming DB/tenant parity. No local command run for C2.3b7r. C2.3b7q plan remains historical PENDING text; this topmost result supersedes it.
+
+**Release gates:** G3 *existing archive hash/format*=PASS for owner-local R0.4 snapshot; G4 historical restore/core-count evidence=prior narrow PASS, current source/media parity=OPEN; G5 minimum 17-table catalog=PASS, full G5=BLOCKED; G6 current writer quiescence/tenancy/ACL=NOT_VERIFIED; G7 six-family historical scan=NOT_AUTHORIZED; replay/write/migration/deploy/merge=NOT_AUTHORIZED. Four CI+Security workflows for preceding exact SHA `9598567b52f5a2601cd59553a6db1805129b2886` were verified SUCCESS: PR Rails #45193397147, PR Security #45193397017, push Rails #45193378131, push Security #45193378140. New docs SHA has separate CI, not yet verified.
+
+
+
+
 ## C2.3b7p owner metadata PASS and C2.3b7q archive integrity gate prepared — 23 November 2026
 
 **2026-11-23, owner terminal output, not remotely inspected private files:** the already documented single C2.3b7p metadata-only Bash preflight (from any old shell; no DB access) returned exactly:
