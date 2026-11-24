@@ -1,17 +1,15 @@
 <div class="container ws-account-page my-4 my-sm-5" id="owner-cabinet">
-  <header class="ws-account-hero wa-compact-banner">
-    <div class="ws-account-hero-copy">
-      <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("account_hub.owner_eyebrow") %></p>
-      <h1 class="visually-hidden"><%= t("account_hub.owner_title") %></h1>
-      <div class="d-flex flex-wrap gap-2 my-2">
-        <%= link_to rc_icon_label("person-vcard", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet", data: { wa_page_dialog: "frame" } %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("person-vcard", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet", data: { wa_page_dialog: "frame" } %>
         <%= link_to rc_icon_label("stars", t("account_hub.interview")), owner_setup_path(step: "A"), class: "rc-action rc-action--quiet", data: { wa_page_dialog: "frame" } %>
-      </div>
-      <div class="ws-account-meta">
+  <% end %>
+  <% banner_metadata = capture do %>
+    <div class="ws-account-meta">
         <span class="ws-account-chip"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.private_scope") %></span>
         <span class="ws-account-chip"><i class="bi bi-person-check" aria-hidden="true"></i><%= current_user.email %></span>
       </div>
-    </div>
+  <% end %>
+  <% banner_accessory = capture do %>
     <div class="ws-account-hero-symbol ws-account-avatar-frame" id="owner-avatar"
          data-controller="wa-avatar-editor wa-private-image"
          data-wa-avatar-editor-success-value="<%= t("account_hub.avatar_crop_ready") %>"
@@ -70,7 +68,8 @@
         </details>
       <% end %>
     </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :account, icon: "person-badge", path: t("account_hub.owner_eyebrow"), title: t("account_hub.owner_title"), extra_class: "ws-account-hero", metadata: banner_metadata, accessory: banner_accessory, actions: banner_actions %>
 
   <section class="ws-account-overview" id="owner-cabinet-overview" data-wa-dialog-refresh aria-label="<%= t('account_hub.owner_overview') %>">
     <div class="ws-account-metric">
