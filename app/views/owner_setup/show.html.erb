@@ -46,7 +46,7 @@
       </div>
       <h2 id="owner-current-question"><%= t("owner_setup.steps.#{@current_key}.title", default: @question.fetch(:title)) %></h2>
       <p class="ws-owner-section-lead"><%= t("owner_setup.steps.#{@current_key}.hint", default: @question.fetch(:hint)) %></p>
-      <%= form_with url: owner_setup_section_path(section_key: @current_key), method: :patch, data: { turbo_frame: ("wa-settings-frame" if turbo_frame_request?) }, class: "ws-owner-form" do %>
+      <%= form_with url: owner_setup_section_path(section_key: @current_key), method: :patch, data: { turbo_frame: ("wa-settings-frame" if turbo_frame_request?), wa_invalid_draft: (@answer_invalid ? "true" : nil) }, class: "ws-owner-form" do %>
         <fieldset>
           <legend><%= t("owner_setup.choose_options") %></legend>
           <%= hidden_field_tag "owner_answer[selected_options][]", "" %>
