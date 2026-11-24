@@ -1,16 +1,7 @@
 <div class="container my-4 my-sm-5 wa-requests" data-controller="wa-requests" data-wa-requests-key-value="rc-owner-requests-view-v1">
-  <header class="rc-page-hero mb-4 wa-compact-banner">
-    <div class="rc-page-hero__content">
-      <p class="eyebrow"><%= t("requests_hub.eyebrow") %></p>
-      <div class="rc-page-hero__heading">
-        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-inboxes"></i></span>
-        <h1 class="visually-hidden"><%= t("requests_hub.title") %></h1>
-      </div>
-      
-    </div>
-    <div class="rc-page-hero__actions">
-      <% if owner_signed_in? %>
-        <%= link_to rc_icon_label("send-plus", t("requests_hub.new_outgoing")), owner_invitations_path, class: "rc-action rc-action--primary" %>
+  <% banner_actions = capture do %>
+    <% if owner_signed_in? %>
+        <%= link_to rc_icon_label("send-plus", t("requests_hub.new_outgoing")), owner_invitations_path, class: "rc-action rc-action--quiet" %>
         <details class="wa-requests__more">
           <summary class="rc-action rc-action--quiet">
             <%= rc_icon_label("sliders", t("requests_hub.more_actions")) %>
@@ -22,8 +13,8 @@
           </div>
         </details>
       <% end %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "inboxes", path: t("requests_hub.eyebrow"), title: t("requests_hub.title"), extra_class: "rc-page-hero mb-4", actions: banner_actions %>
 
   <div class="wa-requests__switch" role="tablist" aria-label="<%= t("requests_hub.switch_label") %>">
     <button type="button" role="tab" id="wa-requests-tab-incoming" class="wa-requests__tab" data-wa-requests-target="tab" data-view="incoming"
