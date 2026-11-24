@@ -1918,3 +1918,6 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 .wa-page-dialog turbo-frame[hidden] { display:none; }
 .wa-page-dialog .ws-owner-interview-layout, .wa-page-dialog .ws-capability-layout { grid-template-columns: minmax(0,1fr); }
 .wa-page-dialog .ws-owner-step-nav, .wa-page-dialog .ws-owner-guide { position:static; }
+
+.consultation-form .wa-compact-input { min-height:3.6rem; max-height:50vh; overflow-y:auto; transition:height .2s ease; }
+@media(prefers-reduced-motion:reduce) { .consultation-form .wa-compact-input { transition:none; } }
