@@ -1,3 +1,4 @@
+<%= turbo_frame_tag "wa-settings-frame", target: "_top" do %>
 <div class="container ws-owner-page ws-owner-activity my-4 my-sm-5" id="owner-ai-activity">
   <header class="ws-owner-hero"><div class="ws-owner-hero-copy">
     <p class="eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_setup.practice_eyebrow") %></p>
@@ -30,3 +31,5 @@
     <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path(kind: "ai"), class: "rc-action rc-action--primary" %>
   </div>
 </div>
+
+<% end %>
