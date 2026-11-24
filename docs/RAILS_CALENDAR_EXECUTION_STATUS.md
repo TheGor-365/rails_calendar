@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.4b.4 invalid interview retention / F2.5.4c contextual breadcrumbs
+
+- Starting exact HEAD 3b21f90: Rails CI 45513571514 and Security Audit 45513571585 queued; no new green gate. Previous unlogged slice 7814788 renders invalid interview submission as HTTP 422 with transient answer and allowed choices, 972e8fb marks invalid draft, a168794 registers dirty form, 3b21f90 adds integration coverage for retention, no writes and no AI spend. All pending runtime validation; previous redirect expectations may need adjustment.
+- 3aae9e6 adds localized navigation history container; c374bbb renders text-only breadcrumb buttons for earlier committed entries and aria-current for current entry, shared jump/back discard guard, records numeric scroll coordinates per entry and restores on matching destination via animation frame. daa2dcf styles horizontally scrollable history and flex iframe height. c1456d6 adds synthetic browser test for profile -> capabilities -> assistant -> first breadcrumb, history truncation and unchanged parent URL. No form contents stored by navigation history. No new route allowlist or authorization change.
+- Limitations: browser CI and scroll restoration not verified; loading failure/redirect handling, event ordering, native submit, browser Back/reload, frame/stream responses, multiple dirty forms and stale state remain risks. Need focused QA and regression repair before local checkout update. Local still 83522ce5; no deployment, merge, database operation or paid AI calls. F2.6a remains after acceptance.
+
+
 ## 2026-11-25 — F2.5.4b.3 expanded explicit HTML mutation outcomes
 
 - Starting HEAD 0dc6773: Rails CI 45512785604 and Security Audit 45512785576 queued; no newer green gate. Expanded explicit outcome markers on 34 successful HTML redirect branches across nine controllers: owner capabilities (4, 826c587), services (8, 410b92d), setup (2, 4a58578), invitations (3, 1e8c193), notifications (2, 71c26e0), AI assistant (2, 5a9cf75), AI conversations (7, 07e1ce0), catalogue AI (3, 7bf70a0), service media (3, 57bad6a). Notifications individual read uses advance; others replace. Existing consent, authorization, persistence, error branches and JSON response formats unchanged.
