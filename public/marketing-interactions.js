@@ -1,6 +1,6 @@
 document.addEventListener("click", event => {
   const closer = event.target.closest("[data-mk-close]");
-  if (closer) document.getElementById(closer.dataset.mkClose)?.close();
+  if (closer) closeMarketingDialog(document.getElementById(closer.dataset.mkClose));
   const trigger = event.target.closest("[data-mk-open]");
   if (trigger) {
     const dialog = document.getElementById(trigger.dataset.mkOpen);
@@ -44,3 +44,20 @@ window.addEventListener("scroll", () => {
 }, { passive: true });
 window.addEventListener("hashchange", syncMarketingSection);
 syncMarketingSection();
+
+function closeMarketingDialog(dialog) {
+  if (!dialog?.open || dialog.classList.contains("mk-closing")) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { dialog.close(); return; }
+  dialog.classList.add("mk-closing");
+  const finish = () => {
+    dialog.classList.remove("mk-closing");
+    if (dialog.open) dialog.close();
+  };
+  dialog.addEventListener("animationend", finish, { once:true });
+  setTimeout(finish, 220);
+}
+document.querySelectorAll(".mk-process-dialog").forEach(dialog => {
+  dialog.addEventListener("cancel", event => {
+    event.preventDefault(); closeMarketingDialog(dialog);
+  });
+});
