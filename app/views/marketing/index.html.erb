@@ -71,7 +71,10 @@
                 <p><strong><%= t("owner_services.included_scope") %></strong><br><%= version.included_scope %></p>
                 <span class="mk-service-footer"><%= client_signed_in? && ClientRequestPilot.enabled?(request: request) ? t("client_requests.new_action") : t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
               <% end %>
-              <details class="mk-footer-disclosure mk-service-tech"><summary><%= t("marketing.technologies", default: "Technologies") %></summary><p><%= t("marketing.service_technology.#{offering.key}", default: t("marketing.technology_on_request", default: "Technology stack agreed during assessment")) %></p></details>
+              <details class="mk-footer-disclosure mk-service-tech"><summary><%= t("marketing.technologies", default: "Technologies") %></summary><% domains = OwnerServices::PublicPresentation.new(offering).technology_domains %>
+                <% if domains.any? %>
+                  <ul class="mk-tech-list"><% domains.each do |domain| %><li><%= t("owner_setup.options.B.#{domain}") %></li><% end %></ul>
+                <% else %><p><%= t("marketing.technology_on_request", default: "Technology stack agreed during assessment") %></p><% end %></details>
             </article>
           <% end %>
         </div>
