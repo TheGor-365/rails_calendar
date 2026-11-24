@@ -1,12 +1,12 @@
 <div class="container my-4 my-sm-5 wa-requests" data-controller="wa-requests" data-wa-requests-key-value="rc-owner-requests-view-v1">
-  <header class="rc-page-hero mb-4">
+  <header class="rc-page-hero mb-4 wa-compact-banner">
     <div class="rc-page-hero__content">
       <p class="eyebrow"><%= t("requests_hub.eyebrow") %></p>
       <div class="rc-page-hero__heading">
         <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-inboxes"></i></span>
-        <h1 class="page-title"><%= t("requests_hub.title") %></h1>
+        <h1 class="visually-hidden"><%= t("requests_hub.title") %></h1>
       </div>
-      <p class="rc-muted wa-requests__intro"><%= t("requests_hub.subtitle") %></p>
+      
     </div>
     <div class="rc-page-hero__actions">
       <% if owner_signed_in? %>
