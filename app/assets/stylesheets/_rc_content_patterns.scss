@@ -359,7 +359,9 @@ textarea[data-controller~="wa-autogrow"] { resize: vertical; min-height: 6rem; m
 .wa-unread-mobile-icon { position: relative; }
 .wa-unread-count--mobile { position: absolute; top: -6px; right: -8px; min-width: 1.12rem; height: 1.12rem; font-size: .59rem; padding: 0 .2rem; }
 @media(max-width: 767.98px) {
-  .rc-mobile-dock--owner { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  // Owner dock has exactly five actions: Month, Today, Add, Requests, Cabinet.
+  // Six tracks left an unused sixth cell and compressed the five real buttons.
+  .rc-mobile-dock--owner { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .rc-mobile-dock--owner .rc-mobile-dock-label { font-size: .62rem; }
 }
 @media(max-width: 340px) {
