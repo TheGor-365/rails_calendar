@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.4g catalogue transport regression gate
+
+- 30f3486 adds positive mocked provider HTTP integration test: missing paid consent must produce no request or ledger reservation; explicit consent with catalogue selected must transmit exact allowed published fields, exclude unpublished draft and excluded scope, settle fictional ledger entry and not change service versions. This is authored test coverage, not executed PASS evidence.
+- Exact prior 5213786 CI 45470957683 and Security 45470957652 queued at inspection. Consolidated QA is the next gate before expanding the schema or adding further features. Local last confirmed 0244c89 PID 847858. Structured FAQ/pricing, explicit file extraction, consultation draft/apply and outstanding UI/service acceptance remain open. No migration, production deployment, real provider request or local database changes.
+
+---
+
 ## 2026-11-24 — F2.4g published catalogue AI context (partial)
 
 - Added OwnerAi::CatalogueContext: explicit opt-in per primary composer request, owner workspace only, immutable approved published versions from current approved professional snapshot, up to 9 offerings and 3500 JSON bytes. Whitelist title/summary/included scope/delivery mode/version. Excludes drafts, hidden scope, private media, prices, other workspace records, stale snapshots. Composer payload digest includes selected context; overall existing 9000-byte cap, ledger and paid consent remain. UI readiness now derives from adapter, four locales disclose scope, option defaults off. No new provider calls or DB changes by assistant.
