@@ -1,20 +1,9 @@
 <div class="container ws-owner-page ai-workspace my-4 my-sm-5" id="owner-catalogue-copilot">
-  <header class="ws-owner-hero ai-workspace__hero">
-    <div class="ws-owner-hero-copy">
-      <p class="eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_services.copilot_eyebrow") %></p>
-      <div class="ai-workspace__title-row">
-        <span class="ai-workspace__hero-icon" aria-hidden="true"><i class="bi bi-stars"></i></span>
-        <div>
-          <h1 class="page-title"><%= t("owner_services.copilot_title") %></h1>
-          <p class="rc-muted"><%= t("owner_services.copilot_intro") %></p>
-        </div>
-      </div>
-    </div>
-    <div class="ai-workspace__hero-actions">
-      <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path,
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path,
                   class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :standard, icon: "stars", path: t("owner_services.copilot_eyebrow") + " / " + t("owner_services.copilot_title"), title: t("owner_services.copilot_title"), extra_class: "ws-owner-hero ai-workspace__hero", description: t("owner_services.copilot_intro"), actions: banner_actions %>
 
   <section class="ai-workspace__metrics" aria-label="<%= t("owner_services.copilot_overview") %>">
     <div class="ai-workspace__metric">
