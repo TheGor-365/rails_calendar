@@ -19,7 +19,7 @@ class OwnerServiceMediaItemsController < ApplicationController
 
     if @media.save
       redirect_to owner_service_path(@offering, anchor: "offering-media"),
-                  notice: t("owner_services.media_uploaded")
+                  notice: t("owner_services.media_uploaded"), flash: { wa_dialog_outcome: "replace" }
     else
       redirect_to owner_service_path(@offering, anchor: "offering-media"),
                   alert: t("owner_services.media_invalid")
@@ -35,7 +35,7 @@ class OwnerServiceMediaItemsController < ApplicationController
       @media.update!(approved_at: Time.current)
     end
     redirect_to owner_service_path(@offering, anchor: "offering-media"),
-                notice: t("owner_services.media_approved")
+                notice: t("owner_services.media_approved"), flash: { wa_dialog_outcome: "replace" }
   rescue ActiveRecord::RecordInvalid
     redirect_to owner_service_path(@offering, anchor: "offering-media"),
                 alert: t("owner_services.media_invalid")
@@ -47,7 +47,7 @@ class OwnerServiceMediaItemsController < ApplicationController
       @media.update!(archived_at: Time.current)
     end
     redirect_to owner_service_path(@offering, anchor: "offering-media"),
-                notice: t("owner_services.media_archived")
+                notice: t("owner_services.media_archived"), flash: { wa_dialog_outcome: "replace" }
   rescue ActiveRecord::RecordInvalid
     redirect_to owner_service_path(@offering, anchor: "offering-media"),
                 alert: t("owner_services.media_invalid")
