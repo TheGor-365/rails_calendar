@@ -1,5 +1,13 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.3b shared White Atlas banner implementation (first migration group)
+
+- Shared `app/views/shared/_wa_banner.html.erb` supports standard, detail and account variants, translated compact path with single small icon, semantic H1, optional description/metadata/actions/accessory. Shared responsive styling added to application.bootstrap.scss. Detail variants retain object title, account variants preserve avatar editor and private metadata.
+- 19 templates migrated: owner_setup show/review/practice/ai_activity/cabinet; owner_capabilities index; owner_services index/new/show; owner_catalogue_ai index; owner_ai_assistant show; owner_ai_conversations index; owner_activity_events index; owner_artifacts index; owner_notifications index; owner_invitations index/show; workspace home; client_home show. Preserved conditional action markup; banner navigation uses quiet style, avatar submission remains functional primary action. No server policy/schema change.
+- Added integration coverage in OwnerAiAssistantTest at `bc9dbed`: checks compact semantics, one path icon, quiet navigation, both contextual profile entrypoints, no AI spend. Tests not yet executed to completion for new code. Earlier exact green CI on 83522ce5 remains historical only.
+- Audited headers in calendar home/day/hour, consultations index/new/edit/show, client requests new/show/edit, admin intake index/edit_spec, owner requirements show, quiz show/review and outbox health. Remaining migrations must preserve dates/time markup, record names, instructions and status metadata, role gates. Public/auth pages not visually audited. Modal navigation stack remains unimplemented. Next complete remaining operational banners, verify regression CI and implement F2.5.4 history/back/redirect/dirty guards per White Atlas contract. Local review still at 83522ce5; no deployment, DB commands or paid AI calls.
+
+
 ## 2026-11-25 — owner feedback / F2.5.3a compact banner correction and F2.5.4 navigation contract
 
 - Owner screenshots confirm interview opens in modal from cabinet, parent URL unchanged and inner global header absent. Manual acceptance partial, not full PASS. Owner requests profile modal, compact green path headings, one small header icon, uniform banner buttons, no orphan large icon and navigable modal history.
