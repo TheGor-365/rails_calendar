@@ -5,7 +5,7 @@
       <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-day"></i></span><h1 class="wa-compact-date">
         <time datetime="<%= @selected_date.iso8601 %>"><%= rc_local_date(@selected_date, format: :rc_full) %></time>
       </h1></div>
-      <p class="rc-muted mb-0">
+      <p class="rc-muted mb-0" id="calendar-day-summary" data-wa-dialog-refresh>
         <span class="rc-data-number" data-calendar-day-total><%= rc_count(@day_total, "calendar", "event") %></span>
         <span aria-hidden="true">·</span> <%= rc_count(@consultations.size, "calendar", "consultation") %>
         <% if owner_signed_in? %>
