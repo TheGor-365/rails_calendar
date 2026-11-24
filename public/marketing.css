@@ -270,3 +270,9 @@ body.marketing-page { min-width: 320px; margin: 0; background: var(--mk-canvas);
 .mk-sidebar-nav .mk-section-trigger { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; }
 .mk-header-nav .is-current { color: #007e76; font-weight: 800; }
 .mk-process-dialog form { margin-top: 16px; display: flex; justify-content: flex-end; }
+
+.mk-service-card { display: flex; flex-direction: column; }
+.mk-service-card > a { height: auto; flex: 1; }
+.mk-service-tech { margin: 0; padding: 0 17px 14px; }
+.mk-service-tech p { margin: 8px 0 0; }
+.mk-process-dialog > button { margin-top: 16px; }
