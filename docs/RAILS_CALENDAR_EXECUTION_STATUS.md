@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.4b initial contextual dirty-form guard
+
+- Starting exact HEAD 3c099ea: Rails CI 45512151116 and Security Audit 45512151611 queued, no new green gate. Inspected current modal controller and owner setup/consultation redirect paths; Rails success notices and alert redirects can both produce HTTP success, so a transport-level successful submission is not yet a complete business-success contract.
+- dbbbc845 adds per-document dirty and pending mutation form sets, publishes only boolean flags to parent iframe dataset, prompts before controlled close/back/cross-area navigation and same-area Turbo visits, blocks controlled departure while Turbo mutation pending; successful transport submission clears its tracked form and requests projection refresh. a240a21 localizes discard confirmation RU/EN/HY/DE. d332efb covers ordinary explicit non-Turbo same-area links. No field contents are serialized. 8c937ba adds synthetic browser test for cancel/confirm close and retained text.
+- Limitations: this is initial guard, not full data-loss guarantee. Need verify Turbo event ordering, business-error redirects, native submit/navigation, frame-level updates, multiple forms, browser reload/back and stale iframe state; add mutation-aware committed-history handling and tests. Do not treat all 2xx/redirects as business success. No CI execution result for 8c937ba at inspection (workflow list empty). Breadcrumb/scroll recovery still pending. Local review unchanged at 83522ce5; no DB operations, production deploy, merge or paid AI.
+
+
 ## 2026-11-25 — public template audit / F2.5.4a first modal navigation history slice
 
 - At start HEAD 53521f85 CI run 45511882972 and Security Audit 45511883407 queued; no new green result established. Reviewed marketing, regular/admin login, owner/client signup, email verification, privacy and invitation landing/preview templates. Marketing already has compact commercial header; auth/privacy share account_heading with necessary visible instructions and remain top-level. Invitation landing/preview migrated to shared detail banner at fcfb2cf and ebff29c; total 39 migrated templates. No token/claim/auth logic change.
