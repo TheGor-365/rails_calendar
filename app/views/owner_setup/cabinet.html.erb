@@ -3,6 +3,10 @@
     <div class="ws-account-hero-copy">
       <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("account_hub.owner_eyebrow") %></p>
       <h1 class="visually-hidden"><%= t("account_hub.owner_title") %></h1>
+      <div class="d-flex flex-wrap gap-2 my-2">
+        <%= link_to rc_icon_label("person-vcard", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet" %>
+        <%= link_to rc_icon_label("stars", t("account_hub.interview")), owner_setup_path(step: "A"), class: "rc-action rc-action--quiet", data: { wa_page_dialog: "frame" } %>
+      </div>
       <div class="ws-account-meta">
         <span class="ws-account-chip"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.private_scope") %></span>
         <span class="ws-account-chip"><i class="bi bi-person-check" aria-hidden="true"></i><%= current_user.email %></span>
@@ -117,17 +121,17 @@
       </div>
       <div class="ws-account-link-grid">
         <%# Identity and account settings only: operational areas have canonical homes. %>
-        <%= link_to owner_setup_path(step: "A"), class: "ws-account-tool" do %>
+        <%= link_to owner_setup_path(step: "A"), class: "ws-account-tool", data: { wa_page_dialog: "frame" } do %>
           <span class="ws-account-tool-icon"><i class="bi bi-chat-square-dots" aria-hidden="true"></i></span>
           <strong><%= t("account_hub.interview") %></strong><small><%= t("account_hub.interview_desc") %></small>
           <span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
         <% end %>
-        <%= link_to owner_capabilities_path, class: "ws-account-tool" do %>
+        <%= link_to owner_capabilities_path, class: "ws-account-tool", data: { wa_page_dialog: "frame" } do %>
           <span class="ws-account-tool-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span>
           <strong><%= t("account_hub.capabilities") %></strong><small><%= t("account_hub.capabilities_desc") %></small>
           <span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
         <% end %>
-        <%= link_to owner_ai_activity_path, class: "ws-account-tool" do %>
+        <%= link_to owner_ai_activity_path, class: "ws-account-tool", data: { wa_page_dialog: "frame" } do %>
           <span class="ws-account-tool-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>
           <strong><%= t("account_hub.ai_activity") %></strong><small><%= t("account_hub.ai_activity_desc") %></small>
           <span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
