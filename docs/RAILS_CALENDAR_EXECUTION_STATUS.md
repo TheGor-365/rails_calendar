@@ -1,5 +1,13 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.4g published catalogue AI context (partial)
+
+- Added OwnerAi::CatalogueContext: explicit opt-in per primary composer request, owner workspace only, immutable approved published versions from current approved professional snapshot, up to 9 offerings and 3500 JSON bytes. Whitelist title/summary/included scope/delivery mode/version. Excludes drafts, hidden scope, private media, prices, other workspace records, stale snapshots. Composer payload digest includes selected context; overall existing 9000-byte cap, ledger and paid consent remain. UI readiness now derives from adapter, four locales disclose scope, option defaults off. No new provider calls or DB changes by assistant.
+- f6c94f5 adds synthetic tests for foreign/public vs draft separation, approved-state/snapshot gates and default opt-out in mocked provider request. Positive opted-in provider transport test still required. New exact CI not verified; prior bc0456b CI 45470513330 and Security 45470513300 queued on inspection.
+- Remaining F2.4g: structured versioned FAQ/price rules, explicit selected-file authorization and extraction, consultation-specific draft/apply flow. No claim of prices or documents being available to composer. Existing service versions may refer to older profile v1 and therefore be excluded until reviewed revision and publication. F2.2/F2.3 and all accumulated UI/browser QA remain open. Local last confirmed 0244c89 PID 847858; next verify CI, finish positive mocked request test and perform consolidated local acceptance. No deploy/migration.
+
+---
+
 ## 2026-11-24 — F2.4f compact consultations (partial)
 
 - 468bc1b removes verbose generic hints from consultation form while retaining accessible constraints and visible timezone, actual overlap advisory and validation. Two-row smooth growing description, capped at half viewport. 4e38c6f removes redundant unfiltered empty list block, retains filtered/invalid feedback. ad88e19 adds owner-only preparation link to existing AI plan_outline in a new tab, preserving current form. CSS and four locale labels added through 6bad2d2.
