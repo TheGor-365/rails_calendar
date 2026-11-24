@@ -1,10 +1,12 @@
 require "application_system_test_case"
+require_relative "../support/owner_service_catalogue_test_data"
 
 class OwnerContextualDialogTest < ApplicationSystemTestCase
-  PASSWORD = "fictional-owner-contextual-dialog-password-2026".freeze
+  include OwnerServiceCatalogueTestData
 
   setup do
-    @owner = User.create!(email: "owner-dialog-navigation@example.test", password: PASSWORD, role: "owner")
+    @owner = make_test_owner("owner-dialog-navigation@example.test")
+    @workspace, @profile, @snapshot, @capabilities = approved_profile_for(@owner)
   end
 
   test "interview steps stay local, cabinet return closes, and focus returns to opener" do
@@ -38,14 +40,14 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
 
     within_frame(find("iframe[data-wa-embedded-page]")) do
       assert_selector "#owner-capabilities"
-      first("a[href='#{owner_practice_path}']").click
+      first("a[href^='#{owner_ai_assistant_path}']").click
     end
 
     assert_current_path owner_cabinet_path
     assert_selector "dialog.wa-page-dialog[open]", count: 1
     assert_selector "iframe[data-wa-embedded-page]", count: 1
     within_frame(find("iframe[data-wa-embedded-page]")) do
-      assert_selector "#owner-practice"
+      assert_selector "#owner-ai-assistant"
       assert_no_selector ".app-header", visible: true
       first("a[href='#{owner_cabinet_path}']").click
     end
@@ -57,7 +59,7 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
   def sign_in_owner
     visit sign_in_path
     fill_in "Email address", with: @owner.email
-    fill_in "Password", with: PASSWORD
+    fill_in "Password", with: OwnerServiceCatalogueTestData::PASSWORD
     click_button "Sign in"
     assert_current_path workspace_path
   end
