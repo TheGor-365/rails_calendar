@@ -23,7 +23,7 @@ class OwnerSetupController < ApplicationController
     unsure = submitted[:unsure] == "1"
 
     if choices.empty? && notes.empty? && !unsure
-      return redirect_to(owner_setup_path(step: key), alert: t("owner_setup.answer_required"))
+      return render_invalid_answer(key, choices, notes, unsure, "owner_setup.answer_required")
     end
 
     @profile.with_lock do
@@ -45,7 +45,7 @@ class OwnerSetupController < ApplicationController
     redirect_to(destination ? owner_setup_path(step: destination) : owner_setup_review_path,
                 notice: t("owner_setup.saved"), flash: { wa_dialog_outcome: "advance" })
   rescue ActiveRecord::RecordInvalid, ActionController::ParameterMissing
-    redirect_to owner_setup_path(step: key), alert: t("owner_setup.invalid_answer")
+    render_invalid_answer(key, choices || [], notes.to_s, unsure == true, "owner_setup.invalid_answer")
   end
 
   def review
@@ -158,6 +158,19 @@ class OwnerSetupController < ApplicationController
   end
 
   private
+
+  def render_invalid_answer(key, choices, notes, unsure, message)
+    @answers = @profile.owner_interview_answers.reload.index_by(&:section_key)
+    @current_key = key
+    @question = OwnerIntelligence::Catalog.question(key)
+    @answer = OwnerInterviewAnswer.new(
+      section_key: key, selected_options: choices & @question.fetch(:options).keys,
+      notes: notes, unsure: unsure
+    )
+    @answer_invalid = true
+    flash.now[:alert] = t(message)
+    render :show, status: :unprocessable_entity
+  end
 
   def require_owner!
     redirect_to sign_in_path, alert: t("owner_setup.owner_only") unless owner_signed_in?
