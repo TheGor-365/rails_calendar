@@ -59,6 +59,7 @@
     </div>
   <% end %>
 
+  <% if @search.errors.any? || @search.filtered? || @search.total.positive? %>
   <p class="rc-results-summary" role="status" aria-live="polite">
     <% if @search.errors.any? %>
       <%= t("consultations.filter_invalid") %>
@@ -68,6 +69,7 @@
       <%= t("consultations.showing", first: @search.first_result, last: @search.last_result, total: rc_count(@search.total, "calendar", "consultation")) %>
     <% end %>
   </p>
+  <% end %>
 
   <% if @consultations.any? %>
     <ul id="consultations" class="rc-record-list">
@@ -98,7 +100,7 @@
         </li>
       <% end %>
     </ul>
-  <% else %>
+  <% elsif @search.filtered? || @search.errors.any? %>
     <div id="consultations" class="rc-empty-state rc-notice--neutral" role="status">
       <span class="rc-empty-state__icon" aria-hidden="true"><i class="bi bi-calendar-x"></i></span>
       <% if @search.errors.any? %>
