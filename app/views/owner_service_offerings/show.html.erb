@@ -61,6 +61,24 @@
           <%= button_to rc_icon_label("files", t("owner_services.new_revision")), revise_owner_service_path(@offering), method: :post, class: "rc-action rc-action--quiet" %>
         </section>
       <% end %>
+      <% presentation = @draft || @approved || @published %>
+      <% if presentation %>
+        <section class="surface-panel wa-services__panel" id="offering-client-preview">
+          <h2><i class="bi bi-eye" aria-hidden="true"></i> <%= t("owner_services.client_preview", default: "Client preview") %></h2>
+          <p class="rc-hint"><%= t("owner_services.client_preview_help", default: "Review the title, client benefit and deliverables before publishing. This preview does not publish changes.") %></p>
+          <h3><%= presentation.title %></h3>
+          <p><%= presentation.summary %></p>
+          <strong><%= t("owner_services.included_scope") %></strong>
+          <ul class="ws-owner-boundaries">
+            <% presentation.included_scope.split(/\r?\n|;\s*/).reject(&:blank?).each do |item| %>
+              <li><i class="bi bi-check2" aria-hidden="true"></i><span><%= item %></span></li>
+            <% end %>
+          </ul>
+          <% if @published && presentation.id != @published.id %>
+            <p class="rc-hint"><%= t("owner_services.client_preview_pending", default: "Clients still see the previously published version.") %></p>
+          <% end %>
+        </section>
+      <% end %>
       <% if @approved %>
         <section class="surface-panel wa-services__panel" id="offering-publication">
           <h2><i class="bi bi-eye" aria-hidden="true"></i> <%= t("owner_services.publication_title") %></h2>
