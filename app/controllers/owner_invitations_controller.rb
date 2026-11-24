@@ -67,7 +67,7 @@ class OwnerInvitationsController < ApplicationController
         end
         format.html do
           flash[:issued_invitation_url] = url
-          redirect_to owner_invitations_path, notice: I18n.t("e2.invitation_issued")
+          redirect_to owner_invitations_path, notice: I18n.t("e2.invitation_issued"), flash: { wa_dialog_outcome: "replace" }
         end
       end
     else
@@ -122,7 +122,7 @@ class OwnerInvitationsController < ApplicationController
     return head :not_found unless candidate &&
       OwnerAi::PageActionRegistry.allowed?(:invitation, candidate.result["purpose"])
     invitation.update!(owner_ai_entry: candidate)
-    redirect_to owner_invitation_path(invitation), notice: I18n.t("e2_handoff.linked")
+    redirect_to owner_invitation_path(invitation), notice: I18n.t("e2_handoff.linked"), flash: { wa_dialog_outcome: "replace" }
   end
 
   # E2.2: a real, journalled provider draft for this page. No changes are
@@ -205,7 +205,7 @@ class OwnerInvitationsController < ApplicationController
       end
     end
     return head :conflict if outcome == :claimed
-    redirect_to owner_invitations_path, notice: I18n.t("e2.revoked")
+    redirect_to owner_invitations_path, notice: I18n.t("e2.revoked"), flash: { wa_dialog_outcome: "replace" }
   end
 
   private
