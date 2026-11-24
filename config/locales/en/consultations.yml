@@ -1,5 +1,6 @@
 en:
   consultations:
+    ai_prepare: "Prepare with AI"
     all_eyebrow: "SCHEDULE / ALL RECORDS"
     title: "Consultations"
     list_hint: "Chronological list of sessions. Open a record or jump directly to its calendar date."
