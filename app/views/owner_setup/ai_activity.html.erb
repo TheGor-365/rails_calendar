@@ -1,4 +1,4 @@
-<%= turbo_frame_tag "wa-settings-frame", target: "_top" do %>
+<% settings_content = capture do %>
 <div class="container ws-owner-page ws-owner-activity my-4 my-sm-5" id="owner-ai-activity">
   <header class="ws-owner-hero"><div class="ws-owner-hero-copy">
     <p class="eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_setup.practice_eyebrow") %></p>
@@ -32,4 +32,13 @@
   </div>
 </div>
 
+<% end %>
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "wa-settings-frame", target: "_top" do %>
+    <% if notice.present? %><p class="rc-notice rc-notice--success" role="status"><%= notice %></p><% end %>
+    <% if alert.present? %><p class="rc-notice rc-notice--error" role="alert"><%= alert %></p><% end %>
+    <%= settings_content %>
+  <% end %>
+<% else %>
+  <%= settings_content %>
 <% end %>
