@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.4c.3 stabilization checkpoint / F2.5.5 verification gate
+
+- Exact historical HEAD 53521f85: Rails CI 45511882972 completed failure (520 runs, 8061 assertions, 1 failure, 0 errors/skips); PG18 schema and upgrade jobs passed; Security Audit 45511883407 passed. Failure was stale `.rc-page-hero__actions` selector in AccountCabinetsTest, corrected in dd4677c while retaining unique canonical service link assertion. Browser suite did not run after integration failure.
+- faa36d7 adds a 15-second navigation lock recovery timer, duplicate parent-driven navigation guard, timer cleanup, and fallback focus on main-content if original opener was detached. Timer is UI recovery only, not proof of load or cancellation of a late response. Runtime acceptance pending.
+- At this checkpoint exact HEAD faa36d7: PR Rails CI 45514150954 and Security Audit 45514151009 queued. Earlier checked PR runs at caf79c6, 3b21f90 and 0dc6773 also queued. GitHub connector workflow listing is PR-triggered only; no claim about all push runs or runner cause. Freeze further feature expansion until useful exact-code CI evidence is available. Next inspect integration failures, then browser tests (profile/back/breadcrumb, dirty cancel, validation 422, saved consultation and parent refresh), then local isolated review at :3003 with assets build and manual 320/390 desktop acceptance. No automatic sync of local checkout, no production deployment, DB operations or paid AI. F2.6a blocked on F2.5 acceptance.
+
+
 ## 2026-11-25 — F2.5.4b.4 invalid interview retention / F2.5.4c contextual breadcrumbs
 
 - Starting exact HEAD 3b21f90: Rails CI 45513571514 and Security Audit 45513571585 queued; no new green gate. Previous unlogged slice 7814788 renders invalid interview submission as HTTP 422 with transient answer and allowed choices, 972e8fb marks invalid draft, a168794 registers dirty form, 3b21f90 adds integration coverage for retention, no writes and no AI spend. All pending runtime validation; previous redirect expectations may need adjustment.
