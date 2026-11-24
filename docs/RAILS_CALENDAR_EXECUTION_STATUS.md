@@ -1,5 +1,19 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.1 contextual navigation code and F2.5.2 regression repair
+
+**Status: CODE_COMMITTED; exact-current-SHA CI and owner browser acceptance still pending.** Working branch remains Draft PR #81, separate from release PR #82 and Railway production. This is NOT a production release or a claim that all navigation cases pass.
+
+- app/javascript/controllers/wa_page_dialog_controller.js: explicit same-origin GET navigation policy (LOCAL_ACTION, LOCAL_WORKFLOW, CLOSE_TO_PARENT, REPLACE_MODAL, NAVIGATE_PARENT, DOWNLOAD, EXTERNAL_LINK). Embedded pages retain normal Rails/CSRF/Turbo/Stimulus forms and local workflows; returning to the opening parent closes the dialog, another allowlisted section replaces the single iframe, and an unrelated same-origin page navigates the parent document after closing. External links open separately and known authorized text/media downloads keep browser handling. Parent accepts messages only from the active iframe window and matching origin.
+- Existing native dialog animation, Escape, and opener focus restoration retained. Current parent scroll position is recorded; nested dialog is not opened. CSS hides the actual .rc-mobile-dock, embedded nested dialog, global header, owner AI dock, and mobile dock bottom padding inside iframe.
+- Scoped parent summary refresh on a successful Turbo mutation: only explicitly tagged read-only regions, currently #owner-cabinet-overview and #calendar-day-summary, are updated by authenticated same-origin GET. Whole parent page is not reloaded. No automatic publish/approve.
+- test/system/consultations_test.rb: the four old day-to-hour full-page expectations now assert an open iframe, hour content, guest read-only behavior, consultation details, real synthetic consultation creation, return to day and persistence in test DB. New test/system/owner_contextual_dialog_test.rb exercises setup step navigation, close-to-cabinet and focus, replacement, and absence of nested dialogs. The shared synthetic approved snapshot fixture was fixed to include headline/private/public fields used by the actual practice view.
+- Evidence: baseline c7ba91a CI 45476334482 failed four legacy consultation browser assertions. Intermediate SHA 31157c2: integration 519/8017 PASS, browser 57/977 with one failure in the newly added owner test; Security SUCCESS. After fixing that test's profile setup, SHA 1fc1ac3: integration 519/8017 PASS, browser 57/983 with one error in an existing owner AI library scenario due to an incomplete synthetic approved snapshot (headline absent); Security SUCCESS. Shared fixture correction committed at 2f245625933f5e8f59689cd34a605dff679edcdc; **no exact-SHA PASS is claimed for this newer code**.
+- No user-local worktree, Puma process, review or production DB, Railway configuration, real mail, xAI billing, or private files were changed by this GitHub-only iteration. Historical local SHA c7ba91a and PID 962459 need a fresh owner terminal check.
+- Open DoD: exact SHA Rails CI/Security; owner manual test on isolated :3003 at desktop and 320/390 (setup A→B, save/reload, return to cabinet, modal replacement, hour→consultation, Escape/focus, overflow, download/external route, parent summary); F2.5.3 full White Atlas banner inventory; F2.6a real mail composer. Production release remains explicitly blocked.
+
+---
+
 ## 2026-11-24 — F2.5 contextual dialog acceptance and next-chat handoff
 
 - Local owner terminal confirms exact c7ba91ae9d72ed8bf0238579c56813228ce135a3, assets PASS, verified local review DB, Puma PID 962459 :3003. Owner screenshots confirm full embedded interview, capabilities and services content, top-right close and thin scrollbar, no visible horizontal scrollbar on shown desktop screens. MANUAL_BROWSER_PARTIAL_PASS for rendering only; form saves, mobile, other modal routes, navigation semantics and stale parent metrics not accepted.
