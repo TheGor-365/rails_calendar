@@ -1900,3 +1900,12 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 .wa-calendar .simple-calendar td, .wa-calendar .simple-calendar th { border-color: rgba(0,126,118,.14); }
 @media(max-width: 576px) { .wa-compact-banner { padding: 12px; border-radius: 16px; gap: 8px; } }
 @media(prefers-reduced-motion:reduce) { .wa-ai-page .wa-compact-input { transition:none; } }
+
+.wa-page-dialog { width:min(920px,calc(100% - 24px)); max-height:85dvh; padding:0; border:1px solid rgba(0,126,118,.16); border-radius:16px; background:var(--rc-surface,#fff); color:inherit; box-shadow:0 20px 65px rgba(24,60,65,.20); }
+.wa-page-dialog[open] { animation:wa-page-dialog-enter .22s ease-out; }
+.wa-page-dialog::backdrop { background:rgba(20,45,52,.4); }
+.wa-page-dialog__header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border-bottom:1px solid rgba(0,126,118,.12); background:#edf8f6; }
+.wa-page-dialog__body { padding:14px; }
+.wa-page-dialog__body .container { width:100%; margin:0 !important; padding:0; }
+@keyframes wa-page-dialog-enter { from {opacity:0; transform:translateY(10px) scale(.99)} to {opacity:1; transform:none} }
+@media(prefers-reduced-motion:reduce) { .wa-page-dialog[open] {animation:none} }
