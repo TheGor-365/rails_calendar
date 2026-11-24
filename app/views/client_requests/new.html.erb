@@ -1,14 +1,5 @@
 <div class="container wa-client-form my-4 my-sm-5">
-  <header class="rc-page-hero mb-4">
-    <div class="rc-page-hero__content">
-      <p class="eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("client_requests.eyebrow") %></p>
-      <div class="rc-page-hero__heading">
-        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-plus"></i></span>
-        <h1 class="page-title"><%= t("client_requests.new_title") %></h1>
-      </div>
-      <p class="rc-muted"><%= t("client_requests.new_hint") %></p>
-    </div>
-  </header>
+  <%= render "shared/wa_banner", icon: "clipboard2-plus", path: t("client_requests.eyebrow") + " / " + t("client_requests.new_title"), title: t("client_requests.new_title"), description: t("client_requests.new_hint"), extra_class: "mb-4" %>
 
   <%= form_with model: @intake, url: client_requests_path,
                 html: { class: "rc-form wa-client-form__form" } do |f| %>
