@@ -1,5 +1,13 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.4b.2 explicit mutation outcome pilot
+
+- Starting exact HEAD dedf27e had Rails CI 45512439108 and Security Audit 45512439218 queued. No newer green result established. ApplicationController supports EN/RU/HY/ES, not DE; corrected navigation/discard translations at e3a4529.
+- Explicit server flash outcome introduced for successful owner interview update (advance, 2cc6341) and consultation create/update/destroy HTML redirects (replace, 1685e91). Layout publishes allowlisted outcome in current main body, not persistent Turbo head (71f8f4e, 5c97315). No authorization, persistence or schema policy changed. JSON consultation responses unchanged.
+- df04be3 tracks mutation source URL, consumes explicit outcome on committed page, refreshes parent projections only on confirmed pilot outcome, replaces current history entry for consultation mutation, advances interview history, conservatively marks rendered invalid consultation form dirty. 39d72e7 restricts committed unknown destination promotion to known top-level GET routes; never blindly GET mutation action URL. b064013 adds integration assertions for successful consultation outcome, one-use flash and absence on invalid submission.
+- Pilot is not complete acceptance. Other mutation endpoints no longer trigger generic transport-success projection refresh and need explicit contracts or audited fallback. Verify Turbo submit-end/render order, failed interview redirects currently may lose submitted values, native/non-Turbo mutations, frame/stream responses, concurrent edits, browser Back/reload, auth redirects, and synthetic browser tests. Do not claim all forms protected. Breadcrumb and scroll work pending. Local review still 83522ce5; no production deployment, merge, review database operations or paid AI calls.
+
+
 ## 2026-11-25 — F2.5.4b initial contextual dirty-form guard
 
 - Starting exact HEAD 3c099ea: Rails CI 45512151116 and Security Audit 45512151611 queued, no new green gate. Inspected current modal controller and owner setup/consultation redirect paths; Rails success notices and alert redirects can both produce HTTP success, so a transport-level successful submission is not yet a complete business-success contract.
