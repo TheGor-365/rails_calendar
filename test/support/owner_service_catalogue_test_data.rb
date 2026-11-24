@@ -19,7 +19,13 @@ module OwnerServiceCatalogueTestData
     profile.update!(onboarding_state: "approved")
     snapshot = profile.professional_context_snapshots.create!(
       version: version, digest: Digest::SHA256.hexdigest("fictional-offering-source-#{owner.id}-#{version}"),
-      payload: { "source" => "owner_confirmed", "capabilities" => capabilities, "desired_services" => desired_services },
+      payload: {
+        "source" => "owner_confirmed",
+        "headline" => "Synthetic Rails delivery profile",
+        "private_summary" => "Fictional test-only owner profile. No actual commercial claims.",
+        "public_summary_draft" => "Synthetic profile for browser acceptance.",
+        "capabilities" => capabilities, "desired_services" => desired_services
+      },
       approved_at: Time.current
     )
     rows = capabilities.map do |domain|
