@@ -1,3 +1,4 @@
+<%= turbo_frame_tag "wa-settings-frame", target: "_top" do %>
 <div class="container ws-owner-page ws-owner-practice my-4 my-sm-5" id="owner-practice">
   <header class="ws-owner-hero">
     <div class="ws-owner-hero-copy">
@@ -15,7 +16,7 @@
             owner_ai_assistant_path(operation: "client_reply"), class: "rc-action rc-action--soft" %>
       <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("boxes", t("owner_services.title")), owner_services_path, class: "rc-action rc-action--primary" %>
-      <%= link_to rc_icon_label("sliders", t("capability_review.edit_link")), owner_capabilities_path, class: "rc-action rc-action--primary" %>
+      <%= link_to rc_icon_label("sliders", t("capability_review.edit_link")), owner_capabilities_path, data: { turbo_frame: "wa-settings-frame" }, class: "rc-action rc-action--primary" %>
       <%= link_to rc_icon_label("chat-square-dots", t("owner_setup.update_profile")), owner_setup_path(step: "A"), class: "rc-action rc-action--quiet" %>
     </div>
   </header>
@@ -114,3 +115,5 @@
     </section>
   <% end %>
 </div>
+
+<% end %>
