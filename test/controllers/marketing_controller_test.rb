@@ -31,6 +31,10 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_select "dialog#process", count: 1
     assert_select "[data-mk-open=process]", minimum: 1
     assert_select ".mk-service-tech", count: 1
+    assert_select ".mk-tech-list li", text: "Ruby on Rails", count: 1
+    assert_select ".mk-tech-list li", text: "React", count: 0
+    refute_includes response.body, "Fictional self-report"
+    refute_includes response.body, "Synthetic policy"
     assert_select "a.mk-service-card", count: 0
     assert_select "article.marketing-service > a[href='#contact']", count: 1
     assert_select "a[href='/sign_in']", minimum: 1
