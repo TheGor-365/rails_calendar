@@ -1,3 +1,5 @@
+require "json"
+
 module OwnerAi
   # Only public, immutable service fields from the current approved snapshot.
   # No drafts, hidden conditions, attachments, customer records or prices.
