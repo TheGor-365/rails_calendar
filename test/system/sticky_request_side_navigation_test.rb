@@ -104,6 +104,54 @@ class StickyRequestSideNavigationTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1440, 900)
   end
 
+  test "owner mobile dock has five evenly spaced accessible routes with no empty right track" do
+    sign_in_as(@owner)
+
+    [admin_project_intakes_path(view: "outgoing"), owner_cabinet_path].each do |path|
+      visit path
+      [400, 320].each do |width|
+        page.driver.browser.manage.window.resize_to(width, 932)
+        assert_selector "nav.rc-mobile-dock--owner .rc-mobile-dock-item", count: 5
+        geometry = page.evaluate_script(<<~JS)
+          (() => {
+            const dock = document.querySelector("nav.rc-mobile-dock--owner");
+            const items = [...dock.querySelectorAll(":scope > .rc-mobile-dock-item")];
+            const style = getComputedStyle(dock);
+            const box = dock.getBoundingClientRect();
+            const rects = items.map(node => node.getBoundingClientRect());
+            const padRight = parseFloat(style.paddingRight);
+            const padLeft = parseFloat(style.paddingLeft);
+            const right = rects[rects.length - 1].right;
+            const left = rects[0].left;
+            return {
+              tracks: style.gridTemplateColumns.trim().split(/\\s+/).length,
+              count: items.length,
+              minWidth: Math.min(...rects.map(r => r.width)),
+              widthSpread: Math.max(...rects.map(r => r.width)) - Math.min(...rects.map(r => r.width)),
+              leftGap: left - box.left - padLeft,
+              rightGap: box.right - padRight - right,
+              dockLeft: box.left,
+              dockRight: box.right,
+              viewport: innerWidth,
+              overflow: document.documentElement.scrollWidth - innerWidth
+            };
+          })()
+        JS
+        assert_equal 5, geometry["count"]
+        assert_equal 5, geometry["tracks"]
+        assert_operator geometry["minWidth"], :>, 38
+        assert_operator geometry["widthSpread"], :<=, 1
+        assert_in_delta geometry["leftGap"], geometry["rightGap"], 2
+        assert_operator geometry["rightGap"], :<=, 2
+        assert_operator geometry["dockLeft"], :>=, -1
+        assert_operator geometry["dockRight"], :<=, geometry["viewport"] + 1
+        assert_operator geometry["overflow"], :<=, 1
+      end
+    end
+  ensure
+    page.driver.browser.manage.window.resize_to(1440, 900)
+  end
+
   test "client rail has only available links, reply navigation, and no horizontal overflow" do
     sign_in_as(@client)
     visit client_request_path(@intake)
