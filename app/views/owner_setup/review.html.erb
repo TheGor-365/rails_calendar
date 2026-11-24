@@ -1,3 +1,4 @@
+<%= turbo_frame_tag "wa-settings-frame", target: "_top" do %>
 <div class="container ws-owner-page ws-owner-review my-4 my-sm-5" id="owner-setup-review">
   <header class="ws-owner-hero">
     <div class="ws-owner-hero-copy"><p class="eyebrow"><i class="bi bi-clipboard2-check" aria-hidden="true"></i> <%= t("owner_setup.eyebrow") %></p>
@@ -14,7 +15,7 @@
           <div class="ws-owner-review-item">
             <div class="d-flex justify-content-between align-items-start gap-2">
               <strong><%= t("owner_setup.steps.#{key}.short") %></strong>
-              <%= link_to rc_icon_label("pencil-square", t("owner_setup.edit")), owner_setup_path(step: key), class: "ws-owner-inline-link" %>
+              <%= link_to rc_icon_label("pencil-square", t("owner_setup.edit")), owner_setup_path(step: key), data: { turbo_frame: "wa-settings-frame" }, class: "ws-owner-inline-link" %>
             </div>
             <% if answer.selected_options.any? %>
               <ul class="list-unstyled mt-2 mb-2">
@@ -38,7 +39,7 @@
         <% end %>
         <p class="rc-hint"><%= t("owner_setup.ai_consent_explanation") %></p>
         <% if @ai_enabled %>
-          <%= form_with url: owner_setup_suggest_path, method: :post do %>
+          <%= form_with url: owner_setup_suggest_path, method: :post, data: { turbo_frame: "wa-settings-frame" } do %>
             <%= button_tag type: "submit", name: "ai_consent", value: "1", class: "rc-action rc-action--primary" do %>
               <%= rc_icon_label("stars", t("owner_setup.generate_ai", default: "Analyze with Grok (paid)")) %>
             <% end %>
@@ -61,7 +62,7 @@
       <div class="ws-owner-data-panel ws-owner-review-approval" id="owner-profile-approval">
         <div class="ws-owner-data-head"><span class="ws-owner-data-icon"><i class="bi bi-shield-check" aria-hidden="true"></i></span><h2><%= t("owner_setup.manual_review") %></h2></div>
         <p class="rc-hint"><%= t("owner_setup.manual_review_hint") %></p>
-        <%= form_with url: owner_setup_approve_path, method: :post, class: "ws-owner-form" do %>
+        <%= form_with url: owner_setup_approve_path, method: :post, data: { turbo_frame: "wa-settings-frame" }, class: "ws-owner-form" do %>
           <div class="ws-owner-field">
             <%= label_tag "owner_headline", t("owner_setup.headline"), class: "rc-field-label" %>
             <%= text_field_tag "professional_profile[headline]",
@@ -89,3 +90,5 @@
     </section>
   </div>
 </div>
+
+<% end %>
