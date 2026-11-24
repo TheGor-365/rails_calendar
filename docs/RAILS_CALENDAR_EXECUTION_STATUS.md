@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.4e compact public showcase and six-stage workflow (partial)
+
+- GitHub access restored. Prior exact bd4702d CI 45469034203 and Security 45469033963 queued at inspection.
+- 886a68a replaces large public hero and duplicate three-stage board with compact banner, two actions, visually hidden catalogue heading and six-stage process dialog with top-right close. Removed verbose contact copy; retained verified external links and developer disclosure. Published-version catalogue and existing authorization gates unchanged.
+- Localized six stages and availability qualification in RU/EN/ES/HY; a6aaec9 adds matching compact banner/dialog styling; a892165 adds animated closing and Escape handling; 231db93 updates integration assertions for six stages and removal of old board. New CI and browser acceptance pending. Workflow describes collaboration, not a claim of production availability.
+- Remaining: functional contact composer requires verified recipient/route and abuse/privacy controls; no fake submission or public intake activation. Individual service icons, commercial revisions of existing persisted offerings, guest/client browser acceptance and navigation QA remain. F2.4f calendar/consultation and F2.4g authorized AI context follow after QA. Local last confirmed 0244c89 PID 847858; no DB writes, provider calls, deploy or migration by assistant.
+
+---
+
 ## 2026-11-24 — F2.4d interactive cabinet settings (implementation, not accepted)
 
 - Added two cabinet banner actions, retained avatar, desktop rail/aside offset to align with profile card. Exact alignment still needs visual acceptance.
