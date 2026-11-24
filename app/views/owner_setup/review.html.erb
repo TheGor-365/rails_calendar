@@ -39,12 +39,8 @@
         <p class="rc-hint"><%= t("owner_setup.ai_consent_explanation") %></p>
         <% if @ai_enabled %>
           <%= form_with url: owner_setup_suggest_path, method: :post do %>
-            <div class="ws-owner-checkbox mb-3">
-              <%= check_box_tag :ai_consent, "1", false, required: true %>
-              <%= label_tag :ai_consent, t("owner_setup.ai_consent") %>
-            </div>
-            <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
-              <%= rc_icon_label("stars", t("owner_setup.generate_ai")) %>
+            <%= button_tag type: "submit", name: "ai_consent", value: "1", class: "rc-action rc-action--primary" do %>
+              <%= rc_icon_label("stars", t("owner_setup.generate_ai", default: "Analyze with Grok (paid)")) %>
             <% end %>
           <% end %>
         <% else %>
@@ -85,12 +81,7 @@
                   id: "owner_public_summary", rows: 4, maxlength: 1000, class: "rc-input rc-input--area", data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
             <small class="rc-hint"><%= t("owner_setup.not_published") %></small>
           </div>
-          <div class="ws-owner-checkbox mb-3">
-            <%= check_box_tag :confirmation, "1", false, id: "owner_confirm_profile",
-                  required: true %>
-            <%= label_tag "owner_confirm_profile", t("owner_setup.confirm_owner_claims") %>
-          </div>
-          <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+          <%= button_tag type: "submit", name: "confirmation", value: "1", class: "rc-action rc-action--primary" do %>
             <%= rc_icon_label("shield-check", t("owner_setup.approve_action")) %>
           <% end %>
         <% end %>
