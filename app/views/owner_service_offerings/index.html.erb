@@ -1,17 +1,11 @@
 <div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-services"
      data-controller="wa-service-preview"
      data-action="turbo:before-cache@document->wa-service-preview#close">
-  <header class="ws-owner-hero wa-services__hero wa-compact-banner">
-    <div class="wa-services__hero-content">
-      <div class="ws-owner-hero-copy">
-        <p class="eyebrow"><i class="bi bi-briefcase" aria-hidden="true"></i> <%= t("owner_services.eyebrow") %></p>
-        <h1 class="visually-hidden"><%= t("owner_services.title") %></h1>
-        
-        <span class="wa-services__hero-meta"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.private_title") %></span>
-      </div>
-    </div>
-    <div class="wa-services__actions">
-      <% if @snapshot && @eligible_capabilities.any? %>
+  <% banner_metadata = capture do %>
+    <span class="wa-services__hero-meta"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.private_title") %></span>
+  <% end %>
+  <% banner_actions = capture do %>
+    <% if @snapshot && @eligible_capabilities.any? %>
         <%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--quiet" %>
       <% end %>
       <details class="wa-services__tools">
@@ -26,8 +20,8 @@
           <% end %>
         </div>
       </details>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "briefcase", path: t("owner_services.eyebrow"), title: t("owner_services.title"), extra_class: "ws-owner-hero wa-services__hero", metadata: banner_metadata, actions: banner_actions %>
 
   <section class="surface-panel wa-services__notice mb-4" aria-label="<%= t('owner_services.private_title') %>">
     <i class="bi bi-shield-lock" aria-hidden="true"></i>
