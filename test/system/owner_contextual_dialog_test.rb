@@ -104,6 +104,34 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
     assert_current_path owner_cabinet_path
   end
 
+
+  test "breadcrumb returns to an earlier contextual page without nested dialogs" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("header[data-wa-banner='account'] a[data-wa-page-dialog][href='#{owner_practice_path}']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-practice"
+      find("header[data-wa-banner] a[href='#{owner_capabilities_path}']").click
+    end
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-capabilities"
+      first("a[href^='#{owner_ai_assistant_path}']").click
+    end
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-ai-assistant"
+    end
+    assert_selector ".wa-page-dialog__trail button", count: 2
+    assert_selector ".wa-page-dialog__trail [aria-current='page']", count: 1
+    first(".wa-page-dialog__trail button").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-practice"
+    end
+    assert_no_selector ".wa-page-dialog__trail", visible: true
+    assert_selector ".wa-page-dialog__back[disabled]"
+    assert_selector "dialog.wa-page-dialog[open]", count: 1
+    assert_current_path owner_cabinet_path
+  end
+
   private
 
   def sign_in_owner
