@@ -373,6 +373,27 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "shared compact banners retain semantic headings and quiet contextual navigation" do
+    login(@owner)
+    assert_no_difference("AiSpendEntry.count") do
+      [owner_cabinet_path, owner_practice_path, owner_setup_path(step: "A"),
+       owner_capabilities_path, owner_services_path, owner_ai_assistant_path].each do |path|
+        get path
+        assert_response :success
+        assert_select "header[data-wa-banner]", count: 1 do
+          assert_select ".wa-banner__path > i", count: 1
+          assert_select "h1.visually-hidden", count: 1
+          assert_select ".ws-owner-heading-icon, .wa-ai-page__hero-mark, .wa-services__hero-symbol", count: 0
+          assert_select ".wa-banner__actions .rc-action--primary, .wa-banner__actions .rc-action--soft", count: 0
+        end
+      end
+      get owner_cabinet_path
+      assert_select "header[data-wa-banner='account'] a[data-wa-page-dialog][href=?]", owner_practice_path, count: 1
+      assert_select "#owner-cabinet a[data-wa-page-dialog][href=?]", owner_practice_path, count: 2
+    end
+  end
+
+
   private
 
   def create_saved_draft(profile, draft)
