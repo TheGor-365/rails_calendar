@@ -1,9 +1,9 @@
 <div class="container my-4 my-sm-5">
   <div class="content-page">
-    <header class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+    <header class="wa-compact-banner mb-4">
       <div>
         <p class="eyebrow mb-2"><%= t("calendar.hour_eyebrow") %></p>
-        <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clock-history"></i></span><h1 class="page-title mb-2">
+        <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clock-history"></i></span><h1 class="wa-compact-date">
           <time datetime="<%= @hour_start.iso8601 %>"><%= @hour_start.strftime("%H:%M") %></time>
           <span aria-hidden="true">–</span>
           <time datetime="<%= @hour_end.iso8601 %>"><%= @hour_end.strftime("%H:%M") %></time>
