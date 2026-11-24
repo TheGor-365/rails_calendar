@@ -1,5 +1,15 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.5 contextual dialog acceptance and next-chat handoff
+
+- Local owner terminal confirms exact c7ba91ae9d72ed8bf0238579c56813228ce135a3, assets PASS, verified local review DB, Puma PID 962459 :3003. Owner screenshots confirm full embedded interview, capabilities and services content, top-right close and thin scrollbar, no visible horizontal scrollbar on shown desktop screens. MANUAL_BROWSER_PARTIAL_PASS for rendering only; form saves, mobile, other modal routes, navigation semantics and stale parent metrics not accepted.
+- Exact c7ba91a Security Audit 45476335093 SUCCESS. Rails CI 45476334482 FAILURE: integration 519 runs / 8017 assertions / 0 failures/errors; browser 55 runs / 905 assertions / 4 failures / 0 errors. All four are ConsultationsTest old top-level hour navigation assertions at lines 65, 411, 434, 443. Update tests to prove actual modal hour content, consultation creation, return and guest behavior, not merely remove assertions.
+- Owner requires contextual modals like tabs: actions/filters/interview steps remain local; return to parent closes only; unrelated routes close then navigate top-level; another modal destination replaces same modal, no recursive application shell. Preserve authentication/CSRF, no broad interception of form submissions, downloads or external URLs. Explicit route/intent allowlist and browser tests required. Not implemented yet.
+- 2a23f12, 8b71cf88, b0978cc compact canonical headers for services, capabilities, interview; inspect remaining descriptions and all other pages; no large black duplicate H1/intro, accessible heading retained; keep essential consent/timezone/error notices. New code not visually accepted or CI verified.
+- Next: implement modal navigation policy, browser regression tests, full banner inventory. Then F2.6a actual email composer, F2.6b AI interview/versioned FAQ and pricing, F2.6c generated downloadable files, F2.6d selected document access; F2.2/F2.3 reviewed services and client funnel; F3 proposals, F4 12-section dual-approved spec, F5 delivery. See product-first plan and full roadmap. No real provider calls, mail, migrations, production deploy or data changes performed. Local remains c7ba91a. 
+
+---
+
 ## 2026-11-24 — F2.5 owner acceptance defects and corrective slice
 
 - Owner terminal confirms local 732a474, assets PASS, verified local review DB, Puma PID 944785 :3003. Screenshots: compact public banner renders but duplicate Services label; cabinet cards aligned at old heading height, settings modal shows only fallback Open link; assistant services read-only projection has horizontal overflow; knowledge inventory shows 9 approved services, FAQ and composer files still unavailable. Visible spend $0.01982; no new paid call established.
