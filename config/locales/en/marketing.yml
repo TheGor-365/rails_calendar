@@ -81,3 +81,6 @@ en:
     contact_warning: "Do not include tokens, passwords, private databases or identity documents in your first message."
     contact_kwork: "Message on Kwork"
     contact_note: "Enquiries are handled on external platforms under their rules. In-app client intake is disabled."
+    close_dialog: "Close"
+    technologies: "Technologies"
+    technology_on_request: "Technology stack agreed during assessment"
