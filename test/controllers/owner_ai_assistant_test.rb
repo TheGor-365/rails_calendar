@@ -170,6 +170,40 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "catalogue context excludes drafts foreign services private fields and stale snapshots" do
+    catalogue = OwnerServices::Catalogue.new(workspace: @workspace)
+    offering = catalogue.create_draft!(service_fields(@profile.professional_capabilities.first, title: "Public synthetic Rails service"))
+    draft = offering.draft_version
+    catalogue.approve!(offering: offering, version: draft.version, digest: draft.digest, confirmed: true)
+    approved = offering.reload.approved_version
+    catalogue.publish!(offering: offering, version_id: approved.id, digest: approved.digest, confirmed: true, owner: @owner)
+    catalogue.create_draft!(service_fields(@profile.professional_capabilities.first, title: "PRIVATE_UNPUBLISHED_SERVICE"))
+    foreign_catalogue = OwnerServices::Catalogue.new(workspace: @foreign_workspace)
+    foreign = foreign_catalogue.create_draft!(service_fields(@foreign_profile.professional_capabilities.first, title: "FOREIGN_PUBLISHED_SERVICE"))
+    foreign_draft = foreign.draft_version
+    foreign_catalogue.approve!(offering: foreign, version: foreign_draft.version, digest: foreign_draft.digest, confirmed: true)
+    foreign_approved = foreign.reload.approved_version
+    foreign_catalogue.publish!(offering: foreign, version_id: foreign_approved.id, digest: foreign_approved.digest, confirmed: true, owner: @other)
+
+    assert_no_difference("AiSpendEntry.count") do
+      entries = OwnerAi::CatalogueContext.new(workspace: @workspace).entries
+      assert_equal 1, entries.length
+      assert_equal %w[delivery_mode included_scope summary title version], entries.first.keys.sort
+      assert_equal "Public synthetic Rails service", entries.first["title"]
+      refute_includes JSON.generate(entries), "FOREIGN_PUBLISHED_SERVICE"
+      refute_includes JSON.generate(entries), "PRIVATE_UNPUBLISHED_SERVICE"
+      assert OwnerAi::KnowledgeReadiness.new(workspace: @workspace).service_catalogue_available_to_composer?
+      @profile.update!(onboarding_state: "draft")
+      assert_empty OwnerAi::CatalogueContext.new(workspace: @workspace).entries
+      @profile.update!(onboarding_state: "approved")
+      @profile.professional_context_snapshots.create!(
+        version: 2, digest: Digest::SHA256.hexdigest("catalogue-stale-snapshot"),
+        payload: { "headline" => "New synthetic profile" }, approved_at: Time.current
+      )
+      assert_empty OwnerAi::CatalogueContext.new(workspace: @workspace).entries
+    end
+  end
+
   test "explicitly consented draft uses bounded provider schema, ledger and no automatic apply" do
     @profile.professional_context_snapshots.create!(
       version: 2, digest: Digest::SHA256.hexdigest("approved-owner-v2"),
@@ -226,6 +260,7 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     refute_includes source_text, "NEVER_SEND_PRIVATE_CONTEXT"
     assert_equal "service_copy", entry.result["purpose"]
     assert_equal 2, entry.result["profile_version"]
+    assert_nil JSON.parse(source_text)["published_service_catalogue"]
   ensure
     ENV["XAI_API_KEY"] = old_key
   end
