@@ -42,7 +42,7 @@ class OwnerQuizI18nTest < ActionDispatch::IntegrationTest
         assert_select ".ws-hub-header a[href=?]", admin_project_intakes_path, count: 1
         get admin_project_intakes_path
         assert_response :success
-        assert_select ".rc-page-hero__actions a[href=?]", owner_services_path, count: 1
+        assert_select "header[data-wa-banner] .wa-banner__actions a[href=?]", owner_services_path, count: 1
 
         get project_intake_quiz_path(@intake, step: "outcome")
         assert_response :success
