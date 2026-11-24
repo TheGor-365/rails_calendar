@@ -1949,3 +1949,8 @@ html.wa-embedded-page { scrollbar-width:thin; scrollbar-color:#a7cdc5 #f4f8f8; }
   .wa-banner__copy { flex-basis: 100%; }
   .wa-banner__actions { max-width: 100%; }
 }
+
+// F2.5.4: one modal shell, stable back/title/close controls.
+.wa-page-dialog__header > strong { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.wa-page-dialog__header > button { flex: 0 0 auto; }
+.wa-page-dialog__back:disabled { opacity: .4; cursor: default; }
