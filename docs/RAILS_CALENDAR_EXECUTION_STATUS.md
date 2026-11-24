@@ -1,5 +1,13 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.4f compact consultations (partial)
+
+- 468bc1b removes verbose generic hints from consultation form while retaining accessible constraints and visible timezone, actual overlap advisory and validation. Two-row smooth growing description, capped at half viewport. 4e38c6f removes redundant unfiltered empty list block, retains filtered/invalid feedback. ad88e19 adds owner-only preparation link to existing AI plan_outline in a new tab, preserving current form. CSS and four locale labels added through 6bad2d2.
+- AI button is navigation only: no consultation-specific AI operation, form-context transfer or automatic application yet. No provider call or consultation write by assistant. Calendar hour/activity modal acceptance remains pending.
+- Exact prior 0715415 CI 45470067551 and Security 45470067620 queued when inspected. Latest CI unverified; local remains 0244c89 last confirmed. Next prioritize CI and consolidated local acceptance, then F2.4g authorized AI knowledge and explicit consultation draft workflow. Remaining F2.4e contact composer and F2.2/F2.3 commercial service revisions/client acceptance still open. No deploy or migration.
+
+---
+
 ## 2026-11-24 — F2.4e compact public showcase and six-stage workflow (partial)
 
 - GitHub access restored. Prior exact bd4702d CI 45469034203 and Security 45469033963 queued at inspection.
