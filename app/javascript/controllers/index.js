@@ -92,3 +92,6 @@ application.register("wa-calendar-create", WaCalendarCreateController)
 
 import WaActivityFilterController from "./wa_activity_filter_controller"
 application.register("wa-activity-filter", WaActivityFilterController)
+
+import WaPageDialogController from "./wa_page_dialog_controller"
+application.register("wa-page-dialog", WaPageDialogController)
