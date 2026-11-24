@@ -4,7 +4,7 @@
       <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("account_hub.owner_eyebrow") %></p>
       <h1 class="visually-hidden"><%= t("account_hub.owner_title") %></h1>
       <div class="d-flex flex-wrap gap-2 my-2">
-        <%= link_to rc_icon_label("person-vcard", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet" %>
+        <%= link_to rc_icon_label("person-vcard", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet", data: { wa_page_dialog: "frame" } %>
         <%= link_to rc_icon_label("stars", t("account_hub.interview")), owner_setup_path(step: "A"), class: "rc-action rc-action--quiet", data: { wa_page_dialog: "frame" } %>
       </div>
       <div class="ws-account-meta">
@@ -102,7 +102,7 @@
     <section class="ws-account-main">
       <div class="ws-account-section-heading" id="cabinet-profile">
         <div><p class="eyebrow"><%= t("account_hub.profile_eyebrow") %></p><h2 class="visually-hidden"><%= t("account_hub.professional_profile") %></h2></div>
-        <%= link_to rc_icon_label("arrow-up-right", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet rc-action--small" %>
+        <%= link_to rc_icon_label("arrow-up-right", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet rc-action--small", data: { wa_page_dialog: "frame" } %>
       </div>
       <div class="ws-account-feature">
         <div class="ws-account-feature-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></div>
