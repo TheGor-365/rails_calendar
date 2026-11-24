@@ -45,7 +45,7 @@ class OwnerAiConversationsController < ApplicationController
     title = t("owner_ai_conversations.default_title") if title.blank?
     conversation = @workspace.owner_ai_conversations.new(title: title)
     if conversation.save
-      redirect_to owner_ai_conversation_path(conversation), notice: t("owner_ai_conversations.created")
+      redirect_to owner_ai_conversation_path(conversation), notice: t("owner_ai_conversations.created"), flash: { wa_dialog_outcome: "replace" }
     else
       redirect_to owner_ai_conversations_path, alert: t("owner_ai_conversations.invalid_title")
     end
@@ -120,9 +120,9 @@ class OwnerAiConversationsController < ApplicationController
 
     case outcome
     when :created
-      redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.saved")
+      redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.saved"), flash: { wa_dialog_outcome: "replace" }
     when :ai_ready
-      redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.ai_ready")
+      redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.ai_ready"), flash: { wa_dialog_outcome: "replace" }
     when :ai_failed
       redirect_to owner_ai_conversation_path(@conversation), alert: t("owner_ai_conversations.ai_failed")
     when :replay
@@ -172,23 +172,23 @@ class OwnerAiConversationsController < ApplicationController
     @conversation.with_lock { @conversation.update!(title: title) }
     return render json: { title: @conversation.title } if request.format.json?
 
-    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.renamed")
+    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.renamed"), flash: { wa_dialog_outcome: "replace" }
   end
 
   def archive
     @conversation.archive!
-    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.archived")
+    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.archived"), flash: { wa_dialog_outcome: "replace" }
   end
 
   def restore
     @conversation.restore!
-    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.restored")
+    redirect_to owner_ai_conversation_path(@conversation), notice: t("owner_ai_conversations.restored"), flash: { wa_dialog_outcome: "replace" }
   end
 
   # 'Delete' is reversible: hide from normal lists, preserve evidence and charges.
   def remove
     @conversation.remove!
-    redirect_to owner_ai_conversations_path, notice: t("owner_ai_conversations.removed")
+    redirect_to owner_ai_conversations_path, notice: t("owner_ai_conversations.removed"), flash: { wa_dialog_outcome: "replace" }
   end
 
   private
