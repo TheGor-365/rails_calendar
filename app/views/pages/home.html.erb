@@ -1,11 +1,6 @@
 <div class="container my-4 my-sm-5 wa-calendar" data-controller="wa-calendar-create" data-wa-calendar-create-url-value="<%= consultations_path %>" data-network-error="<%= t("calendar_actions.network_error") %>">
-  <header class="rc-page-hero mb-4 wa-compact-banner">
-    <div>
-      <p class="eyebrow mb-2"><%= t("calendar.overview_eyebrow") %></p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar3"></i></span><h1 class="visually-hidden"><%= t("calendar.title") %></h1></div>
-    </div>
-    <div class="d-flex flex-wrap align-items-center gap-2">
-      <%= link_to rc_icon_label("calendar3", t("calendar.today_24")), calendar_day_path(date: Time.zone.today.iso8601),
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("calendar3", t("calendar.today_24")), calendar_day_path(date: Time.zone.today.iso8601),
                   class: "rc-action rc-action--quiet" %>
       <%# Appointments live under Calendar, not as a second owner top-nav destination. %>
       <%= link_to rc_icon_label("journal-text", t("nav.consultations")), consultations_path,
@@ -14,8 +9,8 @@
       <% if admin_signed_in? %>
         <%= render "creation_menu", start_at: (Time.zone.today.beginning_of_month == @displayed_month.beginning_of_month ? Time.zone.local(Time.zone.today.year, Time.zone.today.month, Time.zone.today.day, Time.zone.now.hour) : Time.zone.local(@displayed_month.year, @displayed_month.month, 1, 10)) %>
       <% end %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "calendar3", path: t("calendar.overview_eyebrow"), title: t("calendar.title"), extra_class: "rc-page-hero mb-4", actions: banner_actions %>
 
   <section class="ws-overview" aria-label="<%= t("calendar.overview_aria") %>">
     <article class="ws-metric">
