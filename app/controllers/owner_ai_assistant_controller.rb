@@ -45,7 +45,8 @@ class OwnerAiAssistantController < ApplicationController
                          alert: t("owner_ai_assistant.invalid_parent") unless parent
     end
     entry = OwnerAi::Composer.new(workspace: @workspace).generate!(
-      operation: operation, brief: params[:brief], parent: parent
+      operation: operation, brief: params[:brief], parent: parent,
+      include_catalogue: params[:include_catalogue] == "1"
     )
     context = @workspace.service_offerings.find_by(id: params[:offering_id])
     destination = { entry_id: entry.id, operation: operation }
