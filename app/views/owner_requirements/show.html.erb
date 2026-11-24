@@ -1,16 +1,9 @@
 <div class="container wa-owner-intake my-4 my-sm-5">
-  <header class="rc-page-hero mb-4"><div class="rc-page-hero__content">
-    <p class="eyebrow"><%= t("e23_requirements.eyebrow") %></p>
-    <div class="rc-page-hero__heading">
-      <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-list-check"></i></span>
-      <h1 class="page-title"><%= t("e23_requirements.title") %></h1>
-    </div>
-    <p class="rc-muted"><%= @intake.title %></p>
-    <div class="rc-page-hero__actions mt-3">
-      <%= link_to rc_icon_label("arrow-left", t("e23_requirements.back")),
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("arrow-left", t("e23_requirements.back")),
             project_intake_path(@intake), class: "rc-action rc-action--quiet" %>
-    </div>
-  </div></header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "list-check", path: t("e23_requirements.eyebrow") + " / " + t("e23_requirements.title"), title: t("e23_requirements.title"), extra_class: "rc-page-hero mb-4", description: @intake.title, actions: banner_actions %>
   <section class="surface-panel p-3 p-sm-4 mb-3">
     <h2 class="h5"><i class="bi bi-diagram-3" aria-hidden="true"></i> <%= t("e23_requirements.current_source") %></h2>
     <% if @scope_revision %>
