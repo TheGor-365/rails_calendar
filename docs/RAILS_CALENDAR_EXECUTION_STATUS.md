@@ -1,5 +1,13 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.4c shared read-only page dialogs (partial)
+
+- Exact c36d257 Security 45459394545 PASS; CI 45459394654 failed 1 of 517 integration tests: saved AI draft history href changed by the intended result anchor. Corrected owner and foreign href assertions in 95e5c47; do not claim new CI PASS.
+- Added native dialog shell, Stimulus wa-page-dialog and CSS, opt-in same-origin GET links with server authorization, abortable fetch, reduced motion, Escape/backdrop/close button, focus restoration and Turbo cache reset. Read-only HTML projection removes forms and active controllers; normal full-page link remains available. Wired notifications/library/calendar activity links, day hour links and assistant services banner (449d847). These are previews, not full interactive embedded pages: filters, service editing and settings forms still require full-page navigation. No claim of complete modal acceptance. Browser and security tests still needed; next prefer dedicated server-rendered frame partials rather than expanding HTML cloning to editable forms.
+- Remaining F2.4d/e/f/g and F2.2/F2.3 as previous entry. Local still 0244c89 PID 847858. No production changes, DB writes or provider calls. Next verify CI and implement interactive modal surfaces, cabinet alignment and public six-stage workflow. 
+
+---
+
 ## 2026-11-24 — F2.4 compact White Atlas UI, partial implementation
 
 - Local 0244c89 boot confirmed from owner terminal, assets PASS, verified review DB, PID 847858 :3003. Screenshots confirm public published catalogue, technology disclosures, process dialog, profile/cabinet and other owner pages render. No new client submission acceptance. Exact CI 45440071765 failed two integration assertions (technology label Rails vs Ruby on Rails and marketing locale key parity); Security 45440071332 and PG18 schema/upgrade jobs passed.
