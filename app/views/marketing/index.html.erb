@@ -58,44 +58,30 @@
         <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg> <%= t("marketing.services_label") %></span><h2 id="services-title"><%= t("marketing.services_title") %></h2></div>
         <p><%= t("marketing.services_lead") %></p>
       </header>
-      <div class="mk-service-grid">
-        <article class="marketing-service mk-service-card">
-          <a href="#contact" aria-label="<%= t("marketing.bug_aria") %>">
-            <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#bug"></use></svg></span><span class="mk-service-index">01</span></span>
-            <h3><%= t("marketing.bug_title") %></h3>
-            <p><%= t("marketing.bug_desc") %></p>
-            <span class="mk-service-tags"><span>Ruby</span><span>Debug</span><span>Tests</span></span>
-            <span class="mk-service-footer"><%= t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
-          </a>
-        </article>
-        <article class="marketing-service mk-service-card">
-          <a href="#contact" aria-label="<%= t("marketing.forms_aria") %>">
-            <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layout"></use></svg></span><span class="mk-service-index">02</span></span>
-            <h3><%= t("marketing.forms_title") %></h3>
-            <p><%= t("marketing.forms_desc") %></p>
-            <span class="mk-service-tags"><span>Rails</span><span>Forms</span><span>UI</span></span>
-            <span class="mk-service-footer"><%= t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
-          </a>
-        </article>
-        <article class="marketing-service mk-service-card">
-          <a href="#contact" aria-label="<%= t("marketing.api_aria") %>">
-            <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#database"></use></svg></span><span class="mk-service-index">03</span></span>
-            <h3><%= t("marketing.api_title") %></h3>
-            <p><%= t("marketing.api_desc") %></p>
-            <span class="mk-service-tags"><span>API</span><span>SQL</span><span>Data</span></span>
-            <span class="mk-service-footer"><%= t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
-          </a>
-        </article>
-        <article class="marketing-service mk-service-card">
-          <a href="#contact" aria-label="<%= t("marketing.web_aria") %>">
-            <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#bolt"></use></svg></span><span class="mk-service-index">04</span></span>
-            <h3><%= t("marketing.web_title") %></h3>
-            <p><%= t("marketing.web_desc") %></p>
-            <span class="mk-service-tags"><span>Web</span><span>UX</span><span>Automation</span></span>
-            <span class="mk-service-footer"><%= t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
-          </a>
-        </article>
-      </div>
+      <%# Publication pointers are shared with the verified-client selection form.
+          No draft fields, private attachments, account identifiers or profile data. %>
+      <% published_services = ServiceOffering.joins(:published_version)
+           .includes(:published_version).order(:workspace_id, :position, :id) %>
+      <% if published_services.any? %>
+        <div class="mk-service-grid mk-published-catalogue">
+          <% published_services.each_with_index do |offering, index| %>
+            <% version = offering.published_version %>
+            <article class="marketing-service mk-service-card">
+              <%= link_to(client_signed_in? && ClientRequestPilot.enabled?(request: request) ?
+                    new_client_request_path(service_version_id: version.id) : "#contact") do %>
+                <span class="mk-service-top"><span class="mk-service-icon"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#briefcase"></use></svg></span><span class="mk-service-index"><%= format("%02d", index + 1) %></span></span>
+                <h3><%= version.title %></h3>
+                <p><%= version.summary %></p>
+                <p><strong><%= t("owner_services.included_scope") %></strong><br><%= version.included_scope %></p>
+                <span class="mk-service-footer"><%= client_signed_in? && ClientRequestPilot.enabled?(request: request) ? t("client_requests.new_action") : t("marketing.service_discuss") %> <svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></span>
+              <% end %>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <p><%= t("client_requests.no_published_services") %></p>
+        <a class="mk-action mk-action-primary" href="#contact"><%= t("marketing.service_discuss") %></a>
+      <% end %>
     </section>
 
     <section class="mk-section mk-section-tight" id="process" aria-labelledby="process-title">
