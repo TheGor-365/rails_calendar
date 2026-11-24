@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — C2.5f local boot and exact-code CI confirmed
+
+- Owner terminal evidence: isolated worktree HEAD ce869e3fa1385628091ea6a57f3bf4140a30cd42; old PID 221070 verified and stopped, Node v22.23.4/npm 10.9.9, esbuild and Sass succeeded, C25A1_ASSETS_READY=PASS, C21C_DATABASE=verified_local_review, guarded launcher reports no provider call/no DB write at startup. Puma PID 238353, Ruby 3.4.13 / Rails 8.1.4.1, localhost:3003 listening.
+- Exact code+docs SHA ce869e3: Rails Calendar CI run 45300047602 SUCCESS; Security Audit run 45300047629 SUCCESS, verified via connected GitHub. New documentation-only checkpoint receives its own CI results.
+- Owner screenshot at 400×793, Requests outgoing: page renders, menu CLOSED, five dock actions visible. Does not establish new motion behavior or 320px acceptance. F0 remains partial; next owner check 320px with expanded menu, repeated opening/closing and request card; then Cabinet scroll and read-only AI Conversations. No F1 write until isolated data target and explicit action authorization.
+- Status: CODE_CI_PASS / LOCAL_BOOT_PASS / OWNER_MOTION_NOT_TESTED / NOT_DEPLOYED. No production change.
+
+---
+
 ## 2026-11-24 — C2.5f bidirectional dropdown motion
 
 - Owner supplied local RU 400×793 screenshot on previous code b4cf8e8, Requests outgoing with More actions expanded: panel fits viewport, both actions visible, five dock items aligned. Geometry at 400px = manual partial PASS. Owner requests smooth opening AND closing across dropdowns. A still screenshot does not prove motion; 320px, Cabinet scroll and AI Conversations remain pending.
