@@ -39,7 +39,7 @@ class AccountCabinetsTest < ActionDispatch::IntegrationTest
     # area after removing duplicate app links from the cabinet.
     get admin_project_intakes_path
     assert_response :success
-    assert_select ".rc-page-hero__actions a[href=?]", owner_services_path, count: 1
+    assert_select "header[data-wa-banner] .wa-banner__actions a[href=?]", owner_services_path, count: 1
   end
 
   test "client cabinet remains private and shows verified identity without owner context" do
