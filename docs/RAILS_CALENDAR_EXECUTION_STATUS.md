@@ -1,6 +1,24 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## 2026-11-24 — C2.5e owner 400px verified; MVP handoff prepared
+
+**User-supplied evidence (local RU 400×793 screenshots 03:27–03:28 Asia/Yerevan + terminal output):** user stopped only local Puma at :3003, successfully switched isolated clean `~/rails_calendar_c25a_ia_review_20261123` from `b91ab7b3dc1778177d6b55138aa21e8e01b7e0ad` to **`b4cf8e8a8dbaa8f97a631200af03d049eeec636e`**, then launched `RC_C25A1_EXPECTED_SHA=b4cf8e8a8dbaa8f97a631200af03d049eeec636e bash script/rc0551f_c25a1_preview.sh`. Launcher printed `NODE=v22.23.4 NPM=10.9.9`, `C25A1_ASSETS_READY=PASS`, `C21C_LOCAL_GROK_READY (no provider call, no DB write)`, `C21C_DATABASE=verified_local_review`, Puma Ruby 3.4.13 / Rails 8.1.4.1 running on localhost :3003 (PID 221070 at boot, not guaranteed later).
+
+**Actual 400px mobile UI proof:** `/admin/project_intakes?view=outgoing` and `/workspace/cabinet` both show **five equally distributed and centered real bottom-dock actions** (Month, Today, Add, Requests, Cabinet), no unused 6th track on right. Cabinet avatar at top now uses **legible White Atlas icon placeholder** rather than broken image. Screenshot of Cabinet top confirms three summary metrics (approved professional context, six completed profile steps, small AI spending amount); no bottom-of-page/rail-scroll or paid AI operation tested. `C2.5e bottom-dock alignment at 400px = MANUAL_BROWSER_PARTIAL_PASS`; `C2.5d avatar visual fallback at 400px = MANUAL_BROWSER_PARTIAL_PASS`. **Do not claim complete F0/BROWSER_ACCEPTED**: no 320px owner screenshot, no Requests `More actions` menu open in screenshot, no keyboard/focus/Esc, no full Cabinet scroll, no owner/client funnel acceptance. Owner requested to continue to production MVP handoff.
+
+**Image storage remains unresolved:** previous GET `/workspace/avatar/12` returned protected 404 because detached review worktree lacks bytes for an Active Storage blob. The new **visual placeholder works** but does not restore bytes, prove original loss or authorize copying/changing media. Browser DevTools probe `/.well-known/appspecific/com.chrome.devtools.json` 404 is not identified as an app defect. No production/DB writes, no real AI-provider call.
+
+**Exact automated gate:** PR #81 **code+docs SHA `b4cf8e8a8dbaa8f97a631200af03d049eeec636e`**: [Rails Calendar CI #45293957896](https://github.com/TheGor-365/rails_calendar/actions/runs/45293957896) **SUCCESS**, [Security Audit #45293957814](https://github.com/TheGor-365/rails_calendar/actions/runs/45293957814) **SUCCESS**. Newer documentation-only commits after this code SHA require independent checks; they don't erase the already verified code status.
+
+**Fresh next-chat master:** `docs/RAILS_CALENDAR_MVP_CONTINUATION_MASTER_2026-11-24.md` (created docs commit `778eed942ec4d041a3aab883188e851cb8c2a611`). It establishes current remote/local/base/release distinctions, observed owner 400px QA, remaining open mobile menu/320px and Cabernet rail checks, then F0→F1 free persisted conversation→F2 service/client funnel→F3 reviewed AI action→F4 12-section bilateral approved spec→F5 tasks/QA/delivery; separate staged Railway release-gates and no-backup risk.
+
+**Next 1–3 owner actions only:** while :3003 remains up, open `/admin/project_intakes?view=outgoing` at 400px **with `Другие действия` expanded** and send screenshot; repeat/check at 320px if no obstruction; then go to `/workspace/assistant/conversations` for **read-only** owner screenshot (no Ask AI). Record exact observed screenshot results; if mobile menu/UI passes, move to F1 free note persistence **only after verifying disposable data target and obtaining action authorization**. Do not repeat the already successful 400px dock/placeholder QA.
+
+---
+
+
+
 ## C2.5e owner mobile dock five-item grid — 24 November 2026
 
 **Owner screenshots, isolated local code `b91ab7b` :3003, RU emulation 400x793:** `/admin/project_intakes?view=outgoing` and `/workspace/cabinet` both render the same visible bottom navigation defect: 5 real links (Month, Today, Add, Requests, Cabinet) cramped into 6 layout tracks, leaving an obvious unused empty cell to the right. The supplied screenshots show mobile header and body rendering but **Requests `More actions` dropdown was closed**, so do not mark that separate requested mobile popup behavior owner-verified. Local Cabinet screenshot shows the missing owner avatar image as a broken icon on the older C2.5c1 code, supporting C2.5d fallback work; it does not establish a functional failure of avatar editing.
