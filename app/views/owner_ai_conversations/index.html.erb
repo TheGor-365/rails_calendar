@@ -1,12 +1,8 @@
 <main class="container ws-owner-page wa-threads my-4 my-sm-5" id="owner-ai-conversations">
-  <header class="ws-owner-hero wa-threads__masthead">
-    <div class="ws-owner-hero-copy">
-      <p class="eyebrow"><%= t("owner_ai_conversations.eyebrow") %></p>
-      <h1 class="page-title"><%= t("owner_ai_conversations.title") %></h1>
-      <p class="rc-muted"><%= t("owner_ai_conversations.intro") %></p>
-    </div>
+  <% banner_actions = capture do %>
     <%= link_to rc_icon_label("arrow-left", t("owner_ai_conversations.back")), owner_ai_assistant_path, class: "rc-action rc-action--quiet" %>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "chat-square-text", path: t("owner_ai_conversations.eyebrow"), title: t("owner_ai_conversations.title"), extra_class: "ws-owner-hero wa-threads__masthead", description: t("owner_ai_conversations.intro"), actions: banner_actions %>
   <p class="wa-threads__privacy" role="note">
     <i class="bi bi-shield-lock" aria-hidden="true"></i>
     <%= t("owner_ai_conversations.privacy") %>
