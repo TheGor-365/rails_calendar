@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — owner UI accepted for continuation; C2.5g commercial copy
+
+- Owner explicitly accepts current UI for now and requests removal of awkward product copy, especially "ИИ-помощник владельца". Screenshot local :3003 at 400px on /workspace/assistant (not conversation list). F0 disposition: OWNER_ACCEPTED_FOR_CONTINUATION, not exhaustive manual verification; animation timing, 320px manual screenshot, cabinet long scroll and conversation screen remain unverified manually. Previous ce869e3 code CI/Security PASS remains valid for that SHA.
+- C2.5g: 16 locale files / 92 text values revised across assistant and conversation headings in RU/EN/HY/ES, plus Russian workspace, cabinet, library, calendar, activity, invitation AI/handoff and service catalogue copy. Only presentation strings; no auth/model/route/provider changes. Preserve honest pilot restrictions, per-request consent and privacy warnings; client pilot wording and technical operator diagnostics remain explicit. Broader hardcoded-string and secondary-locale audit not exhaustive.
+- Last copy commit 3f3d0e2cc46a2a88540610fcdebe840193a577ef. New exact HEAD CI pending; local running code remains ce869e3 until guarded restart. No production deploy, migration or paid call.
+- Next F1: verify exact new HEAD CI/Security, then isolated local checkout/restart; open /workspace/assistant/conversations read-only and verify copy. Existing local launcher confirms review database identity but not disposability; use synthetic free-note browser tests in isolated test DB (existing automated coverage) and obtain explicit authorization before manual creation in review DB. Paid Ask AI requires separate consent. Preserve prior conversations and media. Then F2 client/service flow.
+
+---
+
 ## 2026-11-24 — C2.5f local boot and exact-code CI confirmed
 
 - Owner terminal evidence: isolated worktree HEAD ce869e3fa1385628091ea6a57f3bf4140a30cd42; old PID 221070 verified and stopped, Node v22.23.4/npm 10.9.9, esbuild and Sass succeeded, C25A1_ASSETS_READY=PASS, C21C_DATABASE=verified_local_review, guarded launcher reports no provider call/no DB write at startup. Puma PID 238353, Ruby 3.4.13 / Rails 8.1.4.1, localhost:3003 listening.
