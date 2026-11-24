@@ -77,10 +77,8 @@
                 rows: 4, maxlength: 800, class: "rc-input rc-input--area",
                 placeholder: t("owner_setup.notes_placeholder"), data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
         </div>
-        <label class="ws-owner-checkbox">
-          <%= check_box_tag "owner_answer[unsure]", "1", @answer.unsure, id: "owner_unsure" %>
-          <span><%= t("owner_setup.not_sure") %></span>
-        </label>
+        <%# Preserve the stored uncertainty flag; do not silently clear it. %>
+        <%= hidden_field_tag "owner_answer[unsure]", "1" if @answer.unsure? %>
         <div class="ws-owner-form-actions">
           <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
             <%= rc_icon_label("arrow-right-circle", t("owner_setup.save_continue")) %>
