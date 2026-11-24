@@ -8,10 +8,13 @@ export default class extends Controller {
   connect() {
     this.onClick = event => this.openLink(event)
     this.element.addEventListener("click", this.onClick)
+    this.beforeCache = () => this.reset()
+    document.addEventListener("turbo:before-cache", this.beforeCache)
   }
 
   disconnect() {
     this.element.removeEventListener("click", this.onClick)
+    document.removeEventListener("turbo:before-cache", this.beforeCache)
     this.reset()
   }
 
@@ -37,7 +40,9 @@ export default class extends Controller {
       if (!response.ok || response.redirected || new URL(response.url).origin !== location.origin) throw Error("unavailable")
       const document = new DOMParser().parseFromString(await response.text(), "text/html")
       const source = document.querySelector("#main-content")
-      if (!source || request.signal.aborted || this.request !== request) return
+      if (source) source.querySelectorAll("turbo-frame").forEach(frame => frame.replaceWith(...frame.childNodes))
+      if (!source) throw Error("unavailable")
+      if (request.signal.aborted || this.request !== request) return
       // Read-only preview: do not clone forms, interactive scripts or nested dialogs.
       source.querySelectorAll("form, script, dialog, iframe, object, embed, [data-controller]").forEach(node => {
         if (node.matches("[data-controller]") && !node.matches("form, script, dialog, iframe, object, embed")) {
@@ -45,9 +50,14 @@ export default class extends Controller {
         } else node.remove()
       })
       source.querySelectorAll("*").forEach(node => {
+        node.removeAttribute("id")
+        node.removeAttribute("autofocus")
         for (const attr of [...node.attributes]) {
           if (attr.name.startsWith("data-") || attr.name.startsWith("on")) node.removeAttribute(attr.name)
         }
+      })
+      source.querySelectorAll("a").forEach(anchor => {
+        anchor.setAttribute("data-turbo", "false")
       })
       this.contentTarget.replaceChildren(...source.childNodes)
       this.statusTarget.hidden = true
