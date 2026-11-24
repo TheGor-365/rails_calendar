@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.1 published technology projection
+
+- Replaced temporary auto-service-key technology strings with read-only OwnerServices::PublicPresentation (3d53300, fa2b89a). It intersects an explicitly published approved version's title/summary/included scope with known technology domains from that version's immutable professional snapshot, excluding excluded/not-interested rows. No private notes, evidence, capability conditions or draft fields serialized. No automatic republish. Generic fallback when no match. This is a conservative textual projection, not a complete structured customer-product model; customer card title/summary still use published copy.
+- Added integration assertions for technology inclusion, unrelated technology exclusion and no private notes/policy disclosure (896230c). Removed obsolete static technology map, added scroll-aware sidebar state and compact contact-link CSS (f4a5cb1, b5ef1da, 0e23349). Browser acceptance not yet performed.
+- Prior fb1e7b7 exact CI/Security queued on inspection (45438893069/45438893443); latest exact HEAD CI pending. Check older setup browser assertions for removed checkboxes and marketing dialog changes before final acceptance. No local DB modifications, paid call, deploy or migrations. Local :3003 last confirmed at 17c40df PID 728783.
+- Next: review latest CI, fix failures, guarded local update, guest/client catalogue + modal + profile review acceptance. Remaining product-language mapping requires explicit reviewable customer-facing content, preserving published version boundaries; F2 stays open. F3 follows.
+
+---
+
 ## 2026-11-24 — F2.1 commercial presentation / profile UI
 
 - Exact 17c40df CI 45409651194 SUCCESS and Security 45409650828 SUCCESS. Owner terminal confirms local detached checkout 17c40df, assets PASS, verified review DB, Puma PID 728783 :3003. Screenshot of public static landing is :3002 (old server), not evidence of current catalogue failure. Other screenshots show owner catalogue nine services, cabinet, setup/review and approved profile v2 with v1 retained. Owner performed profile approval; no inference of new paid call.
