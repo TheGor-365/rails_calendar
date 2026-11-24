@@ -15,44 +15,17 @@
   </aside>
 
   <div class="mk-content">
-    <section class="mk-overview" id="overview" aria-labelledby="mk-main-title">
-      <div class="mk-intro">
-        <div class="mk-intro-top">
-          <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg> WEB SERVICE WORKSPACE</span>
-          <span class="mk-status"><span class="mk-state-dot" aria-hidden="true"></span> <%= t("marketing.hero_status") %></span>
-        </div>
-        <h1 id="mk-main-title"><%= t("marketing.hero_title") %><br><span><%= t("marketing.hero_accent") %></span></h1>
-        <div class="mk-intro-actions">
-          <a class="mk-action mk-action-primary" href="#services"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg> <%= t("marketing.hero_pick") %> <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-right"></use></svg></a>
-          <button type="button" class="mk-action mk-action-quiet" data-mk-open="process"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg> <%= t("marketing.hero_how") %></button>
-        </div>
-      </div>
-
-      <div class="mk-workflow" aria-label="<%= t("marketing.workflow_aria") %>">
-        <div class="mk-workflow-head">
-          <div><span class="mk-workflow-overline">WORKFLOW</span><h2><%= t("marketing.workflow_title") %></h2></div>
-          <span class="mk-demo-label"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#eye"></use></svg> <%= t("marketing.workflow_scheme") %></span>
-        </div>
-        <div class="mk-board">
-          <div class="mk-board-lane">
-            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-new"></span>01 · <%= t("marketing.lane_request") %></div>
-            <div class="mk-board-card"><span class="mk-tag mk-tag-neutral"><%= t("marketing.lane_context") %></span><strong><%= t("marketing.lane_problem") %></strong><small><%= t("marketing.lane_question") %></small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#clipboard"></use></svg> <%= t("marketing.lane_description") %></span></div>
-          </div>
-          <div class="mk-board-lane">
-            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-review"></span>02 · <%= t("marketing.lane_clarify") %></div>
-            <div class="mk-board-card"><span class="mk-tag mk-tag-amber"><%= t("marketing.lane_agreement") %></span><strong><%= t("marketing.lane_boundaries") %></strong><small><%= t("marketing.lane_scope") %></small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#checklist"></use></svg> <%= t("marketing.lane_check") %></span></div>
-          </div>
-          <div class="mk-board-lane">
-            <div class="mk-lane-heading"><span class="mk-lane-dot mk-lane-dot-done"></span>03 · <%= t("marketing.lane_delivery") %></div>
-            <div class="mk-board-card"><span class="mk-tag mk-tag-green"><%= t("marketing.lane_result") %></span><strong><%= t("marketing.lane_changes") %></strong><small><%= t("marketing.lane_demo") %></small><span class="mk-board-card-foot"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#check"></use></svg> <%= t("marketing.lane_accept") %></span></div>
-          </div>
-        </div>
+    <section class="mk-compact-banner" id="overview" aria-labelledby="mk-main-title">
+      <h1 class="mk-kicker" id="mk-main-title"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg> <%= t("marketing.services_label") %></h1>
+      <div class="mk-intro-actions">
+        <a class="mk-action mk-action-primary" href="#services"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#grid"></use></svg> <%= t("marketing.hero_pick") %></a>
+        <button type="button" class="mk-action mk-action-quiet" data-mk-open="process"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg> <%= t("marketing.nav_process") %></button>
       </div>
     </section>
 
     <section class="mk-section" id="services" aria-labelledby="services-title">
       <header class="mk-section-head">
-        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg> <%= t("marketing.services_label") %></span><h2 id="services-title"><%= t("marketing.services_title") %></h2></div>
+        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg> <%= t("marketing.services_label") %></span><h2 class="mk-visually-hidden" id="services-title"><%= t("marketing.services_title") %></h2></div>
       </header>
       <%# Publication pointers are shared with the verified-client selection form.
           No draft fields, private attachments, account identifiers or profile data. %>
@@ -85,24 +58,23 @@
     </section>
 
     <dialog class="mk-process-dialog" id="process" aria-labelledby="process-title">
-      <header class="mk-section-head">
-        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#route"></use></svg> <%= t("marketing.process_label") %></span><h2 id="process-title"><%= t("marketing.process_title") %></h2></div>
+      <header class="mk-dialog-heading">
+        <h2 id="process-title"><%= t("marketing.nav_process") %></h2>
+        <button class="mk-action mk-action-quiet" type="button" data-mk-close="process" aria-label="<%= t("marketing.close_dialog") %>">×</button>
       </header>
       <ol class="mk-process">
-        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg></span><div><strong><%= t("marketing.lane_request") %></strong><p><%= t("marketing.process_request_desc") %></p></div><span class="mk-process-order">01</span></li>
-        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#checklist"></use></svg></span><div><strong><%= t("marketing.lane_agreement") %></strong><p><%= t("marketing.process_agreement_desc") %></p></div><span class="mk-process-order">02</span></li>
-        <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#code"></use></svg></span><div><strong><%= t("marketing.process_build") %></strong><p><%= t("marketing.process_build_desc") %></p></div><span class="mk-process-order">03</span></li>
+        <% %w[request clarify proposal specification build delivery].zip(%w[message checklist clipboard checklist code check]).each_with_index do |(stage, icon), index| %>
+          <li><span class="mk-process-symbol"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#<%= icon %>"></use></svg></span><div><strong><%= t("marketing.workflow_stages.#{stage}.title") %></strong><p><%= t("marketing.workflow_stages.#{stage}.description") %></p></div><span class="mk-process-order"><%= format("%02d", index + 1) %></span></li>
+        <% end %>
       </ol>
-      <button class="mk-action mk-action-quiet" type="button" data-mk-close="process" aria-label="<%= t("marketing.close_dialog", default: "Close") %>">×</button>
+      <p class="mk-workflow-scope"><%= t("marketing.workflow_availability") %></p>
     </dialog>
 
     <section class="mk-section mk-contact-section" id="contact" aria-labelledby="contact-title">
       <div class="mk-contact-card">
         <div class="mk-contact-copy">
           <span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg> <%= t("marketing.contact_label") %></span>
-          <h2 id="contact-title"><%= t("marketing.contact_title") %></h2>
-          <p><%= t("marketing.contact_desc") %></p>
-          <small><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#shield"></use></svg> <%= t("marketing.contact_warning") %></small>
+          <h2 class="mk-visually-hidden" id="contact-title"><%= t("marketing.contact_label") %></h2>
         </div>
         <div class="mk-contact-links">
           <a class="mk-action mk-action-primary" href="https://www.facebook.com/gor.webdevelopment/" rel="noopener noreferrer"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#message"></use></svg> Facebook Page <svg class="mk-icon mk-icon-trailing" aria-hidden="true"><use href="/workspace-icons.svg#arrow-up-right"></use></svg></a>
