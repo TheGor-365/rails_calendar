@@ -43,7 +43,7 @@ class OwnerSetupController < ApplicationController
     next_index = OwnerIntelligence::Catalog::KEYS.index(key) + 1
     destination = OwnerIntelligence::Catalog::KEYS[next_index]
     redirect_to(destination ? owner_setup_path(step: destination) : owner_setup_review_path,
-                notice: t("owner_setup.saved"))
+                notice: t("owner_setup.saved"), flash: { wa_dialog_outcome: "advance" })
   rescue ActiveRecord::RecordInvalid, ActionController::ParameterMissing
     redirect_to owner_setup_path(step: key), alert: t("owner_setup.invalid_answer")
   end
