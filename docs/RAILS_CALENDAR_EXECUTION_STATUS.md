@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.1 customer copy and owner preview
+
+- 97f5a9f adds owner-only client copy preview on service detail, showing current draft/approved title, summary and deliverables, with notice when a different version is public. 8f414bd adds Russian labels. 59d658a revises six automatic draft titles and two descriptions into customer language; original technical boundaries remain. Existing persisted services are not rewritten or published; same-snapshot sync intentionally preserves existing versions. This is a preview of commercial fields, not a pixel-identical public card or a new independent customer-copy model.
+- Exact prior 9373861 CI 45439791473 / Security 45439788216 still queued at recheck. Latest changes untested. Do not advance acceptance before CI and current :3003 browser evidence. Next: review existing nine services, use existing versioned revision/approval mechanism for customer copy as needed, verify published catalogue and selection; do not overwrite drafts or bypass publication consent. Local server last confirmed 17c40df. No database writes, provider calls or deployment by assistant.
+
+---
+
 ## 2026-11-24 — F2.1 published technology projection
 
 - Replaced temporary auto-service-key technology strings with read-only OwnerServices::PublicPresentation (3d53300, fa2b89a). It intersects an explicitly published approved version's title/summary/included scope with known technology domains from that version's immutable professional snapshot, excluding excluded/not-interested rows. No private notes, evidence, capability conditions or draft fields serialized. No automatic republish. Generic fallback when no match. This is a conservative textual projection, not a complete structured customer-product model; customer card title/summary still use published copy.
