@@ -84,3 +84,23 @@ es:
     close_dialog: "Cerrar"
     technologies: "Tecnologías"
     technology_on_request: "Tecnologías por acordar durante la evaluación"
+    workflow_stages:
+      request:
+        title: "Solicitud"
+        description: "Elija un servicio o describa su tarea."
+      clarify:
+        title: "Requisitos"
+        description: "Aclaramos los requisitos y materiales necesarios."
+      proposal:
+        title: "Propuesta"
+        description: "Acordamos alcance, coste y plazos."
+      specification:
+        title: "Especificación"
+        description: "Documentamos requisitos y criterios de aceptación."
+      build:
+        title: "Desarrollo"
+        description: "Implementamos los cambios acordados y probamos el resultado."
+      delivery:
+        title: "Entrega y aceptación"
+        description: "Revisamos el resultado y entregamos los materiales."
+    workflow_availability: "Estas etapas describen la colaboración; las funciones en línea dependen de la versión del servicio."
