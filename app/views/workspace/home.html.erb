@@ -1,7 +1,7 @@
 <div class="container ws-hub my-4 my-sm-5">
-  <header class="ws-hub-header">
+  <header class="ws-hub-header wa-compact-banner">
     <div><p class="eyebrow mb-2"><i class="bi bi-grid-1x2" aria-hidden="true"></i> <%= t("workspace.eyebrow") %></p>
-      <h1><%= t("workspace.title") %></h1><p class="rc-muted mb-0"><%= t("workspace.description") %></p></div>
+      <h1 class="visually-hidden"><%= t("workspace.title") %></h1></div>
     <%= link_to rc_icon_label("inboxes", t("workspace.open_requests")), admin_project_intakes_path, class: "rc-action rc-action--primary" %>
   </header>
   <%# Approved professional identity has one home: the cabinet.
