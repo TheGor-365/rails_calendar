@@ -276,3 +276,9 @@ body.marketing-page { min-width: 320px; margin: 0; background: var(--mk-canvas);
 .mk-service-tech { margin: 0; padding: 0 17px 14px; }
 .mk-service-tech p { margin: 8px 0 0; }
 .mk-process-dialog > button { margin-top: 16px; }
+
+.mk-tech-list { padding-left: 20px; margin: 8px 0 0; }
+.mk-tech-list li { margin: 4px 0; }
+.mk-contact-links { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; }
+.mk-contact-links .mk-action { width: auto; }
+.mk-contact-card { align-items: center; }
