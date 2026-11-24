@@ -1,17 +1,11 @@
 <div class="container ws-owner-page wa-ai-page my-4 my-sm-5" id="owner-ai-assistant">
-  <header class="ws-owner-hero wa-ai-page__hero wa-compact-banner">
-    <span class="wa-ai-page__hero-mark" aria-hidden="true"><i class="bi bi-stars"></i></span>
-    <div class="ws-owner-hero-copy wa-ai-page__hero-copy">
-      <p class="eyebrow"><%= t("owner_ai_assistant.eyebrow") %></p>
-      <h1 class="visually-hidden"><%= t("owner_ai_assistant.title") %></h1>
-    </div>
-    <div class="wa-ai-page__hero-actions">
-      <%= link_to rc_icon_label("chat-square-text", t("owner_ai_conversations.title")), owner_ai_conversations_path, class: "rc-action rc-action--quiet" %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("chat-square-text", t("owner_ai_conversations.title")), owner_ai_conversations_path, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("briefcase", t("owner_services.title")), owner_services_path, data: { wa_page_dialog: true }, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("arrow-left", t("owner_ai_assistant.open_cabinet")),
                   owner_cabinet_path, class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "stars", path: t("owner_ai_assistant.eyebrow"), title: t("owner_ai_assistant.title"), extra_class: "ws-owner-hero wa-ai-page__hero", actions: banner_actions %>
   <div class="wa-ai-page__screen-grid" data-controller="wa-section-nav">
   <nav class="wa-ai-page__wayfinder" aria-label="<%= t("owner_ai_assistant.section_navigation") %>">
     <a href="#wa-ai-compose-heading" class="wa-ai-page__wayfinder-link" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate">
