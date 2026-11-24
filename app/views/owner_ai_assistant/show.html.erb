@@ -7,7 +7,7 @@
     </div>
     <div class="wa-ai-page__hero-actions">
       <%= link_to rc_icon_label("chat-square-text", t("owner_ai_conversations.title")), owner_ai_conversations_path, class: "rc-action rc-action--quiet" %>
-      <%= link_to rc_icon_label("briefcase", t("owner_services.title")), owner_services_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("briefcase", t("owner_services.title")), owner_services_path, data: { wa_page_dialog: true }, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("arrow-left", t("owner_ai_assistant.open_cabinet")),
                   owner_cabinet_path, class: "rc-action rc-action--quiet" %>
     </div>
