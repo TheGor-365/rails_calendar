@@ -1,16 +1,13 @@
 <div class="container ws-owner-page wa-ai-page my-4 my-sm-5" id="owner-ai-assistant">
-  <header class="ws-owner-hero wa-ai-page__hero">
+  <header class="ws-owner-hero wa-ai-page__hero wa-compact-banner">
     <span class="wa-ai-page__hero-mark" aria-hidden="true"><i class="bi bi-stars"></i></span>
     <div class="ws-owner-hero-copy wa-ai-page__hero-copy">
       <p class="eyebrow"><%= t("owner_ai_assistant.eyebrow") %></p>
-      <h1 class="page-title"><%= t("owner_ai_assistant.title") %></h1>
-      <p class="rc-muted"><%= t("owner_ai_assistant.intro") %></p>
-      <div class="wa-ai-page__hero-notes" aria-label="<%= t("owner_ai_assistant.hero_notes_label") %>">
-        <span><i class="bi bi-lock" aria-hidden="true"></i> <%= t("owner_ai_assistant.hero_private") %></span>
-        <span><i class="bi bi-check2-circle" aria-hidden="true"></i> <%= t("owner_ai_assistant.hero_review") %></span>
-      </div>
+      <h1 class="visually-hidden"><%= t("owner_ai_assistant.title") %></h1>
     </div>
     <div class="wa-ai-page__hero-actions">
+      <%= link_to rc_icon_label("chat-square-text", t("owner_ai_conversations.title")), owner_ai_conversations_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("briefcase", t("owner_services.title")), owner_services_path, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("arrow-left", t("owner_ai_assistant.open_cabinet")),
                   owner_cabinet_path, class: "rc-action rc-action--quiet" %>
     </div>
@@ -32,10 +29,7 @@
   </nav>
   <div class="wa-ai-page__screen-body">
 
-  <p class="wa-ai-page__thread-entry">
-    <%= link_to rc_icon_label("chat-square-text", t("owner_ai_conversations.title")),
-                owner_ai_conversations_path, class: "rc-action rc-action--quiet" %>
-  </p>
+
 
   <% if @navigation_result %>
     <section class="surface-panel wa-ai-nav-results" aria-labelledby="wa-ai-nav-heading">
@@ -78,7 +72,7 @@
         <span class="wa-ai-page__icon"><i class="bi bi-pencil-square" aria-hidden="true"></i></span>
         <div>
           <p class="eyebrow"><%= t("owner_ai_assistant.step_one") %></p>
-          <h2 id="wa-ai-compose-heading"><%= t("owner_ai_assistant.compose_heading") %></h2>
+          <h2 class="visually-hidden" id="wa-ai-compose-heading"><%= t("owner_ai_assistant.compose_heading") %></h2>
         </div>
       </div>
       <% if @ai_enabled && @profile&.approved_snapshot && @profile.onboarding_state == "approved" %>
@@ -95,8 +89,8 @@
           </div>
           <div class="rc-field">
             <%= label_tag "wa-ai-brief", t("owner_ai_assistant.brief"), class: "rc-field-label" %>
-            <%= text_area_tag :brief, nil, id: "wa-ai-brief", class: "rc-input rc-input--area",
-                  rows: 5, minlength: 12, maxlength: 1200, required: true,
+            <%= text_area_tag :brief, nil, id: "wa-ai-brief", class: "rc-input rc-input--area wa-compact-input",
+                  rows: 2, data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" }, minlength: 12, maxlength: 1200, required: true,
                   placeholder: t("owner_ai_assistant.placeholder") %>
             <p class="rc-hint"><%= t("owner_ai_assistant.brief_hint") %></p>
           </div>
@@ -133,7 +127,7 @@
     </aside>
   </div>
 
-  <section class="surface-panel wa-ai-page__result" aria-labelledby="wa-ai-result-heading">
+  <section class="<%= @entry ? "surface-panel wa-ai-page__result" : "wa-ai-result-placeholder" %>" aria-labelledby="wa-ai-result-heading">
     <div class="wa-ai-page__heading">
       <span class="wa-ai-page__icon"><i class="bi bi-file-earmark-text" aria-hidden="true"></i></span>
       <div>
@@ -159,9 +153,7 @@
       <% end %>
       <p class="wa-ai-page__next"><strong><%= t("owner_ai_assistant.next") %></strong> <%= @entry.result["next_step"] %></p>
     <% else %>
-      <div class="rc-empty-state">
-        <p><%= t("owner_ai_assistant.no_draft") %></p>
-      </div>
+
     <% end %>
   </section>
   <% if @entry %>
@@ -363,7 +355,7 @@
         <h2 id="wa-ai-library-title"><%= t("owner_ai_assistant.library_title") %></h2>
       </div>
     </div>
-    <p class="rc-muted"><%= t("owner_ai_assistant.library_help") %></p>
+
     <% if @draft_history.any? %>
       <div class="wa-ai-draft-library__grid">
         <% @draft_history.each do |record| %>
@@ -379,7 +371,7 @@
             <h3><%= record.result["heading"] %></h3>
             <p><%= truncate(record.result["draft"].to_s, length: 165) %></p>
             <%= link_to rc_icon_label("arrow-up-right", t("owner_ai_assistant.library_open")),
-                  owner_ai_assistant_path(entry_id: record.id, operation: record.result["purpose"]),
+                  owner_ai_assistant_path(entry_id: record.id, operation: record.result["purpose"], anchor: "wa-ai-result-heading"),
                   class: "rc-action rc-action--quiet rc-action--small" %>
           </article>
         <% end %>
