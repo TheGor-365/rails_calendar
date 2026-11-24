@@ -1,5 +1,16 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2 published catalogue and request selection
+
+- Owner screenshots show 9 existing local owner service cards on :3003 and legacy static landing/client cabinet on :3002. The latter is NOT acceptance evidence for latest review server. Owner requests commercial terminology without "учебная" and actual published catalogue.
+- Russian client request, cabinet and owner-service labels revised (4b21b23, db3e1e5, b8d0610). Local fictional-data consent and ClientRequestPilot environment guard remain intact. No public intake enablement.
+- da70cd3479d020d6d8aea805ef9135bbe19a1f1c replaces four static landing offers with current published versions; public fields title/summary/included scope only, no private media or drafts. Existing publication pointers remain unchanged. Guest CTA remains external contact; verified client CTA under existing local pilot opens request with version id.
+- 40c576b preselects only current published version on GET; eb09512 updates Russian catalogue heading; 0551b14 responsive grid and process index nowrap; d188faa/d13b1bc/a1fcdb9 revise integration tests for new catalogue contract and stale selection. Existing production root shares marketing view. No production deployment or DB writes. Public display of preexisting published pointers must be reviewed before release.
+- Exact da70cd3 Security SUCCESS (45304681385), Rails CI FAILURE (45304681412). Old static-card expectations updated, but failure logs not inspected and latest exact CI not yet confirmed. Remaining risks: other locales and old terminology not exhaustively audited; actual guest/client browser acceptance on :3003 pending; no autosave, paid AI or production acceptance claimed.
+- Next: verify latest exact CI and diagnose failures; then guarded isolated preview update from 47fe8fb, verify public catalogue and verified client selection on :3003 without submitting data. F1 lifecycle and F2 submission-to-inbox tests remain subject to CI. F3 follows.
+
+---
+
 ## 2026-11-24 — F2 invitation-to-inbox browser coverage
 
 - Read-only source audit: existing E2 browser case ended at the verified client's claimed editable draft, although controller supports explicit save, versioned 12-section scope, fact review, idempotent submit and owner unread inbox. Existing integration tests cover published-version selection, foreign-account isolation and invitation expiry/revoke. Do not recreate these features.
