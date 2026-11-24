@@ -3,9 +3,8 @@
      data-action="turbo:before-cache@document->wa-service-preview#close">
   <header class="ws-owner-hero wa-services__hero wa-compact-banner">
     <div class="wa-services__hero-content">
-      <span class="wa-services__hero-symbol" aria-hidden="true"><i class="bi bi-briefcase"></i></span>
       <div class="ws-owner-hero-copy">
-        <p class="eyebrow"><%= t("owner_services.eyebrow") %></p>
+        <p class="eyebrow"><i class="bi bi-briefcase" aria-hidden="true"></i> <%= t("owner_services.eyebrow") %></p>
         <h1 class="visually-hidden"><%= t("owner_services.title") %></h1>
         
         <span class="wa-services__hero-meta"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.private_title") %></span>
@@ -13,7 +12,7 @@
     </div>
     <div class="wa-services__actions">
       <% if @snapshot && @eligible_capabilities.any? %>
-        <%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--primary" %>
+        <%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--quiet" %>
       <% end %>
       <details class="wa-services__tools">
         <summary class="rc-action rc-action--quiet"><%= rc_icon_label("sliders", t("owner_services.catalogue_tools")) %> <i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
