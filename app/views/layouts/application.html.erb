@@ -34,6 +34,7 @@
     <dialog class="wa-page-dialog" aria-labelledby="wa-page-dialog-title" data-wa-page-dialog-target="dialog" data-action="cancel->wa-page-dialog#cancel click->wa-page-dialog#backdrop">
       <div class="wa-page-dialog__shell">
         <header class="wa-page-dialog__header">
+          <button type="button" class="rc-action rc-action--quiet wa-page-dialog__back" aria-label="<%= t("nav.back", default: { ru: "Назад", en: "Back", hy: "Հետ", de: "Zurück" }.fetch(I18n.locale.to_sym, "Back")) %>" data-wa-page-dialog-target="backButton" data-action="wa-page-dialog#back" disabled><i class="bi bi-arrow-left" aria-hidden="true"></i></button>
           <strong id="wa-page-dialog-title" data-wa-page-dialog-target="heading"></strong>
           <button type="button" class="rc-action rc-action--quiet" aria-label="<%= t("marketing.close_dialog") %>" data-action="wa-page-dialog#close"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
         </header>
