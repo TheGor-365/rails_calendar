@@ -1,10 +1,5 @@
 <div class="container my-4 my-sm-5">
-  <header class="rc-page-hero mb-4"><div class="rc-page-hero__content">
-    <p class="eyebrow"><%= t("e2.guest_eyebrow") %></p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-envelope-open"></i></span>
-      <h1 class="page-title"><%= t("e2.guest_title") %></h1></div>
-    <p class="rc-muted"><%= t("e2.guest_hint") %></p>
-  </div></header>
+  <%= render "shared/wa_banner", variant: :detail, icon: "envelope-open", path: t("e2.guest_eyebrow"), title: t("e2.guest_title"), description: t("e2.guest_hint"), extra_class: "rc-page-hero mb-4" %>
   <section class="surface-panel p-3 p-sm-4">
     <%= form_with url: client_invitation_preview_path, method: :post,
           html: { class: "rc-form", data: { controller: "wa-invitation-link" } } do %>
