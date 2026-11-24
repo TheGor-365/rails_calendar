@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.5 owner acceptance defects and corrective slice
+
+- Owner terminal confirms local 732a474, assets PASS, verified local review DB, Puma PID 944785 :3003. Screenshots: compact public banner renders but duplicate Services label; cabinet cards aligned at old heading height, settings modal shows only fallback Open link; assistant services read-only projection has horizontal overflow; knowledge inventory shows 9 approved services, FAQ and composer files still unavailable. Visible spend $0.01982; no new paid call established.
+- Replaced failed mixed HTML-cloning/Turbo modal path with same-origin embedded full document in native animated dialog (ae86c63, a8861a9, 9d9e932). Intended to preserve native form controls, CSRF, controllers, redirects and existing authorization; no duplicate fallback link. Larger responsive viewport and thin scrollbar. Browser acceptance required, including frame embedding response headers, form submission, nested dialogs, navigation and overflow. Parent metrics may need refresh after writes. No claim of PASS.
+- 61ddb03 removes duplicate public Services label; fa3cc41 hides redundant cabinet H2s accessibly; 1d11853 removes assistant side Services link and control heading, reduces input hint. Need visual recheck of alignment after headings hidden.
+- Owner follow-up requirements: actual public email composer with verified recipient and server delivery, prefilled authenticated email, topic presets derived from catalogue, icons, two-row growing text, loading/success/error states; FAQ/prices/rules AI interview with targeted questions from permitted context, saved editable versioned output, generate/edit action; file generation with icon presets, prompt field and downloadable generated artifact, distinct from access to existing files. No fake email send, generated file or approved FAQ; no blanket private file access. Preserve consent, scope, costs, output validation, owner review. These functional features remain open. First verify corrected modals, then implement email and knowledge/file workflow in bounded slices. No production deployment, migration, provider call or local DB write.
+
+---
+
 ## 2026-11-24 — F2.4g catalogue transport regression gate
 
 - 30f3486 adds positive mocked provider HTTP integration test: missing paid consent must produce no request or ledger reservation; explicit consent with catalogue selected must transmit exact allowed published fields, exclude unpublished draft and excluded scope, settle fictional ledger entry and not change service versions. This is authored test coverage, not executed PASS evidence.
