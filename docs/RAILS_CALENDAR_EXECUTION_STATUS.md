@@ -1,6 +1,22 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
 
+## C2.5e owner mobile dock five-item grid — 24 November 2026
+
+**Owner screenshots, isolated local code `b91ab7b` :3003, RU emulation 400x793:** `/admin/project_intakes?view=outgoing` and `/workspace/cabinet` both render the same visible bottom navigation defect: 5 real links (Month, Today, Add, Requests, Cabinet) cramped into 6 layout tracks, leaving an obvious unused empty cell to the right. The supplied screenshots show mobile header and body rendering but **Requests `More actions` dropdown was closed**, so do not mark that separate requested mobile popup behavior owner-verified. Local Cabinet screenshot shows the missing owner avatar image as a broken icon on the older C2.5c1 code, supporting C2.5d fallback work; it does not establish a functional failure of avatar editing.
+
+**Exact root cause in repo:** `application.bootstrap.scss` already defines `.rc-mobile-dock { grid-template-columns: repeat(5, minmax(0, 1fr)); }`, while a later owner-specific override in `_rc_content_patterns.scss` forced `repeat(6, minmax(0, 1fr))` despite `_mobile_nav.html.erb` rendering exactly five owner anchors. The user requested centering and removing the right-side gap; avoid altering navigation order, links, brand, typography, design tokens, safe-area paddings or shell widths.
+
+**C2.5e scoped repair:** update only owner-specific grid override to `repeat(5, minmax(0, 1fr))` (commit `d6698bdffc9c2329c3eed2b872c0d28bda9fd655`). Add system browser case on **Requests and Cabinet, 400px and 320px**: exactly five owner dock actions/tracks, equal widths, symmetric inner left/right gaps, no unused right track, no offscreen dock edge or horizontal page overflow (commit `70efaf63da07a1d3672dc1abd9de136c8aedfb63`). It only resizes existing grid items, no new navigation destinations or model writes.
+
+**Status:** `CODE_COMMITTED`; new exact-SHA **CI_PENDING**; `OWNER_BROWSER_NOT_TESTED` for corrected dock; `NOT_DEPLOYED`. Local detached review `:3003` remains on `b91ab7b`, so old screenshots cannot be treated as proof of the new fix. C2.5d media resiliency awaits its own verification (a missing worktree disk file does not authorize moving/copying blobs or deleting metadata).
+
+**Next:** exact Rails CI and Security Audit; if all PASS, update *only* the isolated review worktree (after stopping :3003 Puma and checking clean HEAD) using `script/rc0551f_c25a1_preview.sh`; verify bottom nav at 400px on Requests and Cabinet, then menu expansion and 320px. Preserve production and local PostgreSQL; no paid AI calls.
+
+---
+
+
+
 ## C2.5d detached-worktree missing private media resilience — 24 November 2026
 
 **Verified owner local run (read-only evidence):** user switched only isolated `~/rails_calendar_c25a_ia_review_20261123` from `7246d054fa7c556ec9b3cc5921b2dcc7c0194cf2` to exact CI-verified `b91ab7b3dc1778177d6b55138aa21e8e01b7e0ad`. `script/rc0551f_c25a1_preview.sh` printed `C25A1_ASSETS_READY=PASS`, `C21C_LOCAL_GROK_READY (no provider call, no DB write)`, `C21C_DATABASE=verified_local_review`; Rails 8.1.4.1/Puma 8.0.4 listening on localhost :3003. No migration, paid AI provider call, or production deployment reported.
