@@ -1,13 +1,13 @@
 <div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-services"
      data-controller="wa-service-preview"
      data-action="turbo:before-cache@document->wa-service-preview#close">
-  <header class="ws-owner-hero wa-services__hero">
+  <header class="ws-owner-hero wa-services__hero wa-compact-banner">
     <div class="wa-services__hero-content">
       <span class="wa-services__hero-symbol" aria-hidden="true"><i class="bi bi-briefcase"></i></span>
       <div class="ws-owner-hero-copy">
         <p class="eyebrow"><%= t("owner_services.eyebrow") %></p>
-        <h1 class="page-title"><%= t("owner_services.title") %></h1>
-        <p class="rc-muted"><%= t("owner_services.intro") %></p>
+        <h1 class="visually-hidden"><%= t("owner_services.title") %></h1>
+        
         <span class="wa-services__hero-meta"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.private_title") %></span>
       </div>
     </div>
