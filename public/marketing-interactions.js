@@ -1,4 +1,6 @@
 document.addEventListener("click", event => {
+  const closer = event.target.closest("[data-mk-close]");
+  if (closer) document.getElementById(closer.dataset.mkClose)?.close();
   const trigger = event.target.closest("[data-mk-open]");
   if (trigger) {
     const dialog = document.getElementById(trigger.dataset.mkOpen);
