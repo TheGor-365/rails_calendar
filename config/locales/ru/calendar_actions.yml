@@ -12,7 +12,7 @@ ru:
     create_in_hour: "Создать событие на %{time}"
     network_error: "Не удалось сохранить. Проверьте соединение и повторите."
     activity_eyebrow: "ИСТОРИЯ / СОБЫТИЯ"
-    activity_heading: "Активность и артефакты"
+    activity_heading: "События и материалы"
     no_activity: "За выбранный период действий не найдено."
     now: "Текущее время"
     kinds:
