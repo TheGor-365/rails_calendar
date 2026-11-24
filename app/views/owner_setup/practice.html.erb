@@ -1,19 +1,14 @@
 <% settings_content = capture do %>
 <div class="container ws-owner-page ws-owner-practice my-4 my-sm-5" id="owner-practice">
-  <header class="ws-owner-hero wa-compact-banner">
-    <div class="ws-owner-hero-copy">
-      <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("owner_setup.practice_eyebrow") %></p>
-      <h1 class="visually-hidden"><%= t("owner_setup.practice_title") %></h1>
-    </div>
-    <div class="ws-owner-hero-actions">
-      <%= link_to rc_icon_label("stars", t("owner_ai_assistant.context_practice")),
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("stars", t("owner_ai_assistant.context_practice")),
             owner_ai_assistant_path(operation: "client_reply"), class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("boxes", t("owner_services.title")), owner_services_path, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("sliders", t("capability_review.edit_link")), owner_capabilities_path, data: { turbo_frame: ("wa-settings-frame" if turbo_frame_request?) }, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("chat-square-dots", t("owner_setup.update_profile")), owner_setup_path(step: "A"), class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "person-badge", path: t("owner_setup.practice_eyebrow"), title: t("owner_setup.practice_title"), extra_class: "ws-owner-hero", actions: banner_actions %>
 
   <% if @snapshot %>
     <section class="ws-owner-profile-hero">
