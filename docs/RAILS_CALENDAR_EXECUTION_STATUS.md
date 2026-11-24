@@ -1,5 +1,20 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — live connector recheck after MVP handoff
+
+**Read-only verification (GitHub + Railway connected APIs, 2026-11-24):**
+- Draft PR #81 remains OPEN/DRAFT on `feat/rc0551f-c21c-live-owner-ai-chat-2026-11-18` at exact **`f814e27c12b3d3330fca9e0cd569e12572ce225a`** (no newer code commit observed). Compare from tested application code **`b4cf8e8a8dbaa8f97a631200af03d049eeec636e`** to this HEAD: three commits, changing **only** `docs/RAILS_CALENDAR_EXECUTION_STATUS.md`, `docs/RAILS_CALENDAR_MVP_CONTINUATION_MASTER_2026-11-24.md`, and `docs/RAILS_CALENDAR_NEXT_CHAT_MASTER.md`. No newer application code in that delta.
+- Exact `f814e27c12b3d3330fca9e0cd569e12572ce225a` **Rails Calendar CI = SUCCESS** (run **45298202856**) and **Rails Calendar Security Audit = SUCCESS** (run **45298203102**), completed according to GitHub Actions. The earlier application-code SHA `b4cf8e8` also has both workflows SUCCESS. CI cannot replace manual browser acceptance.
+- Release Draft PR #82 remains OPEN/DRAFT at **`558cf80be59fd317aaaf18c41c4cd38e773f919c`**; R1A has not been deployed. No production changes authorized.
+- Railway project `rails-calendar-ai-workspace`, environment `production`: web `rails-calendar-ai-web` latest deployment **`c11543af-69de-4694-b9c4-581dc6f56f87`**, **SLEEPING**, app SHA **`90d7a817651ba1bffe174d3f800d32988a664169`** on `feat/client-owner-pilot-2026-11-13`. PostgreSQL 18 service last deployment SUCCESS; live `postgres-volume` 5,000 MB is mounted to PostgreSQL, **not** the web service. No production backup or persistent web media was established by this read. No Railway write, migration, paid AI call, or private-media change made.
+- **F0 status unchanged:** `OWNER_BROWSER_PARTIAL_PASS` only for the previously observed 400px dock/avatar and desktop Requests. Still awaiting owner 400px expanded `Другие действия` screenshot, 320px Requests overflow/popover check, long Cabinet navigation, AI Conversations read-only screen and keyboard/back testing. No new owner screenshots or local DB access occurred in this connector recheck.
+- **Next exact owner step:** from existing isolated local server :3003 at application code `b4cf8e8`, open `/admin/project_intakes?view=outgoing` at 400px with `Другие действия` expanded, screenshot; then verify 320px; then `/workspace/cabinet` full scroll and read-only `/workspace/assistant/conversations`. No paid Ask AI / mutations. F1 synthetic persistence only after isolated data-target safety check.
+
+**This documentation checkpoint is NOT a feature implementation, local browser signoff, or production release.** The committing documentation SHA receives its own CI status.
+
+---
+
+
 
 ## 2026-11-24 — C2.5e owner 400px verified; MVP handoff prepared
 
