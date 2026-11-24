@@ -135,7 +135,8 @@ class OwnerServiceOfferingsTest < ActionDispatch::IntegrationTest
     get owner_services_path
     assert_response :success
     assert_select "a[href=?][data-turbo-frame='wa-owner-service-preview']", owner_service_path(offer)
-    assert_select ".wa-services__hero-symbol", count: 1
+    assert_select "header[data-wa-banner] .wa-banner__path > i.bi-briefcase", count: 1
+    assert_select ".wa-services__hero-symbol", count: 0
     assert_select ".wa-services__card .wa-services__cover-fallback", minimum: 1
     assert_select ".wa-services__tools summary", count: 1
 
