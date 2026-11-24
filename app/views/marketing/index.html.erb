@@ -24,9 +24,7 @@
     </section>
 
     <section class="mk-section" id="services" aria-labelledby="services-title">
-      <header class="mk-section-head">
-        <div><span class="mk-kicker"><svg class="mk-icon" aria-hidden="true"><use href="/workspace-icons.svg#layers"></use></svg> <%= t("marketing.services_label") %></span><h2 class="mk-visually-hidden" id="services-title"><%= t("marketing.services_title") %></h2></div>
-      </header>
+      <h2 class="mk-visually-hidden" id="services-title"><%= t("marketing.services_title") %></h2>
       <%# Publication pointers are shared with the verified-client selection form.
           No draft fields, private attachments, account identifiers or profile data. %>
       <% published_services = ServiceOffering.joins(:published_version)
