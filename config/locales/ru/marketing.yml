@@ -84,13 +84,3 @@ ru:
     close_dialog: "Закрыть"
     technologies: "Технологии"
     technology_on_request: "Стек согласуется при оценке задачи"
-    service_technology:
-      auto-rails-bugfix: "Ruby on Rails, RSpec / Minitest"
-      auto-rails-crud: "Ruby on Rails, Hotwire, PostgreSQL"
-      auto-rails-api: "Ruby on Rails, REST API, PostgreSQL"
-      auto-rails-tests: "RSpec / Minitest"
-      auto-websites: "HTML / CSS, Bootstrap, Tilda"
-      auto-automation: "Стек согласуется при оценке"
-      auto-ai-integrations: "API, Ruby on Rails — после оценки"
-      auto-data-tasks: "CSV, PostgreSQL"
-      auto-adjacent-web: "Vue — после оценки"
