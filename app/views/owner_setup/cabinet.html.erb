@@ -3,7 +3,6 @@
     <div class="ws-account-hero-copy">
       <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("account_hub.owner_eyebrow") %></p>
       <h1 class="page-title"><%= t("account_hub.owner_title") %></h1>
-      <p class="ws-account-lead"><%= t("account_hub.owner_intro") %></p>
       <div class="ws-account-meta">
         <span class="ws-account-chip"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.private_scope") %></span>
         <span class="ws-account-chip"><i class="bi bi-person-check" aria-hidden="true"></i><%= current_user.email %></span>
@@ -92,9 +91,9 @@
 
   <div class="ws-account-content ws-account-content--rail" data-controller="wa-section-nav">
     <nav class="wa-cabinet-rail" aria-label="<%= t("nav.workspace_sections") %>">
-      <a href="#cabinet-profile" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-person-vcard" aria-hidden="true"></i><%= t("account_hub.professional_profile") %></a>
-      <a href="#cabinet-tools" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= t("account_hub.owner_tools") %></a>
-      <a href="#cabinet-privacy" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.storage_heading") %></a>
+      <a href="#cabinet-profile" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-person-vcard" aria-hidden="true"></i><%= t("account_hub.rail_profile", default: "Profile") %></a>
+      <a href="#cabinet-tools" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= t("account_hub.rail_ai", default: "AI settings") %></a>
+      <a href="#cabinet-privacy" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.rail_data", default: "Data") %></a>
     </nav>
     <section class="ws-account-main">
       <div class="ws-account-section-heading" id="cabinet-profile">
