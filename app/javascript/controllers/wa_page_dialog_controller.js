@@ -87,6 +87,9 @@ export default class extends Controller {
       document.addEventListener("turbo:submit-end", this.afterSubmit)
       this.onCommitted = () => this.reportCommittedPage()
       document.addEventListener("turbo:load", this.onCommitted)
+      // A server-rendered invalid consultation remains an unsaved draft.
+      const invalidForm = document.querySelector("#consultation-form-errors")?.closest("form")
+      if (invalidForm) this.dirtyForms.add(invalidForm)
       this.publishFormState()
       this.reportCommittedPage()
     } else {
@@ -191,6 +194,8 @@ export default class extends Controller {
   trackSubmitStart(event) {
     if (!this.mutationForm(event.target)) return
     this.pendingForms.add(event.target)
+    const frame = window.frameElement
+    if (frame) frame.dataset.waMutationSource = location.href
     this.publishFormState()
   }
 
@@ -215,21 +220,25 @@ export default class extends Controller {
   }
 
   embeddedSubmit(event) {
-    const form = event.target
+    const form = event.detail?.formSubmission?.formElement || event.target
     if (!this.mutationForm(form)) return
     this.pendingForms.delete(form)
-    if (event.detail?.success) this.dirtyForms.delete(form)
+    // Transport success is not proof of persistence. The committed server page
+    // supplies the outcome for instrumented workflows.
+    if (event.detail?.success && !form.isConnected) this.dirtyForms.delete(form)
     this.publishFormState()
-    if (!event.detail?.success) return
-    // Only a successfully completed Turbo mutation can refresh parent projections.
-    window.parent.postMessage({ type: "wa:dialog-write", path: location.pathname }, location.origin)
+    if (!event.detail?.success) {
+      const frame = window.frameElement
+      if (frame) delete frame.dataset.waMutationSource
+    }
   }
 
   reportCommittedPage() {
     const heading = document.querySelector("main [data-wa-banner] h1, main h1")
     window.parent.postMessage({
       type: "wa:dialog-committed", href: location.href,
-      title: heading?.textContent.trim() || document.title
+      title: heading?.textContent.trim() || document.title,
+      outcome: document.querySelector("main[data-wa-dialog-outcome]")?.dataset.waDialogOutcome || ""
     }, location.origin)
   }
 
@@ -245,10 +254,6 @@ export default class extends Controller {
     const data = event.data
     if (data?.type === "wa:dialog-committed") {
       this.acceptCommittedPage(data)
-      return
-    }
-    if (data?.type === "wa:dialog-write") {
-      this.refreshParentProjections()
       return
     }
     if (data?.type !== "wa:dialog-navigation" ||
@@ -278,15 +283,27 @@ export default class extends Controller {
     try {
       if (this.pageKey(new URL(this.pageTarget.contentWindow.location.href)) !== this.pageKey(url)) return
     } catch (_) { return }
+    const source = this.pageTarget.dataset.waMutationSource
+    const outcome = source && ["advance", "replace"].includes(data.outcome) ? data.outcome : ""
+    if (outcome) {
+      delete this.pageTarget.dataset.waMutationSource
+      this.pageTarget.dataset.waSubmitting = "false"
+      this.refreshParentProjections()
+    }
     if (sameParentDestination(url, this.pageTarget.dataset.waParentHref)) {
       this.close()
       return
     }
     if (!areaFor(url.pathname)) {
+      // An invalid mutation may render at its action URL; never promote it
+      // into the parent as a speculative GET.
+      if (source && !/^\/(?:sign_in|admin\/login)\/?$/.test(url.pathname)) return
       this.close(() => window.location.assign(url.href))
       return
     }
+    if (source) delete this.pageTarget.dataset.waMutationSource
     const title = typeof data.title === "string" ? data.title.slice(0, 180) : ""
+    if (outcome === "replace" && this.stack?.at(-1)?.href === source) this.stack.pop()
     this.recordPage(url, title)
   }
 
@@ -371,6 +388,7 @@ export default class extends Controller {
       delete this.pageTarget.dataset.waParentHref
       delete this.pageTarget.dataset.waDirty
       delete this.pageTarget.dataset.waSubmitting
+      delete this.pageTarget.dataset.waMutationSource
     }
     if (this.opener?.isConnected) this.opener.focus({ preventScroll: true })
     if (this.parentScroll && (window.scrollX !== this.parentScroll.x ||
