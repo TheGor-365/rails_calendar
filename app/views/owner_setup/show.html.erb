@@ -1,14 +1,9 @@
 <% settings_content = capture do %>
 <div class="container ws-owner-page my-4 my-sm-5" id="owner-setup">
-  <header class="ws-owner-hero wa-compact-banner">
-    <div class="ws-owner-hero-copy">
-      <p class="eyebrow"><i class="bi bi-person-workspace" aria-hidden="true"></i> <%= t("owner_setup.eyebrow") %></p>
-      <h1 class="visually-hidden"><%= t("owner_setup.title") %></h1>
-    </div>
-    <div class="ws-owner-hero-actions">
-      <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "person-workspace", path: t("owner_setup.eyebrow"), title: t("owner_setup.title"), extra_class: "ws-owner-hero", actions: banner_actions %>
 
   <section class="ws-owner-progress" aria-label="<%= t('owner_setup.progress_label') %>">
     <div class="ws-owner-progress-top">
