@@ -88,6 +88,10 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
       post consultations_url, params: { consultation: @valid_attributes }
     end
     assert_redirected_to consultation_url(Consultation.last)
+    follow_redirect!
+    assert_select "main[data-wa-dialog-outcome='replace']", count: 1
+    get consultation_url(Consultation.last)
+    assert_select "main[data-wa-dialog-outcome='replace']", count: 0
   end
 
   test "admin can create a calendar consultation asynchronously with JSON" do
@@ -115,6 +119,8 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     patch consultation_url(@consultation), params: { consultation: { lock_version: @consultation.lock_version, title: "Admin update" } }
     assert_redirected_to consultation_url(@consultation)
     assert_equal "Admin update", @consultation.reload.title
+    follow_redirect!
+    assert_select "main[data-wa-dialog-outcome='replace']", count: 1
   end
 
   test "edit form hides legacy seconds without silently modifying stored instants" do
@@ -196,6 +202,7 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select "[role='alert']#consultation-form-errors"
     assert_select "input[name='consultation[end_time]'][aria-invalid='true']"
+    assert_select "main[data-wa-dialog-outcome='replace']", count: 0
   end
 
 
