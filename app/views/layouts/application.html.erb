@@ -38,7 +38,7 @@
           <strong id="wa-page-dialog-title" data-wa-page-dialog-target="heading"></strong>
           <button type="button" class="rc-action rc-action--quiet" aria-label="<%= t("marketing.close_dialog") %>" data-action="wa-page-dialog#close"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
         </header>
-        <iframe class="wa-page-dialog__page" src="about:blank" title="<%= t("activity_journal.open") %>" data-wa-embedded-page data-wa-page-dialog-target="page"></iframe>
+        <iframe class="wa-page-dialog__page" src="about:blank" title="<%= t("activity_journal.open") %>" data-wa-embedded-page data-wa-page-dialog-target="page" data-wa-discard-message="<%= { ru: "Есть несохранённые изменения. Выйти без сохранения?", en: "Discard unsaved changes?", hy: "Չպահված փոփոխություններ կան։ Դուրս գա՞լ առանց պահպանելու։", de: "Ungespeicherte Änderungen verwerfen?" }.fetch(I18n.locale.to_sym, "Discard unsaved changes?") %>"></iframe>
       </div>
     </dialog>
     <%= render "layouts/mobile_nav" %>
