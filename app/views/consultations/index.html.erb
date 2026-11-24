@@ -1,9 +1,9 @@
 <div class="container my-4 my-sm-5">
-  <header class="rc-page-hero mb-4">
+  <header class="rc-page-hero mb-4 wa-compact-banner">
     <div>
       <p class="eyebrow mb-2"><%= t("consultations.all_eyebrow") %></p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-journal-text"></i></span><h1 class="page-title mb-1"><%= t("consultations.title") %></h1></div>
-      <p class="rc-muted mb-0"><%= t("consultations.list_hint") %></p>
+      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-journal-text"></i></span><h1 class="visually-hidden"><%= t("consultations.title") %></h1></div>
+      
     </div>
     <div class="d-flex flex-wrap gap-2">
       <%= link_to rc_icon_label("calendar3", t("consultations.calendar")), root_path, class: "rc-action rc-action--quiet" %>
@@ -49,7 +49,7 @@
                      type: :submit, class: "rc-action rc-action--primary" %>
       <%= link_to rc_icon_label("arrow-counterclockwise", t("consultations.clear")), consultations_path,
                   class: "rc-action rc-action--quiet" %>
-      <p class="rc-hint mb-0"><%= t("consultations.range_hint") %></p>
+
     </div>
   <% end %>
 
@@ -63,7 +63,7 @@
     <% if @search.errors.any? %>
       <%= t("consultations.filter_invalid") %>
     <% elsif @search.total.zero? %>
-      <%= @search.filtered? ? t("consultations.no_matches") : t("consultations.none_scheduled") %>
+      <%= t("consultations.no_matches") if @search.filtered? %>
     <% else %>
       <%= t("consultations.showing", first: @search.first_result, last: @search.last_result, total: rc_count(@search.total, "calendar", "consultation")) %>
     <% end %>
