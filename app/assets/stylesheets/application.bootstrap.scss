@@ -1954,3 +1954,10 @@ html.wa-embedded-page { scrollbar-width:thin; scrollbar-color:#a7cdc5 #f4f8f8; }
 .wa-page-dialog__header > strong { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .wa-page-dialog__header > button { flex: 0 0 auto; }
 .wa-page-dialog__back:disabled { opacity: .4; cursor: default; }
+
+// F2.5.4c: compact, horizontally scrollable contextual history.
+.wa-page-dialog__shell { height: 88dvh; }
+.wa-page-dialog__page { flex: 1 1 0; min-height: 0; height: auto; }
+.wa-page-dialog__trail:not([hidden]) { display: flex; flex: 0 0 auto; align-items: center; gap: .4rem; overflow-x: auto; padding: .45rem .8rem; background: #edf8f6; border-bottom: 1px solid var(--rc-line); }
+.wa-page-dialog__crumb { flex: 0 0 auto; max-width: min(60vw, 22rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .75rem; color: var(--rc-accent); border: 1px solid var(--rc-line); background: var(--rc-paper); border-radius: .35rem; padding: .3rem .6rem; }
+.wa-page-dialog__crumb[aria-current="page"] { font-weight: 700; background: var(--rc-accent-wash); }
