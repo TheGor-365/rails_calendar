@@ -1,15 +1,9 @@
 <div class="container wa-spec-editor my-4 my-sm-5">
-  <header class="rc-page-hero mb-4">
-    <div class="rc-page-hero__content">
-      <p class="eyebrow"><%= t("intake.admin_spec_eyebrow") %></p>
-      <div class="rc-page-hero__heading">
-        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-check"></i></span>
-        <h1 class="page-title"><%= t("intake.admin_spec_title", id: @intake.id) %></h1>
-      </div>
-      <p class="rc-muted wa-spec-editor__intro"><%= t("intake.admin_spec_hint") %></p>
+  <% banner_meta = capture do %>
+    <p class="rc-muted wa-spec-editor__intro"><%= t("intake.admin_spec_hint") %></p>
       <span class="wa-spec-editor__version"><i class="bi bi-lock" aria-hidden="true"></i><%= t("spec_editor.version", version: @spec.version) %></span>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :detail, icon: "clipboard2-check", path: t("intake.admin_spec_eyebrow"), title: t("intake.admin_spec_title", id: @intake.id), extra_class: "rc-page-hero mb-4", metadata: banner_meta %>
 
   <% sections = [
     { key: "summary", group: "overview", icon: "card-text", title: t("intake.field_summary"), value: @spec.document["summary"].to_s, count: nil },
