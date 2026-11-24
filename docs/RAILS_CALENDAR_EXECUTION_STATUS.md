@@ -1,5 +1,13 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — owner feedback / F2.5.3a compact banner correction and F2.5.4 navigation contract
+
+- Owner screenshots confirm interview opens in modal from cabinet, parent URL unchanged and inner global header absent. Manual acceptance partial, not full PASS. Owner requests profile modal, compact green path headings, one small header icon, uniform banner buttons, no orphan large icon and navigable modal history.
+- First implementation commits: `4909751` setup orphan icon removal; `ecd0319` practice compact banner, hidden visual H1, quiet actions, remove snapshot notice; `989b2f9` capabilities; `3535cdb` services; `cbd1b30` both cabinet profile links use modal. No backend or database changes.
+- `7c8afe7` adds `docs/WHITE_ATLAS_CONTEXTUAL_WORKSPACE_2026-11-25.md` with route-level inventory, banner policy, one-iframe modal history/back/breadcrumb/dirty guard/redirect contract and sequence. This is not a complete rendered-page audit; remaining templates and links require inspection. History/back not implemented yet.
+- Next F2.5.3b complete template inventory and shared banner; F2.5.4 implement authoritative navigation history, back, redirect and dirty guards, role-specific and mobile tests; F2.6a email composer follows. Exact-current-SHA CI and owner acceptance pending. Local remains 83522ce5; no deployment, database mutation or paid AI.
+
+
 ## 2026-11-25 — F2.5.1 local asset build and review HTTP smoke
 
 - Owner terminal confirms exact tested checkout `83522ce5b69005fbc5e15ac5d5bc64a82e7c1aac`, Node 22.23.4/npm 10.9.9/Ruby 3.4.13 via direct runtime PATH; JS syntax, existing esbuild and Sass builds succeeded. Generated application.js 546.5 KB; git working tree clean. No dependency installation or DB commands executed.
