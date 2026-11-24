@@ -31,7 +31,7 @@ class OwnerServiceOfferingsController < ApplicationController
     count = OwnerServices::BulkApproval.new(workspace: @workspace).approve_all!(
       expected_fingerprint: params[:fingerprint]
     )
-    redirect_to owner_services_path, notice: t("owner_services.bulk_approved", count: count)
+    redirect_to owner_services_path, notice: t("owner_services.bulk_approved", count: count), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerServices::BulkApproval::Conflict, OwnerServices::Catalogue::Conflict
     redirect_to owner_services_path, alert: t("owner_services.stale")
   rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid
@@ -42,7 +42,7 @@ class OwnerServiceOfferingsController < ApplicationController
     result = OwnerServices::AutoCatalogue.new(workspace: @workspace).sync!
     redirect_to owner_services_path,
                 notice: t("owner_services.auto_sync_result", created: result.created,
-                          revised: result.revised, deferred: result.deferred)
+                          revised: result.revised, deferred: result.deferred), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid
     redirect_to owner_services_path, alert: t("owner_services.auto_sync_blocked")
   end
@@ -54,7 +54,7 @@ class OwnerServiceOfferingsController < ApplicationController
   def create
     @form_values = offering_params.to_h
     @offering = @catalogue.create_draft!(offering_params.to_h.symbolize_keys)
-    redirect_to owner_service_path(@offering), notice: t("owner_services.created")
+    redirect_to owner_service_path(@offering), notice: t("owner_services.created"), flash: { wa_dialog_outcome: "replace" }
   rescue ActiveRecord::RecordInvalid, OwnerServices::Catalogue::PolicyError,
          ActionController::ParameterMissing
     @error = t("owner_services.invalid")
@@ -88,7 +88,7 @@ class OwnerServiceOfferingsController < ApplicationController
       offering: @offering, attributes: offering_params.to_h.symbolize_keys,
       version: params[:base_version], digest: params[:base_digest]
     )
-    redirect_to owner_service_path(@offering), notice: t("owner_services.saved")
+    redirect_to owner_service_path(@offering), notice: t("owner_services.saved"), flash: { wa_dialog_outcome: "replace" }
   rescue ActiveRecord::RecordInvalid, OwnerServices::Catalogue::PolicyError,
          ActionController::ParameterMissing
     redirect_to owner_service_path(@offering), alert: t("owner_services.invalid")
@@ -101,7 +101,7 @@ class OwnerServiceOfferingsController < ApplicationController
       offering: @offering, version: params[:version], digest: params[:digest],
       confirmed: params[:confirm] == "1"
     )
-    redirect_to approval_return_path, notice: t("owner_services.approved")
+    redirect_to approval_return_path, notice: t("owner_services.approved"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerServices::Catalogue::Conflict
     redirect_to approval_return_path, alert: t("owner_services.stale")
   rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid
@@ -113,7 +113,7 @@ class OwnerServiceOfferingsController < ApplicationController
       offering: @offering, version_id: params[:version_id], digest: params[:digest],
       confirmed: params[:confirm] == "1", owner: current_user
     )
-    redirect_to owner_service_path(@offering), notice: t("owner_services.published")
+    redirect_to owner_service_path(@offering), notice: t("owner_services.published"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerServices::Catalogue::Conflict
     redirect_to owner_service_path(@offering), alert: t("owner_services.stale")
   rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid
@@ -124,7 +124,7 @@ class OwnerServiceOfferingsController < ApplicationController
     @catalogue.unpublish!(
       offering: @offering, owner: current_user, confirmed: params[:confirm] == "1"
     )
-    redirect_to owner_service_path(@offering), notice: t("owner_services.unpublished")
+    redirect_to owner_service_path(@offering), notice: t("owner_services.unpublished"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerServices::Catalogue::Conflict, OwnerServices::Catalogue::PolicyError,
          ActiveRecord::RecordInvalid
     redirect_to owner_service_path(@offering), alert: t("owner_services.stale")
@@ -132,7 +132,7 @@ class OwnerServiceOfferingsController < ApplicationController
 
   def new_revision
     @catalogue.new_revision!(offering: @offering)
-    redirect_to owner_service_path(@offering), notice: t("owner_services.revision_created")
+    redirect_to owner_service_path(@offering), notice: t("owner_services.revision_created"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerServices::Catalogue::Conflict, OwnerServices::Catalogue::PolicyError,
          ActiveRecord::RecordInvalid
     redirect_to owner_service_path(@offering), alert: t("owner_services.review_required")
