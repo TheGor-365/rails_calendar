@@ -90,15 +90,11 @@
           <div class="rc-field">
             <%= label_tag "wa-ai-brief", t("owner_ai_assistant.brief"), class: "rc-field-label" %>
             <%= text_area_tag :brief, nil, id: "wa-ai-brief", class: "rc-input rc-input--area wa-compact-input",
-                  rows: 2, data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" }, minlength: 12, maxlength: 1200, required: true,
+                  rows: 2, data: { controller: "wa-autogrow", wa_autogrow_smooth_value: true, action: "input->wa-autogrow#resize" }, minlength: 12, maxlength: 1200, required: true,
                   placeholder: t("owner_ai_assistant.placeholder") %>
             <p class="rc-hint"><%= t("owner_ai_assistant.brief_hint") %></p>
           </div>
-          <label class="wa-ai-page__consent">
-            <%= check_box_tag :paid_consent, "1", false, required: true %>
-            <span><%= t("owner_ai_assistant.consent") %></span>
-          </label>
-          <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+          <%= button_tag type: "submit", name: "paid_consent", value: "1", class: "rc-action rc-action--primary", data: { turbo_confirm: t("owner_ai_assistant.consent") } do %>
             <%= rc_icon_label("stars", t("owner_ai_assistant.generate")) %>
           <% end %>
         <% end %>
