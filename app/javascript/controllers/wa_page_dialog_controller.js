@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Only explicitly marked GET links. Server authorization is unchanged.
 // The original link is always available as a full-page fallback.
 export default class extends Controller {
-  static targets = ["dialog", "content", "fallback", "status", "heading"]
+  static targets = ["dialog", "content", "fallback", "status", "heading", "frame"]
 
   connect() {
     this.onClick = event => this.openLink(event)
@@ -32,6 +32,11 @@ export default class extends Controller {
     this.contentTarget.replaceChildren()
     this.statusTarget.hidden = false
     this.dialogTarget.showModal()
+    if (link.dataset.waPageDialog === "frame") {
+      this.frameTarget.hidden = false
+      this.frameTarget.src = url.href
+      return
+    }
     this.request = new AbortController()
     const request = this.request
     try {
@@ -66,6 +71,18 @@ export default class extends Controller {
     }
   }
 
+  frameLoaded() {
+    this.statusTarget.hidden = true
+  }
+
+  frameMissing(event) {
+    event.preventDefault()
+    this.statusTarget.hidden = true
+    this.frameTarget.hidden = true
+    this.fallbackTarget.href = event.detail.response.url
+    this.fallbackTarget.focus()
+  }
+
   cancel(event) {
     event.preventDefault()
     this.close()
@@ -92,6 +109,11 @@ export default class extends Controller {
     this.closing = false
     if (this.hasDialogTarget && this.dialogTarget.open) this.dialogTarget.close()
     if (this.hasContentTarget) this.contentTarget.replaceChildren()
+    if (this.hasFrameTarget) {
+      this.frameTarget.removeAttribute("src")
+      this.frameTarget.replaceChildren()
+      this.frameTarget.hidden = true
+    }
     if (this.opener?.isConnected) this.opener.focus({ preventScroll: true })
     this.opener = null
   }
