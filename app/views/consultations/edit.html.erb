@@ -1,10 +1,6 @@
 <div class="container my-4 my-sm-5">
   <div class="form-page">
-    <header class="mb-4">
-      <p class="eyebrow mb-2"><%= t("consultations.scheduling") %></p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-pencil-square"></i></span><h1 class="page-title mb-2"><%= t("consultations.editing") %></h1></div>
-      <p class="text-secondary mb-0"><%= t("consultations.editing_hint") %></p>
-    </header>
+    <%= render "shared/wa_banner", icon: "pencil-square", path: t("consultations.scheduling") + " / " + t("consultations.editing"), title: t("consultations.editing"), description: t("consultations.editing_hint"), extra_class: "mb-4" %>
     <section class="surface-panel" aria-label="<%= t("consultations.details_title") %>">
       <%= render "form", consultation: @consultation %>
     </section>
