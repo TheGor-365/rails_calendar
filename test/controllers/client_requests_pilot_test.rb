@@ -194,7 +194,7 @@ class ClientRequestsPilotTest < ActionDispatch::IntegrationTest
     [client_home_path, client_cabinet_path].each do |path|
       get path
       assert_response :success
-      assert_select "h1.page-title", text: I18n.t("nav.client_home")
+      assert_select "header[data-wa-banner=account] h1.visually-hidden", text: I18n.t("nav.client_home")
       assert_select "header.app-header .rc-nav-group a[href=?]", client_home_path, count: 1
       assert_select "header.app-header .rc-nav-group a[href=?]", client_cabinet_path, count: 0
       assert_select "nav.rc-mobile-dock a[href=?]", client_home_path, count: 1
