@@ -40,6 +40,7 @@
         <div class="wa-page-dialog__body">
           <p role="status" data-wa-page-dialog-target="status"><i class="bi bi-hourglass-split" aria-hidden="true"></i> …</p>
           <div data-wa-page-dialog-target="content"></div>
+          <%= turbo_frame_tag "wa-settings-frame", hidden: true, data: { wa_page_dialog_target: "frame", action: "turbo:frame-load->wa-page-dialog#frameLoaded turbo:frame-missing->wa-page-dialog#frameMissing" } %>
           <a href="#" class="rc-action rc-action--quiet" data-wa-page-dialog-target="fallback" data-turbo="false"><%= rc_icon_label("arrow-up-right", t("activity_journal.open")) %></a>
         </div>
       </div>
