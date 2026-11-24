@@ -239,16 +239,16 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_select "#owner-ai-draft-library"
       assert_select "#owner-ai-draft-library a[href=?]",
-                    owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy"), count: 1
+                    owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy", anchor: "wa-ai-result-heading"), count: 1
       assert_select "#owner-ai-draft-library", text: /FOREIGN_PRIVATE_DRAFT_NOT_VISIBLE/, count: 0
 
       get owner_ai_assistant_path(entry_id: foreign_entry.id)
       assert_response :success
       assert_select ".wa-ai-page__draft", count: 0
       assert_select "#owner-ai-draft-library a[href=?]",
-                    owner_ai_assistant_path(entry_id: foreign_entry.id, operation: "service_copy"), count: 0
+                    owner_ai_assistant_path(entry_id: foreign_entry.id, operation: "service_copy", anchor: "wa-ai-result-heading"), count: 0
 
-      get owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy")
+      get owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy", anchor: "wa-ai-result-heading")
       assert_select ".wa-ai-page__draft", text: /Owner private synthetic AI draft/
     end
   end
