@@ -1934,3 +1934,18 @@ html.wa-embedded-page { scrollbar-width:thin; scrollbar-color:#a7cdc5 #f4f8f8; }
 .wa-embedded-page #main-content { padding-bottom:0!important; }
 .wa-embedded-page .wa-services__grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); }
 @media(max-width:576px) { .wa-page-dialog {width:calc(100vw - 12px);} .wa-page-dialog__page {height:calc(88dvh - 56px);} }
+
+// F2.5.3: shared White Atlas banner contract, independent of legacy page classes.
+.wa-banner { min-width: 0; align-items: center; }
+.wa-banner__copy { flex: 1 1 14rem; min-width: 0; }
+.wa-banner__path { display: flex; align-items: baseline; gap: .45rem; flex-wrap: wrap; color: var(--rc-accent); overflow-wrap: anywhere; }
+.wa-banner__title { font-size: clamp(1rem, 2vw, 1.3rem); font-weight: 700; margin: .4rem 0 0; overflow-wrap: anywhere; }
+.wa-banner__description { margin: .5rem 0 0; }
+.wa-banner__actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.wa-banner__actions > form { margin: 0; }
+.wa-banner__actions .rc-action { max-width: 100%; white-space: normal; }
+.wa-banner--account .wa-banner__copy > .wa-banner__actions { margin: .5rem 0; }
+@media (max-width: 576px) {
+  .wa-banner__copy { flex-basis: 100%; }
+  .wa-banner__actions { max-width: 100%; }
+}
