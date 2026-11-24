@@ -94,6 +94,9 @@
                   placeholder: t("owner_ai_assistant.placeholder") %>
             <p class="rc-hint"><%= t("owner_ai_assistant.brief_hint") %></p>
           </div>
+          <% if @knowledge.service_catalogue_available_to_composer? %>
+            <label class="wa-ai-page__consent"><%= check_box_tag :include_catalogue, "1", false, id: "wa-ai-include-catalogue" %><span><%= t("owner_ai_assistant.include_catalogue") %></span></label>
+          <% end %>
           <%= button_tag type: "submit", name: "paid_consent", value: "1", class: "rc-action rc-action--primary", data: { turbo_confirm: t("owner_ai_assistant.consent") } do %>
             <%= rc_icon_label("stars", t("owner_ai_assistant.generate")) %>
           <% end %>
@@ -264,10 +267,10 @@
           <span class="wa-ai-page__icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span>
           <div>
             <p class="eyebrow"><%= t("owner_ai_assistant.knowledge_step") %></p>
-            <h2 id="wa-ai-knowledge-title"><%= t("owner_ai_assistant.knowledge_title") %></h2>
+            <h2 class="visually-hidden" id="wa-ai-knowledge-title"><%= t("owner_ai_assistant.knowledge_title") %></h2>
           </div>
         </div>
-        <p class="rc-muted"><%= t("owner_ai_assistant.knowledge_help") %></p>
+        
       </div>
       <span class="wa-ai-knowledge__access-note">
         <i class="bi bi-shield-lock" aria-hidden="true"></i>
@@ -309,7 +312,7 @@
           <p class="wa-ai-knowledge__state"><%= t("owner_ai_assistant.knowledge_services_count",
                     total: @knowledge.private_service_count,
                     approved: @knowledge.approved_service_count) %></p>
-          <p><%= t("owner_ai_assistant.knowledge_services_scope") %></p>
+          <p><%= t("owner_ai_assistant.catalogue_context_scope") %></p>
         </div>
         <%= link_to rc_icon_label("arrow-up-right", t("owner_ai_assistant.knowledge_services_link")),
                     owner_services_path, class: "rc-action rc-action--quiet rc-action--small" %>
