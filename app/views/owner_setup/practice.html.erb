@@ -6,7 +6,7 @@
         <span class="ws-owner-heading-icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></span>
         <div>
           <h1 class="page-title"><%= t("owner_setup.practice_title") %></h1>
-          <p class="rc-muted mb-0"><%= @snapshot ? t("owner_setup.profile_version", version: @snapshot.version) : t("owner_setup.not_approved") %></p>
+          <% unless @snapshot %><p class="rc-muted mb-0"><%= t("owner_setup.not_approved") %></p><% end %>
         </div>
       </div>
     </div>
@@ -23,15 +23,14 @@
   <% if @snapshot %>
     <section class="ws-owner-profile-hero">
       <div class="ws-owner-panel-top">
-        <span class="ws-owner-tag"><i class="bi bi-patch-check" aria-hidden="true"></i><%= t("owner_setup.profile_version", version: @snapshot.version) %></span>
+
         <span class="ws-owner-panel-meta"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.private_scope") %></span>
       </div>
       <h2><%= @snapshot.payload.fetch("headline") %></h2>
-      <p class="ws-owner-profile-excerpt"><%= truncate(@snapshot.payload.fetch("private_summary"), length: 320) %></p>
-      <% if @snapshot.payload.fetch("private_summary").length > 320 %>
+      <% if @snapshot.payload.fetch("private_summary").present? %>
         <details class="ws-owner-details">
           <summary><i class="bi bi-chevron-down" aria-hidden="true"></i><%= t("owner_setup.full_context") %></summary>
-          <p><%= @snapshot.payload.fetch("private_summary") %></p>
+          <ul class="ws-owner-boundaries"><% @snapshot.payload.fetch("private_summary").split(/(?<=\.)\s+(?=[A-ZА-Я])/).each do |sentence| %><li><i class="bi bi-dot" aria-hidden="true"></i><span><%= sentence %></span></li><% end %></ul>
         </details>
       <% end %>
       <div class="ws-owner-profile-actions">
@@ -92,7 +91,7 @@
           <span class="ws-owner-data-icon"><i class="bi bi-globe" aria-hidden="true"></i></span>
           <div><h3><%= t("owner_setup.public_preview") %></h3></div>
         </div>
-        <p class="ws-owner-public-draft"><%= @snapshot.payload.fetch("public_summary_draft") %></p>
+        <ul class="ws-owner-boundaries"><% @snapshot.payload.fetch("public_summary_draft").split(/(?<=\.)\s+(?=[A-ZА-Я])/).each do |sentence| %><li><i class="bi bi-dot" aria-hidden="true"></i><span><%= sentence %></span></li><% end %></ul>
         <p class="ws-owner-data-note"><i class="bi bi-lock" aria-hidden="true"></i><%= t("owner_setup.not_published") %></p>
       </section>
     </div>
