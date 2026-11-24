@@ -27,7 +27,10 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Published fictional service"
     refute_includes response.body, "PRIVATE DRAFT NEVER PUBLIC"
     assert_select ".mk-board-lane", count: 3
-    assert_select ".mk-workflow-disclaimer", text: /not an interactive board/
+    assert_select ".mk-workflow-disclaimer", count: 0
+    assert_select "dialog#process", count: 1
+    assert_select "[data-mk-open=process]", minimum: 1
+    assert_select ".mk-service-tech", count: 1
     assert_select "a.mk-service-card", count: 0
     assert_select "article.marketing-service > a[href='#contact']", count: 1
     assert_select "a[href='/sign_in']", minimum: 1
