@@ -1,9 +1,8 @@
 <div class="container ws-hub my-4 my-sm-5">
-  <header class="ws-hub-header wa-compact-banner">
-    <div><p class="eyebrow mb-2"><i class="bi bi-grid-1x2" aria-hidden="true"></i> <%= t("workspace.eyebrow") %></p>
-      <h1 class="visually-hidden"><%= t("workspace.title") %></h1></div>
-    <%= link_to rc_icon_label("inboxes", t("workspace.open_requests")), admin_project_intakes_path, class: "rc-action rc-action--primary" %>
-  </header>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("inboxes", t("workspace.open_requests")), admin_project_intakes_path, class: "rc-action rc-action--quiet" %>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "grid-1x2", path: t("workspace.eyebrow"), title: t("workspace.title"), extra_class: "ws-hub-header", actions: banner_actions %>
   <%# Approved professional identity has one home: the cabinet.
        Show this onboarding action only until its first approved snapshot. %>
   <% unless @practice_profile&.approved_snapshot %>
