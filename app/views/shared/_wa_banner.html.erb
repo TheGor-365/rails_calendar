@@ -6,7 +6,7 @@
     <p class="eyebrow wa-banner__path"><i class="bi bi-<%= icon %>" aria-hidden="true"></i> <%= path %></p>
     <h1 class="<%= banner_variant == :detail ? "wa-banner__title" : "visually-hidden" %>"><%= title %></h1>
     <% if local_assigns[:description].present? %>
-      <p class="rc-hint wa-banner__description"><%= description %></p>
+      <p class="rc-muted wa-banner__description"><%= description %></p>
     <% end %>
     <% if banner_variant == :account && local_assigns[:actions].present? %>
       <div class="wa-banner__actions"><%= actions %></div>
