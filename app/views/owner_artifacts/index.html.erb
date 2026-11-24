@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="rc-page-hero__actions">
-      <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--soft" %>
+      <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, data: { wa_page_dialog: true }, class: "rc-action rc-action--soft" %>
       <%= link_to rc_icon_label("inboxes", t("requests_hub.title")), admin_project_intakes_path, class: "rc-action rc-action--quiet" %>
     </div>
   </header>
