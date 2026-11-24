@@ -29,12 +29,12 @@ function sameParentDestination(url, parentHref) {
 function eligibleLink(link, event) {
   return link && !event.defaultPrevented && event.button === 0 &&
     !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey &&
-    !link.target && !link.hasAttribute("download") &&
-    !link.hasAttribute("data-turbo-method") && !link.hasAttribute("data-method") &&
+    !link.target && !link.hasAttribute("data-turbo-method") && !link.hasAttribute("data-method") &&
     !link.hasAttribute("data-turbo-frame")
 }
 
-function intentFor(url, currentHref, parentHref, explicitModal = false) {
+function intentFor(url, currentHref, parentHref, explicitModal = false, download = false) {
+  if (download) return "DOWNLOAD"
   if (url.origin !== location.origin) return "EXTERNAL_LINK"
   const current = new URL(currentHref)
   if (url.href === current.href || (url.pathname === current.pathname &&
@@ -85,12 +85,12 @@ export default class extends Controller {
   }
 
   openLink(event) {
-    const link = event.target.closest("a[href]")
+    const link = event.target.closest?.("a[href]")
     if (this.embedded) {
       this.embeddedClick(event, link)
       return
     }
-    if (!link?.hasAttribute("data-wa-page-dialog") ||
+    if (!link?.hasAttribute("data-wa-page-dialog") || link.hasAttribute("download") ||
         !eligibleLink(link, event) || this.dialogTarget.open) return
     const url = new URL(link.href, location.href)
     if (url.origin !== location.origin || !areaFor(url.pathname)) return
@@ -114,8 +114,8 @@ export default class extends Controller {
     if (!["http:", "https:"].includes(url.protocol)) return
     const parentHref = window.frameElement?.dataset.waParentHref
     const intent = intentFor(url, window.location.href, parentHref,
-      link.hasAttribute("data-wa-page-dialog"))
-    if (intent === "LOCAL_ACTION" || intent === "LOCAL_WORKFLOW") return
+      link.hasAttribute("data-wa-page-dialog"), link.hasAttribute("download"))
+    if (["LOCAL_ACTION", "LOCAL_WORKFLOW", "DOWNLOAD"].includes(intent)) return
 
     event.preventDefault()
     if (intent === "EXTERNAL_LINK") {
