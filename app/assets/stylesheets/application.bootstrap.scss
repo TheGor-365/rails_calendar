@@ -1921,3 +1921,16 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
 .consultation-form .wa-compact-input { min-height:3.6rem; max-height:50vh; overflow-y:auto; transition:height .2s ease; }
 @media(prefers-reduced-motion:reduce) { .consultation-form .wa-compact-input { transition:none; } }
+
+/* Full-page dialog: independent document, responsive viewport and native forms. */
+.wa-page-dialog { width:min(1440px,calc(100vw - 32px)); max-width:none; max-height:92dvh; overflow:hidden; }
+.wa-page-dialog__shell { display:flex; flex-direction:column; min-width:0; }
+.wa-page-dialog__header { flex:0 0 auto; }
+.wa-page-dialog__page { display:block; width:100%; min-width:0; height:calc(88dvh - 60px); border:0; background:#f4f8f8; }
+html.wa-embedded-page { scrollbar-width:thin; scrollbar-color:#a7cdc5 #f4f8f8; }
+.wa-embedded-page body { min-width:0; }
+.wa-embedded-page .app-header, .wa-embedded-page .mobile-nav, .wa-embedded-page #owner-ai-dock, .wa-embedded-page .skip-link { display:none!important; }
+.wa-embedded-page #main-content > .container { width:100%; max-width:100%; margin:0!important; padding:18px; }
+.wa-embedded-page #main-content { padding-bottom:0!important; }
+.wa-embedded-page .wa-services__grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); }
+@media(max-width:576px) { .wa-page-dialog {width:calc(100vw - 12px);} .wa-page-dialog__page {height:calc(88dvh - 56px);} }
