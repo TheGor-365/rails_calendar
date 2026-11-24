@@ -249,3 +249,10 @@ body.marketing-page { min-width: 320px; margin: 0; background: var(--mk-canvas);
 .rc-locale-option .bi{color:#0a766d;flex:0 0 15px}
 @media(max-width:575.98px){.rc-locale-switcher>summary{padding:.4rem .55rem}.rc-locale-options{right:0}}
 @media(prefers-reduced-motion:reduce){.rc-locale-switcher>summary,.rc-locale-option{transition:none}}
+
+/* F2: variable-size published catalogue; preserve readable cards. */
+.mk-published-catalogue { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.mk-published-catalogue .mk-service-card p { overflow-wrap: anywhere; }
+.mk-process-order { flex-shrink: 0; white-space: nowrap; }
+@media (max-width: 900px) { .mk-published-catalogue { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 560px) { .mk-published-catalogue { grid-template-columns: 1fr; } }
