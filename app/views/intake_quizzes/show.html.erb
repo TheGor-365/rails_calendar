@@ -1,16 +1,10 @@
 <div class="container my-4 my-sm-5">
-  <header class="rc-page-hero mb-3">
-    <div class="rc-page-hero__content">
-      <p class="eyebrow"><%= t("quiz.eyebrow") %></p>
+  <% banner_meta = capture do %>
     <p class="rc-muted"><%= t("quiz.step", step: @position + 1, total: @questions.size) %></p>
-    <div class="rc-page-hero__heading">
-      <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-ui-checks-grid"></i></span>
-      <h1 class="page-title"><%= rc_quiz_question_title(@question) %></h1>
-    </div>
-    <p class="rc-hint mt-2"><%= t("quiz.hint") %></p>
-    </div>
-    <span class="rc-status-pill"><i class="bi bi-shield-check" aria-hidden="true"></i><%= t("quiz.private") %></span>
-  </header>
+<p class="rc-hint mt-2"><%= t("quiz.hint") %></p>
+<span class="rc-status-pill"><i class="bi bi-shield-check" aria-hidden="true"></i><%= t("quiz.private") %></span>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :detail, icon: "ui-checks-grid", path: t("quiz.eyebrow"), title: rc_quiz_question_title(@question), extra_class: "rc-page-hero mb-4", metadata: banner_meta %>
 
   <%= render "progress", questions: @questions, saved_answers: @saved_answers, current_key: @question.fetch(:key) %>
 
