@@ -95,6 +95,50 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
       bounds = page.evaluate_script("({page:document.documentElement.scrollWidth,viewport:innerWidth})")
       assert_operator bounds["page"], :<=, bounds["viewport"] + 1
     end
+    # F2: explicitly save discovery, reload, then submit the same canonical
+    # intake. The custom selects retain their native form values.
+    page.driver.browser.manage.window.resize_to(1440, 900)
+    note = "Synthetic client requirement: preserve the submitted form."
+    fill_in "scope-business_goal", with: note
+    %w[title project_type goal].each do |key|
+      page.execute_script(<<~JS, key)
+        const field = document.getElementById("fact_review_" + arguments[0]);
+        field.value = "confirmed";
+        field.dispatchEvent(new Event("change", { bubbles: true }));
+      JS
+    end
+    click_button "Save changes"
+    assert_text "Draft saved."
+    assert_current_path edit_client_request_path(intake)
+    assert_equal note, intake.reload.latest_scope_revision.answers.fetch("business_goal").fetch("text")
+    visit edit_client_request_path(intake)
+    assert_field "scope-business_goal", with: note
+    assert_equal 0, intake.client_message_count
+    click_button "Send request for review"
+    assert_current_path client_request_path(intake)
+    assert_equal 1, intake.reload.client_message_count
+    assert intake.client_request_invitation.reload.submitted_at
+    assert_equal [version.id], intake.selected_service_offering_versions.pluck(:id)
+    assert_equal 1, client.client_project_intakes.count
+    assert_equal 0, AiSpendEntry.count
+
+    # The owner sees the submitted request, not merely the pre-claim proposal.
+    click_button "Sign out"
+    visit sign_in_path
+    fill_in "Email address", with: owner.email
+    fill_in "Password", with: PASSWORD
+    click_button "Sign in"
+    assert_current_path workspace_path
+    visit admin_project_intakes_path(view: "incoming")
+    assert_selector ".wa-requests__record--unread", text: intake.title
+    within(".wa-requests__record--unread", text: intake.title) do
+      find("summary").click
+      find("a[href='#{project_intake_path(intake)}']").click
+    end
+    assert_current_path project_intake_path(intake)
+    assert_equal 0, AiSpendEntry.count
+    visit admin_project_intakes_path(view: "incoming")
+    assert_no_selector ".wa-requests__record--unread", text: intake.title
   ensure
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
