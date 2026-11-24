@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.4d interactive cabinet settings (implementation, not accepted)
+
+- Added two cabinet banner actions, retained avatar, desktop rail/aside offset to align with profile card. Exact alignment still needs visual acceptance.
+- Three settings links now opt into a dedicated Turbo Frame inside the shared animated dialog. Setup, review, practice, capabilities and AI journal templates render frame wrappers only for frame requests; standalone routes remain available. Existing forms and authorization remain server-controlled. Flash messages rendered in frame. No new provider calls or database writes performed by assistant.
+- Known remaining QA: frame redirects after PATCH/POST, missing-frame fallback, close during pending fetch/submission, focus, stale cabinet metrics after changes, no-JS standalone flow, mobile layout and regression tests. Do not claim full interactive acceptance. Existing paid consent and approval guards unchanged.
+- Previous exact 23c1a0a CI 45468392995 and Security 45468392993 were queued when checked. Latest CI not verified. Local last confirmed 0244c89 PID 847858. Next verify CI and add frame regression tests, then F2.4e six-stage public workflow and compact contact UI. No deployment or migration.
+
+---
+
 ## 2026-11-24 — F2.4c shared read-only page dialogs (partial)
 
 - Exact c36d257 Security 45459394545 PASS; CI 45459394654 failed 1 of 517 integration tests: saved AI draft history href changed by the intended result anchor. Corrected owner and foreign href assertions in 95e5c47; do not claim new CI PASS.
