@@ -1,5 +1,8 @@
 # MASTER PROMPT — Rails Calendar / AI Service Workspace — продолжение до production MVP
 
+
+> **ВАЖНО, 24.11.2026:** это исторический общий master (исходный checkpoint 21.11). **Актуальный готовый handoff**, подтверждённые GitHub SHA/CI, скриншоты 400px, новая IA и последовательность F0→F5 находятся в [`RAILS_CALENDAR_MVP_CONTINUATION_MASTER_2026-11-24.md`](RAILS_CALENDAR_MVP_CONTINUATION_MASTER_2026-11-24.md). Для следующего чата используй **новый файл**, но прежде обязательно прочитай live [`RAILS_CALENDAR_EXECUTION_STATUS.md`](RAILS_CALENDAR_EXECUTION_STATUS.md) сверху и проверь HEAD/CI/production заново. Не воспроизводи устаревшие инструкции о checkout 21.11 и ручном сервере :3002.
+
 > **Этот документ предназначен для вставки целиком в новый ChatGPT-чат.** Он сам по себе не является актуальным статусом. Каждый новый чат начинает с live GitHub, а не с предположения, что записи от 21.11.2026 всё ещё последние.
 
 ## Твоя роль и KPI
