@@ -117,6 +117,22 @@ class ClientServiceSelectionTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "catalogue link preselects only a currently published service without writing" do
+    login(@client)
+    get services_path
+    assert_select "article.marketing-service a[href=?]", new_client_request_path(service_version_id: @version.id)
+    assert_no_difference("ProjectIntake.count") do
+      get new_client_request_path(service_version_id: @version.id)
+      assert_response :success
+      assert_select "input[name='service_version_ids[]'][checked]", count: 1
+      assert_select "input[name='service_version_ids[]'][value=?][checked]", @version.id.to_s
+      @offering.update!(published_version: nil)
+      get new_client_request_path(service_version_id: @version.id)
+      assert_response :success
+      assert_select "input[name='service_version_ids[]'][checked]", count: 0
+    end
+  end
+
   private
 
   def published_offering(workspace, capability, title)
