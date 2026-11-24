@@ -88,8 +88,8 @@ export default class extends Controller {
       this.onCommitted = () => this.reportCommittedPage()
       document.addEventListener("turbo:load", this.onCommitted)
       // A server-rendered invalid consultation remains an unsaved draft.
-      const invalidForm = document.querySelector("#consultation-form-errors")?.closest("form")
-      if (invalidForm) this.dirtyForms.add(invalidForm)
+      const invalidForms = document.querySelectorAll("form[data-wa-invalid-draft=true], form:has(#consultation-form-errors)")
+      for (const form of invalidForms) this.dirtyForms.add(form)
       this.publishFormState()
       this.reportCommittedPage()
     } else {
