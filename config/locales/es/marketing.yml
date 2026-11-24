@@ -81,3 +81,6 @@ es:
     contact_warning: "No envíes tokens, contraseñas, bases de datos privadas ni documentos personales en el primer mensaje."
     contact_kwork: "Escribir por Kwork"
     contact_note: "Las solicitudes se gestionan en plataformas externas según sus reglas. La recepción interna de datos de clientes sigue desactivada."
+    close_dialog: "Cerrar"
+    technologies: "Tecnologías"
+    technology_on_request: "Tecnologías por acordar durante la evaluación"
