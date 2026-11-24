@@ -84,3 +84,23 @@ en:
     close_dialog: "Close"
     technologies: "Technologies"
     technology_on_request: "Technology stack agreed during assessment"
+    workflow_stages:
+      request:
+        title: "Request"
+        description: "Choose a service or describe your task."
+      clarify:
+        title: "Discovery"
+        description: "Discuss requirements and necessary materials."
+      proposal:
+        title: "Proposal"
+        description: "Agree on scope, cost and timing."
+      specification:
+        title: "Specification"
+        description: "Document requirements and acceptance criteria."
+      build:
+        title: "Development"
+        description: "Implement agreed changes and test the result."
+      delivery:
+        title: "Acceptance and delivery"
+        description: "Review the result and hand over materials."
+    workflow_availability: "These stages describe the collaboration process; online features depend on the current service version."
