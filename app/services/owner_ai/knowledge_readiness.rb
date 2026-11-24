@@ -1,6 +1,6 @@
 module OwnerAi
   # RC055.1f C2.0: A read-only, owner-scoped inventory of information the
-  # assistant may actually use. This is deliberately NOT a retrieval adapter.
+  # assistant may actually use.
   # Private service drafts, attachments and customer records remain excluded.
   class KnowledgeReadiness
     def initialize(workspace:)
@@ -52,7 +52,7 @@ module OwnerAi
     end
 
     def service_catalogue_available_to_composer?
-      false
+      CatalogueContext.new(workspace: @workspace).entries.any?
     end
   end
 end
