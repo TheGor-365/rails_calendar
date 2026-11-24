@@ -256,3 +256,12 @@ body.marketing-page { min-width: 320px; margin: 0; background: var(--mk-canvas);
 .mk-process-order { flex-shrink: 0; white-space: nowrap; }
 @media (max-width: 900px) { .mk-published-catalogue { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 560px) { .mk-published-catalogue { grid-template-columns: 1fr; } }
+
+/* F2.1: compact disclosures and native dialog. */
+.mk-process-dialog { width: min(720px, calc(100% - 32px)); max-height: 85vh; overflow: auto; border: 1px solid var(--mk-line); border-radius: 20px; padding: 24px; color: inherit; background: white; box-shadow: var(--mk-shadow-raised); }
+.mk-process-dialog::backdrop { background: rgba(15,39,45,.42); }
+.mk-process-dialog .mk-process { grid-template-columns: 1fr; }
+.mk-footer-disclosure { margin-top: 20px; }
+.mk-footer-disclosure summary { cursor: pointer; font-size: .8rem; color: var(--mk-subtle); }
+@supports selector(details::details-content) { @supports (interpolate-size: allow-keywords) { .mk-footer-disclosure { interpolate-size: allow-keywords; } .mk-footer-disclosure::details-content { block-size: 0; overflow: clip; opacity: 0; transition: block-size .24s ease, opacity .2s ease, content-visibility .24s allow-discrete; } .mk-footer-disclosure[open]::details-content { block-size: auto; opacity: 1; } } }
+@media (prefers-reduced-motion: reduce) { .mk-footer-disclosure::details-content { transition: none; } }
