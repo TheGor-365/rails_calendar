@@ -394,6 +394,24 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
   end
 
 
+
+  test "invalid interview submission retains text and allowed choices without writing" do
+    login(@owner)
+    allowed = OwnerIntelligence::Catalog.options_for("A").keys.first
+    notes = "Synthetic invalid interview note"
+    assert_no_difference ["OwnerInterviewAnswer.count", "OwnerInterviewAnswerRevision.count", "AiSpendEntry.count"] do
+      patch owner_setup_section_path(section_key: "A"), params: {
+        owner_answer: { notes: notes, selected_options: [allowed, "invalid_test_option"] }
+      }
+      assert_response :unprocessable_entity
+      assert_select "form[data-wa-invalid-draft='true']", count: 1
+      assert_select "textarea#owner_notes", text: notes
+      assert_select "input[type=checkbox][value=?][checked]", allowed, count: 1
+      assert_select "main[data-wa-dialog-outcome='advance']", count: 0
+    end
+    assert_equal "approved", @profile.reload.onboarding_state
+  end
+
   private
 
   def create_saved_draft(profile, draft)
