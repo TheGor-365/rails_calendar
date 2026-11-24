@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2.1 commercial presentation / profile UI
+
+- Exact 17c40df CI 45409651194 SUCCESS and Security 45409650828 SUCCESS. Owner terminal confirms local detached checkout 17c40df, assets PASS, verified review DB, Puma PID 728783 :3003. Screenshot of public static landing is :3002 (old server), not evidence of current catalogue failure. Other screenshots show owner catalogue nine services, cabinet, setup/review and approved profile v2 with v1 retained. Owner performed profile approval; no inference of new paid call.
+- Owner requests compact public showcase, actual catalogue, client-oriented products and technology disclosures, active navigation, process dialog, developer footer disclosure and compact profile. Commits 0421c0a through 1a8c62d implement first package: compact cabinet rail, RU labels, structured answer lists and private summary bullets, budget details, remove duplicate version banners, public process dialog + external JS, footer developer details, dynamic published catalogue technology disclosure, explicit named submit buttons instead of separate consent/approval checkboxes (server still requires consent params; paid transfer explanation retained), preserve prior unsure flag on setup.
+- Technology labels are currently curated by stable auto-service key, not a live projection of approved capability data; public product copy still uses published service title/summary/scope. Do not claim full client-oriented capability synchronization. New catalogue UI and modal unverified in browser. Public header/section click state is partial; scroll/hash synchronization and compact footer contact layout remain. Other locales and legacy system tests need review. No private snapshot fields exposed to guests, no automatic profile/service republish, no paid call/deploy/migration by assistant.
+- Next: inspect exact HEAD CI and fix stale UI assertions; verify current :3003/services (not :3002), then build reviewed customer-facing capability/product projection linked to approved service versions, with no private data leak and no unsupported stack claims. F2 browser acceptance remains open; F3 next after gates.
+
+---
+
 ## 2026-11-24 — F2 CI diagnostic and browser publication contract
 
 - Exact 0ba863d566b71115df98bfb81dceeaeb739c14e5: Security Audit 45408812350 SUCCESS; Rails CI 45408812945 FAILURE solely in browser job. Model/controller tests 517 runs / 7974 assertions / 0 failures / 0 errors / 0 skips. PG18 schema and deployed-baseline synthetic upgrade jobs SUCCESS. Browser suite 55 runs / 942 assertions / 1 failure / 0 errors / 0 skips.
