@@ -283,7 +283,7 @@ export default class extends Controller {
     if (data.intent === "CLOSE_TO_PARENT") {
       if (sameParentDestination(url, this.pageTarget.dataset.waParentHref)) this.close()
     } else if (data.intent === "REPLACE_MODAL") {
-      if (areaFor(url.pathname) && this.allowDeparture()) this.replacePage(url, data.title || this.headingTarget.textContent)
+      if (!this.navigationPending && areaFor(url.pathname) && this.allowDeparture()) this.replacePage(url, data.title || this.headingTarget.textContent)
     } else {
       this.close(() => window.location.assign(url.href))
     }
@@ -300,6 +300,7 @@ export default class extends Controller {
     try {
       if (this.pageKey(new URL(this.pageTarget.contentWindow.location.href)) !== this.pageKey(url)) return
     } catch (_) { return }
+    this.clearNavigationTimer()
     const source = this.pageTarget.dataset.waMutationSource
     const outcome = source && ["advance", "replace"].includes(data.outcome) ? data.outcome : ""
     if (outcome) {
@@ -374,7 +375,7 @@ export default class extends Controller {
   }
 
   jumpTo(index) {
-    if (!this.dialogTarget.open || this.closing || this.pendingRestore ||
+    if (!this.dialogTarget.open || this.closing || this.navigationPending ||
         !this.stack || index < 0 || index >= this.stack.length - 1) return
     if (!this.allowDeparture()) return
     const entry = this.stack[index]
@@ -384,10 +385,32 @@ export default class extends Controller {
 
   replacePage(url, title) {
     // The committed document, not a clicked link, becomes a history entry.
+    this.clearNavigationTimer()
+    this.navigationPending = true
     this.headingTarget.textContent = title
     this.pageTarget.title = title
     if (this.hasBackButtonTarget) this.backButtonTarget.disabled = true
+    if (this.hasTrailTarget) this.trailTarget.querySelectorAll("button").forEach(button => { button.disabled = true })
+    this.navigationTimer = window.setTimeout(() => {
+      this.navigationPending = false
+      this.pendingRestore = null
+      this.navigationTimer = null
+      if (!this.dialogTarget.open) return
+      const last = this.stack?.at(-1)
+      if (last) {
+        this.headingTarget.textContent = last.title
+        this.pageTarget.title = last.title
+      }
+      if (this.hasBackButtonTarget) this.backButtonTarget.disabled = (this.stack?.length || 0) < 2
+      this.renderTrail()
+    }, 15000)
     this.pageTarget.src = url.href
+  }
+
+  clearNavigationTimer() {
+    if (this.navigationTimer != null) window.clearTimeout(this.navigationTimer)
+    this.navigationTimer = null
+    this.navigationPending = false
   }
 
   back() {
@@ -441,6 +464,7 @@ export default class extends Controller {
 
   reset() {
     this.closing = false
+    this.clearNavigationTimer()
     if (this.hasDialogTarget && this.dialogTarget.open) this.dialogTarget.close()
     if (this.hasPageTarget) {
       this.pageTarget.src = "about:blank"
@@ -450,6 +474,7 @@ export default class extends Controller {
       delete this.pageTarget.dataset.waMutationSource
     }
     if (this.opener?.isConnected) this.opener.focus({ preventScroll: true })
+    else if (this.opener) document.getElementById("main-content")?.focus({ preventScroll: true })
     if (this.parentScroll && (window.scrollX !== this.parentScroll.x ||
         window.scrollY !== this.parentScroll.y)) {
       window.scrollTo(this.parentScroll.x, this.parentScroll.y)
