@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="robots" content="noindex,nofollow">
     <meta name="theme-color" content="#ffffff">
-    <% if %w[advance replace].include?(flash[:wa_dialog_outcome]) %>
-      <meta name="wa-dialog-outcome" content="<%= flash[:wa_dialog_outcome] %>">
-    <% end %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -25,7 +22,7 @@
       <%= render "layouts/nav" %>
     </header>
 
-    <main id="main-content" class="pb-5" tabindex="-1">
+    <main id="main-content" class="pb-5" tabindex="-1" data-wa-dialog-outcome="<%= flash[:wa_dialog_outcome] if %w[advance replace].include?(flash[:wa_dialog_outcome]) %>">
       <% if notice.present? %>
         <p class="container rc-notice rc-notice--success mt-3" role="status"><%= notice %></p>
       <% end %>
