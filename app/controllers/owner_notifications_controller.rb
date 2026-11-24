@@ -19,12 +19,12 @@ class OwnerNotificationsController < ApplicationController
     return head :not_found unless event
 
     Activity::Inbox.mark_read!(owner: current_user, event: event)
-    redirect_to Activity::Presenter.display(event)[:path], status: :see_other
+    redirect_to Activity::Presenter.display(event)[:path], status: :see_other, flash: { wa_dialog_outcome: "advance" }
   end
 
   def read_all
     Activity::Inbox.mark_all_read!(owner: current_user)
-    redirect_to owner_notifications_path, notice: t("notifications.all_read"), status: :see_other
+    redirect_to owner_notifications_path, notice: t("notifications.all_read"), status: :see_other, flash: { wa_dialog_outcome: "replace" }
   end
 
   private
