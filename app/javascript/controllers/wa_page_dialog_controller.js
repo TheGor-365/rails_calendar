@@ -74,12 +74,20 @@ export default class extends Controller {
 
     if (this.embedded) {
       document.documentElement.classList.add("wa-embedded-page")
+      this.dirtyForms = new Set()
+      this.pendingForms = new Set()
+      this.onEdit = event => this.trackEdit(event)
+      this.onSubmitStart = event => this.trackSubmitStart(event)
+      this.element.addEventListener("input", this.onEdit, true)
+      this.element.addEventListener("change", this.onEdit, true)
+      document.addEventListener("turbo:submit-start", this.onSubmitStart)
       this.beforeVisit = event => this.embeddedVisit(event)
       this.afterSubmit = event => this.embeddedSubmit(event)
       document.addEventListener("turbo:before-visit", this.beforeVisit)
       document.addEventListener("turbo:submit-end", this.afterSubmit)
       this.onCommitted = () => this.reportCommittedPage()
       document.addEventListener("turbo:load", this.onCommitted)
+      this.publishFormState()
       this.reportCommittedPage()
     } else {
       this.onMessage = event => this.receiveMessage(event)
@@ -91,6 +99,9 @@ export default class extends Controller {
     this.element.removeEventListener("click", this.onClick)
     document.removeEventListener("turbo:before-cache", this.beforeCache)
     if (this.embedded) {
+      this.element.removeEventListener("input", this.onEdit, true)
+      this.element.removeEventListener("change", this.onEdit, true)
+      document.removeEventListener("turbo:submit-start", this.onSubmitStart)
       document.removeEventListener("turbo:before-visit", this.beforeVisit)
       document.removeEventListener("turbo:submit-end", this.afterSubmit)
       document.removeEventListener("turbo:load", this.onCommitted)
@@ -148,15 +159,60 @@ export default class extends Controller {
     if (url.origin !== location.origin) return
     const intent = intentFor(url, window.location.href,
       window.frameElement?.dataset.waParentHref)
-    if (intent === "LOCAL_ACTION" || intent === "LOCAL_WORKFLOW") return
+    if (intent === "LOCAL_ACTION") return
+    if (intent === "LOCAL_WORKFLOW") {
+      if (!this.allowEmbeddedDeparture()) event.preventDefault()
+      return
+    }
     event.preventDefault()
     this.notifyParent(intent, url)
   }
 
+  mutationForm(form) {
+    return form instanceof HTMLFormElement && form.method.toLowerCase() !== "get"
+  }
+
+  trackEdit(event) {
+    const field = event.target
+    if (!field?.matches?.("input, textarea, select") || !this.mutationForm(field.form)) return
+    if (["hidden", "submit", "button", "reset"].includes(field.type)) return
+    this.dirtyForms.add(field.form)
+    this.publishFormState()
+  }
+
+  trackSubmitStart(event) {
+    if (!this.mutationForm(event.target)) return
+    this.pendingForms.add(event.target)
+    this.publishFormState()
+  }
+
+  publishFormState() {
+    const frame = window.frameElement
+    if (!frame) return
+    frame.dataset.waDirty = String(this.dirtyForms.size > 0)
+    frame.dataset.waSubmitting = String(this.pendingForms.size > 0)
+  }
+
+  allowEmbeddedDeparture() {
+    if (this.pendingForms.size > 0) return false
+    if (!this.dirtyForms.size) return true
+    return window.confirm(window.frameElement?.dataset.waDiscardMessage || "Discard unsaved changes?")
+  }
+
+  allowDeparture() {
+    const frame = this.pageTarget
+    if (frame.dataset.waSubmitting === "true") return false
+    if (frame.dataset.waDirty !== "true") return true
+    return window.confirm(frame.dataset.waDiscardMessage || "Discard unsaved changes?")
+  }
+
   embeddedSubmit(event) {
     const form = event.target
-    if (!event.detail?.success || !(form instanceof HTMLFormElement) ||
-        form.method.toLowerCase() === "get") return
+    if (!this.mutationForm(form)) return
+    this.pendingForms.delete(form)
+    if (event.detail?.success) this.dirtyForms.delete(form)
+    this.publishFormState()
+    if (!event.detail?.success) return
     // Only a successfully completed Turbo mutation can refresh parent projections.
     window.parent.postMessage({ type: "wa:dialog-write", path: location.pathname }, location.origin)
   }
@@ -190,13 +246,14 @@ export default class extends Controller {
     if (data?.type !== "wa:dialog-navigation" ||
         !["CLOSE_TO_PARENT", "REPLACE_MODAL", "NAVIGATE_PARENT"].includes(data.intent)) return
     if (typeof data.href !== "string") return
-    const url = new URL(data.href, location.href)
+    let url
+    try { url = new URL(data.href, location.href) } catch (_) { return }
     if (url.origin !== location.origin || !["http:", "https:"].includes(url.protocol)) return
 
     if (data.intent === "CLOSE_TO_PARENT") {
       if (sameParentDestination(url, this.pageTarget.dataset.waParentHref)) this.close()
     } else if (data.intent === "REPLACE_MODAL") {
-      if (areaFor(url.pathname)) this.replacePage(url, data.title || this.headingTarget.textContent)
+      if (areaFor(url.pathname) && this.allowDeparture()) this.replacePage(url, data.title || this.headingTarget.textContent)
     } else {
       this.close(() => window.location.assign(url.href))
     }
@@ -248,6 +305,7 @@ export default class extends Controller {
 
   back() {
     if (!this.dialogTarget.open || this.closing || !this.stack || this.stack.length < 2) return
+    if (!this.allowDeparture()) return
     const previous = this.stack[this.stack.length - 2]
     // Explicit GET only; never use iframe browser history which may replay a form.
     this.replacePage(new URL(previous.href), previous.title)
@@ -283,7 +341,7 @@ export default class extends Controller {
   backdrop(event) { if (event.target === this.dialogTarget) this.close() }
 
   close(afterClose) {
-    if (!this.dialogTarget.open || this.closing) return
+    if (!this.dialogTarget.open || this.closing || !this.allowDeparture()) return
     this.closing = true
     const finish = () => {
       this.reset()
@@ -303,6 +361,8 @@ export default class extends Controller {
     if (this.hasPageTarget) {
       this.pageTarget.src = "about:blank"
       delete this.pageTarget.dataset.waParentHref
+      delete this.pageTarget.dataset.waDirty
+      delete this.pageTarget.dataset.waSubmitting
     }
     if (this.opener?.isConnected) this.opener.focus({ preventScroll: true })
     if (this.parentScroll && (window.scrollX !== this.parentScroll.x ||
