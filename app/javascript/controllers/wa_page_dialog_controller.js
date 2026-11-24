@@ -20,6 +20,18 @@ const MODAL_AREAS = [
 
 const areaFor = path => MODAL_AREAS.find(([, pattern]) => pattern.test(path))?.[0]
 
+// Explicit authenticated download endpoints. Leave their normal browser behavior
+// intact so Content-Disposition and Rails authorization remain authoritative.
+const DOWNLOAD_PATHS = [
+  /^\/workspace\/activity\/\d+\.txt$/,
+  /^\/workspace\/library\/[^/]+\/\d+\.txt$/,
+  /^\/workspace\/assistant\/conversations\/\d+\/messages\/\d+\/files\/\d+$/,
+  /^\/workspace\/services\/\d+\/media\/\d+\/file$/,
+  /^\/workspace\/avatar\/\d+$/,
+  /^\/client\/avatar\/\d+$/
+]
+const isDownload = path => DOWNLOAD_PATHS.some(pattern => pattern.test(path))
+
 function sameParentDestination(url, parentHref) {
   if (!parentHref) return false
   const parent = new URL(parentHref)
@@ -34,7 +46,7 @@ function eligibleLink(link, event) {
 }
 
 function intentFor(url, currentHref, parentHref, explicitModal = false, download = false) {
-  if (download) return "DOWNLOAD"
+  if (download || isDownload(url.pathname)) return "DOWNLOAD"
   if (url.origin !== location.origin) return "EXTERNAL_LINK"
   const current = new URL(currentHref)
   if (url.href === current.href || (url.pathname === current.pathname &&
