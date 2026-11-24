@@ -143,7 +143,15 @@ export default class extends Controller {
     const parentHref = window.frameElement?.dataset.waParentHref
     const intent = intentFor(url, window.location.href, parentHref,
       link.hasAttribute("data-wa-page-dialog"), link.hasAttribute("download"))
-    if (["LOCAL_ACTION", "LOCAL_WORKFLOW", "DOWNLOAD"].includes(intent)) return
+    if (["LOCAL_ACTION", "DOWNLOAD"].includes(intent)) return
+    if (intent === "LOCAL_WORKFLOW" && link.getAttribute("data-turbo") !== "false" &&
+        !link.closest('[data-turbo="false"]')) return
+    // Ordinary non-Turbo GET links use the same parent navigation guard.
+    if (intent === "LOCAL_WORKFLOW") {
+      event.preventDefault()
+      this.notifyParent("REPLACE_MODAL", url, this.linkTitle(link))
+      return
+    }
 
     event.preventDefault()
     if (intent === "EXTERNAL_LINK") {
