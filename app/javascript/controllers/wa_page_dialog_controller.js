@@ -62,7 +62,7 @@ function intentFor(url, currentHref, parentHref, explicitModal = false, download
 // Same-origin full pages retain their own forms, CSRF, Turbo and controllers.
 // Navigation is coordinated only for a document inside the explicitly marked iframe.
 export default class extends Controller {
-  static targets = ["dialog", "heading", "page", "backButton"]
+  static targets = ["dialog", "heading", "page", "backButton", "trail"]
 
   connect() {
     this.embedded = window.parent !== window &&
@@ -86,6 +86,8 @@ export default class extends Controller {
       document.addEventListener("turbo:before-visit", this.beforeVisit)
       document.addEventListener("turbo:submit-end", this.afterSubmit)
       this.onCommitted = () => this.reportCommittedPage()
+      this.onScroll = () => this.reportScroll()
+      window.addEventListener("scroll", this.onScroll, { passive: true })
       document.addEventListener("turbo:load", this.onCommitted)
       // A server-rendered invalid consultation remains an unsaved draft.
       const invalidForms = document.querySelectorAll("form[data-wa-invalid-draft=true], form:has(#consultation-form-errors)")
@@ -108,6 +110,7 @@ export default class extends Controller {
       document.removeEventListener("turbo:before-visit", this.beforeVisit)
       document.removeEventListener("turbo:submit-end", this.afterSubmit)
       document.removeEventListener("turbo:load", this.onCommitted)
+      window.removeEventListener("scroll", this.onScroll)
     } else {
       window.removeEventListener("message", this.onMessage)
       this.reset()
@@ -242,6 +245,12 @@ export default class extends Controller {
     }, location.origin)
   }
 
+  reportScroll() {
+    window.parent.postMessage({
+      type: "wa:dialog-scroll", href: location.href, x: window.scrollX, y: window.scrollY
+    }, location.origin)
+  }
+
   notifyParent(intent, url, title = "") {
     window.parent.postMessage({
       type: "wa:dialog-navigation", intent, href: url.href, title
@@ -252,6 +261,14 @@ export default class extends Controller {
     if (!this.hasPageTarget || !this.hasDialogTarget || !this.dialogTarget.open ||
         event.origin !== location.origin || event.source !== this.pageTarget.contentWindow) return
     const data = event.data
+    if (data?.type === "wa:dialog-scroll") {
+      const current = this.stack?.at(-1)
+      if (current && data.href === current.href && !this.pendingRestore &&
+          Number.isFinite(data.x) && Number.isFinite(data.y)) {
+        current.scroll = { x: Math.max(0, data.x), y: Math.max(0, data.y) }
+      }
+      return
+    }
     if (data?.type === "wa:dialog-committed") {
       this.acceptCommittedPage(data)
       return
@@ -312,13 +329,57 @@ export default class extends Controller {
     this.stack ||= []
     const key = this.pageKey(url)
     const existing = this.stack.findIndex(entry => entry.key === key)
-    const entry = { key, href: url.href, title: title || this.headingTarget.textContent || document.title }
+    const entry = { key, href: url.href, title: title || this.headingTarget.textContent || document.title,
+      scroll: existing >= 0 ? this.stack[existing].scroll : { x: 0, y: 0 } }
     if (existing >= 0) this.stack.splice(existing, this.stack.length - existing, entry)
     else this.stack.push(entry)
     if (this.stack.length > 40) this.stack.shift()
     this.headingTarget.textContent = entry.title
     this.pageTarget.title = entry.title
     if (this.hasBackButtonTarget) this.backButtonTarget.disabled = this.stack.length < 2
+    this.renderTrail()
+    const restore = this.pendingRestore
+    if (restore) {
+      this.pendingRestore = null
+      if (restore.key === key) {
+        const frame = this.pageTarget.contentWindow
+        frame.requestAnimationFrame(() => {
+          try {
+            if (this.dialogTarget.open && this.pageKey(new URL(frame.location.href)) === key) {
+              frame.scrollTo(restore.scroll.x, restore.scroll.y)
+            }
+          } catch (_) {}
+        })
+      }
+    }
+  }
+
+  renderTrail() {
+    if (!this.hasTrailTarget) return
+    this.trailTarget.replaceChildren()
+    this.trailTarget.hidden = !this.stack?.length || this.stack.length < 2
+    if (this.trailTarget.hidden) return
+    this.stack.forEach((entry, index) => {
+      const current = index === this.stack.length - 1
+      const item = document.createElement(current ? "span" : "button")
+      item.className = "wa-page-dialog__crumb"
+      item.textContent = entry.title
+      if (current) item.setAttribute("aria-current", "page")
+      else {
+        item.type = "button"
+        item.addEventListener("click", () => this.jumpTo(index))
+      }
+      this.trailTarget.append(item)
+    })
+  }
+
+  jumpTo(index) {
+    if (!this.dialogTarget.open || this.closing || this.pendingRestore ||
+        !this.stack || index < 0 || index >= this.stack.length - 1) return
+    if (!this.allowDeparture()) return
+    const entry = this.stack[index]
+    this.pendingRestore = { key: entry.key, scroll: entry.scroll || { x: 0, y: 0 } }
+    this.replacePage(new URL(entry.href), entry.title)
   }
 
   replacePage(url, title) {
@@ -330,11 +391,8 @@ export default class extends Controller {
   }
 
   back() {
-    if (!this.dialogTarget.open || this.closing || !this.stack || this.stack.length < 2) return
-    if (!this.allowDeparture()) return
-    const previous = this.stack[this.stack.length - 2]
     // Explicit GET only; never use iframe browser history which may replay a form.
-    this.replacePage(new URL(previous.href), previous.title)
+    this.jumpTo((this.stack?.length || 0) - 2)
   }
 
   // Refresh only explicitly marked, read-only summary projections, not the whole
@@ -399,6 +457,8 @@ export default class extends Controller {
     this.opener = null
     this.parentScroll = null
     this.stack = []
+    this.pendingRestore = null
+    this.renderTrail()
     if (this.hasBackButtonTarget) this.backButtonTarget.disabled = true
   }
 }
