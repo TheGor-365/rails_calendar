@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.3b.2 operational banner migration and CI corrections
+
+- Previous exact HEAD b22b653 CI run 45498017433: 520 runs / 7884 assertions / 5 failures, security and both PG18 jobs passed. Fixed missing rc-muted description style and updated two obsolete presentation selectors without dropping content/privacy checks (9a7d436, 32ef631, ca016c8). Follow-up exact e19d2c2 CI queued when checked; green not yet established.
+- Previous slice migrated consultation show/edit and client request new/edit (four templates, total 23). Current slice migrated another 14 templates: calendar home/day/hour; consultation index/new; client request show; owner admin intake index/edit_spec; owner requirements; intake quiz show/review; outbox health; project intake new/show. Total 37 templates now call shared White Atlas banner. Retained date/time tags, day summary refresh marker, time zones, record titles, version/status metadata, role conditional actions and quiz progress. Updated localized owner navigation test selector at 786d096. No backend/schema changes.
+- Remaining: exact-SHA integration/browser CI, inspect any selector/layout regressions, public/auth/invite landing template audit (do not remove essential marketing or verification headings), manual review of responsive banners. F2.5.4 history/back/redirect/dirty guard implementation still pending. Local review remains 83522ce5; no merge/deploy, DB changes or paid AI. See WHITE_ATLAS_CONTEXTUAL_WORKSPACE_2026-11-25.md.
+
+
 ## 2026-11-25 — F2.5.3b shared White Atlas banner implementation (first migration group)
 
 - Shared `app/views/shared/_wa_banner.html.erb` supports standard, detail and account variants, translated compact path with single small icon, semantic H1, optional description/metadata/actions/accessory. Shared responsive styling added to application.bootstrap.scss. Detail variants retain object title, account variants preserve avatar editor and private metadata.
