@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.1 local asset build and review HTTP smoke
+
+- Owner terminal confirms exact tested checkout `83522ce5b69005fbc5e15ac5d5bc64a82e7c1aac`, Node 22.23.4/npm 10.9.9/Ruby 3.4.13 via direct runtime PATH; JS syntax, existing esbuild and Sass builds succeeded. Generated application.js 546.5 KB; git working tree clean. No dependency installation or DB commands executed.
+- Verified Puma config includes `plugin :tmp_restart`. Owner requested restart by touching isolated review tmp/restart.txt, then HTTP GET / on 127.0.0.1:3003 returned 200. Listener remained ruby PID 962459; separate :3002 remained PID 45565. This proves request and HTTP availability, not independently verified restart completion or updated browser asset behavior.
+- F2.5.1 manual owner acceptance remains pending: cabinet modal, contextual transitions, parent return and focus, mobile shell, consultation flow. Next step browser screenshots after hard reload. F2.5.3 and F2.6a remain subsequent slices. No production deploy, migration or paid AI invocation performed in this local smoke.
+
+
 ## 2026-11-25 — F2.5.2 exact-SHA CI PASS / isolated review checkout confirmed
 
 - Exact code/checkpoint SHA `83522ce5b69005fbc5e15ac5d5bc64a82e7c1aac`: Rails CI run 45493000913 SUCCESS; integration 519 runs / 8017 assertions, system/browser 57 runs / 983 assertions, zero failures/errors/skips in both. PG18 schema and upgrade-from-deployed jobs SUCCESS. Security Audit run 45493000853 SUCCESS.
