@@ -1,23 +1,17 @@
 <div class="container wa-client-request my-4 my-sm-5">
-  <header class="rc-page-hero mb-4">
-    <div class="rc-page-hero__content">
-      <p class="eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("client_requests.eyebrow") %></p>
-      <div class="rc-page-hero__heading">
-        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-kanban"></i></span>
-        <h1 class="page-title"><%= @intake.title %></h1>
-      </div>
-      <div class="wa-client-request__meta">
+  <% banner_meta = capture do %>
+    <div class="wa-client-request__meta">
         <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= rc_intake_type(@intake.project_type) %></span>
         <span class="rc-status-pill"><i class="bi bi-circle-half" aria-hidden="true"></i><%= rc_intake_status(@intake.status) %></span>
         <% if @spec %>
           <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-file-earmark-check" aria-hidden="true"></i><%= t("client_requests.spec_version", version: @spec.version) %></span>
         <% end %>
       </div>
-      <div class="rc-page-hero__actions mt-3">
-        <%= link_to rc_icon_label("arrow-left", t("client_requests.back")), client_home_path, class: "rc-action rc-action--quiet rc-action--small" %>
-      </div>
-    </div>
-  </header>
+  <% end %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("arrow-left", t("client_requests.back")), client_home_path, class: "rc-action rc-action--quiet rc-action--small" %>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :detail, icon: "kanban", path: t("client_requests.eyebrow"), title: @intake.title, extra_class: "rc-page-hero mb-4", metadata: banner_meta, actions: banner_actions %>
 
   <% if @invitation %>
     <section class="surface-panel p-3 p-sm-4 mb-3" aria-label="<%= t('e2.owner_seed_title') %>">
