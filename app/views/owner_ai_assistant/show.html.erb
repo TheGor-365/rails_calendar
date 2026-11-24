@@ -23,9 +23,7 @@
     <a href="#owner-ai-draft-library" class="wa-ai-page__wayfinder-link" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate">
       <i class="bi bi-archive" aria-hidden="true"></i><%= t("owner_ai_assistant.section_library") %>
     </a>
-    <%= link_to owner_services_path, class: "wa-ai-page__wayfinder-link wa-ai-page__wayfinder-link--external" do %>
-      <%= rc_icon_label("arrow-up-right", t("owner_ai_assistant.section_services")) %>
-    <% end %>
+
   </nav>
   <div class="wa-ai-page__screen-body">
 
@@ -92,7 +90,7 @@
             <%= text_area_tag :brief, nil, id: "wa-ai-brief", class: "rc-input rc-input--area wa-compact-input",
                   rows: 2, data: { controller: "wa-autogrow", wa_autogrow_smooth_value: true, action: "input->wa-autogrow#resize" }, minlength: 12, maxlength: 1200, required: true,
                   placeholder: t("owner_ai_assistant.placeholder") %>
-            <p class="rc-hint"><%= t("owner_ai_assistant.brief_hint") %></p>
+            <p class="rc-hint">12–1200</p>
           </div>
           <% if @knowledge.service_catalogue_available_to_composer? %>
             <label class="wa-ai-page__consent"><%= check_box_tag :include_catalogue, "1", false, id: "wa-ai-include-catalogue" %><span><%= t("owner_ai_assistant.include_catalogue") %></span></label>
@@ -115,7 +113,7 @@
         <span class="wa-ai-page__icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
         <div>
           <p class="eyebrow"><%= t("owner_ai_assistant.control") %></p>
-          <h2 id="wa-ai-scope"><%= t("owner_ai_assistant.data_heading") %></h2>
+          <h2 class="visually-hidden" id="wa-ai-scope"><%= t("owner_ai_assistant.data_heading") %></h2>
         </div>
       </div>
       <p><%= t("owner_ai_assistant.data_policy") %></p>
