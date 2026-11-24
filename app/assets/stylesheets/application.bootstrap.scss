@@ -1781,3 +1781,101 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
 // Private owner event history, traceable to canonical records.
 @import 'wa_activity_journal';
+
+
+// C2.5f — White Atlas bidirectional disclosure motion.
+// Native state and accessibility remain authoritative. Discrete transitions
+// keep outgoing content painted until the fade/height transition completes.
+// Older engines retain the original immediate native behavior.
+:root {
+  --wa-menu-enter: 240ms;
+  --wa-menu-exit: 200ms;
+  --wa-menu-ease: cubic-bezier(.22,.74,.24,1);
+}
+
+@supports selector(details::details-content) {
+  @supports (transition-behavior: allow-discrete) {
+    // Floating disclosures must not interpolate height or clip their panels.
+    // The details-content box retains native visibility semantics.
+    details:is(.wa-requests__more, .wa-threads__more, .rc-locale-switcher,
+      .wa-calendar-create-menu__details, .wa-ai-dock)::details-content {
+      opacity: 0;
+      transition: opacity var(--wa-menu-exit) ease-in,
+        content-visibility var(--wa-menu-exit) allow-discrete;
+    }
+    details:is(.wa-requests__more, .wa-threads__more, .rc-locale-switcher,
+      .wa-calendar-create-menu__details, .wa-ai-dock)[open]::details-content {
+      opacity: 1;
+      transition-duration: var(--wa-menu-enter);
+      transition-timing-function: var(--wa-menu-ease);
+    }
+    details:is(.wa-requests__more, .wa-threads__more, .rc-locale-switcher,
+      .wa-calendar-create-menu__details, .wa-ai-dock):not([open]) > :not(summary) {
+      pointer-events: none;
+    }
+    // Disable old one-way keyframes on the calendar menu.
+    .wa-calendar .wa-calendar-create-menu__items { animation: none; }
+    @supports (interpolate-size: allow-keywords) {
+      details:not([data-controller~="wa-accordion"]):not(:is(.wa-requests__more,
+        .wa-threads__more, .rc-locale-switcher, .wa-calendar-create-menu__details, .wa-ai-dock)) {
+        interpolate-size: allow-keywords;
+      }
+      details:not([data-controller~="wa-accordion"]):not(:is(.wa-requests__more,
+        .wa-threads__more, .rc-locale-switcher, .wa-calendar-create-menu__details, .wa-ai-dock))::details-content {
+        block-size: 0;
+        overflow: clip;
+        opacity: 0;
+        transition: block-size var(--wa-menu-exit) var(--wa-menu-ease),
+          opacity var(--wa-menu-exit) ease-in,
+          content-visibility var(--wa-menu-exit) allow-discrete;
+      }
+      details:not([data-controller~="wa-accordion"]):not(:is(.wa-requests__more,
+        .wa-threads__more, .rc-locale-switcher, .wa-calendar-create-menu__details, .wa-ai-dock))[open]::details-content {
+        block-size: auto;
+        opacity: 1;
+        transition-duration: var(--wa-menu-enter);
+      }
+      .wa-requests .wa-requests__detail,
+      .ws-avatar-edit-panel, .wa-invite-artifact-recover__body { animation: none; }
+    }
+  }
+}
+
+// Bootstrap menus retain their Popper positioning transform. Never animate it.
+// The custom select's hidden attribute and native popover top layer remain
+// authoritative; display/overlay transitions delay only their visual removal.
+@supports (transition-behavior: allow-discrete) {
+  .dropdown-menu, .rc-select-menu, .wa-calendar-slot-menu {
+    opacity: 0;
+    transition: opacity var(--wa-menu-exit) ease-in,
+      display var(--wa-menu-exit) allow-discrete;
+  }
+  .wa-calendar-slot-menu {
+    transition: opacity var(--wa-menu-exit) ease-in,
+      display var(--wa-menu-exit) allow-discrete,
+      overlay var(--wa-menu-exit) allow-discrete;
+  }
+  .dropdown-menu.show, .rc-select-menu:not([hidden]), .wa-calendar-slot-menu:popover-open {
+    opacity: 1;
+    transition-duration: var(--wa-menu-enter);
+    transition-timing-function: var(--wa-menu-ease);
+  }
+  .wa-calendar-slot-menu:popover-open { animation: none; }
+  .dropdown-menu:not(.show), .rc-select-menu[hidden],
+  .wa-calendar-slot-menu:not(:popover-open) { pointer-events: none; }
+  @starting-style {
+    .dropdown-menu.show, .rc-select-menu:not([hidden]), .wa-calendar-slot-menu:popover-open {
+      opacity: 0;
+    }
+  }
+}
+.wa-requests .wa-requests__more > summary .bi-chevron-down,
+.rc-locale-switcher > summary .bi-chevron-down { transition: transform var(--wa-menu-enter) var(--wa-menu-ease); }
+.wa-requests .wa-requests__more[open] > summary .bi-chevron-down,
+.rc-locale-switcher[open] > summary .bi-chevron-down { transform: rotate(180deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  details::details-content, .dropdown-menu, .rc-select-menu, .wa-calendar-slot-menu {
+    transition: none !important;
+  }
+}
