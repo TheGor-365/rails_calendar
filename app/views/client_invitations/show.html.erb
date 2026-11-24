@@ -1,14 +1,5 @@
 <div class="container wa-e2-entry my-4 my-sm-5">
-  <header class="rc-page-hero wa-e2-entry__hero mb-4">
-    <div class="rc-page-hero__content">
-      <p class="eyebrow"><%= t("e2.guest_eyebrow") %></p>
-      <div class="rc-page-hero__heading">
-        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-stars"></i></span>
-        <h1 class="page-title"><%= t("e2.preview_title") %></h1>
-      </div>
-      <p class="rc-muted"><%= t("e2.preview_public") %></p>
-    </div>
-  </header>
+  <%= render "shared/wa_banner", variant: :detail, icon: "stars", path: t("e2.guest_eyebrow"), title: t("e2.preview_title"), description: t("e2.preview_public"), extra_class: "rc-page-hero mb-4 wa-e2-entry__hero" %>
   <% if @invitation.nil? || %i[invalid expired revoked already_claimed services_changed].include?(@state) ||
         (@invitation.claimed_at.present? && (!client_signed_in? || @invitation.claimed_by_user_id != current_user.id)) %>
     <section class="surface-panel p-3 p-sm-4">
