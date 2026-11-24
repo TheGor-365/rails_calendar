@@ -37,12 +37,7 @@
           <strong id="wa-page-dialog-title" data-wa-page-dialog-target="heading"></strong>
           <button type="button" class="rc-action rc-action--quiet" aria-label="<%= t("marketing.close_dialog") %>" data-action="wa-page-dialog#close"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
         </header>
-        <div class="wa-page-dialog__body">
-          <p role="status" data-wa-page-dialog-target="status"><i class="bi bi-hourglass-split" aria-hidden="true"></i> …</p>
-          <div data-wa-page-dialog-target="content"></div>
-          <%= turbo_frame_tag "wa-settings-frame", hidden: true, data: { wa_page_dialog_target: "frame", action: "turbo:frame-load->wa-page-dialog#frameLoaded turbo:frame-missing->wa-page-dialog#frameMissing" } %>
-          <a href="#" class="rc-action rc-action--quiet" data-wa-page-dialog-target="fallback" data-turbo="false"><%= rc_icon_label("arrow-up-right", t("activity_journal.open")) %></a>
-        </div>
+        <iframe class="wa-page-dialog__page" src="about:blank" title="<%= t("activity_journal.open") %>" data-wa-embedded-page data-wa-page-dialog-target="page"></iframe>
       </div>
     </dialog>
     <%= render "layouts/mobile_nav" %>
