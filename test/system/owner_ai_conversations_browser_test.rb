@@ -89,4 +89,67 @@ class OwnerAiConversationsBrowserTest < ApplicationSystemTestCase
     assert_current_path client_home_path
     assert_no_text "SYNTHETIC OWNER PRIVATE CHAT"
   end
+
+  test "renaming and reversible trash preserve free history without spending" do
+    owner = make_test_owner("owner-chat-lifecycle-#{SecureRandom.hex(5)}@example.test")
+    owner.create_owner_workspace!
+    visit sign_in_path
+    fill_in "Email address", with: owner.email
+    fill_in "Password", with: PASSWORD
+    click_button "Sign in"
+    assert_current_path workspace_path
+    visit owner_ai_conversations_path
+    within(".wa-threads__new-form") { find("button[type='submit']").click }
+    assert_selector ".wa-threads__composer"
+    conversation = owner.owner_workspace.owner_ai_conversations.order(:id).last
+    assert conversation
+    note = "Synthetic free lifecycle note"
+    within(".wa-threads__composer") do
+      fill_in "wa-thread-body", with: note
+      find("button[name='intent'][value='note']").click
+    end
+    assert_selector ".wa-threads__message-body", text: note
+    assert_equal note, conversation.reload.title
+    row = ".wa-threads__list-row[data-wa-thread-title-conversation-id-value='#{conversation.id}']"
+    within(row) do
+      find(".wa-threads__more summary").click
+      find("button[data-action='wa-thread-title#edit']").click
+      field = find("input[name='title']")
+      field.set("Cancelled title")
+      field.send_keys(:escape)
+      assert_selector "[data-wa-thread-title-target='label']", text: note
+      find(".wa-threads__more summary").click
+      find("button[data-action='wa-thread-title#edit']").click
+      field = find("input[name='title']")
+      field.set("Renamed synthetic conversation")
+      field.send_keys(:enter)
+      assert_selector "[data-wa-thread-title-target='label']", text: "Renamed synthetic conversation"
+    end
+    assert_selector "[data-wa-thread-title-current-id='#{conversation.id}']", text: "Renamed synthetic conversation"
+    visit owner_ai_conversation_path(conversation)
+    assert_selector "[data-wa-thread-title-current-id='#{conversation.id}']", text: "Renamed synthetic conversation"
+    assert_selector ".wa-threads__message-body", text: note
+    within(row) do
+      find(".wa-threads__more summary").click
+      accept_confirm do
+        find("form[action='#{remove_owner_ai_conversation_path(conversation)}'] button").click
+      end
+    end
+    assert_current_path owner_ai_conversations_path
+    assert_selector ".wa-threads__trash"
+    assert_equal "removed", conversation.reload.state
+    assert_equal 1, conversation.owner_ai_messages.count
+    find(".wa-threads__trash > summary").click
+    within(row) do
+      find(".wa-threads__more summary").click
+      find("form[action='#{restore_owner_ai_conversation_path(conversation)}'] button").click
+    end
+    assert_selector ".wa-threads__composer"
+    assert_selector ".wa-threads__message-body", text: note
+    assert_equal "active", conversation.reload.state
+    assert_equal "Renamed synthetic conversation", conversation.title
+    assert_equal 1, conversation.owner_ai_messages.count
+    assert_equal 0, AiSpendEntry.count
+  end
+
 end
