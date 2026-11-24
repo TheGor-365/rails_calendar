@@ -101,7 +101,7 @@
     </nav>
     <section class="ws-account-main">
       <div class="ws-account-section-heading" id="cabinet-profile">
-        <div><p class="eyebrow"><%= t("account_hub.profile_eyebrow") %></p><h2><%= t("account_hub.professional_profile") %></h2></div>
+        <div><p class="eyebrow"><%= t("account_hub.profile_eyebrow") %></p><h2 class="visually-hidden"><%= t("account_hub.professional_profile") %></h2></div>
         <%= link_to rc_icon_label("arrow-up-right", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet rc-action--small" %>
       </div>
       <div class="ws-account-feature">
@@ -117,7 +117,7 @@
       </div>
 
       <div class="ws-account-section-heading ws-account-section-heading--later" id="cabinet-tools">
-        <div><p class="eyebrow"><%= t("account_hub.tools_eyebrow") %></p><h2><%= t("account_hub.owner_tools") %></h2></div>
+        <div><p class="eyebrow"><%= t("account_hub.tools_eyebrow") %></p><h2 class="visually-hidden"><%= t("account_hub.owner_tools") %></h2></div>
       </div>
       <div class="ws-account-link-grid">
         <%# Identity and account settings only: operational areas have canonical homes. %>
