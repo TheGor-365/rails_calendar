@@ -265,6 +265,53 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     ENV["XAI_API_KEY"] = old_key
   end
 
+  test "explicit catalogue opt-in sends only current published fields to mocked provider" do
+    catalogue = OwnerServices::Catalogue.new(workspace: @workspace)
+    offering = catalogue.create_draft!(service_fields(@profile.professional_capabilities.first, title: "Consented public service"))
+    draft = offering.draft_version
+    catalogue.approve!(offering: offering, version: draft.version, digest: draft.digest, confirmed: true)
+    approved = offering.reload.approved_version
+    catalogue.publish!(offering: offering, version_id: approved.id, digest: approved.digest, confirmed: true, owner: @owner)
+    catalogue.create_draft!(service_fields(@profile.professional_capabilities.first, title: "SECRET_DRAFT_NOT_SENT"))
+    response = Struct.new(:code, :body).new("200", JSON.generate(
+      status: "completed", id: "provider-catalogue-synthetic",
+      output: [{ type: "message", content: [{ type: "output_text", text: JSON.generate(
+        heading: "Synthetic catalogue draft", draft: "Review the published service before confirming the task.",
+        questions: [], cautions: [], next_step: "Owner reviews."
+      ) }] }],
+      usage: { input_tokens: 120, output_tokens: 180, total_tokens: 300, cost_in_usd_ticks: 120_000 }
+    ))
+    payloads = []
+    http = Object.new
+    http.define_singleton_method(:request) { |request| payloads << JSON.parse(request.body); response }
+    old_key = ENV["XAI_API_KEY"]
+    ENV["XAI_API_KEY"] = "xai-fictional-catalogue-test"
+    login(@owner)
+    OwnerIntelligence::Grok.stub(:enabled?, true) do
+      IntakeAiQuota.stub(:reserve_call!, true) do
+        Net::HTTP.stub(:start, ->(*_args, **_kwargs, &block) { block.call(http) }) do
+          assert_no_difference("AiSpendEntry.count") do
+            post create_owner_ai_draft_path, params: { operation: "service_copy", brief: "Review the fictional service catalogue.", include_catalogue: "1" }
+          end
+          assert_empty payloads
+          assert_difference("AiSpendEntry.count", 1) do
+            assert_no_difference("ServiceOfferingVersion.count") do
+              post create_owner_ai_draft_path, params: { operation: "service_copy", brief: "Review the fictional service catalogue.", include_catalogue: "1", paid_consent: "1" }
+            end
+          end
+        end
+      end
+    end
+    assert_equal 1, payloads.size
+    source = JSON.parse(payloads.first.fetch("input").last.fetch("content"))
+    assert_equal [{ "title" => approved.title, "summary" => approved.summary, "included_scope" => approved.included_scope, "delivery_mode" => approved.delivery_mode, "version" => approved.version }], source.fetch("published_service_catalogue")
+    refute_includes JSON.generate(source), "SECRET_DRAFT_NOT_SENT"
+    refute_includes JSON.generate(source), approved.excluded_scope
+    assert_equal "settled", @profile.ai_spend_entries.order(:id).last.status
+  ensure
+    ENV["XAI_API_KEY"] = old_key
+  end
+
   test "owner sees only their saved AI draft history and review GET never bills" do
     owner_entry = create_saved_draft(@profile, "Owner private synthetic AI draft")
     foreign_entry = create_saved_draft(@foreign_profile, "FOREIGN_PRIVATE_DRAFT_NOT_VISIBLE")
