@@ -1,5 +1,11 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.4b.3 expanded explicit HTML mutation outcomes
+
+- Starting HEAD 0dc6773: Rails CI 45512785604 and Security Audit 45512785576 queued; no newer green gate. Expanded explicit outcome markers on 34 successful HTML redirect branches across nine controllers: owner capabilities (4, 826c587), services (8, 410b92d), setup (2, 4a58578), invitations (3, 1e8c193), notifications (2, 71c26e0), AI assistant (2, 5a9cf75), AI conversations (7, 07e1ce0), catalogue AI (3, 7bf70a0), service media (3, 57bad6a). Notifications individual read uses advance; others replace. Existing consent, authorization, persistence, error branches and JSON response formats unchanged.
+- This is code-only expansion, not runtime acceptance. Requirements controller inspected but not instrumented because its routes are not currently in the modal allowlist. AI replay, partial-success alerts, native submissions, Turbo Frames/Streams, stale mutation source, validation input retention and unknown destination handling remain to audit. Explicit markers alone do not prove the browser consumes them correctly. Next prioritize exact-SHA CI and focused browser coverage, then repair failed form retention and implement breadcrumb/scroll. Local review remains 83522ce5; no production deploy, merge, review database operations or paid AI invocations.
+
+
 ## 2026-11-25 — F2.5.4b.2 explicit mutation outcome pilot
 
 - Starting exact HEAD dedf27e had Rails CI 45512439108 and Security Audit 45512439218 queued. No newer green result established. ApplicationController supports EN/RU/HY/ES, not DE; corrected navigation/discard translations at e3a4529.
