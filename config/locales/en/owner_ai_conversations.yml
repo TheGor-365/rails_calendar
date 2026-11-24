@@ -1,9 +1,9 @@
 en:
   owner_ai_conversations:
-    eyebrow: "WHITE ATLAS / PRIVATE THREADS"
+    eyebrow: "WORKSPACE / CONVERSATIONS"
     title: "My AI conversations"
-    intro: "Private conversation history. A real paid Grok response is available only with per-turn consent."
-    back: "Back to AI Workspace"
+    intro: "Save notes for free or ask Grok with separate consent for each paid request."
+    back: "Back to AI assistant"
     privacy: "Text is stored in your workspace's private database. Do not paste passwords, documents, or others' personal information. Encryption and automatic deletion are not claimed here."
     conversation_list: "Conversations"
     new_heading: "New conversation"
@@ -58,7 +58,7 @@ en:
     paid_budget_notice: "Each call reserves $0.10 from the pilot budget. Actual provider billing may differ. Uncertain charges are never retried automatically."
     consent_required: "Explicit consent is required for each paid AI turn. Nothing was sent."
     ai_disabled: "Grok is not configured or enabled. Free private notes remain available."
-    ai_ready: "Real Grok reply and billed cost saved."
+    ai_ready: "Grok reply and cost saved."
     ai_failed: "No confirmed AI reply. Check the message status and spend ledger; never retry an uncertain charge."
     ai_busy: "A prior AI request is pending or has uncertain billing. New paid turns are blocked until reconciliation."
     replayed: "This form was already processed; no second call or charge."
@@ -66,7 +66,7 @@ en:
     billed: "Confirmed xAI charge: $%{amount}"
     suggestions: "Suggested next actions (not performed):"
     roles:
-      owner: "Owner"
+      owner: "You"
       assistant: "Assistant"
     states:
       draft: "Stored text"
