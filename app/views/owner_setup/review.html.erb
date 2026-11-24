@@ -1,11 +1,9 @@
 <% settings_content = capture do %>
 <div class="container ws-owner-page ws-owner-review my-4 my-sm-5" id="owner-setup-review">
-  <header class="ws-owner-hero">
-    <div class="ws-owner-hero-copy"><p class="eyebrow"><i class="bi bi-clipboard2-check" aria-hidden="true"></i> <%= t("owner_setup.eyebrow") %></p>
-    <h1 class="page-title"><%= t("owner_setup.review_title") %></h1>
-    </div>
-    <div class="ws-owner-hero-actions"><%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %></div>
-  </header>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "clipboard2-check", path: t("owner_setup.eyebrow") + " / " + t("owner_setup.review_title"), title: t("owner_setup.review_title"), extra_class: "ws-owner-hero", actions: banner_actions %>
   <div class="ws-owner-review-layout">
     <section class="ws-owner-review-answers" aria-label="<%= t('owner_setup.answer_review_label') %>">
       <div class="ws-owner-data-panel">
