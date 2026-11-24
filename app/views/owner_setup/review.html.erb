@@ -2,7 +2,7 @@
   <header class="ws-owner-hero">
     <div class="ws-owner-hero-copy"><p class="eyebrow"><i class="bi bi-clipboard2-check" aria-hidden="true"></i> <%= t("owner_setup.eyebrow") %></p>
     <h1 class="page-title"><%= t("owner_setup.review_title") %></h1>
-    <p class="rc-muted"><%= t("owner_setup.review_intro") %></p></div>
+    </div>
     <div class="ws-owner-hero-actions"><%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %></div>
   </header>
   <div class="ws-owner-review-layout">
@@ -16,7 +16,13 @@
               <strong><%= t("owner_setup.steps.#{key}.short") %></strong>
               <%= link_to rc_icon_label("pencil-square", t("owner_setup.edit")), owner_setup_path(step: key), class: "ws-owner-inline-link" %>
             </div>
-            <p class="mb-1"><%= answer.selected_options.map { |v| t("owner_setup.options.#{key}.#{v}", default: OwnerIntelligence::Catalog.options_for(key)[v]) }.join(", ").presence || t("owner_setup.no_options") %></p>
+            <% if answer.selected_options.any? %>
+              <ul class="list-unstyled mt-2 mb-2">
+                <% answer.selected_options.each do |value| %>
+                  <li class="d-flex align-items-start gap-2 mb-1"><i class="bi bi-check2 text-success" aria-hidden="true"></i><span><%= t("owner_setup.options.#{key}.#{value}", default: OwnerIntelligence::Catalog.options_for(key)[value]) %></span></li>
+                <% end %>
+              </ul>
+            <% else %><p class="rc-hint"><%= t("owner_setup.no_options") %></p><% end %>
             <% if answer.notes.present? %><p class="rc-hint mb-1"><%= answer.notes %></p><% end %>
             <% if answer.unsure? %><small><%= t("owner_setup.unsure_tag") %></small><% end %>
           </div>
@@ -53,7 +59,7 @@
             <% end %>
           <% end %>
         <% end %>
-        <p class="rc-hint mb-0"><%= t("owner_setup.budget", spent: format("%.5f", @spend[:billed_ticks].to_f / AiSpendLedger::USD_TICKS), cap: format("%.2f", @spend[:cap_ticks].to_f / AiSpendLedger::USD_TICKS)) %></p>
+        <details class="ws-owner-details"><summary><i class="bi bi-wallet2" aria-hidden="true"></i> <%= t("account_hub.ai_spending") %></summary><p class="rc-hint"><%= t("owner_setup.budget", spent: format("%.5f", @spend[:billed_ticks].to_f / AiSpendLedger::USD_TICKS), cap: format("%.2f", @spend[:cap_ticks].to_f / AiSpendLedger::USD_TICKS)) %></p></details>
       </div>
 
       <div class="ws-owner-data-panel ws-owner-review-approval" id="owner-profile-approval">
