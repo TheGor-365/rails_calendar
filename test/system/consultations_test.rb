@@ -62,8 +62,13 @@ class ConsultationsTest < ApplicationSystemTestCase
       find("a.calendar-day-link[href*='2023-01-19']").click
       assert_current_path calendar_day_path(date: "2023-01-19")
       find("#hour-22 a.rc-time-axis-link").click
-      assert_current_path calendar_hour_path(date: "2023-01-19", hour: 22)
-      assert_link @consultation.title
+      assert_current_path calendar_day_path(date: "2023-01-19")
+      assert_selector "dialog.wa-page-dialog[open]"
+      within_frame(find("iframe[data-wa-embedded-page]")) do
+        assert_selector "h1", text: "22:00"
+        assert_link @consultation.title
+        assert_no_link "Add consultation"
+      end
     end
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
@@ -408,12 +413,18 @@ class ConsultationsTest < ApplicationSystemTestCase
     assert_no_link "Add consultation"
 
     find("a.rc-hour-band[href*='hour=22']").click
-    assert_current_path calendar_hour_path(date: "2023-01-19", hour: 22)
-    assert_selector "h1", text: "22:00"
-    assert_link @consultation.title
+    assert_current_path calendar_day_path(date: "2023-01-19")
+    assert_selector "dialog.wa-page-dialog[open]"
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "h1", text: "22:00"
+      assert_link @consultation.title
+      assert_no_link "Add consultation"
 
-    click_on @consultation.title
-    assert_current_path consultation_path(@consultation)
+      click_on @consultation.title
+      assert_selector "h1", text: "Consultation details"
+      assert_text @consultation.title
+    end
+    assert_current_path calendar_day_path(date: "2023-01-19")
   end
 
   test "long consultation renders once per day and neighboring hours stay clickable" do
@@ -431,27 +442,40 @@ class ConsultationsTest < ApplicationSystemTestCase
     # The large event intentionally covers the band; the left time axis
     # provides an independent click target for its interval.
     find("#hour-12 a.rc-time-axis-link").click
-    assert_current_path calendar_hour_path(date: "2023-01-19", hour: 12)
-    assert_link "Long support session"
+    assert_current_path calendar_day_path(date: "2023-01-19")
+    assert_selector "dialog.wa-page-dialog[open]"
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "h1", text: "12:00"
+      assert_link "Long support session"
+      click_on "Back to day"
+    end
+    assert_no_selector "dialog.wa-page-dialog[open]"
+    assert_current_path calendar_day_path(date: "2023-01-19")
+    assert_selector "article#event-#{long_event.id}", count: 1
   end
 
   test "administrator manually creates a consultation from a selected time interval" do
     sign_in_as_admin
     visit calendar_day_url(date: "2026-11-06")
     find("a.rc-hour-band[href*='hour=9']").click
+    assert_current_path calendar_day_path(date: "2026-11-06")
+    assert_selector "dialog.wa-page-dialog[open]"
 
-    assert_current_path calendar_hour_path(date: "2026-11-06", hour: 9)
-    click_on "Add consultation"
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "h1", text: "09:00"
+      click_on "Add consultation"
 
-    assert_selector "h1", text: "New consultation"
-    assert_field "Start time", with: /2026-11-06T09:00/
-    assert_field "End time", with: /2026-11-06T10:00/
+      assert_selector "h1", text: "New consultation"
+      assert_field "Start time", with: /2026-11-06T09:00/
+      assert_field "End time", with: /2026-11-06T10:00/
 
-    fill_in "Title", with: "Project kickoff"
-    click_on "Create Consultation"
-
-    assert_text "Consultation was successfully created"
-    assert_text "Project kickoff"
+      fill_in "Title", with: "Project kickoff"
+      click_on "Create Consultation"
+      assert_text "Consultation was successfully created"
+      assert_text "Project kickoff"
+    end
+    assert_current_path calendar_day_path(date: "2026-11-06")
+    assert Consultation.exists?(title: "Project kickoff")
   end
 
   private
