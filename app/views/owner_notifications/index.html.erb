@@ -1,12 +1,12 @@
 <div class="container wa-activity-journal my-4 my-sm-5">
-  <header class="rc-page-hero mb-4">
+  <header class="rc-page-hero mb-4 wa-compact-banner">
     <div class="rc-page-hero__content">
       <p class="eyebrow"><%= t("notifications.eyebrow") %></p>
       <div class="rc-page-hero__heading">
         <span class="rc-page-hero__symbol"><i class="bi bi-bell" aria-hidden="true"></i></span>
-        <h1 class="page-title"><%= t("notifications.title") %></h1>
+        <h1 class="visually-hidden"><%= t("notifications.title") %></h1>
       </div>
-      <p class="rc-muted"><%= t("notifications.description") %></p>
+      
     </div>
     <div class="d-flex flex-wrap gap-2">
       <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--quiet" %>
