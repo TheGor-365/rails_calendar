@@ -22,11 +22,13 @@ class MarketingControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "html[lang='en']", count: 1
     assert_select "body.marketing-page", count: 1
-    assert_select "h1", text: /Web tasks/
+    assert_select ".mk-compact-banner h1", count: 1
     assert_select "section#services article.marketing-service", count: 1
     assert_includes response.body, "Published fictional service"
     refute_includes response.body, "PRIVATE DRAFT NEVER PUBLIC"
-    assert_select ".mk-board-lane", count: 3
+    assert_select ".mk-board-lane", count: 0
+    assert_select "dialog#process .mk-process > li", count: 6
+    assert_select "dialog#process header button[data-mk-close=process]", count: 1
     assert_select ".mk-workflow-disclaimer", count: 0
     assert_select "dialog#process", count: 1
     assert_select "[data-mk-open=process]", minimum: 1
