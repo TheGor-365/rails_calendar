@@ -1,5 +1,15 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F1 lifecycle browser coverage
+
+- F0 accepted by owner for continuation, not exhaustive manual QA. No new manual conversation screenshot or review DB write supplied in this turn.
+- Inspected current OwnerAiConversationsController, OwnerAiConversation, inline title controller and existing integration/browser tests. Existing implementation covers private owner-scoped conversations, persisted FREE notes, idempotent UUIDs, paid consent/ledger, archive/restore/remove. Existing browser tests cover creation, notes, reload, archive/restore, mobile overflow and client denial. Do not rebuild these features.
+- F1 commit 720ef9578e9ba821c879e94f3a3d6d928cf2d08e adds synthetic browser regression for automatic title, Escape cancellation, manual rename via Enter, persisted title after reload, reversible trash/restore, intact note and zero AiSpendEntry rows. Tests are for isolated CI/test DB only, no paid provider call; newly added case has not yet passed CI.
+- Prior C2.5g SHA 96800b0d2f7b9efd09c9e8e8f58d128fdea36f59 workflows were queued at inspection (Rails CI 45301722885, Security 45301722924). Check exact latest HEAD before acceptance; do not equate prior ce869e3 success with new code.
+- Next: verify latest CI and Security, update only isolated local checkout from ce869e3 and restart guarded :3003 server. Read-only conversation screen first; existing review database identity is known but disposability is not established. Manual synthetic note write requires explicit permission; otherwise use CI synthetic browser evidence. Then F2. No production changes.
+
+---
+
 ## 2026-11-24 — owner UI accepted for continuation; C2.5g commercial copy
 
 - Owner explicitly accepts current UI for now and requests removal of awkward product copy, especially "ИИ-помощник владельца". Screenshot local :3003 at 400px on /workspace/assistant (not conversation list). F0 disposition: OWNER_ACCEPTED_FOR_CONTINUATION, not exhaustive manual verification; animation timing, 320px manual screenshot, cabinet long scroll and conversation screen remain unverified manually. Previous ce869e3 code CI/Security PASS remains valid for that SHA.
