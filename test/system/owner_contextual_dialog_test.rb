@@ -80,6 +80,30 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
     assert_current_path owner_cabinet_path
   end
 
+
+  test "closing an edited interview requires explicit discard" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("a.ws-account-tool[data-wa-page-dialog][href*='/workspace/setup']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-setup"
+      fill_in "owner_notes", with: "Synthetic unsaved review note"
+    end
+    assert_selector "iframe[data-wa-dirty='true']"
+    dismiss_confirm do
+      find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    end
+    assert_selector "dialog.wa-page-dialog[open]"
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_field "owner_notes", with: "Synthetic unsaved review note"
+    end
+    accept_confirm do
+      find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    end
+    assert_no_selector "dialog.wa-page-dialog[open]"
+    assert_current_path owner_cabinet_path
+  end
+
   private
 
   def sign_in_owner
