@@ -15,7 +15,7 @@
     </summary>
     <div class="wa-calendar-activity__body" data-wa-accordion-target="content">
       <nav class="wa-calendar-activity__links" aria-label="<%= t("calendar_actions.activity_heading") %>">
-        <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--soft rc-action--small" %>
+        <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, data: { wa_page_dialog: true }, class: "rc-action rc-action--soft rc-action--small" %>
         <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path, class: "rc-action rc-action--quiet rc-action--small" %>
       </nav>
       <% if activities.any? %>
