@@ -18,3 +18,29 @@ document.addEventListener("click", event => {
     else item.removeAttribute("aria-current");
   });
 });
+
+function syncMarketingSection() {
+  const links = [...document.querySelectorAll(".mk-sidebar-nav a[href^='#']")];
+  const sections = links.map(link => document.getElementById(link.hash.slice(1)))
+    .filter(section => section && !(section instanceof HTMLDialogElement));
+  const line = 160;
+  const active = sections.filter(section => section.getBoundingClientRect().top <= line).pop() || sections[0];
+  if (!active) return;
+  links.forEach(link => {
+    const current = link.hash === "#" + active.id;
+    link.classList.toggle("is-current", current);
+    if (current) link.setAttribute("aria-current", "location");
+    else link.removeAttribute("aria-current");
+  });
+}
+let marketingScrollPending = false;
+window.addEventListener("scroll", () => {
+  if (marketingScrollPending) return;
+  marketingScrollPending = true;
+  requestAnimationFrame(() => {
+    marketingScrollPending = false;
+    syncMarketingSection();
+  });
+}, { passive: true });
+window.addEventListener("hashchange", syncMarketingSection);
+syncMarketingSection();
