@@ -1,18 +1,10 @@
 <div class="container wa-library wa-requests my-4 my-sm-5" data-controller="wa-library"
      data-wa-library-all-label-value="<%= t("artifact_library.kinds.all") %>">
-  <header class="rc-page-hero mb-4 wa-compact-banner">
-    <div class="rc-page-hero__content">
-      <p class="eyebrow"><%= t("artifact_library.eyebrow") %></p>
-      <div class="rc-page-hero__heading">
-        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-collection"></i></span>
-        <h1 class="visually-hidden"><%= t("artifact_library.title") %></h1>
-      </div>
-    </div>
-    <div class="rc-page-hero__actions">
-      <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, data: { wa_page_dialog: true }, class: "rc-action rc-action--soft" %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, data: { wa_page_dialog: true }, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("inboxes", t("requests_hub.title")), admin_project_intakes_path, class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "collection", path: t("artifact_library.eyebrow"), title: t("artifact_library.title"), extra_class: "rc-page-hero mb-4", actions: banner_actions %>
 
   <div class="wa-library__layout">
     <aside class="wa-library__sidebar" aria-label="<%= t("artifact_library.filters") %>">
