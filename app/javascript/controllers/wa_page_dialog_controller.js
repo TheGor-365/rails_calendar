@@ -295,10 +295,11 @@ export default class extends Controller {
       return
     }
     if (!areaFor(url.pathname)) {
-      // An invalid mutation may render at its action URL; never promote it
-      // into the parent as a speculative GET.
-      if (source && !/^\/(?:sign_in|admin\/login)\/?$/.test(url.pathname)) return
-      this.close(() => window.location.assign(url.href))
+      // Only recognized top-level GET destinations can escape after a server
+      // redirect. Unknown URLs may be mutation endpoints rendering errors.
+      const topLevel = /^\/(?:sign_in|admin\/login|workspace|workspace\/cabinet|client|client\/cabinet|calendar\/day|services)?\/?$/.test(url.pathname)
+      if (source) delete this.pageTarget.dataset.waMutationSource
+      if (topLevel) this.close(() => window.location.assign(url.href))
       return
     }
     if (source) delete this.pageTarget.dataset.waMutationSource
