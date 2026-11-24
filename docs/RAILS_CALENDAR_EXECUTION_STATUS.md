@@ -1,5 +1,16 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — C2.5f bidirectional dropdown motion
+
+- Owner supplied local RU 400×793 screenshot on previous code b4cf8e8, Requests outgoing with More actions expanded: panel fits viewport, both actions visible, five dock items aligned. Geometry at 400px = manual partial PASS. Owner requests smooth opening AND closing across dropdowns. A still screenshot does not prove motion; 320px, Cabinet scroll and AI Conversations remain pending.
+- Prior exact documentation SHA 6418d840a3305bd67fd1ddb5639e8c8b85aaf27f: Rails CI and Security Audit both SUCCESS (runs 45299256479 / 45299256453).
+- C2.5f code: b9e8f98a6060f4eedf0c11b7004753c666a0b4a0 adds shared CSS 240ms enter / 200ms exit for native floating disclosures (Requests, thread menus, locale, calendar, AI dock), intrinsic-height disclosures, Bootstrap dropdowns, custom select and calendar popover. Progressive browser support, reduced-motion override; no new requests, no changes to form values or authorization. Older browsers may retain instant native behavior. Existing AI dock explicit-close policy preserved. Global coverage and outside-dismiss behavior require browser verification; do not claim all dropdowns accepted.
+- 82b771f54e32ba09c1007f56a594e67c53a92344 improves existing Stimulus accordion reversal and Turbo cache settling. b0ab89345dd116b47f43e7578878d2e14420f444 adds browser regression for Requests at 400/320px, open/close transition configuration and viewport bounds. Tests not locally executed by connector.
+- Status: CODE_COMMITTED / EXACT_HEAD_CI_PENDING / OWNER_MOTION_NOT_TESTED / NOT_DEPLOYED. F0 stays open. No DB migrations, paid AI, Railway changes, or production deployment.
+- Next: check exact new HEAD CI + Security; stop only isolated :3003 Puma, fast-forward via detached checkout to verified SHA in ~/rails_calendar_c25a_ia_review_20261123 (clean tracked source required), restart guarded script/rc0551f_c25a1_preview.sh with exact SHA. Verify Requests 320px, repeated menu open/close, then Cabinet long scroll and read-only AI Conversations. F1 free synthetic note only after disposable data target and authorization.
+
+---
+
 ## 2026-11-24 — live connector recheck after MVP handoff
 
 **Read-only verification (GitHub + Railway connected APIs, 2026-11-24):**
