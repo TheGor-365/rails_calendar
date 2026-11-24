@@ -1,0 +1,17 @@
+<%# Shared White Atlas masthead. Callers supply translated text and captured action markup. %>
+<% banner_variant = local_assigns.fetch(:variant, :standard) %>
+<% banner_classes = ["wa-compact-banner", "wa-banner", "wa-banner--#{banner_variant}", local_assigns[:extra_class]].compact.join(" ") %>
+<header class="<%= banner_classes %>" data-wa-banner="<%= banner_variant %>">
+  <div class="wa-banner__copy">
+    <p class="eyebrow wa-banner__path"><i class="bi bi-<%= icon %>" aria-hidden="true"></i> <%= path %></p>
+    <h1 class="<%= banner_variant == :detail ? "wa-banner__title" : "visually-hidden" %>"><%= title %></h1>
+    <% if local_assigns[:description].present? %>
+      <p class="rc-hint wa-banner__description"><%= description %></p>
+    <% end %>
+    <%= local_assigns[:metadata] %>
+  </div>
+  <% if local_assigns[:actions].present? %>
+    <div class="wa-banner__actions"><%= actions %></div>
+  <% end %>
+  <%= local_assigns[:accessory] %>
+</header>
