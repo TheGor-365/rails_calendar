@@ -1,8 +1,8 @@
 <div class="container my-4 my-sm-5 wa-calendar" data-controller="wa-calendar-create" data-wa-calendar-create-url-value="<%= consultations_path %>" data-network-error="<%= t("calendar_actions.network_error") %>">
-  <header class="rc-page-hero mb-4">
+  <header class="rc-page-hero mb-4 wa-compact-banner">
     <div>
       <p class="eyebrow mb-2"><%= t("calendar.day_eyebrow", day_number: @selected_date.strftime("%j")) %></p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-day"></i></span><h1 class="page-title mb-1">
+      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-day"></i></span><h1 class="wa-compact-date">
         <time datetime="<%= @selected_date.iso8601 %>"><%= rc_local_date(@selected_date, format: :rc_full) %></time>
       </h1></div>
       <p class="rc-muted mb-0">
