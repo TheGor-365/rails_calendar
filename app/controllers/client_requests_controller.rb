@@ -115,7 +115,11 @@ class ClientRequestsController < ApplicationController
   def new
     load_published_services
     @intake = current_user.client_project_intakes.new
-    @selected_service_version_ids = []
+    requested_id = params[:service_version_id].to_s
+    @selected_service_version_ids = @public_offerings.filter_map do |offering|
+      id = offering.published_version_id.to_s
+      id if id == requested_id
+    end
   end
 
   def create
