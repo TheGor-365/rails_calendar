@@ -27,7 +27,8 @@ class OwnerAvatarsTest < ActionDispatch::IntegrationTest
     assert_select "#owner-avatar-form"
     assert_select ".ws-account-avatar-panel", count: 0
     assert_select "details.ws-avatar-edit summary.ws-avatar-edit-trigger[aria-label]"
-    assert_select "[data-controller=wa-avatar-editor]"
+    assert_select "[data-controller~='wa-avatar-editor']"
+    assert_select "[data-controller~='wa-private-image']"
     assert_no_difference("User.count") do
       post owner_avatars_path, params: { avatar: { file: image_upload } }
     end
