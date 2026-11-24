@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — public template audit / F2.5.4a first modal navigation history slice
+
+- At start HEAD 53521f85 CI run 45511882972 and Security Audit 45511883407 queued; no new green result established. Reviewed marketing, regular/admin login, owner/client signup, email verification, privacy and invitation landing/preview templates. Marketing already has compact commercial header; auth/privacy share account_heading with necessary visible instructions and remain top-level. Invitation landing/preview migrated to shared detail banner at fcfb2cf and ebff29c; total 39 migrated templates. No token/claim/auth logic change.
+- Added localized accessible back control (13e1f6b), parent-owned in-memory stack of committed same-origin iframe destinations, bounded to 40 entries; URL path/query identity, existing entry truncation, explicit GET back, destination H1 title, reset on close, active iframe source/origin and actual location checks (54bd787). Header alignment CSS aabb3b8. Browser test for cabinet -> profile -> capabilities -> back -> profile -> close at 83f67ac. This is first code slice, not full acceptance: redirect/mutation distinction, unsaved form guards, breadcrumb jump, scroll restoration, browser Back behavior and stale/loading edge cases remain unverified or unimplemented. Do not claim mutation replay or dirty guard protection beyond explicit GET back.
+- Next: obtain exact-SHA CI, repair actual failures, harden F2.5.4 against mutation redirects and unsaved changes; add same-area history and role-specific tests before local review. Local review unchanged at 83522ce5. No production deploy, merge, review DB operation or paid AI invocation.
+
+
 ## 2026-11-25 — F2.5.3b.2 operational banner migration and CI corrections
 
 - Previous exact HEAD b22b653 CI run 45498017433: 520 runs / 7884 assertions / 5 failures, security and both PG18 jobs passed. Fixed missing rc-muted description style and updated two obsolete presentation selectors without dropping content/privacy checks (9a7d436, 32ef631, ca016c8). Follow-up exact e19d2c2 CI queued when checked; green not yet established.
