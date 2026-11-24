@@ -1,17 +1,11 @@
 <div class="container my-4 my-sm-5">
-  <header class="rc-page-hero mb-4 wa-compact-banner">
-    <div>
-      <p class="eyebrow mb-2"><%= t("consultations.all_eyebrow") %></p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-journal-text"></i></span><h1 class="visually-hidden"><%= t("consultations.title") %></h1></div>
-      
-    </div>
-    <div class="d-flex flex-wrap gap-2">
-      <%= link_to rc_icon_label("calendar3", t("consultations.calendar")), root_path, class: "rc-action rc-action--quiet" %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("calendar3", t("consultations.calendar")), root_path, class: "rc-action rc-action--quiet" %>
       <% if admin_signed_in? %>
-        <%= link_to rc_icon_label("plus-lg", t("consultations.new")), new_consultation_path, class: "rc-action rc-action--primary" %>
+        <%= link_to rc_icon_label("plus-lg", t("consultations.new")), new_consultation_path, class: "rc-action rc-action--quiet" %>
       <% end %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "journal-text", path: t("consultations.all_eyebrow"), title: t("consultations.title"), extra_class: "rc-page-hero mb-4", actions: banner_actions %>
 
   <%= form_with url: consultations_path, method: :get, local: true,
                 html: { class: "rc-consultation-filters", role: "search",
