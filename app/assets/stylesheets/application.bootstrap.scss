@@ -1879,3 +1879,24 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
     transition: none !important;
   }
 }
+
+// F2.4 shared compact White Atlas masthead; retains existing page landmarks.
+.wa-compact-banner {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 12px; min-height: 76px; padding: 18px 22px; margin-bottom: 20px;
+  border: 1px solid rgba(0,126,118,.12); border-radius: 20px;
+  background: radial-gradient(circle at 100% 0%,rgba(0,160,140,.08),transparent 45%),linear-gradient(110deg,#fff,#edf8f6);
+  box-shadow: 0 8px 22px rgba(24,60,65,.06);
+}
+.wa-compact-banner .eyebrow { margin: 0 !important; }
+.wa-compact-banner .rc-page-hero__heading { margin: 0; }
+.wa-compact-banner .wa-ai-page__hero-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.wa-compact-banner .wa-compact-date { font-size: 1.15rem; margin: 0; }
+.wa-ai-page .wa-compact-input { min-height: 3.6rem; max-height: 50vh; overflow-y:auto; transition:height .2s ease; }
+.wa-ai-result-placeholder { padding: 8px 12px; }
+.wa-ai-result-placeholder h2 { display:none; }
+#wa-ai-result-heading { scroll-margin-top: 190px; }
+.wa-activity-journal__filters { align-items:end; }
+.wa-calendar .simple-calendar td, .wa-calendar .simple-calendar th { border-color: rgba(0,126,118,.14); }
+@media(max-width: 576px) { .wa-compact-banner { padding: 12px; border-radius: 16px; gap: 8px; } }
+@media(prefers-reduced-motion:reduce) { .wa-ai-page .wa-compact-input { transition:none; } }
