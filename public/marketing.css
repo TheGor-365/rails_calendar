@@ -265,3 +265,8 @@ body.marketing-page { min-width: 320px; margin: 0; background: var(--mk-canvas);
 .mk-footer-disclosure summary { cursor: pointer; font-size: .8rem; color: var(--mk-subtle); }
 @supports selector(details::details-content) { @supports (interpolate-size: allow-keywords) { .mk-footer-disclosure { interpolate-size: allow-keywords; } .mk-footer-disclosure::details-content { block-size: 0; overflow: clip; opacity: 0; transition: block-size .24s ease, opacity .2s ease, content-visibility .24s allow-discrete; } .mk-footer-disclosure[open]::details-content { block-size: auto; opacity: 1; } } }
 @media (prefers-reduced-motion: reduce) { .mk-footer-disclosure::details-content { transition: none; } }
+
+.mk-section-trigger { background: transparent; color: inherit; font: inherit; border: 0; text-align: inherit; cursor: pointer; }
+.mk-sidebar-nav .mk-section-trigger { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; }
+.mk-header-nav .is-current { color: #007e76; font-weight: 800; }
+.mk-process-dialog form { margin-top: 16px; display: flex; justify-content: flex-end; }
