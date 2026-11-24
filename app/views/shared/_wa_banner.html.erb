@@ -8,9 +8,12 @@
     <% if local_assigns[:description].present? %>
       <p class="rc-hint wa-banner__description"><%= description %></p>
     <% end %>
+    <% if banner_variant == :account && local_assigns[:actions].present? %>
+      <div class="wa-banner__actions"><%= actions %></div>
+    <% end %>
     <%= local_assigns[:metadata] %>
   </div>
-  <% if local_assigns[:actions].present? %>
+  <% if banner_variant != :account && local_assigns[:actions].present? %>
     <div class="wa-banner__actions"><%= actions %></div>
   <% end %>
   <%= local_assigns[:accessory] %>
