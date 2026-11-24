@@ -38,7 +38,7 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
 
     within_frame(find("iframe[data-wa-embedded-page]")) do
       assert_selector "#owner-capabilities"
-      find("a[href='#{owner_practice_path}']").first.click
+      first("a[href='#{owner_practice_path}']").click
     end
 
     assert_current_path owner_cabinet_path
@@ -47,7 +47,7 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
     within_frame(find("iframe[data-wa-embedded-page]")) do
       assert_selector "#owner-practice"
       assert_no_selector ".app-header", visible: true
-      find("a[href='#{owner_cabinet_path}']").first.click
+      first("a[href='#{owner_cabinet_path}']").click
     end
     assert_no_selector "dialog.wa-page-dialog[open]"
   end
