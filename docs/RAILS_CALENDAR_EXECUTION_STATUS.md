@@ -1,5 +1,13 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.2 exact-SHA CI PASS / isolated review checkout confirmed
+
+- Exact code/checkpoint SHA `83522ce5b69005fbc5e15ac5d5bc64a82e7c1aac`: Rails CI run 45493000913 SUCCESS; integration 519 runs / 8017 assertions, system/browser 57 runs / 983 assertions, zero failures/errors/skips in both. PG18 schema and upgrade-from-deployed jobs SUCCESS. Security Audit run 45493000853 SUCCESS.
+- Owner terminal confirms direct Git tree comparison matched remote 12 changed files, no DB/config/dependency changes, no replacement refs. Clean detached isolated review checkout now at exact tested SHA `83522ce5`. Initial ordinary git diff output was unexpectedly empty; direct /usr/bin/git diff-tree established correct changes; underlying cause not established.
+- Owner confirms review Puma 962459 on loopback :3003, cwd ~/rails_calendar_c25a_ia_review_20261123; separate :3002 Puma PID 45565 untouched. Ruby executable ~/.asdf/installs/ruby/3.4.13/bin/ruby. Installed Node 22.23.4 and 25.2.1; asdf shim failed in noninteractive Bash because asdf executable unavailable on PATH. Use absolute installed Node 22 path for local asset checks/build; no reinstall needed at this stage.
+- F2.5.2 automated regression gate PASS. F2.5.1 owner browser acceptance still pending; rebuild existing local assets and verify safe restart using existing review launch configuration before manual acceptance. No production deployment, migration, database mutation or paid provider calls authorized by this checkpoint.
+
+
 ## 2026-11-25 — F2.5.1 review synchronization gate / CI fixture correction
 
 - Owner terminal confirms clean detached review worktree `~/rails_calendar_c25a_ia_review_20261123`, HEAD `c7ba91ae9d72ed8bf0238579c56813228ce135a3`, listener 127.0.0.1:3003 ruby PID 962459. No local checkout/restart confirmed yet.
