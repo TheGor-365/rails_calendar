@@ -52,7 +52,7 @@
           <li class="wa-calendar-day-recap__item wa-calendar-day-recap__item--<%= period %>"
               data-calendar-activity-hour="<%= occurred.hour %>">
             <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: occurred.hour),
-                        class: "wa-calendar-day-recap__time" do %>
+                        data: { wa_page_dialog: true }, class: "wa-calendar-day-recap__time" do %>
               <time datetime="<%= occurred.iso8601 %>"><%= occurred.strftime("%H:%M") %></time>
             <% end %>
             <div class="wa-calendar-day-recap__description">
@@ -81,7 +81,7 @@
         <% @hour_slots.each do |slot| %>
           <div class="rc-time-axis-hour <%= 'wa-calendar-hour--past' if slot[:end_time] <= Time.current %>" id="hour-<%= format('%02d', slot[:hour]) %>">
             <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
-                        class: "rc-time-axis-link",
+                        data: { wa_page_dialog: true }, class: "rc-time-axis-link",
                         aria: { label: t("calendar.inspect_interval", range: "#{slot[:start_time].strftime('%H:%M')}–#{slot[:end_time].strftime('%H:%M')}") } do %>
               <time datetime="<%= slot[:start_time].iso8601 %>"><%= slot[:start_time].strftime("%H:%M") %></time>
             <% end %>
@@ -107,7 +107,7 @@
               <% from_label = slot[:start_time].strftime("%H:%M") %>
               <% to_label = slot[:end_time].strftime("%H:%M") %>
               <%= link_to calendar_hour_path(date: @selected_date.iso8601, hour: slot[:hour]),
-                          class: "rc-hour-band #{'rc-hour-band--busy' if slot[:count].positive?} #{'wa-calendar-hour--past' if slot[:end_time] <= Time.current}",
+                          data: { wa_page_dialog: true }, class: "rc-hour-band #{'rc-hour-band--busy' if slot[:count].positive?} #{'wa-calendar-hour--past' if slot[:end_time] <= Time.current}",
                           role: "listitem",
                           aria: { label: t("calendar.inspect_interval_count", range: "#{from_label}–#{to_label}", events: rc_count(slot[:count], "calendar", "event")) },
                           title: t("calendar.inspect_interval", range: "#{from_label}–#{to_label}") do %>
