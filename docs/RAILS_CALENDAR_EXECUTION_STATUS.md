@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2 CI diagnostic and browser publication contract
+
+- Exact 0ba863d566b71115df98bfb81dceeaeb739c14e5: Security Audit 45408812350 SUCCESS; Rails CI 45408812945 FAILURE solely in browser job. Model/controller tests 517 runs / 7974 assertions / 0 failures / 0 errors / 0 skips. PG18 schema and deployed-baseline synthetic upgrade jobs SUCCESS. Browser suite 55 runs / 942 assertions / 1 failure / 0 errors / 0 skips.
+- Failure log job 138496711453: owner_service_offerings_browser_test.rb:51 expected a published service to remain absent from /services, obsolete after approved F2 catalogue change. Commit 312a05e3215e4d6bfe02d1362fed730b677e5e52 explicitly checks absence before publication and presence after publication. Latest CI not yet accepted. No production code change in this fix.
+- Prior da70cd3 failure logs confirmed only three obsolete catalogue assertions, already corrected by 0ba863d.
+- Owner terminal: isolated review checkout still 47fe8fb, clean tracked tree, PID 246850 on :3003; separate old server PID 45565 on :3002 must not be stopped. Next guarded update :3003 only to verified latest HEAD; guest and client catalogue read-only visual acceptance, preselection without submit. Local test DB writes and paid provider calls require separate authorization. No deployment/migration.
+
+---
+
 ## 2026-11-24 — F2 published catalogue and request selection
 
 - Owner screenshots show 9 existing local owner service cards on :3003 and legacy static landing/client cabinet on :3002. The latter is NOT acceptance evidence for latest review server. Owner requests commercial terminology without "учебная" and actual published catalogue.
