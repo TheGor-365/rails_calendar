@@ -63,7 +63,7 @@ class OwnerSetupController < ApplicationController
     return redirect_to(owner_setup_review_path, alert: t("owner_setup.consent_required")) unless params[:ai_consent] == "1"
 
     OwnerIntelligence::Grok.new(@profile).suggest!
-    redirect_to owner_setup_review_path, notice: t("owner_setup.ai_ready")
+    redirect_to owner_setup_review_path, notice: t("owner_setup.ai_ready"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerIntelligence::Grok::Unavailable
     redirect_to owner_setup_review_path, alert: t("owner_setup.ai_unavailable")
   end
@@ -123,7 +123,7 @@ class OwnerSetupController < ApplicationController
     # Errors do not roll back the already committed owner-approved snapshot.
     begin
       OwnerServices::AutoCatalogue.new(workspace: @workspace).sync!
-      redirect_to owner_practice_path, notice: t("owner_setup.approved")
+      redirect_to owner_practice_path, notice: t("owner_setup.approved"), flash: { wa_dialog_outcome: "replace" }
     rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid => error
       Rails.logger.warn("Automatic offering draft generation failed: #{error.class}")
       redirect_to owner_practice_path, alert: t("owner_services.auto_sync_blocked")
