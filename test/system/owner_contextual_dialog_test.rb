@@ -54,6 +54,32 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
     assert_no_selector "dialog.wa-page-dialog[open]"
   end
 
+
+  test "contextual profile and capabilities return through logical modal history" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("header[data-wa-banner='account'] a[data-wa-page-dialog][href='#{owner_practice_path}']").click
+    assert_selector "dialog.wa-page-dialog[open]"
+    assert_selector ".wa-page-dialog__back[disabled]"
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-practice"
+      find("header[data-wa-banner] a[href='#{owner_capabilities_path}']").click
+    end
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-capabilities"
+    end
+    assert_selector ".wa-page-dialog__back:not([disabled])"
+    find(".wa-page-dialog__back").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-practice"
+    end
+    assert_selector ".wa-page-dialog__back[disabled]"
+    assert_current_path owner_cabinet_path
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_no_selector "dialog.wa-page-dialog[open]"
+    assert_current_path owner_cabinet_path
+  end
+
   private
 
   def sign_in_owner
