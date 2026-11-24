@@ -11,7 +11,7 @@ class OwnerServiceOfferingsTest < ActionDispatch::IntegrationTest
     @workspace, @profile, @snapshot, @capabilities = approved_profile_for(@owner)
   end
 
-  test "owner creates and reviews versions, but /services and client flow never expose them" do
+  test "owner creates and reviews versions; only published versions appear in catalogue" do
     sign_in(@owner)
     get owner_services_path
     assert_response :success
@@ -61,7 +61,7 @@ class OwnerServiceOfferingsTest < ActionDispatch::IntegrationTest
     assert_equal 1, offer.reload.published_version.version
     assert_equal 1, ServiceOfferingPublication.where(service_offering: offer, event: "publish").count
     get services_path
-    assert_no_match(/Fix a fictional Rails error/, response.body)
+    assert_select "section#services article h3", text: "Fix a fictional Rails error"
 
     post revise_owner_service_path(offer)
     assert_equal 2, offer.reload.draft_version.version
