@@ -129,6 +129,11 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
   end
 
   test "knowledge inventory is scoped, read-only, and never exposes private profile summary" do
+    # Explicitly model an approved profile without shareable facts before version 2.
+    snapshot = @profile.approved_snapshot
+    snapshot.update_columns(payload: snapshot.payload.except("public_summary_draft", "public_summary"))
+    @workspace.reload
+
     catalogue = OwnerServices::Catalogue.new(workspace: @workspace)
     catalogue.create_draft!(service_fields(@profile.professional_capabilities.first,
       title: "Synthetic owner-only knowledge service"))
