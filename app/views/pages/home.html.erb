@@ -1,8 +1,8 @@
 <div class="container my-4 my-sm-5 wa-calendar" data-controller="wa-calendar-create" data-wa-calendar-create-url-value="<%= consultations_path %>" data-network-error="<%= t("calendar_actions.network_error") %>">
-  <header class="rc-page-hero mb-4">
+  <header class="rc-page-hero mb-4 wa-compact-banner">
     <div>
       <p class="eyebrow mb-2"><%= t("calendar.overview_eyebrow") %></p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar3"></i></span><h1 class="page-title mb-1"><%= t("calendar.title") %></h1></div>
+      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar3"></i></span><h1 class="visually-hidden"><%= t("calendar.title") %></h1></div>
     </div>
     <div class="d-flex flex-wrap align-items-center gap-2">
       <%= link_to rc_icon_label("calendar3", t("calendar.today_24")), calendar_day_path(date: Time.zone.today.iso8601),
