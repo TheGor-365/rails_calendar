@@ -62,7 +62,7 @@ function intentFor(url, currentHref, parentHref, explicitModal = false, download
 // Same-origin full pages retain their own forms, CSRF, Turbo and controllers.
 // Navigation is coordinated only for a document inside the explicitly marked iframe.
 export default class extends Controller {
-  static targets = ["dialog", "heading", "page"]
+  static targets = ["dialog", "heading", "page", "backButton"]
 
   connect() {
     this.embedded = window.parent !== window &&
@@ -78,6 +78,9 @@ export default class extends Controller {
       this.afterSubmit = event => this.embeddedSubmit(event)
       document.addEventListener("turbo:before-visit", this.beforeVisit)
       document.addEventListener("turbo:submit-end", this.afterSubmit)
+      this.onCommitted = () => this.reportCommittedPage()
+      document.addEventListener("turbo:load", this.onCommitted)
+      this.reportCommittedPage()
     } else {
       this.onMessage = event => this.receiveMessage(event)
       window.addEventListener("message", this.onMessage)
@@ -90,6 +93,7 @@ export default class extends Controller {
     if (this.embedded) {
       document.removeEventListener("turbo:before-visit", this.beforeVisit)
       document.removeEventListener("turbo:submit-end", this.afterSubmit)
+      document.removeEventListener("turbo:load", this.onCommitted)
     } else {
       window.removeEventListener("message", this.onMessage)
       this.reset()
@@ -111,8 +115,9 @@ export default class extends Controller {
     this.opener = link
     this.parentScroll = { x: window.scrollX, y: window.scrollY }
     this.pageTarget.dataset.waParentHref = window.location.href
-    this.replacePage(url, this.linkTitle(link))
+    this.stack = []
     this.dialogTarget.showModal()
+    this.replacePage(url, this.linkTitle(link))
   }
 
   linkTitle(link) {
@@ -156,6 +161,14 @@ export default class extends Controller {
     window.parent.postMessage({ type: "wa:dialog-write", path: location.pathname }, location.origin)
   }
 
+  reportCommittedPage() {
+    const heading = document.querySelector("main [data-wa-banner] h1, main h1")
+    window.parent.postMessage({
+      type: "wa:dialog-committed", href: location.href,
+      title: heading?.textContent.trim() || document.title
+    }, location.origin)
+  }
+
   notifyParent(intent, url, title = "") {
     window.parent.postMessage({
       type: "wa:dialog-navigation", intent, href: url.href, title
@@ -166,6 +179,10 @@ export default class extends Controller {
     if (!this.hasPageTarget || !this.hasDialogTarget || !this.dialogTarget.open ||
         event.origin !== location.origin || event.source !== this.pageTarget.contentWindow) return
     const data = event.data
+    if (data?.type === "wa:dialog-committed") {
+      this.acceptCommittedPage(data)
+      return
+    }
     if (data?.type === "wa:dialog-write") {
       this.refreshParentProjections()
       return
@@ -185,10 +202,55 @@ export default class extends Controller {
     }
   }
 
+  pageKey(url) { return url.pathname + url.search }
+
+  acceptCommittedPage(data) {
+    if (typeof data.href !== "string") return
+    let url
+    try { url = new URL(data.href) } catch (_) { return }
+    if (url.origin !== location.origin) return
+    // Ignore stale messages from a document which has already navigated.
+    try {
+      if (this.pageKey(new URL(this.pageTarget.contentWindow.location.href)) !== this.pageKey(url)) return
+    } catch (_) { return }
+    if (sameParentDestination(url, this.pageTarget.dataset.waParentHref)) {
+      this.close()
+      return
+    }
+    if (!areaFor(url.pathname)) {
+      this.close(() => window.location.assign(url.href))
+      return
+    }
+    const title = typeof data.title === "string" ? data.title.slice(0, 180) : ""
+    this.recordPage(url, title)
+  }
+
+  recordPage(url, title) {
+    this.stack ||= []
+    const key = this.pageKey(url)
+    const existing = this.stack.findIndex(entry => entry.key === key)
+    const entry = { key, href: url.href, title: title || this.headingTarget.textContent || document.title }
+    if (existing >= 0) this.stack.splice(existing, this.stack.length - existing, entry)
+    else this.stack.push(entry)
+    if (this.stack.length > 40) this.stack.shift()
+    this.headingTarget.textContent = entry.title
+    this.pageTarget.title = entry.title
+    if (this.hasBackButtonTarget) this.backButtonTarget.disabled = this.stack.length < 2
+  }
+
   replacePage(url, title) {
+    // The committed document, not a clicked link, becomes a history entry.
     this.headingTarget.textContent = title
     this.pageTarget.title = title
+    if (this.hasBackButtonTarget) this.backButtonTarget.disabled = true
     this.pageTarget.src = url.href
+  }
+
+  back() {
+    if (!this.dialogTarget.open || this.closing || !this.stack || this.stack.length < 2) return
+    const previous = this.stack[this.stack.length - 2]
+    // Explicit GET only; never use iframe browser history which may replay a form.
+    this.replacePage(new URL(previous.href), previous.title)
   }
 
   // Refresh only explicitly marked, read-only summary projections, not the whole
@@ -249,5 +311,7 @@ export default class extends Controller {
     }
     this.opener = null
     this.parentScroll = null
+    this.stack = []
+    if (this.hasBackButtonTarget) this.backButtonTarget.disabled = true
   }
 }
