@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F1 local read-only acceptance
+
+- Owner terminal confirms detached review checkout 47fe8fb72f82cb80911c677e74add62eb1800cd9, JS/SCSS build PASS, verified local review database, Puma PID 246850 listening :3003. Guarded launcher reports no provider call or DB write at startup.
+- Two desktop screenshots show updated Russian commercial copy, switching existing conversations, previously saved note and settled AI response with historical spend. Old English persisted title is not overwritten. F1 read-only history PASS; no evidence of new note, rename, trash or restore in this manual session.
+- Exact 47fe8fb Rails CI 45301926517 and Security 45301926508 remain queued at latest connector check. New lifecycle browser regression is not yet accepted. No new paid turn, migration or deployment.
+- Next: check CI synthetic lifecycle evidence, or explicitly authorize one new synthetic free note in the local review database and verify reload. Database identity is verified but disposability is not established. No writes to existing history. In parallel, read-only F2 service/invitation funnel audit may proceed.
+
+---
+
 ## 2026-11-24 — F1 lifecycle browser coverage
 
 - F0 accepted by owner for continuation, not exhaustive manual QA. No new manual conversation screenshot or review DB write supplied in this turn.
