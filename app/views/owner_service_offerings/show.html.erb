@@ -1,19 +1,18 @@
 <div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-service-detail">
-  <header class="rc-page-hero mb-4">
-    <p class="eyebrow"><%= t("owner_services.eyebrow") %></p>
-    <h1 class="page-title"><%= (@draft || @approved || @published).title %></h1>
+  <% banner_metadata = capture do %>
     <p class="rc-hint"><i class="bi bi-person-check" aria-hidden="true"></i> <%= owner_capability_title((@draft || @approved || @published).source_capability_domain, (@draft || @approved || @published).professional_capability.delivery_mode) %></p>
-    <div class="wa-services__actions">
-      <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path,
-            class: "rc-action rc-action--soft" %>
+  <% end %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path,
+            class: "rc-action rc-action--quiet" %>
       <% if @draft %>
         <%= link_to rc_icon_label("pencil-square", t("owner_ai_assistant.context_action")),
                     owner_ai_assistant_path(operation: "service_copy", offering_id: @offering.id),
-                    class: "rc-action rc-action--soft" %>
+                    class: "rc-action rc-action--quiet" %>
       <% end %>
       <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path, class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :detail, icon: "briefcase", path: t("owner_services.eyebrow"), title: (@draft || @approved || @published).title, extra_class: "rc-page-hero mb-4", metadata: banner_metadata, actions: banner_actions %>
   <section class="surface-panel wa-services__notice mb-4">
     <i class="bi bi-shield-lock" aria-hidden="true"></i>
     <div><strong><%= t("owner_services.private_title") %></strong><p><%= t("owner_services.private_help") %></p></div>
