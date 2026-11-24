@@ -1,8 +1,5 @@
 <div class="container wa-owner-intake my-4 my-sm-5">
-  <header class="rc-page-hero mb-4">
-    <div class="rc-page-hero__content">
-    <p class="eyebrow"><%= t("intake.show_eyebrow", id: @intake.id) %></p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-kanban"></i></span><h1 class="page-title"><%= @intake.title %></h1></div>
+  <% banner_metadata = capture do %>
     <div class="wa-owner-intake__meta" aria-label="<%= t("intake.owner_view.meta_label") %>">
       <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= rc_intake_type(@intake.project_type) %></span>
       <span class="rc-status-pill"><i class="bi bi-circle-half" aria-hidden="true"></i><%= rc_intake_status(@intake.status) %></span>
@@ -15,12 +12,12 @@
       <% quiz_saved = @intake.intake_answers.where(question_key: quiz_questions.map { |question| question.fetch(:key) }).count %>
       <% quiz_label = quiz_saved.zero? ? t("intake.quiz_start") : (quiz_saved < quiz_questions.size ? t("intake.quiz_resume") : t("intake.quiz_review")) %>
       <div class="rc-quiz-intake-entry">
-        <%= link_to rc_icon_label("ui-checks-grid", quiz_label), project_intake_quiz_path(@intake), class: "rc-action rc-action--primary" %>
+        <%= link_to rc_icon_label("ui-checks-grid", quiz_label), project_intake_quiz_path(@intake), class: "rc-action rc-action--quiet" %>
         <p class="rc-hint mb-0 mt-2"><%= t("intake.quiz_saved", saved: quiz_saved, total: quiz_questions.size) %></p>
       </div>
     <% end %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :detail, icon: "kanban", path: t("intake.show_eyebrow", id: @intake.id), title: @intake.title, extra_class: "rc-page-hero mb-4", metadata: banner_metadata %>
   <% owner_nav_sections = [
     ["intake-current", "pin-angle", t("intake_context.current_title")],
     ["intake-workflow", "diagram-3", t("intake.workflow_show")],
