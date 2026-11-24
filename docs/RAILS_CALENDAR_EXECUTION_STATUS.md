@@ -1,5 +1,13 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.1 review synchronization gate / CI fixture correction
+
+- Owner terminal confirms clean detached review worktree `~/rails_calendar_c25a_ia_review_20261123`, HEAD `c7ba91ae9d72ed8bf0238579c56813228ce135a3`, listener 127.0.0.1:3003 ruby PID 962459. No local checkout/restart confirmed yet.
+- Exact SHA `fd107a66fb8d8fbd6f47b95a7fa93ea7d4d0aae4`: Security Audit and both PG18 jobs passed; integration 519 runs / 7994 assertions / 1 failure, seed 62452, OwnerAiAssistantTest knowledge inventory line 142. The shared synthetic fixture now includes public facts, contradicting this test's initial absent-public-facts premise. Browser job did not run after integration failure.
+- Commit `38c09bc35a7a64df301a30f775c57d75d4747a04` explicitly models missing public summaries in that single synthetic test before creating approved version 2. No privacy assertion removed and no application policy changed. Exact-SHA CI and owner acceptance remain required.
+- Next: fetch and inspect review diff; only switch clean isolated worktree after confirming no schema/dependency changes and exact CI. Verify process ownership and launch configuration before any restart. Do not touch port 3002, databases, paid AI, PR #82 or production.
+
+
 ## 2026-11-25 — F2.5.1 contextual navigation code and F2.5.2 regression repair
 
 **Status: CODE_COMMITTED; exact-current-SHA CI and owner browser acceptance still pending.** Working branch remains Draft PR #81, separate from release PR #82 and Railway production. This is NOT a production release or a claim that all navigation cases pass.
