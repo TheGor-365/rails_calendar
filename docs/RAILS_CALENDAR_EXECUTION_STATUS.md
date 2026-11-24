@@ -1,5 +1,14 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-24 — F2 invitation-to-inbox browser coverage
+
+- Read-only source audit: existing E2 browser case ended at the verified client's claimed editable draft, although controller supports explicit save, versioned 12-section scope, fact review, idempotent submit and owner unread inbox. Existing integration tests cover published-version selection, foreign-account isolation and invitation expiry/revoke. Do not recreate these features.
+- Commit 42acbc3d57479550a583dd7b477d56daa96bfeaf extends existing synthetic browser journey to save one scope answer, reload and check persistence, submit same canonical intake, retain exact published service version, sign in as owner, locate unread request, open details and verify unread clears; asserts no AI spend. Runs in isolated CI test database with Grok disabled. Not yet executed/accepted at exact new SHA. Service publication is still fixture setup, not browser-tested in this case; fact-review selection uses native controls via JS, not custom select click acceptance. No autosave claim (explicit save only).
+- F1 remains read-only locally accepted; full synthetic lifecycle CI pending. At prior c860e55 HEAD CI 45302746814 and Security 45302746750 queued. No new manual screenshot or local mutation this turn.
+- Next: check exact latest CI and address failures; owner read-only /workspace/services and /workspace/invitations screenshots, then scoped synthetic end-to-end acceptance. F3/F4/F5 and production release remain separate. No deployment, migration or paid call.
+
+---
+
 ## 2026-11-24 — F1 local read-only acceptance
 
 - Owner terminal confirms detached review checkout 47fe8fb72f82cb80911c677e74add62eb1800cd9, JS/SCSS build PASS, verified local review database, Puma PID 246850 listening :3003. Guarded launcher reports no provider call or DB write at startup.
