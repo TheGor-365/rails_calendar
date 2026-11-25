@@ -167,6 +167,12 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
     find("dialog.wa-confirm-dialog [data-wa-page-dialog-target='keepEditing']").click
     assert_field "proposal_seed_goal", with: "Original synthetic description"
     find("[data-action='click->wa-invitation-ai#apply']").click
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    page.execute_script("document.getElementById('proposal_seed_goal').value = 'Newer synthetic input'")
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#confirmDiscard']").click
+    assert_no_selector "dialog.wa-confirm-dialog[open]"
+    assert_field "proposal_seed_goal", with: "Newer synthetic input"
+    find("[data-action='click->wa-invitation-ai#apply']").click
     find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#confirmDiscard']").click
     assert_field "proposal_seed_goal", with: "Synthetic replacement description"
 
