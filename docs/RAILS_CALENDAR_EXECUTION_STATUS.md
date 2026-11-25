@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.2.1 core exact CI GREEN / local launch PASS
+
+- Exact candidate `6c09b96bb6924a4fe8e39575e650c61e3dd26349`: Rails CI #45524076439 SUCCESS and Security #45524077137 SUCCESS. Test log counts: 2026-11-25T01:25:08.6581081Z 521 runs, 8083 assertions, 0 failures, 0 errors, 0 skips; 2026-11-25T01:26:36.1306177Z 68 runs, 1108 assertions, 0 failures, 0 errors, 0 skips. PG18 jobs passed. All authored core lifecycle system regressions now covered by green CI.
+- User terminal shows guarded preview launch from exact candidate; direct Node 22.23.4/npm 10.9.9, asset builds PASS, script reports C21C_DATABASE=verified_local_review and no provider call/DB write during preflight. Puma 8.0.4, Rails 8.1.4.1, Ruby 3.4.13, new PID 1182083 listening 127.0.0.1:3003. Screenshot confirms owner cabinet renders. Previous PID 962459 stopped manually. New evidence does not independently verify :3002 listener after restart. No private profile contents copied.
+- NEXT manual synthetic dirty close/Escape/cancel/discard acceptance on candidate; then F2.5.5f.2.2 quiz and invitation overwrite integrations. No application code edits, real form submissions, paid AI, migration, merge or production deployment in this slice.
+
+
 ## 2026-11-25 — F2.5.5f.2.1 local core candidate preflight/build PASS
 
 - User terminal confirms isolated review preflight from f8688dc to 6c09b96: clean tree, ancestry/reachability verified, four changed files +208/-12, infrastructure guard empty, Ruby 3.4.13, Node 25.2.1 and npm 11.6.2. Guarded detached switch to `6c09b96bb6924a4fe8e39575e650c61e3dd26349` then Ruby test syntax and both JS syntax checks PASS, esbuild 562.7 KB / map 1014.3 KB and Sass PASS; final tree clean. Review :3003 PID 962459 and independent :3002 PID 45565 listening. No restart or new-core runtime acceptance yet evidenced.
