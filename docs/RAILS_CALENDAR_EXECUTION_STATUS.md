@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5 review smoke PASS / F2.5.5f.2.1 shared confirmation core candidate
+
+- User terminal confirms local f8688dc clean, guarded review PID 962459 cwd, touch review tmp/restart.txt and HTTP 200, :3002 PID 45565 unchanged. Restart trigger and HTTP smoke evidenced; no independent proof of process reload or new browser acceptance. Exact prior CI green: 521 model/controller runs 8083 assertions, 64 browser runs 1065 assertions, zero failures/errors/skips; PG18 and security green.
+- da04fa7 introduces Promise<boolean> shared confirmation lifecycle, one request per document, explicit kind and localized text, fail-closed missing/stale/duplicate/exception paths, safe cancel focus, original copy restoration, native close and Turbo before-cache cancellation. 06ef4ba integrates existing contextual discard while preserving current source-document/pending-mutation checks and existing markup/actions. c5d3011 adds synthetic browser cases for duplicate departure, Escape and native close/reopen. 1e899b4 relocates library to app/javascript/lib/wa_confirmation.js and updates import to avoid additional esbuild entrypoint. Exact candidate `1e899b4f7b969a43669025a92d78ce07bfa515fc` verified in branch source; CI results not yet returned at inspection. No new runtime tests executed independently. Stale-frame and teardown-specific browser coverage still pending; shared API still relies on existing dialog controller's action delegation. Nine other sites not migrated.
+- NEXT check exact core CI/security, add remaining teardown/stale-source tests and guarded local acceptance before migrating quiz and invitation overwrite handlers; six Turbo sites later with paid consent last. Local remains f8688dc; no review DB writes, paid AI, merge or production deploy.
+
+
 ## 2026-11-25 — F2.5.5 corrected candidate CI GREEN / local build PASS
 
 - Exact functional SHA `f8688dc7bfb5153d99da9fb9b76f21b81aea7f06`: Rails CI #45521955702 SUCCESS (test job including Chrome system tests, PG18 fresh schema and deployed-baseline upgrade all SUCCESS); Security #45521955745 SUCCESS. Browser regression repair gate green; no production acceptance implied.
