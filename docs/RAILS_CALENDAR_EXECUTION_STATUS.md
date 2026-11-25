@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.2.2 invitation exact CI GREEN / local build PASS
+
+- Exact candidate `8acb84088161a255ba0a4ab56d99b97e233dac92`: Rails CI #45526625297 SUCCESS and Security #45526625195 SUCCESS; PG18 fresh schema and deployed-baseline upgrade SUCCESS. Test logs: 2026-11-25T01:35:18.8619986Z 521 runs, 8083 assertions, 0 failures, 0 errors, 0 skips; 2026-11-25T01:37:02.0752478Z 69 runs, 1122 assertions, 0 failures, 0 errors, 0 skips. Invitation overwrite cancel/approve, stale input and sharing-checkbox synthetic regression covered by green CI; no actual provider calls in that test.
+- User terminal confirms guarded detached switch to exact 8acb840, Ruby system test syntax and JS controller syntax PASS, esbuild 564.5 KB / map 1017.3 KB and Sass PASS, final working tree clean. Review :3003 PID 1182083 and independent :3002 PID 45565 both listening. New candidate restart and runtime browser acceptance not yet evidenced.
+- NEXT guarded review-only restart trigger and HTTP smoke, then synthetic invitation overwrite browser acceptance (no generation, issue or real data submission), then quiz migration with native beforeunload preserved. No DB commands, actual paid AI, merge or production deploy.
+
+
 ## 2026-11-25 — F2.5.5f.2.2 invitation candidate local preflight PASS
 
 - User terminal confirms isolated review clean at 6c09b96, candidate `8acb84088161a255ba0a4ab56d99b97e233dac92` fetched, ancestry and reachability verified, three changed files +112/-10, infrastructure guard empty. Review :3003 PID 1182083 and independent :3002 PID 45565 both listening. Candidate checkout/build not yet evidenced.
