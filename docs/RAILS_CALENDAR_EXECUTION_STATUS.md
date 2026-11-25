@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5 browser regression repair candidate / adapter gate remains pending
+
+- Exact test-correction SHA 87cafc2: Security #45520914108 SUCCESS; Rails CI #45520914113 FAILURE in Chrome system suite (64 runs, 1033 assertions, 2 failures, 0 errors/skips). Model/controller 521 runs, 8083 assertions, zero failures/errors/skips; PG18 fresh schema and deployed-baseline upgrade SUCCESS. Failed system cases: sticky Requests hub banner selector (line 68) and admin manual consultation from selected calendar interval (line 474; remains on form instead of committed notice). Other system cases passed; branded discard manual acceptance remains valid.
+- b2406bb updates stale Requests Hub assertion to the unique canonical outgoing link in White Atlas banner and preserves other coverage. Source inspection of Turbo 8.0.23 navigator/form submission confirms a redirected successful form response proposes a visit via turbo:before-visit; this supports the hypothesis that embedded dirty/pending guard blocks the response visit. eff41d9 adds one-shot exact same-origin allowlisted HTML redirect token only for a single pending mutation form, no request replay, five-second expiry, cleanup on failed submit/disconnect. 4be738d strengthens existing consultation system test (dirty input, original success flash and title, no editor, cleared dirty flag, one persisted synthetic record). f8688dc additionally rejects competing navigation while token exists and publishes pending state to parent until token consumed/cleared. This is a candidate fix, not yet proven by browser rerun. Remaining event-order/stale-response/focus and unrelated navigation edge cases require testing. No relaxation of server ACL, validation, or paid consent.
+- NEXT: inspect exact candidate f8688dc CI/security and fix remaining failures; only then implement F2.5.5f.2 common confirmation lifecycle per contract. Local review still 4c3ccc9; no local/production DB commands, deployments or paid AI calls.
+
+
 ## 2026-11-25 — F2.5.5f.2 adapter design contract / CI gate pending
 
 - Corrective test SHA 87cafc2: Rails CI #45520914113 and Security #45520914108 queued at inspection. Previous ledger SHA 74c475a: CI #45520935907 and Security #45520935880 queued. No green repair gate yet.
