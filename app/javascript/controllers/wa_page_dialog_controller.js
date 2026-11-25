@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { confirmationPending, requestConfirmation, settleConfirmation } from "../wa_confirmation"
 
 // Explicit GET destinations which are safe to use as embedded workspaces.
 // Unknown internal destinations leave the dialog and navigate the main page.
@@ -259,24 +260,26 @@ export default class extends Controller {
 
   async allowDeparture() {
     const frame = this.pageTarget
-    if (this.discardResolver || frame.dataset.waSubmitting === "true") return false
+    if (confirmationPending(document) || frame.dataset.waSubmitting === "true") return false
     if (frame.dataset.waDirty !== "true") return true
-    if (!this.hasConfirmationTarget) return false
+    if (!this.hasConfirmationTarget || !this.hasKeepEditingTarget) return false
     const source = frame.contentDocument
-    const approved = await new Promise(resolve => {
-      this.discardResolver = resolve
-      this.confirmationTarget.showModal()
-      this.keepEditingTarget.focus()
+    const dialog = this.confirmationTarget
+    const current = () => Boolean(source && this.dialogTarget.open &&
+      source === frame.contentDocument && frame.dataset.waSubmitting !== "true")
+    const approved = await requestConfirmation(document, {
+      kind: "discard",
+      title: dialog.querySelector("#wa-discard-title")?.textContent,
+      message: dialog.querySelector("#wa-discard-description")?.textContent,
+      cancel: this.keepEditingTarget.textContent,
+      approve: dialog.querySelector("[data-action='wa-page-dialog#confirmDiscard']")?.textContent,
+      isCurrent: current
     })
-    return approved && this.dialogTarget.open && source === frame.contentDocument &&
-      frame.dataset.waSubmitting !== "true"
+    return approved && current()
   }
 
   finishDiscard(approved) {
-    const resolve = this.discardResolver
-    this.discardResolver = null
-    if (this.hasConfirmationTarget && this.confirmationTarget.open) this.confirmationTarget.close()
-    if (resolve) resolve(approved)
+    if (this.hasConfirmationTarget) settleConfirmation(this.confirmationTarget, approved)
   }
 
   cancelDiscard(event) {
