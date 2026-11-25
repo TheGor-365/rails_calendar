@@ -1,8 +1,5 @@
 <div class="container wa-owner-intake my-4 my-sm-5">
-  <header class="rc-page-hero mb-4">
-    <div class="rc-page-hero__content">
-    <p class="eyebrow"><%= t("intake.show_eyebrow", id: @intake.id) %></p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-kanban"></i></span><h1 class="page-title"><%= @intake.title %></h1></div>
+  <% banner_metadata = capture do %>
     <div class="wa-owner-intake__meta" aria-label="<%= t("intake.owner_view.meta_label") %>">
       <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= rc_intake_type(@intake.project_type) %></span>
       <span class="rc-status-pill"><i class="bi bi-circle-half" aria-hidden="true"></i><%= rc_intake_status(@intake.status) %></span>
@@ -10,24 +7,24 @@
         <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-file-earmark-text" aria-hidden="true"></i><%= t("intake.spec_eyebrow", version: @latest_spec.version) %></span>
       <% end %>
     </div>
-    <p class="rc-hint"><%= t("intake.show_hint") %></p>
     <% if owner_signed_in? %>
       <% quiz_questions = Intake::QuizCatalog.for(@intake.project_type) %>
       <% quiz_saved = @intake.intake_answers.where(question_key: quiz_questions.map { |question| question.fetch(:key) }).count %>
       <% quiz_label = quiz_saved.zero? ? t("intake.quiz_start") : (quiz_saved < quiz_questions.size ? t("intake.quiz_resume") : t("intake.quiz_review")) %>
       <div class="rc-quiz-intake-entry">
-        <%= link_to rc_icon_label("ui-checks-grid", quiz_label), project_intake_quiz_path(@intake), class: "rc-action rc-action--primary" %>
+        <%= link_to rc_icon_label("ui-checks-grid", quiz_label), project_intake_quiz_path(@intake), class: "rc-action rc-action--quiet" %>
         <p class="rc-hint mb-0 mt-2"><%= t("intake.quiz_saved", saved: quiz_saved, total: quiz_questions.size) %></p>
       </div>
     <% end %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :detail, icon: "kanban", path: t("intake.show_eyebrow", id: @intake.id), title: @intake.title, extra_class: "rc-page-hero mb-4", metadata: banner_metadata %>
   <% owner_nav_sections = [
     ["intake-current", "pin-angle", t("intake_context.current_title")],
     ["intake-workflow", "diagram-3", t("intake.workflow_show")],
     ["intake-brief", "card-text", t("intake.owner_view.brief")],
     ["intake-interview", "chat-left-text", t("intake.interview_title")]
   ] %>
+  <% owner_nav_sections << ["intake-scope", "diagram-3", t("e2_scope.owner_title")] if @intake.latest_scope_revision %>
   <% owner_nav_sections << ["intake-review", "shield-lock", t("intake.admin_title")] if admin_signed_in? %>
   <% owner_nav_sections << ["intake-spec", "file-earmark-text", t("intake.spec_title")] if @latest_spec && (admin_signed_in? || @latest_spec.approved?) %>
   <% owner_nav_sections << ["private-project-calendar", "calendar-range", t("intake.calendar_title")] if @milestones.any? && (admin_signed_in? || @latest_spec&.approved?) %>
@@ -49,6 +46,18 @@
       <div><h2 id="intake-brief-heading"><%= t("intake.owner_view.brief") %></h2>
       <p class="rc-hint mb-0"><%= t("intake.owner_view.brief_help") %></p></div>
     </div>
+    <% if (invite = @intake.client_request_invitation) %>
+      <p class="rc-status-pill rc-status-pill--muted"><%= t("e2.state_#{invite.state}") %></p>
+      <details class="wa-context__original mb-3">
+        <summary><%= t("e2.owner_seed_title") %></summary>
+        <p class="rc-hint"><%= t("e2.owner_seed_warning") %></p>
+        <p class="wa-owner-intake__prose"><%= invite.seed_goal %></p>
+        <% if invite.seed_goal != @intake.goal %>
+          <p class="rc-hint"><%= t("e2.edit_title") %></p>
+          <p class="wa-owner-intake__prose"><%= @intake.goal %></p>
+        <% end %>
+      </details>
+    <% end %>
     <details class="wa-context__original" <%= "open" if @intake.goal.length <= 360 %>>
       <summary><i class="bi bi-journal-text" aria-hidden="true"></i><%= t("intake_context.original_toggle") %></summary>
       <div class="wa-owner-intake__brief">
@@ -73,6 +82,53 @@
       </div>
     <% end %>
   </section>
+  <% if owner_signed_in? && @intake.latest_scope_revision %>
+    <section class="surface-panel wa-owner-intake__panel mb-4">
+      <div class="wa-owner-intake__section-heading">
+        <span class="wa-owner-intake__icon"><i class="bi bi-list-check" aria-hidden="true"></i></span>
+        <div>
+          <h2><%= t("e23_requirements.title") %></h2>
+          <p class="rc-hint mb-0"><%= t("e23_requirements.no_approval") %></p>
+        </div>
+      </div>
+      <%= link_to rc_icon_label("journal-code", t("e23_requirements.generate")),
+        owner_requirements_path(@intake), class: "rc-action rc-action--primary" %>
+    </section>
+  <% end %>
+  <% if (scope_revision = @intake.latest_scope_revision) %>
+    <section class="surface-panel wa-owner-intake__panel wa-scope-owner mb-4" id="intake-scope" aria-labelledby="intake-scope-heading">
+      <div class="wa-owner-intake__section-heading">
+        <span class="wa-owner-intake__icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></span>
+        <div>
+          <h2 id="intake-scope-heading"><%= t("e2_scope.owner_title") %></h2>
+          <p class="rc-hint mb-0"><%= t("e2_scope.owner_hint", version: scope_revision.version) %></p>
+        </div>
+      </div>
+      <div class="wa-scope-owner__grid">
+        <% IntakeScopeSections::ITEMS.each_with_index do |(key, icon), index| %>
+          <% answer = scope_revision.answers.fetch(key, {}) %>
+          <article class="wa-scope-owner__item">
+            <div class="wa-scope-owner__item-top">
+              <span class="wa-scope__section-icon"><i class="bi <%= icon %>" aria-hidden="true"></i></span>
+              <div>
+                <small><%= format("S-%02d", index + 1) %> <%= t("e2_scope.section_reference") %></small>
+                <h3><%= t("e2_scope.sections.#{key}.title") %></h3>
+              </div>
+            </div>
+            <p class="wa-scope-owner__technical"><%= t("e2_scope.sections.#{key}.technical") %></p>
+            <p class="wa-scope-owner__client"><span><%= t("e2_scope.owner_client_says") %></span>
+              <%= answer.fetch("text", "").presence || t("e2_scope.not_yet_answered") %></p>
+            <div class="wa-scope-owner__meta">
+              <span><%= t("e2_scope.statuses.#{answer.fetch("status", "unknown")}") %></span>
+              <span><%= t("e2_scope.responsibilities.#{answer.fetch("responsibility", "open")}") %></span>
+            </div>
+          </article>
+        <% end %>
+      </div>
+      <p class="rc-hint mt-3"><%= t("e2_scope.owner_warning") %></p>
+    </section>
+  <% end %>
+
   <section class="surface-panel wa-owner-intake__panel mb-4" id="intake-interview"
            aria-label="<%= t("intake.interview_aria") %>">
     <div class="wa-owner-intake__section-heading">

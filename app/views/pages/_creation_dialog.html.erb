@@ -1,0 +1,36 @@
+<% if admin_signed_in? %>
+  <dialog class="wa-calendar-dialog" data-wa-calendar-create-target="dialog" aria-labelledby="wa-calendar-dialog-title"
+          data-action="click->wa-calendar-create#outside">
+    <div class="wa-calendar-dialog__body">
+      <header class="wa-calendar-dialog__header">
+        <span class="wa-calendar-dialog__icon"><i class="bi bi-calendar2-plus" aria-hidden="true"></i></span>
+        <div><p class="eyebrow mb-1"><%= t("calendar_actions.new_entry") %></p>
+          <h2 id="wa-calendar-dialog-title"><%= t("calendar_actions.consultation") %></h2></div>
+        <button type="button" class="wa-calendar-dialog__close" data-action="click->wa-calendar-create#close" aria-label="<%= t("calendar_actions.close") %>"><i class="bi bi-x-lg"></i></button>
+      </header>
+      <form class="wa-calendar-dialog__form" data-action="submit->wa-calendar-create#save">
+        <div>
+          <label for="wa-calendar-title"><%= t("consultations.field_title") %></label>
+          <input id="wa-calendar-title" name="consultation[title]" type="text" maxlength="120" required
+                 data-wa-calendar-create-target="title">
+        </div>
+        <div class="wa-calendar-dialog__times">
+          <div><label for="wa-calendar-start"><%= t("consultations.field_start") %></label>
+            <input id="wa-calendar-start" name="consultation[start_time]" type="datetime-local" required
+                   min="2000-01-01T00:00" max="2100-12-31T23:59" step="60" data-wa-calendar-create-target="start"></div>
+          <div><label for="wa-calendar-end"><%= t("consultations.field_end") %></label>
+            <input id="wa-calendar-end" name="consultation[end_time]" type="datetime-local" required
+                   min="2000-01-01T00:00" max="2100-12-31T23:59" step="60" data-wa-calendar-create-target="end"></div>
+        </div>
+        <div><label for="wa-calendar-description"><%= t("consultations.field_description") %></label>
+          <textarea id="wa-calendar-description" name="consultation[description]" rows="3" maxlength="5000"
+                    data-wa-calendar-create-target="description"></textarea></div>
+        <p class="wa-calendar-dialog__error" role="alert" data-wa-calendar-create-target="error"></p>
+        <div class="wa-calendar-dialog__actions">
+          <button type="submit" class="rc-action rc-action--primary" data-wa-calendar-create-target="submit"><%= rc_icon_label("check2-circle", t("consultations.create_action")) %></button>
+          <button type="button" class="rc-action rc-action--quiet" data-action="click->wa-calendar-create#close"><%= rc_icon_label("x-lg", t("consultations.cancel")) %></button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+<% end %>

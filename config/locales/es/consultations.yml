@@ -1,5 +1,6 @@
 es:
   consultations:
+    ai_prepare: "Preparar con IA"
     all_eyebrow: "HORARIO / TODOS LOS REGISTROS"
     title: "Consultas"
     list_hint: "Lista cronológica. Abre una consulta o salta a la fecha de su calendario."

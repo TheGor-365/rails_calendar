@@ -1,23 +1,33 @@
 <div class="container wa-client-request my-4 my-sm-5">
-  <header class="rc-page-hero mb-4">
-    <div class="rc-page-hero__content">
-      <p class="eyebrow"><i class="bi bi-shield-check" aria-hidden="true"></i> <%= t("client_requests.eyebrow") %></p>
-      <div class="rc-page-hero__heading">
-        <span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-kanban"></i></span>
-        <h1 class="page-title"><%= @intake.title %></h1>
-      </div>
-      <div class="wa-client-request__meta">
+  <% banner_meta = capture do %>
+    <div class="wa-client-request__meta">
         <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= rc_intake_type(@intake.project_type) %></span>
         <span class="rc-status-pill"><i class="bi bi-circle-half" aria-hidden="true"></i><%= rc_intake_status(@intake.status) %></span>
         <% if @spec %>
           <span class="rc-status-pill rc-status-pill--muted"><i class="bi bi-file-earmark-check" aria-hidden="true"></i><%= t("client_requests.spec_version", version: @spec.version) %></span>
         <% end %>
       </div>
-      <div class="rc-page-hero__actions mt-3">
-        <%= link_to rc_icon_label("arrow-left", t("client_requests.back")), client_home_path, class: "rc-action rc-action--quiet rc-action--small" %>
-      </div>
-    </div>
-  </header>
+  <% end %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("arrow-left", t("client_requests.back")), client_home_path, class: "rc-action rc-action--quiet rc-action--small" %>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :detail, icon: "kanban", path: t("client_requests.eyebrow"), title: @intake.title, extra_class: "rc-page-hero mb-4", metadata: banner_meta, actions: banner_actions %>
+
+  <% if @invitation %>
+    <section class="surface-panel p-3 p-sm-4 mb-3" aria-label="<%= t('e2.owner_seed_title') %>">
+      <h2 class="h5"><%= t("e2.owner_seed_title") %></h2>
+      <p class="rc-hint"><%= t("e2.owner_seed_warning") %></p>
+      <details><summary><%= t("e2.owner_seed_title") %></summary>
+        <p class="wa-prose"><%= @invitation.seed_goal %></p>
+      </details>
+      <% if @invitation.submitted_at.nil? %>
+        <%= link_to rc_icon_label("pencil-square", t("e2.edit_title")),
+              edit_client_request_path(@intake), class: "rc-action rc-action--primary mt-2" %>
+      <% else %>
+        <p class="rc-notice rc-notice--success mb-0"><%= t("e2.state_submitted") %></p>
+      <% end %>
+    </section>
+  <% end %>
 
   <% client_nav_sections = [
     ["intake-current", "pin-angle", t("intake_context.current_title")],
@@ -42,6 +52,18 @@
       <span class="wa-client-request__section-icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
       <h2 id="client-request-description"><%= t("client_requests.description_title") %></h2>
     </div>
+    <% if @selected_service_versions.any? %>
+      <div class="wa-client-request__services">
+        <strong><%= t("client_requests.selected_services_heading") %></strong>
+        <ul>
+          <% @selected_service_versions.each do |version| %>
+            <li><%= version.title %>
+              <small><%= t("client_requests.service_revision", version: version.version) %></small>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
     <details class="wa-context__original" <%= "open" if @intake.goal.length <= 360 %>>
       <summary><i class="bi bi-journal-text" aria-hidden="true"></i><%= t("intake_context.original_toggle") %></summary>
       <div class="wa-client-request__description wa-prose"><%= @intake.goal %></div>

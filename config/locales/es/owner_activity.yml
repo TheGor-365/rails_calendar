@@ -1,0 +1,11 @@
+es:
+  owner_activity:
+    outgoing: "Invitaciones enviadas"
+    all_outgoing: "Todas las invitaciones"
+    open_request: "Abrir solicitud"
+    requirements: "Requisitos y alcance"
+    none_outgoing: "Todavía no hay invitaciones enviadas."
+    view_ai_result: "Ver resultado de IA"
+    open_invitation: "Abrir invitación"
+    project_activity: "Actividad de proyectos"
+    none_in_period: "No hay invitaciones enviadas en este período."

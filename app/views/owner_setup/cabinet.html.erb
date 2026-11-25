@@ -1,21 +1,26 @@
 <div class="container ws-account-page my-4 my-sm-5" id="owner-cabinet">
-  <header class="ws-account-hero">
-    <div class="ws-account-hero-copy">
-      <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("account_hub.owner_eyebrow") %></p>
-      <h1 class="page-title"><%= t("account_hub.owner_title") %></h1>
-      <p class="ws-account-lead"><%= t("account_hub.owner_intro") %></p>
-      <div class="ws-account-meta">
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("person-vcard", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet", data: { wa_page_dialog: "frame" } %>
+        <%= link_to rc_icon_label("stars", t("account_hub.interview")), owner_setup_path(step: "A"), class: "rc-action rc-action--quiet", data: { wa_page_dialog: "frame" } %>
+  <% end %>
+  <% banner_metadata = capture do %>
+    <div class="ws-account-meta">
         <span class="ws-account-chip"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.private_scope") %></span>
         <span class="ws-account-chip"><i class="bi bi-person-check" aria-hidden="true"></i><%= current_user.email %></span>
       </div>
-    </div>
+  <% end %>
+  <% banner_accessory = capture do %>
     <div class="ws-account-hero-symbol ws-account-avatar-frame" id="owner-avatar"
-         data-controller="wa-avatar-editor"
+         data-controller="wa-avatar-editor wa-private-image"
          data-wa-avatar-editor-success-value="<%= t("account_hub.avatar_crop_ready") %>"
          data-wa-avatar-editor-failure-value="<%= t("account_hub.avatar_crop_failed") %>">
       <% if (avatar = local_owner_avatar_attachment(current_user)) %>
         <%= image_tag owner_avatar_file_path(avatar), class: "ws-account-avatar",
-              alt: t("account_hub.avatar_alt"), loading: "lazy" %>
+              alt: t("account_hub.avatar_alt"), loading: "lazy",
+              data: { wa_private_image_target: "image",
+                      action: "error->wa-private-image#failed" } %>
+        <i class="bi bi-person-workspace ws-account-avatar-placeholder" aria-hidden="true"
+           data-wa-private-image-target="fallback" hidden></i>
       <% else %>
         <i class="bi bi-person-workspace ws-account-avatar-placeholder" aria-hidden="true"></i>
       <% end %>
@@ -63,9 +68,10 @@
         </details>
       <% end %>
     </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :account, icon: "person-badge", path: t("account_hub.owner_eyebrow"), title: t("account_hub.owner_title"), extra_class: "ws-account-hero", metadata: banner_metadata, accessory: banner_accessory, actions: banner_actions %>
 
-  <section class="ws-account-overview" aria-label="<%= t('account_hub.owner_overview') %>">
+  <section class="ws-account-overview" id="owner-cabinet-overview" data-wa-dialog-refresh aria-label="<%= t('account_hub.owner_overview') %>">
     <div class="ws-account-metric">
       <span class="ws-account-metric-icon"><i class="bi bi-patch-check" aria-hidden="true"></i></span>
       <small><%= t("account_hub.profile_status") %></small>
@@ -86,12 +92,17 @@
     </div>
   </section>
 
-  <div class="ws-account-content">
-    <section class="ws-account-main">
-      <div class="ws-account-section-heading">
-        <div><p class="eyebrow"><%= t("account_hub.profile_eyebrow") %></p><h2><%= t("account_hub.professional_profile") %></h2></div>
-        <%= link_to rc_icon_label("arrow-up-right", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet rc-action--small" %>
-      </div>
+  <div class="ws-account-content ws-account-content--rail" data-controller="wa-section-nav">
+    <nav class="wa-cabinet-rail" aria-label="<%= t("nav.workspace_sections") %>">
+      <a href="#cabinet-profile" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-person-vcard" aria-hidden="true"></i><%= t("account_hub.rail_profile", default: "Profile") %></a>
+      <a href="#cabinet-tools" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= t("account_hub.rail_ai", default: "AI settings") %></a>
+      <a href="#cabinet-privacy" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.rail_data", default: "Data") %></a>
+    </nav>
+    <div class="ws-account-section-heading ws-account-profile-heading" id="cabinet-profile">
+        <div><p class="eyebrow"><%= t("account_hub.profile_eyebrow") %></p><h2 id="cabinet-profile-title" class="visually-hidden"><%= t("account_hub.professional_profile") %></h2></div>
+        <%= link_to rc_icon_label("arrow-up-right", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet rc-action--small", data: { wa_page_dialog: "frame" } %>
+    </div>
+    <section class="ws-account-main" aria-labelledby="cabinet-profile-title">
       <div class="ws-account-feature">
         <div class="ws-account-feature-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></div>
         <div class="ws-account-feature-copy">
@@ -104,56 +115,36 @@
         </div>
       </div>
 
-      <div class="ws-account-section-heading ws-account-section-heading--later">
-        <div><p class="eyebrow"><%= t("account_hub.tools_eyebrow") %></p><h2><%= t("account_hub.owner_tools") %></h2></div>
+      <div class="ws-account-section-heading ws-account-section-heading--later" id="cabinet-tools">
+        <div><p class="eyebrow"><%= t("account_hub.tools_eyebrow") %></p><h2 class="visually-hidden"><%= t("account_hub.owner_tools") %></h2></div>
       </div>
       <div class="ws-account-link-grid">
-        <%= link_to owner_setup_path(step: "A"), class: "ws-account-tool" do %>
+        <%# Identity and account settings only: operational areas have canonical homes. %>
+        <%= link_to owner_setup_path(step: "A"), class: "ws-account-tool", data: { wa_page_dialog: "frame" } do %>
           <span class="ws-account-tool-icon"><i class="bi bi-chat-square-dots" aria-hidden="true"></i></span>
-          <strong><%= t("account_hub.interview") %></strong><small><%= t("account_hub.interview_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
-        <% end %>
-        <%= link_to owner_capabilities_path, class: "ws-account-tool" do %>
-          <span class="ws-account-tool-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span>
-          <strong><%= t("account_hub.capabilities") %></strong><small><%= t("account_hub.capabilities_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
-        <% end %>
-        <%= link_to owner_services_path, class: "ws-account-tool" do %>
-          <span class="ws-account-tool-icon"><i class="bi bi-boxes" aria-hidden="true"></i></span>
-          <strong><%= t("account_hub.my_services") %></strong><small><%= t("account_hub.my_services_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
-        <% end %>
-        <%= link_to owner_catalogue_ai_path, class: "ws-account-tool" do %>
-          <span class="ws-account-tool-icon"><i class="bi bi-stars" aria-hidden="true"></i></span>
-          <strong><%= t("account_hub.catalogue_copilot") %></strong><small><%= t("account_hub.catalogue_copilot_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
-        <% end %>
-        <%= link_to owner_ai_assistant_path, class: "ws-account-tool" do %>
-          <span class="ws-account-tool-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></span>
-          <strong><%= t("owner_ai_assistant.context_owner_workspace") %></strong>
-          <small><%= t("owner_ai_assistant.context_owner_workspace_desc") %></small>
+          <strong><%= t("account_hub.interview") %></strong><small><%= t("account_hub.interview_desc") %></small>
           <span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
         <% end %>
-        <%= link_to owner_ai_activity_path, class: "ws-account-tool" do %>
-          <span class="ws-account-tool-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>
-          <strong><%= t("account_hub.ai_activity") %></strong><small><%= t("account_hub.ai_activity_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+        <%= link_to owner_capabilities_path, class: "ws-account-tool", data: { wa_page_dialog: "frame" } do %>
+          <span class="ws-account-tool-icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span>
+          <strong><%= t("account_hub.capabilities") %></strong><small><%= t("account_hub.capabilities_desc") %></small>
+          <span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
         <% end %>
-        <%= link_to workspace_path, class: "ws-account-tool" do %>
-          <span class="ws-account-tool-icon"><i class="bi bi-grid-1x2" aria-hidden="true"></i></span>
-          <strong><%= t("account_hub.workspace") %></strong><small><%= t("account_hub.workspace_desc") %></small><span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
+        <%= link_to owner_ai_activity_path, class: "ws-account-tool", data: { wa_page_dialog: "frame" } do %>
+          <span class="ws-account-tool-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>
+          <strong><%= t("account_hub.ai_activity") %></strong><small><%= t("account_hub.ai_activity_desc") %></small>
+          <span class="ws-account-tool-arrow"><i class="bi bi-arrow-up-right" aria-hidden="true"></i></span>
         <% end %>
       </div>
     </section>
     <aside class="ws-account-aside">
-      <div class="ws-account-side-panel">
+      <div class="ws-account-side-panel" id="cabinet-privacy">
         <span class="ws-account-side-icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
         <h2><%= t("account_hub.storage_heading") %></h2>
         <p><%= t("account_hub.storage_explanation") %></p>
         <div class="ws-account-fact"><span><%= t("account_hub.data_scope") %></span><strong><%= t("account_hub.local_private") %></strong></div>
         <div class="ws-account-fact"><span><%= t("account_hub.public_visibility") %></span><strong><%= t("account_hub.not_published") %></strong></div>
         <div class="ws-account-fact"><span><%= t("account_hub.approval") %></span><strong><%= t("account_hub.owner_approval") %></strong></div>
-      </div>
-      <div class="ws-account-side-panel ws-account-side-panel--soft">
-        <h2><%= t("account_hub.work_overview") %></h2>
-        <div class="ws-account-fact"><span><%= t("account_hub.intake_drafts") %></span><strong><%= @open_intakes %></strong></div>
-        <div class="ws-account-fact"><span><%= t("account_hub.upcoming_consultations") %></span><strong><%= @upcoming_consultations %></strong></div>
-        <%= link_to rc_icon_label("inboxes", t("account_hub.open_requests")), admin_project_intakes_path, class: "rc-action rc-action--quiet rc-action--small" %>
       </div>
     </aside>
   </div>

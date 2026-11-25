@@ -129,6 +129,11 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
   end
 
   test "knowledge inventory is scoped, read-only, and never exposes private profile summary" do
+    # Explicitly model an approved profile without shareable facts before version 2.
+    snapshot = @profile.approved_snapshot
+    snapshot.update_columns(payload: snapshot.payload.except("public_summary_draft", "public_summary"))
+    @workspace.reload
+
     catalogue = OwnerServices::Catalogue.new(workspace: @workspace)
     catalogue.create_draft!(service_fields(@profile.professional_capabilities.first,
       title: "Synthetic owner-only knowledge service"))
@@ -167,6 +172,40 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
       assert_select "#owner-ai-knowledge", text: /OWNER_PRIVATE_NOT_FOR_KNOWLEDGE_UI/, count: 0
       assert_select "#owner-ai-knowledge", text: /FOREIGN_PRIVATE_KNOWLEDGE_NEVER_VISIBLE/, count: 0
       assert_select "#owner-ai-knowledge", text: /1.*0/
+    end
+  end
+
+  test "catalogue context excludes drafts foreign services private fields and stale snapshots" do
+    catalogue = OwnerServices::Catalogue.new(workspace: @workspace)
+    offering = catalogue.create_draft!(service_fields(@profile.professional_capabilities.first, title: "Public synthetic Rails service"))
+    draft = offering.draft_version
+    catalogue.approve!(offering: offering, version: draft.version, digest: draft.digest, confirmed: true)
+    approved = offering.reload.approved_version
+    catalogue.publish!(offering: offering, version_id: approved.id, digest: approved.digest, confirmed: true, owner: @owner)
+    catalogue.create_draft!(service_fields(@profile.professional_capabilities.first, title: "PRIVATE_UNPUBLISHED_SERVICE"))
+    foreign_catalogue = OwnerServices::Catalogue.new(workspace: @foreign_workspace)
+    foreign = foreign_catalogue.create_draft!(service_fields(@foreign_profile.professional_capabilities.first, title: "FOREIGN_PUBLISHED_SERVICE"))
+    foreign_draft = foreign.draft_version
+    foreign_catalogue.approve!(offering: foreign, version: foreign_draft.version, digest: foreign_draft.digest, confirmed: true)
+    foreign_approved = foreign.reload.approved_version
+    foreign_catalogue.publish!(offering: foreign, version_id: foreign_approved.id, digest: foreign_approved.digest, confirmed: true, owner: @other)
+
+    assert_no_difference("AiSpendEntry.count") do
+      entries = OwnerAi::CatalogueContext.new(workspace: @workspace).entries
+      assert_equal 1, entries.length
+      assert_equal %w[delivery_mode included_scope summary title version], entries.first.keys.sort
+      assert_equal "Public synthetic Rails service", entries.first["title"]
+      refute_includes JSON.generate(entries), "FOREIGN_PUBLISHED_SERVICE"
+      refute_includes JSON.generate(entries), "PRIVATE_UNPUBLISHED_SERVICE"
+      assert OwnerAi::KnowledgeReadiness.new(workspace: @workspace).service_catalogue_available_to_composer?
+      @profile.update!(onboarding_state: "draft")
+      assert_empty OwnerAi::CatalogueContext.new(workspace: @workspace).entries
+      @profile.update!(onboarding_state: "approved")
+      @profile.professional_context_snapshots.create!(
+        version: 2, digest: Digest::SHA256.hexdigest("catalogue-stale-snapshot"),
+        payload: { "headline" => "New synthetic profile" }, approved_at: Time.current
+      )
+      assert_empty OwnerAi::CatalogueContext.new(workspace: @workspace).entries
     end
   end
 
@@ -226,6 +265,54 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     refute_includes source_text, "NEVER_SEND_PRIVATE_CONTEXT"
     assert_equal "service_copy", entry.result["purpose"]
     assert_equal 2, entry.result["profile_version"]
+    assert_nil JSON.parse(source_text)["published_service_catalogue"]
+  ensure
+    ENV["XAI_API_KEY"] = old_key
+  end
+
+  test "explicit catalogue opt-in sends only current published fields to mocked provider" do
+    catalogue = OwnerServices::Catalogue.new(workspace: @workspace)
+    offering = catalogue.create_draft!(service_fields(@profile.professional_capabilities.first, title: "Consented public service"))
+    draft = offering.draft_version
+    catalogue.approve!(offering: offering, version: draft.version, digest: draft.digest, confirmed: true)
+    approved = offering.reload.approved_version
+    catalogue.publish!(offering: offering, version_id: approved.id, digest: approved.digest, confirmed: true, owner: @owner)
+    catalogue.create_draft!(service_fields(@profile.professional_capabilities.first, title: "SECRET_DRAFT_NOT_SENT"))
+    response = Struct.new(:code, :body).new("200", JSON.generate(
+      status: "completed", id: "provider-catalogue-synthetic",
+      output: [{ type: "message", content: [{ type: "output_text", text: JSON.generate(
+        heading: "Synthetic catalogue draft", draft: "Review the published service before confirming the task.",
+        questions: [], cautions: [], next_step: "Owner reviews."
+      ) }] }],
+      usage: { input_tokens: 120, output_tokens: 180, total_tokens: 300, cost_in_usd_ticks: 120_000 }
+    ))
+    payloads = []
+    http = Object.new
+    http.define_singleton_method(:request) { |request| payloads << JSON.parse(request.body); response }
+    old_key = ENV["XAI_API_KEY"]
+    ENV["XAI_API_KEY"] = "xai-fictional-catalogue-test"
+    login(@owner)
+    OwnerIntelligence::Grok.stub(:enabled?, true) do
+      IntakeAiQuota.stub(:reserve_call!, true) do
+        Net::HTTP.stub(:start, ->(*_args, **_kwargs, &block) { block.call(http) }) do
+          assert_no_difference("AiSpendEntry.count") do
+            post create_owner_ai_draft_path, params: { operation: "service_copy", brief: "Review the fictional service catalogue.", include_catalogue: "1" }
+          end
+          assert_empty payloads
+          assert_difference("AiSpendEntry.count", 1) do
+            assert_no_difference("ServiceOfferingVersion.count") do
+              post create_owner_ai_draft_path, params: { operation: "service_copy", brief: "Review the fictional service catalogue.", include_catalogue: "1", paid_consent: "1" }
+            end
+          end
+        end
+      end
+    end
+    assert_equal 1, payloads.size
+    source = JSON.parse(payloads.first.fetch("input").last.fetch("content"))
+    assert_equal [{ "title" => approved.title, "summary" => approved.summary, "included_scope" => approved.included_scope, "delivery_mode" => approved.delivery_mode, "version" => approved.version }], source.fetch("published_service_catalogue")
+    refute_includes JSON.generate(source), "SECRET_DRAFT_NOT_SENT"
+    refute_includes JSON.generate(source), approved.excluded_scope
+    assert_equal "settled", @profile.ai_spend_entries.order(:id).last.status
   ensure
     ENV["XAI_API_KEY"] = old_key
   end
@@ -239,16 +326,16 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_select "#owner-ai-draft-library"
       assert_select "#owner-ai-draft-library a[href=?]",
-                    owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy"), count: 1
+                    owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy", anchor: "wa-ai-result-heading"), count: 1
       assert_select "#owner-ai-draft-library", text: /FOREIGN_PRIVATE_DRAFT_NOT_VISIBLE/, count: 0
 
       get owner_ai_assistant_path(entry_id: foreign_entry.id)
       assert_response :success
       assert_select ".wa-ai-page__draft", count: 0
       assert_select "#owner-ai-draft-library a[href=?]",
-                    owner_ai_assistant_path(entry_id: foreign_entry.id, operation: "service_copy"), count: 0
+                    owner_ai_assistant_path(entry_id: foreign_entry.id, operation: "service_copy", anchor: "wa-ai-result-heading"), count: 0
 
-      get owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy")
+      get owner_ai_assistant_path(entry_id: owner_entry.id, operation: "service_copy", anchor: "wa-ai-result-heading")
       assert_select ".wa-ai-page__draft", text: /Owner private synthetic AI draft/
     end
   end
@@ -269,7 +356,8 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
     assert_no_difference("AiSpendEntry.count") do
       get owner_cabinet_path
       assert_response :success
-      assert_select "a.ws-account-tool[href=?]", owner_ai_assistant_path
+      assert_select "a.ws-account-tool[href=?]", owner_ai_assistant_path, count: 0
+      assert_select "header.app-header a[href=?]", owner_ai_assistant_path, minimum: 1
 
       get owner_practice_path
       assert_response :success
@@ -283,6 +371,45 @@ class OwnerAiAssistantTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_select "a[href=?]", owner_ai_assistant_path(operation: "service_copy")
     end
+  end
+
+  test "shared compact banners retain semantic headings and quiet contextual navigation" do
+    login(@owner)
+    assert_no_difference("AiSpendEntry.count") do
+      [owner_cabinet_path, owner_practice_path, owner_setup_path(step: "A"),
+       owner_capabilities_path, owner_services_path, owner_ai_assistant_path].each do |path|
+        get path
+        assert_response :success
+        assert_select "header[data-wa-banner]", count: 1 do
+          assert_select ".wa-banner__path > i", count: 1
+          assert_select "h1.visually-hidden", count: 1
+          assert_select ".ws-owner-heading-icon, .wa-ai-page__hero-mark, .wa-services__hero-symbol", count: 0
+          assert_select ".wa-banner__actions .rc-action--primary, .wa-banner__actions .rc-action--soft", count: 0
+        end
+      end
+      get owner_cabinet_path
+      assert_select "header[data-wa-banner='account'] a[data-wa-page-dialog][href=?]", owner_practice_path, count: 1
+      assert_select "#owner-cabinet a[data-wa-page-dialog][href=?]", owner_practice_path, count: 2
+    end
+  end
+
+
+
+  test "invalid interview submission retains text and allowed choices without writing" do
+    login(@owner)
+    allowed = OwnerIntelligence::Catalog.options_for("A").keys.first
+    notes = "Synthetic invalid interview note"
+    assert_no_difference ["OwnerInterviewAnswer.count", "OwnerInterviewAnswerRevision.count", "AiSpendEntry.count"] do
+      patch owner_setup_section_path(section_key: "A"), params: {
+        owner_answer: { notes: notes, selected_options: [allowed, "invalid_test_option"] }
+      }
+      assert_response :unprocessable_entity
+      assert_select "form[data-wa-invalid-draft='true']", count: 1
+      assert_select "textarea#owner_notes", text: notes
+      assert_select "input[type=checkbox][value=?][checked]", allowed, count: 1
+      assert_select "main[data-wa-dialog-outcome='advance']", count: 0
+    end
+    assert_equal "approved", @profile.reload.onboarding_state
   end
 
   private

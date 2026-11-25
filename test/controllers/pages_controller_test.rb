@@ -14,6 +14,31 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "time.calendar-day-label[datetime='2023-01-19']", count: 1
   end
 
+  test "owner without workspace sees calendar but no private activity" do
+    owner = User.create!(email: "calendar-no-workspace@example.test", role: "owner",
+      password: "synthetic-calendar-password-2026")
+    assert_nil owner.owner_workspace
+
+    post account_session_path, params: {
+      email: owner.email, password: "synthetic-calendar-password-2026"
+    }
+    assert_redirected_to workspace_path
+
+    assert_no_difference "Workspace.count" do
+      get root_path(start_date: "2026-11-18")
+      assert_response :success
+      assert_select "[data-calendar-month-total]", minimum: 1
+
+      get calendar_day_path(date: "2026-11-18")
+      assert_response :success
+      assert_select ".wa-calendar-day-recap", count: 0
+
+      get calendar_hour_path(date: "2026-11-18", hour: 17)
+      assert_response :success
+      assert_select "li[data-hour-activity-source]", count: 0
+    end
+  end
+
   test "should get home" do
     get root_url
     assert_response :success

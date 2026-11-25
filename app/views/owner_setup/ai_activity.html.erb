@@ -1,11 +1,12 @@
+<% settings_content = capture do %>
 <div class="container ws-owner-page ws-owner-activity my-4 my-sm-5" id="owner-ai-activity">
-  <header class="ws-owner-hero"><div class="ws-owner-hero-copy">
-    <p class="eyebrow"><i class="bi bi-stars" aria-hidden="true"></i> <%= t("owner_setup.practice_eyebrow") %></p>
-    <h1 class="page-title"><%= t("owner_setup.ai_activity") %></h1>
-    <p class="rc-muted"><%= t("owner_setup.activity_intro") %></p>
-    <p class="ws-owner-tag"><i class="bi bi-currency-dollar" aria-hidden="true"></i><%= t("owner_setup.budget", spent: format("%.5f", @spend[:billed_ticks].to_f / AiSpendLedger::USD_TICKS), cap: format("%.2f", @spend[:cap_ticks].to_f / AiSpendLedger::USD_TICKS)) %></p></div>
-    <div class="ws-owner-hero-actions"><%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %></div>
-  </header>
+  <% banner_metadata = capture do %>
+    <p class="ws-owner-tag"><i class="bi bi-currency-dollar" aria-hidden="true"></i><%= t("owner_setup.budget", spent: format("%.5f", @spend[:billed_ticks].to_f / AiSpendLedger::USD_TICKS), cap: format("%.2f", @spend[:cap_ticks].to_f / AiSpendLedger::USD_TICKS)) %></p>
+  <% end %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :standard, icon: "stars", path: t("owner_setup.practice_eyebrow") + " / " + t("owner_setup.ai_activity"), title: t("owner_setup.ai_activity"), extra_class: "ws-owner-hero", description: t("owner_setup.activity_intro"), metadata: banner_metadata, actions: banner_actions %>
   <div class="ws-owner-data-panel">
     <% if @entries.empty? %><p class="rc-muted"><%= t("owner_setup.no_activity") %></p><% end %>
     <ol class="rc-record-list ws-owner-activity-list">
@@ -14,9 +15,30 @@
           <strong><%= entry.operation %> · <%= entry.status %></strong>
           <p class="rc-hint mb-0"><%= entry.model %> · <%= l(entry.created_at, format: :short) %> ·
             <%= entry.charged_ticks ? format("$%.8f", entry.charged_ticks.to_f / AiSpendLedger::USD_TICKS) : t("owner_setup.cost_pending") %></p>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <% if entry.operation == OwnerAi::Composer::VERSION && entry.status == "settled" && entry.result.is_a?(Hash) %>
+              <%= link_to rc_icon_label("journal-text", t("owner_activity.view_ai_result")), owner_ai_assistant_path(entry_id: entry.id), class: "rc-action rc-action--quiet rc-action--small" %>
+            <% end %>
+            <% if (invitation = @linked_invitation_by_entry_id[entry.id]) %>
+              <%= link_to rc_icon_label("send-check", t("owner_activity.open_invitation")), owner_invitation_path(invitation), class: "rc-action rc-action--soft rc-action--small" %>
+            <% end %>
+          </div>
         </li>
       <% end %>
     </ol>
+    <%= link_to rc_icon_label("activity", t("activity_journal.title")), owner_activity_events_path, class: "rc-action rc-action--soft" %>
     <%= link_to t("owner_setup.my_practice"), owner_practice_path, class: "rc-action rc-action--quiet" %>
+    <%= link_to rc_icon_label("collection", t("artifact_library.title")), owner_artifacts_path(kind: "ai"), class: "rc-action rc-action--primary" %>
   </div>
 </div>
+
+<% end %>
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "wa-settings-frame", target: "_top" do %>
+    <% if notice.present? %><p class="rc-notice rc-notice--success" role="status"><%= notice %></p><% end %>
+    <% if alert.present? %><p class="rc-notice rc-notice--error" role="alert"><%= alert %></p><% end %>
+    <%= settings_content %>
+  <% end %>
+<% else %>
+  <%= settings_content %>
+<% end %>

@@ -1,0 +1,88 @@
+en:
+  e2_scope:
+    eyebrow: "PROJECT DISCOVERY / 12 SECTIONS"
+    title: "Let's define what needs to be built"
+    intro: "Start with what matters to you. Leave any unknown detail open or ask the developer to recommend an approach."
+    progress: "Sections with details"
+    your_answer: "Your wishes or observations"
+    status_label: "How certain is this?"
+    responsibility_label: "Who should decide?"
+    technical_label: "Technical interpretation (optional)"
+    draft_only: "These answers are draft inputs, not an approved specification or contract. Older saved versions are preserved."
+    invalid: "Please review your answers; a section contains unsupported or overly long information."
+    statuses:
+      suggested: "Suggested"
+      confirmed: "Confirmed"
+      unknown: "Not sure yet"
+      excluded: "Not included"
+    responsibilities:
+      client: "I'll decide"
+      owner: "Developer to recommend"
+      open: "Decide together"
+    owner_title: "Technical review of client's project"
+    owner_hint: "Discovery draft v%{version}. Technical decisions are not approved yet."
+    section_reference: "SECTION"
+    owner_client_says: "In the client's words"
+    not_yet_answered: "Not answered yet; clarify with the client or propose an option."
+    owner_warning: "Section numbers are navigation labels, not requirement IDs. Future specification requirements will receive unique R-IDs and source references."
+    sections:
+      business_goal:
+        title: "Business goal and context"
+        help: "Why is this project needed?"
+        placeholder: "Describe the problem or opportunity in your own words."
+        technical: "Business objectives, boundaries, metrics and assumptions."
+      audiences:
+        title: "People and access"
+        help: "Who will use the result?"
+        placeholder: "Customers, staff, managers, visitors..."
+        technical: "User roles, authorization and access control."
+      journeys:
+        title: "Pages and user journeys"
+        help: "What will people do step by step?"
+        placeholder: "For example: open a page, fill a form and receive a reply."
+        technical: "Navigation, views, user flows and state changes."
+      features:
+        title: "Features and behavior"
+        help: "What must work?"
+        placeholder: "List actions the website should perform."
+        technical: "Functional requirements, API endpoints, validations and edge cases."
+      data:
+        title: "Data and connections"
+        help: "What must be stored or connected?"
+        placeholder: "For example: submissions, payments, emails, other services."
+        technical: "Database schema, integrations, data lifecycle and access rules."
+      quality:
+        title: "Speed, reliability and safety"
+        help: "How well must it work?"
+        placeholder: "Mention speed, phone support or privacy needs."
+        technical: "Performance, security, availability, accessibility and testing."
+      content_design:
+        title: "Content and visual design"
+        help: "What should it look like?"
+        placeholder: "Do you have texts, images, logos, examples or brand colors?"
+        technical: "Design system, assets, content ownership and responsive layouts."
+      acceptance:
+        title: "How to verify success"
+        help: "How will we know it is done?"
+        placeholder: "Describe what you should be able to test."
+        technical: "Acceptance scenarios, measurable outcomes and test evidence."
+      exclusions:
+        title: "What is not included"
+        help: "What should not be done now?"
+        placeholder: "Name work that can wait for a later stage."
+        technical: "Out-of-scope items, assumptions and change boundaries."
+      risks:
+        title: "Risks and unknowns"
+        help: "What still needs an answer?"
+        placeholder: "Leave anything uncertain here."
+        technical: "Dependencies, blockers, open decisions and mitigation."
+      breakdown:
+        title: "Work stages"
+        help: "How would you like the work divided?"
+        placeholder: "For example: first a working form, then improvements."
+        technical: "Implementation backlog, dependencies and milestones."
+      estimate:
+        title: "Budget and timing"
+        help: "What are your preferences or limits?"
+        placeholder: "A rough budget or desired date is fine; you may leave it open."
+        technical: "Non-binding estimate, delivery assumptions, infrastructure and running costs."

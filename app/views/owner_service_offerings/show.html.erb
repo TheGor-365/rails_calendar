@@ -1,19 +1,18 @@
 <div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-service-detail">
-  <header class="rc-page-hero mb-4">
-    <p class="eyebrow"><%= t("owner_services.eyebrow") %></p>
-    <h1 class="page-title"><%= (@draft || @approved || @published).title %></h1>
+  <% banner_metadata = capture do %>
     <p class="rc-hint"><i class="bi bi-person-check" aria-hidden="true"></i> <%= owner_capability_title((@draft || @approved || @published).source_capability_domain, (@draft || @approved || @published).professional_capability.delivery_mode) %></p>
-    <div class="wa-services__actions">
-      <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path,
-            class: "rc-action rc-action--soft" %>
+  <% end %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path,
+            class: "rc-action rc-action--quiet" %>
       <% if @draft %>
         <%= link_to rc_icon_label("pencil-square", t("owner_ai_assistant.context_action")),
                     owner_ai_assistant_path(operation: "service_copy", offering_id: @offering.id),
-                    class: "rc-action rc-action--soft" %>
+                    class: "rc-action rc-action--quiet" %>
       <% end %>
       <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path, class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", variant: :detail, icon: "briefcase", path: t("owner_services.eyebrow"), title: (@draft || @approved || @published).title, extra_class: "rc-page-hero mb-4", metadata: banner_metadata, actions: banner_actions %>
   <section class="surface-panel wa-services__notice mb-4">
     <i class="bi bi-shield-lock" aria-hidden="true"></i>
     <div><strong><%= t("owner_services.private_title") %></strong><p><%= t("owner_services.private_help") %></p></div>
@@ -59,6 +58,24 @@
             <% if @approved.requirements_prompt.present? %><dt><%= t("owner_services.requirements_prompt") %></dt><dd><%= @approved.requirements_prompt %></dd><% end %>
           </dl>
           <%= button_to rc_icon_label("files", t("owner_services.new_revision")), revise_owner_service_path(@offering), method: :post, class: "rc-action rc-action--quiet" %>
+        </section>
+      <% end %>
+      <% presentation = @draft || @approved || @published %>
+      <% if presentation %>
+        <section class="surface-panel wa-services__panel" id="offering-client-preview">
+          <h2><i class="bi bi-eye" aria-hidden="true"></i> <%= t("owner_services.client_preview", default: "Client preview") %></h2>
+          <p class="rc-hint"><%= t("owner_services.client_preview_help", default: "Review the title, client benefit and deliverables before publishing. This preview does not publish changes.") %></p>
+          <h3><%= presentation.title %></h3>
+          <p><%= presentation.summary %></p>
+          <strong><%= t("owner_services.included_scope") %></strong>
+          <ul class="ws-owner-boundaries">
+            <% presentation.included_scope.split(/\r?\n|;\s*/).reject(&:blank?).each do |item| %>
+              <li><i class="bi bi-check2" aria-hidden="true"></i><span><%= item %></span></li>
+            <% end %>
+          </ul>
+          <% if @published && presentation.id != @published.id %>
+            <p class="rc-hint"><%= t("owner_services.client_preview_pending", default: "Clients still see the previously published version.") %></p>
+          <% end %>
         </section>
       <% end %>
       <% if @approved %>

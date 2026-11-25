@@ -27,7 +27,7 @@ class OwnerCatalogueAiController < ApplicationController
       return redirect_to owner_catalogue_ai_path, alert: t("owner_services.copilot_consent")
     end
     entry = @copilot.audit!
-    redirect_to owner_catalogue_ai_path, notice: t("owner_services.copilot_completed", count: Array(entry.result["recommendations"]).length)
+    redirect_to owner_catalogue_ai_path, notice: t("owner_services.copilot_completed", count: Array(entry.result["recommendations"]).length), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerServices::CatalogueCopilot::Unavailable
     redirect_to owner_catalogue_ai_path, alert: t("owner_services.copilot_unavailable")
   end
@@ -35,7 +35,7 @@ class OwnerCatalogueAiController < ApplicationController
   def apply_all
     entry = @profile&.ai_spend_entries&.find_by(id: params[:entry_id])
     count = @copilot.apply_all!(entry: entry, expected_fingerprint: params[:fingerprint].to_s)
-    redirect_to owner_catalogue_ai_path, notice: t("owner_services.copilot_all_drafts", count: count)
+    redirect_to owner_catalogue_ai_path, notice: t("owner_services.copilot_all_drafts", count: count), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerServices::CatalogueCopilot::Conflict
     redirect_to owner_catalogue_ai_path, alert: t("owner_services.copilot_stale")
   end
@@ -43,7 +43,7 @@ class OwnerCatalogueAiController < ApplicationController
   def apply
     entry = @profile&.ai_spend_entries&.find_by(id: params[:entry_id])
     @copilot.apply!(entry: entry, offering_id: params[:offering_id], base_digest: params[:base_digest])
-    redirect_to owner_service_path(params[:offering_id]), notice: t("owner_services.copilot_draft_created")
+    redirect_to owner_service_path(params[:offering_id]), notice: t("owner_services.copilot_draft_created"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerServices::CatalogueCopilot::Conflict
     redirect_to owner_catalogue_ai_path, alert: t("owner_services.copilot_stale")
   end

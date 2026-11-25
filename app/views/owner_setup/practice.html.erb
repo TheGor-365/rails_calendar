@@ -1,37 +1,26 @@
+<% settings_content = capture do %>
 <div class="container ws-owner-page ws-owner-practice my-4 my-sm-5" id="owner-practice">
-  <header class="ws-owner-hero">
-    <div class="ws-owner-hero-copy">
-      <p class="eyebrow"><i class="bi bi-person-badge" aria-hidden="true"></i> <%= t("owner_setup.practice_eyebrow") %></p>
-      <div class="ws-owner-heading">
-        <span class="ws-owner-heading-icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></span>
-        <div>
-          <h1 class="page-title"><%= t("owner_setup.practice_title") %></h1>
-          <p class="rc-muted mb-0"><%= @snapshot ? t("owner_setup.profile_version", version: @snapshot.version) : t("owner_setup.not_approved") %></p>
-        </div>
-      </div>
-    </div>
-    <div class="ws-owner-hero-actions">
-      <%= link_to rc_icon_label("stars", t("owner_ai_assistant.context_practice")),
-            owner_ai_assistant_path(operation: "client_reply"), class: "rc-action rc-action--soft" %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("stars", t("owner_ai_assistant.context_practice")),
+            owner_ai_assistant_path(operation: "client_reply"), class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
-      <%= link_to rc_icon_label("boxes", t("owner_services.title")), owner_services_path, class: "rc-action rc-action--primary" %>
-      <%= link_to rc_icon_label("sliders", t("capability_review.edit_link")), owner_capabilities_path, class: "rc-action rc-action--primary" %>
+      <%= link_to rc_icon_label("boxes", t("owner_services.title")), owner_services_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("sliders", t("capability_review.edit_link")), owner_capabilities_path, data: { turbo_frame: ("wa-settings-frame" if turbo_frame_request?) }, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("chat-square-dots", t("owner_setup.update_profile")), owner_setup_path(step: "A"), class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "person-badge", path: t("owner_setup.practice_eyebrow"), title: t("owner_setup.practice_title"), extra_class: "ws-owner-hero", actions: banner_actions %>
 
   <% if @snapshot %>
     <section class="ws-owner-profile-hero">
       <div class="ws-owner-panel-top">
-        <span class="ws-owner-tag"><i class="bi bi-patch-check" aria-hidden="true"></i><%= t("owner_setup.profile_version", version: @snapshot.version) %></span>
+
         <span class="ws-owner-panel-meta"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.private_scope") %></span>
       </div>
       <h2><%= @snapshot.payload.fetch("headline") %></h2>
-      <p class="ws-owner-profile-excerpt"><%= truncate(@snapshot.payload.fetch("private_summary"), length: 320) %></p>
-      <% if @snapshot.payload.fetch("private_summary").length > 320 %>
+      <% if @snapshot.payload.fetch("private_summary").present? %>
         <details class="ws-owner-details">
           <summary><i class="bi bi-chevron-down" aria-hidden="true"></i><%= t("owner_setup.full_context") %></summary>
-          <p><%= @snapshot.payload.fetch("private_summary") %></p>
+          <ul class="ws-owner-boundaries"><% @snapshot.payload.fetch("private_summary").split(/(?<=\.)\s+(?=[A-ZА-Я])/).each do |sentence| %><li><i class="bi bi-dot" aria-hidden="true"></i><span><%= sentence %></span></li><% end %></ul>
         </details>
       <% end %>
       <div class="ws-owner-profile-actions">
@@ -41,7 +30,6 @@
       <% if @profile.onboarding_state == "draft" %>
         <p class="rc-notice rc-notice--neutral mt-3"><%= t("owner_setup.pending_edits") %></p>
       <% end %>
-      <p class="rc-hint mb-0"><%= t("owner_setup.snapshot_notice") %></p>
     </section>
 
     <div class="ws-owner-practice-grid">
@@ -92,7 +80,7 @@
           <span class="ws-owner-data-icon"><i class="bi bi-globe" aria-hidden="true"></i></span>
           <div><h3><%= t("owner_setup.public_preview") %></h3></div>
         </div>
-        <p class="ws-owner-public-draft"><%= @snapshot.payload.fetch("public_summary_draft") %></p>
+        <ul class="ws-owner-boundaries"><% @snapshot.payload.fetch("public_summary_draft").split(/(?<=\.)\s+(?=[A-ZА-Я])/).each do |sentence| %><li><i class="bi bi-dot" aria-hidden="true"></i><span><%= sentence %></span></li><% end %></ul>
         <p class="ws-owner-data-note"><i class="bi bi-lock" aria-hidden="true"></i><%= t("owner_setup.not_published") %></p>
       </section>
     </div>
@@ -115,3 +103,14 @@
     </section>
   <% end %>
 </div>
+
+<% end %>
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "wa-settings-frame", target: "_top" do %>
+    <% if notice.present? %><p class="rc-notice rc-notice--success" role="status"><%= notice %></p><% end %>
+    <% if alert.present? %><p class="rc-notice rc-notice--error" role="alert"><%= alert %></p><% end %>
+    <%= settings_content %>
+  <% end %>
+<% else %>
+  <%= settings_content %>
+<% end %>

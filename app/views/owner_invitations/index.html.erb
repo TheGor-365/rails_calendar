@@ -1,0 +1,286 @@
+<div class="container my-4 my-sm-5 wa-invite-page">
+  <%= render "shared/wa_banner", icon: "send", path: t("e2.owner_eyebrow"), title: t("e2.owner_title"), extra_class: "ws-owner-hero wa-invite-hero mb-4" %>
+
+  <% if (url = flash[:issued_invitation_url]).present? %>
+    <section class="surface-panel p-3 p-sm-4 mb-4 wa-invite-copy" aria-label="<%= t('e2.copy_title') %>">
+      <h2 class="h5"><%= t("e2.copy_title") %></h2>
+      <p class="rc-hint"><%= t("e2.copy_once") %></p>
+      <div data-controller="wa-copy">
+        <label for="e2-invite-link" class="rc-field-label"><%= t("e2.link_label") %></label>
+        <input id="e2-invite-link" type="url" class="rc-input mb-2" readonly
+               value="<%= url %>" data-wa-copy-target="input" />
+        <button type="button" class="rc-action rc-action--primary" data-action="click->wa-copy#copy">
+          <%= rc_icon_label("clipboard", t("e2.copy_action")) %>
+        </button>
+        <span class="rc-hint" data-wa-copy-target="status" role="status"></span>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="wa-invite-compose mb-4">
+    <div class="wa-invite-section-heading">
+      <div>
+        <p class="eyebrow">01 / DRAFT</p>
+        <h2 class="h5"><%= t("e2.new_title") %></h2>
+      </div>
+    </div>
+    <% if @invitation&.errors&.any? %>
+      <p class="rc-notice rc-notice--error" role="alert"><%= @invitation.errors.full_messages.to_sentence %></p>
+    <% end %>
+    <%= form_with url: owner_invitations_path, method: :post, html: {
+      class: "rc-form wa-invite-form",
+      data: {
+        controller: "wa-invitation-brief wa-invitation-issue",
+        action: "submit->wa-invitation-issue#submit",
+        wa_invitation_issue_error: t("e2_handoff.issue_error"),
+        wa_invitation_issue_issued: t("e2_handoff.issued"),
+        wa_invitation_brief_minimum_value: 10, wa_invitation_brief_maximum_value: 1200,
+        wa_brief_client_decides: t("e2_builder.client_decides"),
+        wa_brief_owner_decides: t("e2_builder.owner_decides"),
+        wa_brief_notes_label: t("e2_builder.notes"),
+        wa_brief_keep_manual: t("e2_builder.keep_manual"),
+        wa_brief_empty: t("e2_builder.empty"),
+        wa_brief_long: t("e2_builder.long"),
+        wa_brief_composed: t("e2_builder.composed")
+      }
+    } do %>
+      <%= hidden_field_tag "proposal[owner_ai_entry_id]", @invitation&.owner_ai_entry_id, id: "proposal_owner_ai_entry_id" %>
+      <div class="wa-invite-brief-grid">
+      <div class="rc-field mb-3">
+        <%= label_tag "proposal_seed_title", t("e2.seed_title"), class: "rc-field-label" %>
+        <%= text_field_tag "proposal[seed_title]", @invitation&.seed_title, id: "proposal_seed_title",
+              class: "rc-input", maxlength: 120, required: true,
+              data: { action: "input->wa-invitation-brief#refreshSuggestions" } %>
+      </div>
+      <div class="rc-field mb-3">
+        <%= label_tag "proposal_seed_project_type", t("e2.seed_type"), class: "rc-field-label" %>
+        <%= select_tag "proposal[seed_project_type]",
+              options_for_select(ProjectIntake::TYPES.map { |type| [rc_intake_type(type), type] },
+                                 @invitation&.seed_project_type),
+              id: "proposal_seed_project_type", class: "rc-input",
+              data: { action: "change->wa-invitation-brief#refreshSuggestions" } %>
+      </div>
+      </div>
+      <section class="wa-invite-builder" aria-labelledby="wa-invite-builder-heading">
+        <div class="wa-invite-field-heading">
+          <div>
+            <h3 id="wa-invite-builder-heading"><%= t("e2_builder.title") %></h3>
+              </div>
+        </div>
+        <% InvitationBriefTaxonomy.sections.each do |group, options| %>
+          <details class="wa-invite-builder__group" <%= "open" if group == "tasks" %>>
+            <summary><i class="bi <%= InvitationBriefTaxonomy::ICONS.fetch(group) %>" aria-hidden="true"></i> <%= t("e2_builder.sections.#{group}") %> <i class="bi bi-chevron-down wa-invite-builder__chevron" aria-hidden="true"></i></summary>
+            <fieldset data-wa-brief-section>
+              <legend><%= t("e2_builder.sections.#{group}") %></legend>
+              <div class="wa-invite-builder__choices">
+                <% options.each do |option| %>
+                  <label class="wa-invite-builder__choice">
+                    <input type="checkbox" name="proposal[brief_selections][<%= group %>][]" value="<%= option %>" data-wa-brief-choice data-action="change->wa-invitation-brief#refreshSuggestions" <%= "checked" if @invitation&.brief_selections&.fetch(group, [])&.include?(option) %>>
+                    <span><%= t("e2_builder.options.#{option}") %></span>
+                  </label>
+                <% end %>
+              </div>
+              <label class="wa-invite-builder__decision">
+                <select class="rc-input" name="proposal[brief_decisions][<%= group %>]" data-wa-brief-decision aria-label="<%= t("e2_builder.decision_label") %>">
+                  <% [["skip", t("e2_builder.skip")], ["client", t("e2_builder.client_decides")], ["owner", t("e2_builder.owner_decides")]].each do |value, name| %>
+                    <option value="<%= value %>" <%= "selected" if (@invitation&.brief_decisions || {}).fetch(group, "skip") == value %>><%= name %></option>
+                  <% end %>
+                </select>
+              </label>
+            </fieldset>
+          </details>
+        <% end %>
+        <label class="rc-field-label" for="wa-invite-builder-notes"><%= t("e2_builder.notes") %></label>
+        <textarea id="wa-invite-builder-notes" name="proposal[brief_notes]" rows="2" maxlength="350" class="rc-input rc-input--area"
+                  data-wa-invitation-brief-target="notes" data-action="input->wa-invitation-brief#refreshSuggestions"><%= @invitation&.brief_notes %></textarea>
+        <div class="wa-invite-builder__actions">
+          <button type="button" class="rc-action rc-action--soft" data-action="click->wa-invitation-brief#compose">
+            <%= rc_icon_label("magic", t("e2_builder.assemble")) %>
+          </button>
+          <span class="visually-hidden" data-wa-invitation-brief-target="status" role="status" aria-live="polite"></span>
+        </div>
+      </section>
+      <div class="rc-field mb-3 wa-invite-goal">
+        <div class="wa-invite-field-heading">
+          <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-card-text"></i></span>
+          <div><strong><%= t("e2.seed_goal") %></strong></div>
+        </div>
+        <%= text_area_tag "proposal[seed_goal]", @invitation&.seed_goal,
+              id: "proposal_seed_goal", class: "rc-input rc-input--area", rows: 5,
+              minlength: 10, maxlength: 1200, required: true,
+              data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize input->wa-invitation-brief#manualEdit", wa_invitation_brief_target: "goal" } %>
+      </div>
+      <section class="wa-invite-ai" data-controller="wa-invitation-ai"
+               data-wa-invitation-ai-url-value="<%= owner_invitation_ai_draft_path %>"
+               data-consent-required="<%= t("e2_ai.consent_required") %>"
+               data-generating="<%= t("e2_ai.generating") %>"
+               data-saved="<%= t("e2_ai.saved") %>"
+               data-unavailable="<%= t("e2_ai.unavailable") %>"
+               data-provider-unavailable="<%= t("e2_ai.unavailable") %>"
+               data-unsupported-operation="<%= t("e2_ai.invalid") %>"
+               data-invalid-brief="<%= t("e2_ai.invalid") %>"
+               data-brief-too-long="<%= t("e2_ai.too_long") %>"
+               data-too-long="<%= t("e2_ai.too_long") %>"
+               data-replace-confirm="<%= t("e2_ai.replace_confirm") %>"
+               data-applied="<%= t("e2_ai.applied") %>"
+               data-preview-ready="<%= t("e2_handoff.preview_ready") %>">
+        <div class="wa-invite-ai__header">
+          <span class="wa-invite-ai__symbol"><i class="bi bi-stars" aria-hidden="true"></i></span>
+          <div><h3><%= t("e2_ai.title") %></h3>
+            <p class="rc-hint"><%= t("e2_ai.subtitle") %></p></div>
+        </div>
+        <div class="wa-invite-ai__actions">
+          <% OwnerAi::PageActionRegistry.for_page(:invitation).each_with_index do |(operation, definition), index| %>
+            <div class="wa-invite-ai__action">
+              <label class="wa-invite-ai__select">
+                <input type="radio" name="ai_operation" value="<%= operation %>" <%= "checked" if index.zero? %>>
+                <i class="bi <%= definition.fetch(:icon) %>" aria-hidden="true"></i>
+                <strong><%= t("e2_ai.actions.#{operation}.name") %></strong>
+              </label>
+              <details class="wa-invite-ai__explain">
+                <summary aria-label="<%= t("e2_ai.explain", action: t("e2_ai.actions.#{operation}.name")) %>">
+                  <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                  <span><%= t("e2_ai.what_changes") %></span>
+                </summary>
+                <p><%= t("e2_ai.actions.#{operation}.description") %></p>
+              </details>
+            </div>
+          <% end %>
+        </div>
+        <div class="wa-invite-ai__footer">
+          <label class="wa-invite-ai__consent">
+            <input type="checkbox" data-wa-invitation-ai-target="consent">
+            <span><%= t("e2_ai.paid_consent") %></span>
+          </label>
+          <button type="button" class="rc-action rc-action--primary"
+                  data-wa-invitation-ai-target="generate"
+                  data-action="click->wa-invitation-ai#generate"
+                  <%= "disabled" unless OwnerIntelligence::Grok.enabled? %>>
+            <%= rc_icon_label("stars", t("e2_ai.generate")) %>
+          </button>
+        </div>
+        <% unless OwnerIntelligence::Grok.enabled? %>
+          <p class="rc-hint"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("e2_ai.disabled") %></p>
+        <% end %>
+        <p class="wa-invite-ai__status" role="status" aria-live="polite" data-wa-invitation-ai-target="status"><%= t("e2_handoff.saved_ai_reused") if @reused_ai_entry.present? %></p>
+        <section class="wa-invite-ai__result" <%= "hidden" unless @reused_ai_entry.present? %> data-wa-invitation-ai-target="result" aria-label="<%= t("e2_ai.result") %>">
+          <div class="wa-invite-ai__result-heading">
+            <i class="bi bi-journal-check" aria-hidden="true"></i>
+            <h4 data-wa-invitation-ai-target="heading"><%= @reused_ai_entry&.result&.fetch("heading", nil) %></h4>
+          </div>
+          <p class="wa-invite-ai__draft" data-wa-invitation-ai-target="draft"><%= @reused_ai_entry&.result&.fetch("draft", nil) %></p>
+          <ul class="wa-invite-ai__questions" data-wa-invitation-ai-target="questions"><% Array(@reused_ai_entry&.result&.fetch("questions", nil)).each do |question| %><li><%= question %></li><% end %></ul>
+          <ul class="wa-invite-ai__cautions" data-wa-invitation-ai-target="cautions"><% Array(@reused_ai_entry&.result&.fetch("cautions", nil)).each do |caution| %><li><%= caution %></li><% end %></ul>
+          <p data-wa-invitation-ai-target="nextStep"><%= @reused_ai_entry&.result&.fetch("next_step", nil) %></p>
+          <div class="wa-invite-ai__result-actions">
+            <a href="<%= @reused_ai_entry ? owner_ai_assistant_path(entry_id: @reused_ai_entry.id) : '#' %>" class="rc-action rc-action--quiet" <%= "hidden" unless @reused_ai_entry.present? %> data-wa-invitation-ai-target="reviewLink">
+              <%= rc_icon_label("journal-text", t("e2_ai.open_saved")) %>
+            </a>
+            <button type="button" class="rc-action rc-action--soft" data-action="click->wa-invitation-ai#useClientPreview">
+              <%= rc_icon_label("person-check", t("e2_handoff.use_client_preview")) %>
+            </button>
+            <button type="button" class="rc-action rc-action--primary"
+                    data-wa-invitation-ai-target="apply"
+                    data-action="click->wa-invitation-ai#apply">
+              <%= rc_icon_label("check2", t("e2_ai.use_in_form")) %>
+            </button>
+          </div>
+        </section>
+      </section>
+      <section class="wa-invite-client-preview" aria-labelledby="wa-client-preview-title">
+        <div class="wa-invite-field-heading">
+          <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-eye"></i></span>
+          <div>
+            <h3 id="wa-client-preview-title"><%= t("e2_handoff.client_preview_title") %></h3>
+            <p class="rc-hint"><%= t("e2_handoff.client_preview_hint") %></p>
+          </div>
+        </div>
+        <label for="proposal_approved_client_preview" class="rc-field-label"><%= t("e2_handoff.client_preview_label") %></label>
+        <textarea name="proposal[approved_client_preview]" id="proposal_approved_client_preview"
+                  maxlength="1200" rows="4" class="rc-input rc-input--area wa-invite-client-preview__textarea"
+                  data-controller="wa-autogrow" data-wa-autogrow-smooth-value="true"
+                  data-action="input->wa-autogrow#resize"><%= @invitation&.approved_client_preview %></textarea>
+        <label class="wa-invite-client-preview__consent">
+          <input type="checkbox" id="proposal_share_preview" name="proposal[share_preview]" value="1">
+          <span><%= t("e2_handoff.share_consent") %></span>
+        </label>
+      </section>
+      <fieldset class="rc-field mb-3 wa-invite-services">
+        <legend class="rc-field-label"><i class="bi bi-grid-1x2" aria-hidden="true"></i> <%= t("e2.services") %></legend>
+        <div class="wa-invite-service-grid">
+        <% @offerings.each do |offering| %>
+          <label class="wa-invite-service-choice">
+            <%= check_box_tag "service_version_ids[]", offering.published_version_id,
+                  @invitation&.service_version_ids&.include?(offering.published_version_id) || false,
+                  data: {
+                    wa_invitation_brief_target: "service",
+                    wa_service_search: [offering.published_version.title, offering.published_version.summary].join(" "),
+                    wa_service_category: offering.published_version.project_category,
+                    action: "change->wa-invitation-brief#manualService"
+                  } %>
+            <span class="wa-invite-service-choice__icon" aria-hidden="true"><i class="bi bi-check2-square"></i></span>
+            <span><%= offering.published_version.title %></span>
+          </label>
+        <% end %>
+        </div>
+      </fieldset>
+      <div class="wa-invite-submit">
+        <button type="submit" class="rc-action rc-action--primary" data-wa-invitation-issue-target="submit">
+          <%= rc_icon_label("link-45deg", t("e2.issue_action")) %>
+        </button>
+      </div>
+      <section class="wa-invite-issued" hidden data-wa-invitation-issue-target="result"
+               aria-label="<%= t("e2_handoff.issued") %>">
+        <h3><i class="bi bi-link-45deg" aria-hidden="true"></i> <%= t("e2_handoff.issued") %></h3>
+        <p class="rc-hint"><%= t("e2.copy_once") %></p>
+        <input type="url" readonly class="rc-input" data-wa-invitation-issue-target="link"
+               aria-label="<%= t("e2.link_label") %>">
+        <div class="wa-invite-issued__actions">
+          <button type="button" class="rc-action rc-action--primary"
+                  data-action="click->wa-invitation-issue#copy">
+            <%= rc_icon_label("clipboard", t("e2.copy_action")) %>
+          </button>
+          <a class="rc-action rc-action--quiet" href="#" data-wa-invitation-issue-target="preview">
+            <%= rc_icon_label("eye", t("e2_handoff.owner_preview")) %>
+          </a>
+          <a class="rc-action rc-action--quiet" href="#" data-wa-invitation-issue-target="download">
+            <%= rc_icon_label("download", t("e2_handoff.export")) %>
+          </a>
+        </div>
+      </section>
+      <p role="status" aria-live="polite" class="wa-invite-issued__status"
+         data-wa-invitation-issue-target="status"></p>
+    <% end %>
+  </section>
+
+  <section class="wa-invite-history" id="invitation-history">
+    <div class="wa-invite-section-heading">
+      <span class="wa-invite-section-icon" aria-hidden="true"><i class="bi bi-clock-history"></i></span>
+      <div><p class="eyebrow">02 / HISTORY</p><h2 class="h5"><%= t("e2.sent_title") %></h2></div>
+    </div>
+    <% if @invitations.any? %>
+      <ul class="rc-record-list">
+        <% @invitations.each do |invite| %>
+          <li class="rc-record d-flex flex-wrap justify-content-between gap-3">
+            <div><strong><%= invite.seed_title %></strong>
+              <p class="rc-hint mb-0"><%= t("e2.state_#{invite.state}") %> ·
+                <time datetime="<%= invite.expires_at.iso8601 %>"><%= l(invite.expires_at, format: :short) %></time></p>
+            </div>
+            <div class="wa-invite-history__actions">
+              <%= link_to rc_icon_label("eye", t("e2_handoff.owner_preview")),
+                  owner_invitation_path(invite), class: "rc-action rc-action--quiet rc-action--small" %>
+              <%= link_to rc_icon_label("download", t("e2_handoff.export")),
+                  owner_invitation_path(invite, format: :json), class: "rc-action rc-action--quiet rc-action--small" %>
+            </div>
+            <% if invite.claimed_at.nil? && invite.revoked_at.nil? && invite.expires_at.future? %>
+              <%= button_to t("e2.revoke_action"), revoke_owner_invitation_path(invite),
+                    method: :post, class: "rc-action rc-action--quiet rc-action--small" %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="rc-empty-state"><i class="bi bi-envelope-paper" aria-hidden="true"></i><p><%= t("e2.none_yet") %></p></div>
+    <% end %>
+  </section>
+</div>

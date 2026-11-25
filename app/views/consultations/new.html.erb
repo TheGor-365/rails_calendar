@@ -1,10 +1,12 @@
 <div class="container my-4 my-sm-5">
   <div class="form-page">
-    <header class="mb-4">
-      <p class="eyebrow mb-2"><%= t("consultations.scheduling") %></p>
-      <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-calendar-plus"></i></span><h1 class="page-title mb-2"><%= t("consultations.new") %></h1></div>
-      <p class="text-secondary mb-0"><%= t("consultations.new_hint") %></p>
-    </header>
+    <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("journal-text", t("consultations.title")), consultations_path, class: "rc-action rc-action--quiet" %>
+      <% if owner_signed_in? %>
+        <%= link_to rc_icon_label("stars", t("consultations.ai_prepare", default: "Prepare with AI")), owner_ai_assistant_path(operation: "plan_outline"), class: "rc-action rc-action--quiet", target: "_blank", rel: "noopener" %>
+      <% end %>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "calendar-plus", path: t("consultations.scheduling") + " / " + t("consultations.new"), title: t("consultations.new"), extra_class: "rc-page-hero mb-4", actions: banner_actions %>
     <section class="surface-panel" aria-label="<%= t("consultations.details_title") %>">
       <%= render "form", consultation: @consultation %>
     </section>

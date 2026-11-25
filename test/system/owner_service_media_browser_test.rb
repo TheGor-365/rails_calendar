@@ -6,7 +6,7 @@ require_relative "../support/owner_service_catalogue_test_data"
 class OwnerServiceMediaBrowserTest < ApplicationSystemTestCase
   include OwnerServiceCatalogueTestData
 
-  test "owner reaches catalog from cabinet and uploads a private image in White Atlas" do
+  test "owner reaches catalog from Requests and uploads a private image in White Atlas" do
     owner = make_test_owner("media-browser-owner@example.test")
     workspace, _profile, _snapshot, capabilities = approved_profile_for(owner)
     offering = OwnerServices::Catalogue.new(workspace: workspace).create_draft!(
@@ -19,9 +19,13 @@ class OwnerServiceMediaBrowserTest < ApplicationSystemTestCase
     click_button "Sign in"
     assert_current_path workspace_path
 
-    visit owner_cabinet_path
-    assert_selector ".ws-account-tool[href='#{owner_services_path}']"
-    click_link "My services"
+    visit admin_project_intakes_path
+    assert_selector ".wa-requests__more > summary"
+    find(".wa-requests__more > summary").click
+    assert_selector ".wa-requests__more-panel a[href='#{owner_services_path}']"
+    within ".wa-requests__more-panel" do
+      click_link "My services"
+    end
     assert_current_path owner_services_path
 
     visit owner_service_path(offering)

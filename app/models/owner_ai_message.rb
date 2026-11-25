@@ -6,6 +6,8 @@ class OwnerAiMessage < ApplicationRecord
   belongs_to :owner_ai_conversation, inverse_of: :owner_ai_messages
   belongs_to :parent_message, class_name: "OwnerAiMessage", optional: true
   belongs_to :ai_spend_entry, optional: true
+  # Existing Active Storage tables: no schema change or public signed file routes.
+  has_many_attached :files
 
   ROLES = %w[owner assistant].freeze
   STATES = %w[draft pending settled failed uncertain].freeze
@@ -27,6 +29,12 @@ class OwnerAiMessage < ApplicationRecord
 
   before_validation :set_request_id, on: :create
 
+  # Save the source-only delivery envelope in the *same transaction* as a
+  # newly-settled assistant reply. Its activity projection remains separate.
+  after_save :enqueue_settled_reply, if: :newly_settled_assistant_reply?
+  after_commit :record_settled_reply, on: %i[create update],
+    if: :newly_settled_assistant_reply?
+
   scope :in_order, -> { order(:sequence, :id) }
 
   def owner_message?
@@ -38,6 +46,23 @@ class OwnerAiMessage < ApplicationRecord
   end
 
   private
+
+  def newly_settled_assistant_reply?
+    assistant_message? && state == "settled" && ai_spend_entry&.status == "settled" &&
+      (saved_change_to_state? || saved_change_to_id?)
+  end
+
+  def enqueue_settled_reply
+    DomainOutboxEvent.enqueue_settled_reply!(self)
+  end
+
+  def record_settled_reply
+    Activity::Recorder.record!(
+      workspace: owner_ai_conversation.workspace, subject: self,
+      kind: "ai_reply_saved", title: "AI reply saved",
+      occurred_at: updated_at
+    )
+  end
 
   def set_request_id
     self.request_id ||= SecureRandom.uuid
@@ -68,7 +93,7 @@ class OwnerAiMessage < ApplicationRecord
     profile = owner_ai_conversation.workspace&.professional_profile
     unless profile && ai_spend_entry.professional_profile_id == profile.id &&
            ai_spend_entry.project_intake_id.nil? &&
-           ai_spend_entry.operation == OwnerAi::Composer::VERSION
+           [OwnerAi::Composer::VERSION, OwnerAi::ConversationResponder::VERSION].include?(ai_spend_entry.operation)
       errors.add(:ai_spend_entry, "must belong to this owner's AI composer")
     end
   end

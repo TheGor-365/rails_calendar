@@ -19,10 +19,26 @@ module ApplicationHelper
   end
 
   # One SQL count per rendered owner request; client and legacy admin get zero.
+  # Shared label for the same activity in month, day, hour and activity history.
+  def rc_calendar_activity_status(item)
+    status = item[:status].to_s
+    if ActivityEvent::KINDS.include?(status)
+      t("activity_journal.events.#{status}")
+    else
+      t("calendar_actions.states.#{status}", default: status.tr("_", " "))
+    end
+  end
+
   def owner_unread_intake_count
     return 0 unless owner_signed_in?
 
     @owner_unread_intake_count ||= OwnerIntakeInbox.unread_for(owner: current_user).count
+  end
+
+  def owner_unread_activity_count
+    return 0 unless owner_signed_in? && current_user.owner_workspace
+
+    @owner_unread_activity_count ||= Activity::Inbox.unread_for(owner: current_user).count
   end
 
   def owner_unread_badge_label

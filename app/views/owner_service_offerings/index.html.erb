@@ -1,25 +1,27 @@
-<div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-services">
-  <header class="ws-owner-hero wa-services__hero">
-    <div class="ws-owner-hero-copy">
-      <p class="eyebrow"><i class="bi bi-boxes" aria-hidden="true"></i> <%= t("owner_services.eyebrow") %></p>
-      <h1 class="page-title"><%= t("owner_services.title") %></h1>
-      <p class="rc-muted"><%= t("owner_services.intro") %></p>
-    </div>
-    <div class="wa-services__actions">
-      <%= link_to rc_icon_label("pencil-square", t("owner_ai_assistant.context_catalogue")),
-            owner_ai_assistant_path(operation: "service_copy"), class: "rc-action rc-action--soft" %>
-      <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path,
-            class: "rc-action rc-action--soft" %>
-      <%= link_to rc_icon_label("person-badge", t("owner_setup.practice_title")), owner_practice_path, class: "rc-action rc-action--quiet" %>
-      <% if @snapshot && @eligible_capabilities.any? && @profile.onboarding_state == "approved" && @profile.professional_capability_corrections.none? %>
-        <%= button_to rc_icon_label("arrow-repeat", t("owner_services.auto_sync_action")), sync_owner_services_path,
-              method: :post, form: { class: "wa-services__inline-form" }, class: "rc-action rc-action--quiet" %>
+<div class="container wa-services ws-owner-page my-4 my-sm-5" id="owner-services"
+     data-controller="wa-service-preview"
+     data-action="turbo:before-cache@document->wa-service-preview#close">
+  <% banner_metadata = capture do %>
+    <span class="wa-services__hero-meta"><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("owner_services.private_title") %></span>
+  <% end %>
+  <% banner_actions = capture do %>
+    <% if @snapshot && @eligible_capabilities.any? %>
+        <%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--quiet" %>
       <% end %>
-      <% if @snapshot && @eligible_capabilities.any? %>
-        <%= link_to rc_icon_label("plus-circle", t("owner_services.new_action")), new_owner_service_path, class: "rc-action rc-action--primary" %>
-      <% end %>
-    </div>
-  </header>
+      <details class="wa-services__tools">
+        <summary class="rc-action rc-action--quiet"><%= rc_icon_label("sliders", t("owner_services.catalogue_tools")) %> <i class="bi bi-chevron-down" aria-hidden="true"></i></summary>
+        <div class="wa-services__tools-panel">
+          <%= link_to rc_icon_label("pencil-square", t("owner_ai_assistant.context_catalogue")), owner_ai_assistant_path(operation: "service_copy"), class: "rc-action rc-action--quiet" %>
+          <%= link_to rc_icon_label("stars", t("owner_services.copilot_action")), owner_catalogue_ai_path, class: "rc-action rc-action--quiet" %>
+          <%= link_to rc_icon_label("person-badge", t("owner_setup.practice_title")), owner_practice_path, class: "rc-action rc-action--quiet" %>
+          <% if @snapshot && @eligible_capabilities.any? && @profile.onboarding_state == "approved" && @profile.professional_capability_corrections.none? %>
+            <%= button_to rc_icon_label("arrow-repeat", t("owner_services.auto_sync_action")), sync_owner_services_path,
+                  method: :post, form: { class: "wa-services__inline-form" }, class: "rc-action rc-action--quiet" %>
+          <% end %>
+        </div>
+      </details>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "briefcase", path: t("owner_services.eyebrow"), title: t("owner_services.title"), extra_class: "ws-owner-hero wa-services__hero", metadata: banner_metadata, actions: banner_actions %>
 
   <section class="surface-panel wa-services__notice mb-4" aria-label="<%= t('owner_services.private_title') %>">
     <i class="bi bi-shield-lock" aria-hidden="true"></i>
@@ -65,17 +67,23 @@
           <% latest = offering.draft_version || offering.approved_version || offering.published_version %>
           <% icon, state, kind = service_offering_state(offering) %>
           <article class="surface-panel wa-services__card">
-            <% if (cover = @media_cover_by_offering_id[offering.id]) %>
-              <div class="wa-services__cover-wrap">
+            <% cover = @media_cover_by_offering_id[offering.id] %>
+            <div class="wa-services__cover-wrap">
+              <div class="wa-services__cover-fallback" aria-hidden="true">
+                <i class="bi <%= service_offering_icon(offering) %>"></i>
+                <span><%= t("owner_services.cover_placeholder") %></span>
+              </div>
+              <% if cover %>
                 <%= image_tag owner_service_media_file_path(offering, cover),
                       alt: cover.caption.presence || t("owner_services.media_image_alt"),
-                      loading: "lazy", class: "wa-services__card-banner" %>
+                      loading: "lazy", class: "wa-services__card-banner",
+                      data: { action: "error->wa-service-preview#imageFailed" } %>
                 <% unless cover.approved? %>
                   <span class="wa-services__cover-pending"><i class="bi bi-eye" aria-hidden="true"></i>
                     <%= t("owner_services.media_preview_only") %></span>
                 <% end %>
-              </div>
-            <% end %>
+              <% end %>
+            </div>
             <header class="wa-services__card-heading">
               <span aria-hidden="true"><i class="bi <%= service_offering_icon(offering) %>"></i></span>
               <div>
@@ -85,10 +93,10 @@
                 </small>
               </div>
             </header>
-            <p class="wa-services__summary"><%= truncate(latest.summary, length: 240) %></p>
+            <p class="wa-services__summary"><%= truncate(latest.summary, length: 185) %></p>
             <div class="wa-services__scope">
               <strong><i class="bi bi-check2-circle" aria-hidden="true"></i> <%= t("owner_services.included_scope") %></strong>
-              <p><%= truncate(latest.included_scope, length: 125) %></p>
+              <p><%= truncate(latest.included_scope, length: 110) %></p>
             </div>
             <footer class="wa-services__card-footer">
               <span class="wa-services__state wa-services__state--<%= kind %>">
@@ -101,6 +109,11 @@
                         params: { version: latest.version, digest: latest.digest, confirm: "1", return_to_catalog: "1" },
                         form: { class: "wa-services__inline-form" }, class: "rc-action rc-action--soft rc-action--small" %>
                 <% end %>
+                <%= link_to rc_icon_label("eye", t("owner_services.quick_preview")), owner_service_path(offering),
+                      class: "rc-action rc-action--soft rc-action--small",
+                      data: { turbo_frame: "wa-owner-service-preview",
+                              turbo_prefetch: false,
+                              action: "click->wa-service-preview#remember" } %>
                 <%= link_to rc_icon_label("arrow-up-right", t("owner_services.open")), owner_service_path(offering),
                       class: "rc-action rc-action--quiet rc-action--small wa-services__open" %>
               </div>
@@ -110,4 +123,24 @@
       </div>
     <% end %>
   <% end %>
+  <%# The full owner service page remains the no-JS and direct-URL fallback. %>
+  <dialog class="wa-services__preview-dialog" aria-label="<%= t("owner_services.quick_preview") %>"
+          data-wa-service-preview-target="dialog"
+          data-action="click->wa-service-preview#backdrop close->wa-service-preview#restoreFocus">
+    <div class="wa-services__preview-shell">
+      <div class="wa-services__preview-toolbar">
+        <span><i class="bi bi-eye" aria-hidden="true"></i> <%= t("owner_services.quick_preview") %></span>
+        <button type="button" class="rc-action rc-action--quiet rc-action--small"
+                aria-label="<%= t("owner_services.close_preview") %>"
+                data-action="click->wa-service-preview#close">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <%= turbo_frame_tag "wa-owner-service-preview",
+            data: { wa_service_preview_target: "frame",
+                    action: "turbo:frame-load->wa-service-preview#loaded" } do %>
+        <p class="rc-hint"><%= t("owner_services.private_help") %></p>
+      <% end %>
+    </div>
+  </dialog>
 </div>

@@ -1,0 +1,76 @@
+<div class="container wa-activity-journal my-4 my-sm-5" data-outbox-health>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("activity", t("activity_journal.title")),
+        owner_activity_events_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("collection", t("artifact_library.title")),
+        owner_artifacts_path, class: "rc-action rc-action--quiet" %>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "clipboard-data", path: t("outbox_health.eyebrow") + " / " + t("outbox_health.title"), title: t("outbox_health.title"), extra_class: "rc-page-hero mb-4", actions: banner_actions, description: t("outbox_health.description") %>
+
+  <section class="surface-panel p-3 p-sm-4 mb-4" aria-labelledby="outbox-health-summary">
+    <h2 class="h5" id="outbox-health-summary"><%= t("outbox_health.summary") %></h2>
+    <div class="row g-3 mt-1">
+      <% %w[total pending delivered failed due exhausted attempts_total].each do |key| %>
+        <div class="col-6 col-md-4 col-xl-3">
+          <div class="surface-panel p-3" data-outbox-metric="<%= key %>">
+            <span class="rc-muted d-block"><%= t("outbox_health.metrics.#{key}") %></span>
+            <strong class="h4 d-block mb-0"><%= key.in?(%w[pending delivered failed]) ? @snapshot[:states].fetch(key) : @snapshot.fetch(key.to_sym) %></strong>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <p class="rc-muted mt-3 mb-0">
+      <%= t("outbox_health.oldest") %>:
+      <strong data-outbox-oldest><%= @snapshot[:oldest_undelivered_age_seconds].nil? ? t("outbox_health.none") : t("outbox_health.seconds", count: @snapshot[:oldest_undelivered_age_seconds]) %></strong>
+    </p>
+  </section>
+
+  <section class="surface-panel p-3 p-sm-4" aria-labelledby="outbox-health-preview">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+      <div>
+        <h2 class="h5 mb-1" id="outbox-health-preview"><%= t("outbox_health.preview") %></h2>
+        <p class="rc-muted mb-0"><%= t("outbox_health.preview_warning") %></p>
+      </div>
+      <%= form_with url: owner_outbox_health_path, method: :get, class: "d-flex align-items-center gap-2" do |f| %>
+        <%= f.label :limit, t("outbox_health.limit"), class: "rc-field-label" %>
+        <%= f.select :limit, [10, 25, 50, 100], { selected: @limit }, class: "rc-input" %>
+        <%= f.submit t("outbox_health.apply"), class: "rc-action rc-action--quiet" %>
+      <% end %>
+    </div>
+    <% if @candidates.any? %>
+      <div class="table-responsive">
+        <table class="table" data-outbox-candidates>
+          <thead>
+            <tr>
+              <% %w[source kind version attempts age].each do |field| %>
+                <th scope="col"><%= t("outbox_health.columns.#{field}") %></th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody>
+            <% @candidates.each do |item| %>
+              <tr>
+                <td><%= item.fetch(:source_type) %></td>
+                <td><%= item.fetch(:kind) %></td>
+                <td><%= item.fetch(:source_version) %></td>
+                <td><%= item.fetch(:attempts) %></td>
+                <td><%= t("outbox_health.seconds", count: item.fetch(:age_seconds)) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="rc-muted mb-0" data-outbox-empty><%= t("outbox_health.empty") %></p>
+    <% end %>
+    <p class="rc-notice rc-notice--neutral mt-3 mb-0"><%= t("outbox_health.no_replay") %></p>
+  </section>
+
+  <section class="surface-panel p-3 p-sm-4 mt-4" aria-labelledby="outbox-operator-gate-title"
+           data-outbox-operator-preparation data-replay-enabled="false">
+    <h2 class="h5" id="outbox-operator-gate-title"><%= t("outbox_health.operator_gate.title") %></h2>
+    <p class="rc-muted"><%= t("outbox_health.operator_gate.description") %></p>
+    <p class="rc-muted"><%= t("outbox_health.operator_gate.limits") %></p>
+    <p class="rc-notice rc-notice--neutral mb-0"><%= t("outbox_health.operator_gate.disabled") %></p>
+  </section>
+</div>

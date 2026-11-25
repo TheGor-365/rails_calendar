@@ -29,13 +29,16 @@ class OwnerIntakeUnreadSystemTest < ApplicationSystemTestCase
     visit admin_project_intakes_path
     assert_selector "header a.wa-inbox-nav .wa-unread-count", text: "1"
     assert_selector "nav.rc-mobile-dock--owner a.wa-inbox-mobile .wa-unread-count", text: "1", visible: :all
-    assert_selector ".wa-inbox-record--unread", count: 1
+    assert_selector ".wa-requests__record--unread", count: 1
 
-    click_link @intake.title
+    within(".wa-requests__record--unread") do
+      find("summary", text: @intake.title).click
+      find("a[href='#{project_intake_path(@intake)}']").click
+    end
     assert_current_path project_intake_path(@intake)
     assert_no_selector "header a.wa-inbox-nav .wa-unread-count"
     visit admin_project_intakes_path
-    assert_no_selector ".wa-inbox-record--unread"
+    assert_no_selector ".wa-requests__record--unread"
 
     [390, 320].each do |width|
       page.driver.browser.manage.window.resize_to(width, 932)
@@ -46,4 +49,40 @@ class OwnerIntakeUnreadSystemTest < ApplicationSystemTestCase
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
+
+  test "requests menu uses bidirectional motion without horizontal overflow" do
+    visit sign_in_path
+    fill_in "Email address", with: @owner.email
+    fill_in "Password", with: PASSWORD
+    click_button "Sign in"
+    assert_current_path workspace_path
+    visit admin_project_intakes_path(view: "outgoing")
+    [400, 320].each do |width|
+      page.driver.browser.manage.window.resize_to(width, 932)
+      menu = find(".wa-requests__more > summary")
+      menu.click
+      assert_selector ".wa-requests__more[open] .wa-requests__more-panel"
+      dimensions = page.evaluate_script(<<~JS)
+        (() => {
+          const panel = document.querySelector(".wa-requests__more-panel").getBoundingClientRect();
+          return {left: panel.left, right: panel.right, page: document.documentElement.scrollWidth, viewport: innerWidth};
+        })()
+      JS
+      assert_operator dimensions["left"], :>=, -1
+      assert_operator dimensions["right"], :<=, dimensions["viewport"] + 1
+      assert_operator dimensions["page"], :<=, dimensions["viewport"] + 1
+      if page.evaluate_script("CSS.supports('selector(details::details-content)') && CSS.supports('transition-behavior: allow-discrete') && !matchMedia('(prefers-reduced-motion: reduce)').matches")
+        assert page.evaluate_script("getComputedStyle(document.querySelector('.wa-requests__more'), '::details-content').transitionDuration.includes('0.24s')")
+      end
+      menu.click
+      assert_no_selector ".wa-requests__more[open]"
+      if page.evaluate_script("CSS.supports('selector(details::details-content)') && CSS.supports('transition-behavior: allow-discrete') && !matchMedia('(prefers-reduced-motion: reduce)').matches")
+        assert page.evaluate_script("getComputedStyle(document.querySelector('.wa-requests__more'), '::details-content').transitionDuration.includes('0.2s')")
+      end
+      assert_no_selector ".wa-requests__more-panel", visible: true
+    end
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
 end

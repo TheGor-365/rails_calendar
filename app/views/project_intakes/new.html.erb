@@ -1,11 +1,5 @@
 <div class="container my-4 my-sm-5">
-  <header class="rc-page-hero mb-4">
-    <div class="rc-page-hero__content">
-    <p class="eyebrow"><%= t("intake.new_eyebrow") %></p>
-    <div class="rc-page-hero__heading"><span class="rc-page-hero__symbol" aria-hidden="true"><i class="bi bi-clipboard2-plus"></i></span><h1 class="page-title"><%= t("intake.new_title") %></h1></div>
-    <p class="rc-muted"><%= t("intake.new_hint") %></p>
-    </div>
-  </header>
+  <%= render "shared/wa_banner", icon: "clipboard2-plus", path: t("intake.new_eyebrow") + " / " + t("intake.new_title"), title: t("intake.new_title"), extra_class: "rc-page-hero mb-4" %>
   <%= render "shared/workflow", title: t("intake.workflow_new"), current: "request", steps: [ ["request", "clipboard2-plus", t("intake.step_request"), t("intake.step_request_desc")], ["interview", "chat-left-text", t("intake.step_interview"), t("intake.step_interview_desc")], ["review", "clipboard2-check", t("intake.step_review"), t("intake.step_review_desc")], ["plan", "calendar-range", t("intake.step_plan"), t("intake.step_plan_desc")] ] %>
   <div class="surface-panel p-4">
     <% if @intake.errors.any? %>
@@ -32,7 +26,6 @@
         <%= check_box_tag :demo_consent, "1", false, required: true %>
         <%= label_tag :demo_consent, t("intake.demo_consent") %>
       </div>
-      <p class="rc-hint"><%= t("intake.demo_warning") %></p>
       <%= f.button type: :submit, class: "rc-action rc-action--primary" do %><%= rc_icon_label("arrow-right-circle", t("intake.start_intake")) %><% end %>
     <% end %>
   </div>

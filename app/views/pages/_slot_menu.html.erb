@@ -1,0 +1,14 @@
+<% if admin_signed_in? %>
+  <div class="wa-calendar-slot-menu" popover="auto" data-wa-calendar-create-target="popover"
+       aria-label="<%= t("calendar_actions.create") %>">
+    <p class="wa-calendar-slot-menu__heading"><i class="bi bi-plus-circle" aria-hidden="true"></i> <%= t("calendar_actions.create") %></p>
+    <button type="button" data-action="click->wa-calendar-create#open"><%= rc_icon_label("calendar2-plus", t("calendar_actions.consultation")) %></button>
+    <% if owner_signed_in? %>
+      <%= link_to rc_icon_label("send-plus", t("calendar_actions.invitation")), owner_invitations_path %>
+      <%= link_to rc_icon_label("journal-plus", t("calendar_actions.request")), new_project_intake_path %>
+      <%= link_to rc_icon_label("collection", t("calendar_actions.library")), owner_artifacts_path %>
+      <div class="wa-calendar-slot-menu__divider"></div>
+      <%= link_to rc_icon_label("stars", t("calendar_actions.with_ai")), owner_ai_assistant_path, class: "wa-calendar-slot-menu__ai" %>
+    <% end %>
+  </div>
+<% end %>

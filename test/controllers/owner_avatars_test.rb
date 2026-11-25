@@ -27,7 +27,8 @@ class OwnerAvatarsTest < ActionDispatch::IntegrationTest
     assert_select "#owner-avatar-form"
     assert_select ".ws-account-avatar-panel", count: 0
     assert_select "details.ws-avatar-edit summary.ws-avatar-edit-trigger[aria-label]"
-    assert_select "[data-controller=wa-avatar-editor]"
+    assert_select "[data-controller~='wa-avatar-editor']"
+    assert_select "[data-controller~='wa-private-image']"
     assert_no_difference("User.count") do
       post owner_avatars_path, params: { avatar: { file: image_upload } }
     end
@@ -70,6 +71,27 @@ class OwnerAvatarsTest < ActionDispatch::IntegrationTest
     get owner_avatar_file_path(attachment)
     assert_response :not_found
     assert_equal 0, @other.owner_avatars_attachments.count
+  end
+
+  test "missing private avatar file returns 404 instead of raising 500" do
+    login(@owner)
+    post owner_avatars_path, params: { avatar: { file: image_upload } }
+    attachment = @owner.owner_avatars_attachments.last
+    attachment.blob.service.delete(attachment.blob.key)
+
+    get owner_avatar_file_path(attachment)
+    assert_response :not_found
+    assert_equal 1, @owner.owner_avatars_attachments.count
+
+    get owner_cabinet_path
+    assert_response :success
+    assert_select ".ws-account-avatar[data-wa-private-image-target=image]", count: 1
+    assert_select ".ws-account-avatar-placeholder[data-wa-private-image-target=fallback][hidden]", count: 1
+
+    get workspace_path
+    assert_response :success
+    assert_select ".ws-nav-avatar-link[data-controller=wa-private-image]", count: 1
+    assert_select ".ws-nav-avatar-placeholder[data-wa-private-image-target=fallback][hidden]", count: 1
   end
 
   test "wrong file extension and MIME are rejected" do

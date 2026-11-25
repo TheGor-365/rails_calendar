@@ -1769,3 +1769,235 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 
 // Scoped global owner-only AI launcher and draft review.
 @import 'rc_owner_ai_assistant';
+
+// Owner requests hub: White Atlas tabs, cards and accordion details.
+@import 'wa_requests';
+
+// White Atlas artifact library sidebar and live search.
+@import 'wa_library';
+
+// White Atlas calendar context actions and temporal contrast.
+@import 'wa_calendar_actions';
+
+// Private owner event history, traceable to canonical records.
+@import 'wa_activity_journal';
+
+
+// C2.5f — White Atlas bidirectional disclosure motion.
+// Native state and accessibility remain authoritative. Discrete transitions
+// keep outgoing content painted until the fade/height transition completes.
+// Older engines retain the original immediate native behavior.
+:root {
+  --wa-menu-enter: 240ms;
+  --wa-menu-exit: 200ms;
+  --wa-menu-ease: cubic-bezier(.22,.74,.24,1);
+}
+
+@supports selector(details::details-content) {
+  @supports (transition-behavior: allow-discrete) {
+    // Floating disclosures must not interpolate height or clip their panels.
+    // The details-content box retains native visibility semantics.
+    details:is(.wa-requests__more, .wa-threads__more, .rc-locale-switcher,
+      .wa-calendar-create-menu__details, .wa-ai-dock)::details-content {
+      opacity: 0;
+      transition: opacity var(--wa-menu-exit) ease-in,
+        content-visibility var(--wa-menu-exit) allow-discrete;
+    }
+    details:is(.wa-requests__more, .wa-threads__more, .rc-locale-switcher,
+      .wa-calendar-create-menu__details, .wa-ai-dock)[open]::details-content {
+      opacity: 1;
+      transition-duration: var(--wa-menu-enter);
+      transition-timing-function: var(--wa-menu-ease);
+    }
+    details:is(.wa-requests__more, .wa-threads__more, .rc-locale-switcher,
+      .wa-calendar-create-menu__details, .wa-ai-dock):not([open]) > :not(summary) {
+      pointer-events: none;
+    }
+    // Disable old one-way keyframes on the calendar menu.
+    .wa-calendar .wa-calendar-create-menu__items { animation: none; }
+    @supports (interpolate-size: allow-keywords) {
+      details:not([data-controller~="wa-accordion"]):not(:is(.wa-requests__more,
+        .wa-threads__more, .rc-locale-switcher, .wa-calendar-create-menu__details, .wa-ai-dock)) {
+        interpolate-size: allow-keywords;
+      }
+      details:not([data-controller~="wa-accordion"]):not(:is(.wa-requests__more,
+        .wa-threads__more, .rc-locale-switcher, .wa-calendar-create-menu__details, .wa-ai-dock))::details-content {
+        block-size: 0;
+        overflow: clip;
+        opacity: 0;
+        transition: block-size var(--wa-menu-exit) var(--wa-menu-ease),
+          opacity var(--wa-menu-exit) ease-in,
+          content-visibility var(--wa-menu-exit) allow-discrete;
+      }
+      details:not([data-controller~="wa-accordion"]):not(:is(.wa-requests__more,
+        .wa-threads__more, .rc-locale-switcher, .wa-calendar-create-menu__details, .wa-ai-dock))[open]::details-content {
+        block-size: auto;
+        opacity: 1;
+        transition-duration: var(--wa-menu-enter);
+      }
+      .wa-requests .wa-requests__detail,
+      .ws-avatar-edit-panel, .wa-invite-artifact-recover__body { animation: none; }
+    }
+  }
+}
+
+// Bootstrap menus retain their Popper positioning transform. Never animate it.
+// The custom select's hidden attribute and native popover top layer remain
+// authoritative; display/overlay transitions delay only their visual removal.
+@supports (transition-behavior: allow-discrete) {
+  .dropdown-menu, .rc-select-menu, .wa-calendar-slot-menu {
+    opacity: 0;
+    transition: opacity var(--wa-menu-exit) ease-in,
+      display var(--wa-menu-exit) allow-discrete;
+  }
+  .wa-calendar-slot-menu {
+    transition: opacity var(--wa-menu-exit) ease-in,
+      display var(--wa-menu-exit) allow-discrete,
+      overlay var(--wa-menu-exit) allow-discrete;
+  }
+  .dropdown-menu.show, .rc-select-menu:not([hidden]), .wa-calendar-slot-menu:popover-open {
+    opacity: 1;
+    transition-duration: var(--wa-menu-enter);
+    transition-timing-function: var(--wa-menu-ease);
+  }
+  .wa-calendar-slot-menu:popover-open { animation: none; }
+  .dropdown-menu:not(.show), .rc-select-menu[hidden],
+  .wa-calendar-slot-menu:not(:popover-open) { pointer-events: none; }
+  @starting-style {
+    .dropdown-menu.show, .rc-select-menu:not([hidden]), .wa-calendar-slot-menu:popover-open {
+      opacity: 0;
+    }
+  }
+}
+.wa-requests .wa-requests__more > summary .bi-chevron-down,
+.rc-locale-switcher > summary .bi-chevron-down { transition: transform var(--wa-menu-enter) var(--wa-menu-ease); }
+.wa-requests .wa-requests__more[open] > summary .bi-chevron-down,
+.rc-locale-switcher[open] > summary .bi-chevron-down { transform: rotate(180deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  details::details-content, .dropdown-menu, .rc-select-menu, .wa-calendar-slot-menu {
+    transition: none !important;
+  }
+}
+
+// F2.4 shared compact White Atlas masthead; retains existing page landmarks.
+.wa-compact-banner {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 12px; min-height: 76px; padding: 18px 22px; margin-bottom: 20px;
+  border: 1px solid rgba(0,126,118,.12); border-radius: 20px;
+  background: radial-gradient(circle at 100% 0%,rgba(0,160,140,.08),transparent 45%),linear-gradient(110deg,#fff,#edf8f6);
+  box-shadow: 0 8px 22px rgba(24,60,65,.06);
+}
+.wa-compact-banner .eyebrow { margin: 0 !important; }
+.wa-compact-banner .rc-page-hero__heading { margin: 0; }
+.wa-compact-banner .wa-ai-page__hero-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.wa-compact-banner .wa-compact-date { font-size: 1.15rem; margin: 0; }
+.wa-ai-page .wa-compact-input { min-height: 3.6rem; max-height: 50vh; overflow-y:auto; transition:height .2s ease; }
+.wa-ai-result-placeholder { padding: 8px 12px; }
+.wa-ai-result-placeholder h2 { display:none; }
+#wa-ai-result-heading { scroll-margin-top: 190px; }
+.wa-activity-journal__filters { align-items:end; }
+.wa-calendar .simple-calendar td, .wa-calendar .simple-calendar th { border-color: rgba(0,126,118,.14); }
+@media(max-width: 576px) { .wa-compact-banner { padding: 12px; border-radius: 16px; gap: 8px; } }
+@media(prefers-reduced-motion:reduce) { .wa-ai-page .wa-compact-input { transition:none; } }
+
+.wa-page-dialog { width:min(920px,calc(100% - 24px)); max-height:85dvh; padding:0; border:1px solid rgba(0,126,118,.16); border-radius:16px; background:var(--rc-surface,#fff); color:inherit; box-shadow:0 20px 65px rgba(24,60,65,.20); }
+.wa-page-dialog[open] { animation:wa-page-dialog-enter .22s ease-out; }
+.wa-page-dialog::backdrop { background:rgba(20,45,52,.4); }
+.wa-page-dialog__header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border-bottom:1px solid rgba(0,126,118,.12); background:#edf8f6; }
+.wa-page-dialog__body { padding:14px; }
+.wa-page-dialog__body .container { width:100%; margin:0 !important; padding:0; }
+@keyframes wa-page-dialog-enter { from {opacity:0; transform:translateY(10px) scale(.99)} to {opacity:1; transform:none} }
+@media(prefers-reduced-motion:reduce) { .wa-page-dialog[open] {animation:none} }
+
+/* Cabinet columns begin at the profile card rather than the section heading. */
+// Align the actual card tops on a shared grid row, independent of heading height.
+#owner-cabinet .ws-account-profile-heading { grid-column: 1 / -1; margin-bottom: 0; }
+@media (min-width: 901px) and (max-width: 1199px) {
+  #owner-cabinet .ws-account-profile-heading { grid-column: 1; grid-row: 2; }
+  #owner-cabinet .ws-account-main { grid-column: 1; grid-row: 3; }
+  #owner-cabinet .ws-account-aside { grid-column: 2; grid-row: 3; }
+}
+@media (min-width: 1200px) {
+  #owner-cabinet .ws-account-profile-heading { grid-column: 2; grid-row: 1; }
+  #owner-cabinet .wa-cabinet-rail { grid-column: 1; grid-row: 2; }
+  #owner-cabinet .ws-account-main { grid-column: 2; grid-row: 2; }
+  #owner-cabinet .ws-account-aside { grid-column: 3; grid-row: 2; }
+}
+.wa-page-dialog turbo-frame:not([hidden]) { display:block; }
+.wa-page-dialog turbo-frame[hidden] { display:none; }
+.wa-page-dialog .ws-owner-interview-layout, .wa-page-dialog .ws-capability-layout { grid-template-columns: minmax(0,1fr); }
+.wa-page-dialog .ws-owner-step-nav, .wa-page-dialog .ws-owner-guide { position:static; }
+
+.consultation-form .wa-compact-input { min-height:3.6rem; max-height:50vh; overflow-y:auto; transition:height .2s ease; }
+@media(prefers-reduced-motion:reduce) { .consultation-form .wa-compact-input { transition:none; } }
+
+/* Full-page dialog: independent document, responsive viewport and native forms. */
+.wa-page-dialog { width:min(1440px,calc(100vw - 32px)); max-width:none; max-height:92dvh; overflow:hidden; }
+.wa-page-dialog__shell { display:flex; flex-direction:column; min-width:0; }
+.wa-page-dialog__header { flex:0 0 auto; }
+.wa-page-dialog__page { display:block; width:100%; min-width:0; height:calc(88dvh - 60px); border:0; background:#f4f8f8; }
+html.wa-embedded-page { scrollbar-width:thin; scrollbar-color:#a7cdc5 #f4f8f8; }
+.wa-embedded-page body { min-width:0; padding-bottom:0!important; }
+.wa-embedded-page .app-header, .wa-embedded-page .rc-mobile-dock, .wa-embedded-page .mobile-nav, .wa-embedded-page #owner-ai-dock, .wa-embedded-page .skip-link, .wa-embedded-page .wa-page-dialog { display:none!important; }
+.wa-embedded-page #main-content > .container { width:100%; max-width:100%; margin:0!important; padding:18px; }
+.wa-embedded-page #main-content { padding-bottom:0!important; }
+.wa-embedded-page .wa-services__grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); }
+@media(max-width:576px) { .wa-page-dialog {width:calc(100vw - 12px);} .wa-page-dialog__page {height:calc(88dvh - 56px);} }
+
+// F2.5.3: shared White Atlas banner contract, independent of legacy page classes.
+.wa-banner { min-width: 0; align-items: center; }
+.wa-banner__copy { flex: 1 1 14rem; min-width: 0; }
+.wa-banner__path { display: flex; align-items: baseline; gap: .45rem; flex-wrap: wrap; color: var(--rc-accent); overflow-wrap: anywhere; }
+.wa-banner__title { font-size: clamp(1rem, 2vw, 1.3rem); font-weight: 700; margin: .4rem 0 0; overflow-wrap: anywhere; }
+.wa-banner__description { margin: .5rem 0 0; }
+.wa-banner__actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.wa-banner__actions > form { margin: 0; }
+.wa-banner__actions .rc-action { max-width: 100%; white-space: normal; }
+.wa-banner--account .wa-banner__copy > .wa-banner__actions { margin: .5rem 0; }
+@media (max-width: 576px) {
+  .wa-banner__copy { flex-basis: 100%; }
+  .wa-banner__actions { max-width: 100%; }
+}
+
+// F2.5.4: one modal shell, stable back/title/close controls.
+.wa-page-dialog__header > strong { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.wa-page-dialog__header > button { flex: 0 0 auto; }
+.wa-page-dialog__back:disabled { opacity: .4; cursor: default; }
+
+// F2.5.4c: compact, horizontally scrollable contextual history.
+.wa-page-dialog__shell { height: 88dvh; }
+.wa-page-dialog__page { flex: 1 1 0; min-height: 0; height: auto; }
+.wa-page-dialog__trail:not([hidden]) { display: flex; flex: 0 0 auto; align-items: center; gap: .4rem; overflow-x: auto; padding: .45rem .8rem; background: #edf8f6; border-bottom: 1px solid var(--rc-line); }
+.wa-page-dialog__crumb { flex: 0 0 auto; max-width: min(60vw, 22rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .75rem; color: var(--rc-accent); border: 1px solid var(--rc-line); background: var(--rc-paper); border-radius: .35rem; padding: .3rem .6rem; }
+.wa-page-dialog__crumb[aria-current="page"] { font-weight: 700; background: var(--rc-accent-wash); }
+
+
+// White Atlas confirmation: above the contextual work dialog, never another workspace.
+.wa-confirm-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: 0;
+  border: 1px solid var(--rc-line);
+  border-radius: 18px;
+  background: var(--rc-paper);
+  color: var(--rc-ink);
+  box-shadow: 0 24px 64px rgba(21, 43, 53, .24);
+}
+.wa-confirm-dialog::backdrop { background: rgba(23, 47, 49, .36); }
+.wa-confirm-dialog__body { padding: 1.4rem; }
+.wa-confirm-dialog__icon {
+  display: grid; place-items: center; width: 44px; height: 44px;
+  border-radius: 12px; background: #fff1df; color: #8c5319;
+  margin-bottom: 1rem; font-size: 1.2rem;
+}
+.wa-confirm-dialog h2 { font-size: 1.12rem; font-weight: 750; margin: 0 0 .5rem; }
+.wa-confirm-dialog p { color: var(--rc-muted); font-size: .9rem; line-height: 1.6; margin: 0 0 1.25rem; }
+.wa-confirm-dialog__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
+.wa-confirm-dialog__actions .rc-action { white-space: normal; min-height: 44px; }
+@media (max-width: 480px) {
+  .wa-confirm-dialog__body { padding: 1rem; }
+  .wa-confirm-dialog__actions { flex-direction: column; }
+  .wa-confirm-dialog__actions .rc-action { width: 100%; }
+}

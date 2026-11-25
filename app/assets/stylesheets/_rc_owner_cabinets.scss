@@ -390,3 +390,97 @@
 @media(prefers-reduced-motion: reduce) {
   .ws-avatar-edit-trigger, .ws-avatar-edit-panel { transition: none; animation: none; }
 }
+
+
+/* C2.5a — owner cabinet: in-page section map, not a second primary menu. */
+.wa-cabinet-rail {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .42rem;
+  min-width: 0;
+  padding: .55rem;
+  border: 1px solid var(--ws-border);
+  border-radius: 15px;
+  background: var(--ws-paper);
+  box-shadow: var(--ws-shadow);
+}
+.wa-cabinet-rail a {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 44px;
+  padding: .62rem .7rem;
+  border-radius: 10px;
+  color: var(--ws-ink);
+  text-decoration: none;
+  font-size: .78rem;
+  font-weight: 750;
+}
+.wa-cabinet-rail a .bi { flex: 0 0 auto; color: var(--ws-teal); }
+.wa-cabinet-rail a:hover,
+.wa-cabinet-rail a:focus-visible {
+  background: var(--ws-teal-wash);
+  color: var(--ws-teal-deep);
+}
+.ws-account-page :is(#cabinet-profile, #cabinet-tools, #cabinet-privacy) {
+  scroll-margin-top: 1.5rem;
+}
+@media (min-width: 1200px) {
+  .ws-account-content--rail {
+    grid-template-columns: 168px minmax(0,1fr) 320px;
+  }
+  .wa-cabinet-rail {
+    position: sticky;
+    top: var(--wa-section-nav-sticky-top, 10rem);
+    max-height: calc(100dvh - var(--wa-section-nav-sticky-top, 10rem) - 1rem);
+    overflow-y: auto;
+    grid-column: auto;
+    align-self: start;
+    flex-direction: column;
+    align-items: stretch;
+    padding: .7rem;
+  }
+  .wa-cabinet-rail a { width: 100%; }
+}
+
+/* C2.5a1 — correct owner cabinet anchor offset and show active local section. */
+.ws-account-content--rail :is(#cabinet-profile, #cabinet-tools, #cabinet-privacy) {
+  scroll-margin-top: calc(var(--wa-section-nav-sticky-top, 1.5rem) + .75rem);
+}
+.wa-cabinet-rail a[aria-current="location"] {
+  background: var(--ws-teal-wash);
+  color: var(--ws-teal-deep);
+}
+
+/* C2.5b focused cabinet: three identity/settings actions, no duplicate app hub. */
+#owner-cabinet .ws-account-tool { min-height: 132px; }
+@media (min-width: 640px) {
+  #owner-cabinet .ws-account-link-grid > .ws-account-tool:last-child {
+    grid-column: 1 / -1;
+    min-height: 110px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #owner-cabinet .ws-account-tool { transition: none; transform: none; }
+}
+
+
+/* C2.5d missing-private-image visual fallback, without modifying any blob.
+   An existing image overlays the icon; only a failed request reveals it. */
+.ws-account-avatar[hidden],
+.ws-account-avatar-placeholder[hidden],
+.ws-nav-avatar[hidden],
+.ws-nav-avatar-placeholder[hidden] { display: none !important; }
+.ws-nav-avatar-placeholder {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  color: var(--ws-teal-deep);
+  background: var(--ws-teal-wash);
+  border: 1px solid var(--ws-border);
+  border-radius: 10px;
+}

@@ -73,6 +73,26 @@ class OwnerServiceMediaItemsTest < ActionDispatch::IntegrationTest
     assert_select ".wa-services__media-item", count: 0
   end
 
+  test "missing private disk bytes return 404 without destroying media metadata" do
+    sign_in(@owner)
+    post owner_service_media_items_path(@offer), params: {
+      media: { media_kind: "banner", caption: "Missing file fixture", file: upload_png }
+    }
+    item = @offer.media_items.last
+    assert item.file.attached?
+    blob = item.file.blob
+    blob.service.delete(blob.key)
+
+    assert_no_difference("ServiceOfferingMediaItem.count") do
+      assert_no_difference("ActiveStorage::Attachment.count") do
+        get owner_service_media_file_path(@offer, item)
+        assert_response :not_found
+      end
+    end
+    assert item.reload.file.attached?
+    assert_equal blob.id, item.file.blob.id
+  end
+
   test "guest, client and foreign owner cannot access or mutate media" do
     sign_in(@owner)
     post owner_service_media_items_path(@offer), params: {

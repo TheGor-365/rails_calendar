@@ -88,6 +88,30 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
       post consultations_url, params: { consultation: @valid_attributes }
     end
     assert_redirected_to consultation_url(Consultation.last)
+    follow_redirect!
+    assert_select "main[data-wa-dialog-outcome='replace']", count: 1
+    get consultation_url(Consultation.last)
+    assert_select "main[data-wa-dialog-outcome='replace']", count: 0
+  end
+
+  test "admin can create a calendar consultation asynchronously with JSON" do
+    sign_in_as_admin
+
+    assert_difference "Consultation.count", 1 do
+      post consultations_url(format: :json), params: { consultation: @valid_attributes }, as: :json
+    end
+    assert_response :created
+    payload = response.parsed_body
+    assert_equal Consultation.last.id, payload.fetch("id")
+    assert_equal consultation_path(Consultation.last), payload.fetch("path")
+
+    assert_no_difference "Consultation.count" do
+      post consultations_url(format: :json),
+           params: { consultation: @valid_attributes.merge(end_time: @valid_attributes[:start_time]) },
+           as: :json
+    end
+    assert_response :unprocessable_entity
+    assert response.parsed_body.fetch("errors").present?
   end
 
   test "admin can update a consultation" do
@@ -95,6 +119,8 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     patch consultation_url(@consultation), params: { consultation: { lock_version: @consultation.lock_version, title: "Admin update" } }
     assert_redirected_to consultation_url(@consultation)
     assert_equal "Admin update", @consultation.reload.title
+    follow_redirect!
+    assert_select "main[data-wa-dialog-outcome='replace']", count: 1
   end
 
   test "edit form hides legacy seconds without silently modifying stored instants" do
@@ -176,6 +202,7 @@ class ConsultationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select "[role='alert']#consultation-form-errors"
     assert_select "input[name='consultation[end_time]'][aria-invalid='true']"
+    assert_select "main[data-wa-dialog-outcome='replace']", count: 0
   end
 
 

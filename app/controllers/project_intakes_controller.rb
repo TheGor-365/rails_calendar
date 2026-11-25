@@ -101,6 +101,12 @@ class ProjectIntakesController < ApplicationController
   end
 
   def require_intake_access!
+    if owner_signed_in?
+      return if @intake.workspace_id.present? &&
+                @intake.workspace_id == current_user.owner_workspace&.id
+      return if @intake.workspace_id.nil? && User.where(role: "owner").count == 1
+      return head :not_found
+    end
     return if admin_signed_in?
     return if ENV["RC_INTAKE_PUBLIC_DEMO"] == "true" && session[:project_intake_id] == @intake.id
 

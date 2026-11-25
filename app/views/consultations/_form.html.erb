@@ -13,9 +13,7 @@
     </div>
   <% end %>
 
-  <p id="consultation-timezone-hint" class="rc-hint mb-4">
-    <%= t("consultations.required_hint", zone: Time.zone.name, min: Consultation::MIN_SCHEDULE_YEAR, max: Consultation::MAX_SCHEDULE_YEAR) %>
-  </p>
+  <span id="consultation-timezone-hint" class="visually-hidden"><%= t("consultations.required_hint", zone: Time.zone.name, min: Consultation::MIN_SCHEDULE_YEAR, max: Consultation::MAX_SCHEDULE_YEAR) %></span>
 
   <div class="rc-field">
     <%= form.label :title, t("consultations.field_title"), class: "rc-field-label" %>
@@ -29,9 +27,9 @@
 
   <div class="rc-field">
     <%= form.label :description, t("consultations.field_description"), class: "rc-field-label" %>
-    <%= form.text_area :description, rows: 3, maxlength: 5000,
-                      class: "rc-input rc-input--area#{' rc-input--invalid' if consultation.errors.include?(:description)}",
-                      aria: { invalid: consultation.errors.include?(:description) }, data: { controller: "wa-autogrow", action: "input->wa-autogrow#resize" } %>
+    <%= form.text_area :description, rows: 2, maxlength: 5000,
+                      class: "rc-input rc-input--area wa-compact-input#{' rc-input--invalid' if consultation.errors.include?(:description)}",
+                      aria: { invalid: consultation.errors.include?(:description) }, data: { controller: "wa-autogrow", wa_autogrow_smooth_value: true, action: "input->wa-autogrow#resize" } %>
     <% if consultation.errors.include?(:description) %>
       <p class="rc-field-error"><%= consultation.errors.full_messages_for(:description).join(", ") %></p>
     <% end %>
@@ -82,7 +80,7 @@
     </div>
   <% end %>
 
-  <p class="rc-hint mb-3"><%= t("consultations.overlap_hint") %></p>
+  <p class="rc-hint mb-2"><i class="bi bi-clock" aria-hidden="true"></i> <%= Time.zone.name %></p>
   <%= render "overlap_advisory", overlaps: @overlaps, more: @overlaps_more, mode: :form %>
 
   <div class="d-flex flex-wrap align-items-center gap-2">

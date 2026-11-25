@@ -62,7 +62,7 @@ class ClientRequestClarificationsTest < ActionDispatch::IntegrationTest
 
     sign_in(@owner)
     get admin_project_intakes_path
-    assert_select ".wa-inbox-record--unread", count: 1
+    assert_select ".wa-requests__record--unread", count: 1
     assert_select "header a.wa-inbox-nav .wa-unread-count", text: "1"
     get project_intake_path(@intake)
     assert_response :success

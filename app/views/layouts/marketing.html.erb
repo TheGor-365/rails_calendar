@@ -17,6 +17,7 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="any">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="stylesheet" href="/marketing.css">
+    <script src="/marketing-interactions.js" defer></script>
   </head>
   <body class="marketing-page">
     <a class="mk-skip" href="#main-content"><%= t("nav.skip") %></a>
@@ -27,8 +28,8 @@
           <span class="mk-brand-name">Rails Calendar <small>AI Workspace</small></span>
         <% end %>
         <nav class="mk-header-nav" aria-label="<%= t("nav.main_navigation") %>">
-          <%= link_to t("nav.services"), services_path(anchor: "services") %>
-          <%= link_to t("marketing.nav_process"), services_path(anchor: "process"), class: "mk-header-secondary" %>
+          <%= link_to t("nav.services"), services_path(anchor: "services"), class: "is-current", aria: { current: "page" } %>
+          <button type="button" class="mk-header-secondary mk-section-trigger" data-mk-open="process"><%= t("marketing.nav_process") %></button>
           <%= link_to t("marketing.nav_contact"), services_path(anchor: "contact"), class: "mk-header-secondary" %>
         </nav>
         <%= render "shared/locale_switcher" %>

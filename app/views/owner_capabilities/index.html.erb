@@ -1,22 +1,12 @@
+<% settings_content = capture do %>
 <div class="container ws-owner-page ws-capability-page my-4 my-sm-5" id="owner-capabilities">
-  <header class="ws-owner-hero">
-    <div class="ws-owner-hero-copy">
-      <p class="eyebrow"><i class="bi bi-person-gear" aria-hidden="true"></i> <%= t("capability_review.eyebrow") %></p>
-      <div class="ws-owner-heading">
-        <span class="ws-owner-heading-icon"><i class="bi bi-sliders" aria-hidden="true"></i></span>
-        <div>
-          <h1 class="page-title"><%= t("capability_review.title") %></h1>
-          <p class="rc-muted mb-0"><%= t("capability_review.intro") %></p>
-        </div>
-      </div>
-    </div>
-    <div class="ws-owner-hero-actions">
-      <%= link_to rc_icon_label("stars", t("owner_ai_assistant.context_capabilities")),
-            owner_ai_assistant_path(operation: "intake_questions"), class: "rc-action rc-action--soft" %>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("stars", t("owner_ai_assistant.context_capabilities")),
+            owner_ai_assistant_path(operation: "intake_questions"), class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("person-badge", t("account_hub.owner_cabinet")), owner_cabinet_path, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("arrow-left", t("capability_review.back")), owner_practice_path, class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "person-gear", path: t("capability_review.eyebrow"), title: t("capability_review.title"), extra_class: "ws-owner-hero", actions: banner_actions %>
 
   <section class="ws-capability-overview" aria-label="<%= t('capability_review.overview') %>">
     <div class="ws-capability-overview-item">
@@ -50,7 +40,7 @@
             </summary>
             <div class="ws-capability-editor">
               <p class="ws-owner-data-note"><i class="bi bi-info-circle" aria-hidden="true"></i><%= t("capability_review.self_assessed") %></p>
-              <%= form_with url: owner_capability_path(capability_key: cap.domain), method: :patch, class: "ws-owner-form" do %>
+              <%= form_with url: owner_capability_path(capability_key: cap.domain), method: :patch, data: { turbo_frame: ("wa-settings-frame" if turbo_frame_request?) }, class: "ws-owner-form" do %>
                 <div class="ws-capability-fields">
                   <div class="ws-owner-field">
                     <%= label_tag "mode_#{cap.domain}", t("capability_review.delivery_mode"), class: "rc-field-label" %>
@@ -77,7 +67,7 @@
                 </div>
               <% end %>
               <% if change %>
-                <%= button_to discard_owner_capability_path(capability_key: cap.domain), method: :delete,
+                <%= button_to discard_owner_capability_path(capability_key: cap.domain), method: :delete, form: { data: { turbo_frame: ("wa-settings-frame" if turbo_frame_request?) } },
                       class: "rc-action rc-action--quiet rc-action--small ws-capability-discard" do %>
                   <%= rc_icon_label("arrow-counterclockwise", t("capability_review.discard")) %>
                 <% end %>
@@ -95,7 +85,7 @@
           <p class="rc-muted"><%= t("capability_review.no_changes") %></p>
         <% else %>
           <p class="rc-muted"><%= t("capability_review.approval_explainer") %></p>
-          <%= form_with url: approve_owner_capabilities_path, method: :post, class: "ws-owner-form" do %>
+          <%= form_with url: approve_owner_capabilities_path, method: :post, data: { turbo_frame: ("wa-settings-frame" if turbo_frame_request?) }, class: "ws-owner-form" do %>
             <%= hidden_field_tag :base_version, @snapshot.version %>
             <div class="ws-owner-field">
               <%= label_tag "corrected_headline", t("owner_setup.headline"), class: "rc-field-label" %>
@@ -126,7 +116,7 @@
         <h2><%= t("capability_review.ai_heading") %></h2>
         <p><%= t("capability_review.ai_explainer") %></p>
         <% if @ai_enabled %>
-          <%= form_with url: suggest_owner_capabilities_path, method: :post do %>
+          <%= form_with url: suggest_owner_capabilities_path, method: :post, data: { turbo_frame: ("wa-settings-frame" if turbo_frame_request?) } do %>
             <label class="ws-owner-checkbox mb-3">
               <%= check_box_tag :ai_consent, "1", false, required: true %>
               <span><%= t("capability_review.ai_consent") %></span>
@@ -156,3 +146,14 @@
     </aside>
   </div>
 </div>
+
+<% end %>
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "wa-settings-frame", target: "_top" do %>
+    <% if notice.present? %><p class="rc-notice rc-notice--success" role="status"><%= notice %></p><% end %>
+    <% if alert.present? %><p class="rc-notice rc-notice--error" role="alert"><%= alert %></p><% end %>
+    <%= settings_content %>
+  <% end %>
+<% else %>
+  <%= settings_content %>
+<% end %>

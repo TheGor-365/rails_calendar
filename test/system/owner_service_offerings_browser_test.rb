@@ -44,11 +44,15 @@ class OwnerServiceOfferingsBrowserTest < ApplicationSystemTestCase
     assert_no_selector "#offering-draft-form"
     assert_text "Final copy"
 
+    visit services_path
+    assert_no_text "Fix a fictional Rails error"
+    visit owner_service_path(@offering)
+
     check "I confirm enabling this approved revision without unsupported promises."
     click_button "Enable"
     assert_selector ".wa-services__state--enabled", text: "Enabled v1"
     visit services_path
-    assert_no_text "Fix a fictional Rails error"
+    assert_selector "section#services article h3", text: "Fix a fictional Rails error"
   ensure
     page.driver.browser.manage.window.resize_to(1400, 900)
   end

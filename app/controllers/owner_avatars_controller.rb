@@ -33,6 +33,10 @@ class OwnerAvatarsController < ApplicationController
     send_data attachment.blob.download,
               type: attachment.blob.content_type,
               disposition: "inline", filename: attachment.blob.filename.to_s
+  rescue ActiveStorage::FileNotFoundError
+    # A preview/restored DB can contain a blob row whose private disk file has not
+    # been copied into this checkout. Do not treat missing media as an app-wide 500.
+    head :not_found
   end
 
   private

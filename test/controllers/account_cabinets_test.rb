@@ -24,14 +24,22 @@ class AccountCabinetsTest < ActionDispatch::IntegrationTest
     assert_select "#owner-cabinet h1", text: I18n.t("account_hub.owner_title")
     assert_select ".ws-account-tool[href=?]", owner_setup_path(step: "A")
     assert_select ".ws-account-tool[href=?]", owner_capabilities_path
-    assert_select ".ws-account-tool[href=?]", owner_services_path
     assert_select ".ws-account-tool[href=?]", owner_ai_activity_path
-    assert_select ".ws-account-tool[href=?]", workspace_path
+    assert_select ".ws-account-tool", count: 3
+    assert_select ".ws-account-tool[href=?]", owner_services_path, count: 0
+    assert_select ".ws-account-tool[href=?]", workspace_path, count: 0
+    assert_select ".wa-cabinet-rail a", count: 3
     assert_select "a[href=?]", owner_cabinet_path
     assert_no_match(/cabinet-client@example.test/, response.body)
     get workspace_path
     assert_response :success
     assert_select "a[href=?]", owner_setup_path
+
+    # Service management remains discoverable under the canonical Requests
+    # area after removing duplicate app links from the cabinet.
+    get admin_project_intakes_path
+    assert_response :success
+    assert_select "header[data-wa-banner] .wa-banner__actions a[href=?]", owner_services_path, count: 1
   end
 
   test "client cabinet remains private and shows verified identity without owner context" do

@@ -1,9 +1,11 @@
 <div class="container ws-hub my-4 my-sm-5">
-  <header class="ws-hub-header">
-    <div><p class="eyebrow mb-2"><i class="bi bi-grid-1x2" aria-hidden="true"></i> <%= t("workspace.eyebrow") %></p>
-      <h1><%= t("workspace.title") %></h1><p class="rc-muted mb-0"><%= t("workspace.description") %></p></div>
-    <%= link_to rc_icon_label("plus-lg", t("workspace.new_consultation")), new_consultation_path, class: "rc-action rc-action--primary" %>
-  </header>
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("inboxes", t("workspace.open_requests")), admin_project_intakes_path, class: "rc-action rc-action--quiet" %>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "grid-1x2", path: t("workspace.eyebrow"), title: t("workspace.title"), extra_class: "ws-hub-header", actions: banner_actions %>
+  <%# Approved professional identity has one home: the cabinet.
+       Show this onboarding action only until its first approved snapshot. %>
+  <% unless @practice_profile&.approved_snapshot %>
   <section class="surface-panel p-3 p-sm-4 mb-4" id="owner-practice-progress">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
       <div><h2 class="h5 mb-1"><%= t("owner_setup.practice_title") %></h2>
@@ -11,21 +13,49 @@
       <%= link_to rc_icon_label("person-badge", @practice_profile&.approved_snapshot ? t("account_hub.owner_cabinet") : t("owner_setup.start_setup")), @practice_profile&.approved_snapshot ? owner_cabinet_path : owner_setup_path, class: "rc-action rc-action--primary" %>
     </div>
   </section>
+  <% end %>
   <section class="ws-hub-metrics" aria-label="<%= t("workspace.summary_aria") %>">
     <div class="ws-hub-metric"><i class="bi bi-calendar2-check" aria-hidden="true"></i><span><%= t("workspace.upcoming_metric") %></span><strong><%= @upcoming_count %></strong><small><%= t("workspace.upcoming_metric_note") %></small></div>
     <div class="ws-hub-metric"><i class="bi bi-inboxes" aria-hidden="true"></i><span><%= t("workspace.intakes_metric") %></span><strong><%= @intake_count %></strong><small><%= t("workspace.intakes_metric_note") %></small></div>
     <div class="ws-hub-metric"><i class="bi bi-clipboard-check" aria-hidden="true"></i><span><%= t("workspace.review_metric") %></span><strong><%= @review_count %></strong><small><%= t("workspace.review_metric_note") %></small></div>
   </section>
-  <section class="ws-hub-section" aria-labelledby="ws-tools">
-    <div class="ws-hub-section-head"><h2 id="ws-tools"><%= t("workspace.tools_heading") %></h2><span><i class="bi bi-shield-lock" aria-hidden="true"></i> <%= t("workspace.owner_only") %></span></div>
-    <div class="ws-hub-tools">
-      <%= link_to root_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-calendar3" aria-hidden="true"></i></span><strong><%= t("workspace.calendar") %></strong><small><%= t("workspace.calendar_desc") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
-      <%= link_to consultations_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></span><strong><%= t("workspace.consultations") %></strong><small><%= t("workspace.consultations_desc") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
-      <%= link_to admin_project_intakes_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-inboxes" aria-hidden="true"></i></span><strong><%= t("workspace.intakes") %></strong><small><%= t("workspace.intakes_desc") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
-      <%= link_to owner_services_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-boxes" aria-hidden="true"></i></span><strong><%= t("owner_services.title") %></strong><small><%= t("owner_services.owner_only_help") %></small><span class="ws-hub-tool-action"><%= t("workspace.open") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
-      <%= link_to new_project_intake_path, class: "ws-hub-tool" do %><span class="ws-hub-tool-icon"><i class="bi bi-clipboard2-plus" aria-hidden="true"></i></span><strong><%= t("workspace.new_intake") %></strong><small><%= t("workspace.new_intake_desc") %></small><span class="ws-hub-tool-action"><%= t("workspace.start") %> <i class="bi bi-arrow-up-right" aria-hidden="true"></i></span><% end %>
+  <section class="ws-hub-section" aria-labelledby="ws-outgoing">
+    <div class="ws-hub-section-head">
+      <h2 id="ws-outgoing" class="ws-hub-section-title">
+        <span class="ws-hub-section-title__icon"><i class="bi bi-send-check" aria-hidden="true"></i></span>
+        <span><%= t("owner_activity.outgoing") %></span>
+        <span class="ws-hub-section-title__count"><%= @outgoing_count %></span>
+      </h2>
+      <%= link_to rc_icon_label("arrow-up-right", t("owner_activity.all_outgoing")), owner_invitations_path(anchor: "invitation-history"), class: "rc-action rc-action--quiet rc-action--small" %>
     </div>
+    <% if @outgoing_invitations.any? %>
+      <div class="ws-hub-panels">
+        <section class="ws-hub-panel">
+          <ul class="ws-hub-list">
+            <% @outgoing_invitations.each do |invitation| %>
+              <li>
+                <%= link_to owner_invitation_path(invitation) do %>
+                  <strong><i class="bi bi-envelope-paper" aria-hidden="true"></i> <%= invitation.seed_title %></strong>
+                  <small><%= t("e2.state_#{invitation.state}") %> · <%= l(invitation.created_at, format: :short) %></small>
+                  <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                <% end %>
+                <% if invitation.project_intake_id.present? %>
+                  <%= link_to rc_icon_label("journal-text", t("owner_activity.open_request")), project_intake_path(invitation.project_intake_id), class: "rc-action rc-action--soft rc-action--small" %>
+                  <% if invitation.project_intake&.latest_scope_revision %>
+                    <%= link_to rc_icon_label("list-check", t("owner_activity.requirements")), owner_requirements_path(invitation.project_intake_id), class: "rc-action rc-action--quiet rc-action--small" %>
+                  <% end %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </section>
+      </div>
+    <% else %>
+      <p class="ws-hub-empty"><%= t("owner_activity.none_outgoing") %></p>
+    <% end %>
   </section>
+  <%# Canonical destinations now live in the top navigation; this page is
+       a real records dashboard, not a second full application launcher. %>
   <div class="ws-hub-panels">
     <section class="ws-hub-panel" aria-labelledby="ws-upcoming">
       <div class="ws-hub-panel-head"><h2 id="ws-upcoming"><%= t("workspace.upcoming_heading") %></h2><%= link_to t("workspace.all_records"), consultations_path %></div>

@@ -1,0 +1,11 @@
+ru:
+  owner_activity:
+    outgoing: "Исходящие приглашения"
+    all_outgoing: "Все приглашения"
+    open_request: "Открыть заявку"
+    requirements: "Требования и ТЗ"
+    none_outgoing: "Исходящих приглашений пока нет."
+    view_ai_result: "Посмотреть результат ИИ"
+    open_invitation: "Открыть приглашение"
+    project_activity: "Активность проектов"
+    none_in_period: "За выбранный период исходящих приглашений нет."

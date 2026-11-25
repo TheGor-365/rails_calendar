@@ -8,52 +8,77 @@
       <span class="wa-ai-dock__symbol" aria-hidden="true"><i class="bi bi-stars"></i></span>
       <div>
         <strong><%= t("owner_ai_assistant.title") %></strong>
-        <small><%= t("owner_ai_assistant.private_desc") %></small>
       </div>
+      <button type="button" class="wa-ai-dock__close" data-action="click->wa-ai-dock#close" aria-label="Close AI assistant">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
     </header>
     <%= link_to owner_ai_assistant_path, class: "wa-ai-dock__workspace-link" do %>
       <span class="wa-ai-dock__workspace-symbol"><i class="bi bi-columns-gap" aria-hidden="true"></i></span>
       <span class="wa-ai-dock__workspace-copy">
         <strong><%= t("owner_ai_assistant.full_page") %></strong>
-        <small><%= t("owner_ai_assistant.workspace_link_hint") %></small>
       </span>
-      <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
     <% end %>
     <%= form_with url: create_owner_ai_draft_path, method: :post, class: "wa-ai-dock__form" do %>
-      <div class="rc-field">
-        <%= label_tag "wa-dock-operation", t("owner_ai_assistant.operation"), class: "rc-field-label" %>
-        <%= select_tag :operation, options_for_select(OwnerAi::OperationRegistry.keys.map { |key|
-              [t("owner_ai_assistant.operation_#{key}"), key]
-            }), id: "wa-dock-operation", class: "rc-input" %>
-      </div>
+      <fieldset class="rc-field wa-ai-dock__operations">
+        <legend class="rc-field-label"><%= t("owner_ai_assistant.operation") %></legend>
+        <div class="wa-ai-dock__operation-grid">
+          <% OwnerAi::OperationRegistry.keys.each_with_index do |key, index| %>
+            <label class="wa-ai-dock__operation">
+              <%= radio_button_tag :operation, key, index.zero?, required: true %>
+              <i class="bi <%= OwnerAi::OperationRegistry.fetch(key).fetch(:icon) %>" aria-hidden="true"></i>
+              <span><%= t("owner_ai_assistant.operation_#{key}") %></span>
+            </label>
+          <% end %>
+        </div>
+      </fieldset>
       <div class="rc-field">
         <%= label_tag "wa-dock-brief", t("owner_ai_assistant.brief"), class: "rc-field-label" %>
         <%= text_area_tag :brief, nil, id: "wa-dock-brief", class: "rc-input rc-input--area",
               rows: 3, minlength: 12, maxlength: 1200, required: true,
               placeholder: t("owner_ai_assistant.placeholder") %>
       </div>
-      <label class="wa-ai-dock__consent">
+      <label class="wa-ai-dock__consent wa-ai-dock__consent--compact">
         <%= check_box_tag :paid_consent, "1", false, required: true %>
-        <span><%= t("owner_ai_assistant.consent") %></span>
+        <span><%= t("owner_ai_assistant.consent_short") %></span>
       </label>
+      <details class="wa-ai-dock__cost-details">
+        <summary><%= t("owner_ai_assistant.cost_more") %></summary>
+        <p><%= t("owner_ai_assistant.consent") %></p>
+      </details>
       <%= button_tag type: "submit", class: "rc-action rc-action--primary wa-ai-dock__submit" do %>
         <%= rc_icon_label("stars", t("owner_ai_assistant.generate")) %>
       <% end %>
     <% end %>
-    <%= form_with url: navigate_owner_ai_path, method: :post, class: "wa-ai-dock__navigation" do %>
-      <div class="rc-field">
-        <%= label_tag "wa-dock-command", t("owner_ai_assistant.navigate_label"), class: "rc-field-label" %>
-        <%= text_field_tag :command, nil, id: "wa-dock-command", class: "rc-input",
-              maxlength: 120, required: true, placeholder: t("owner_ai_assistant.navigate_placeholder") %>
+    <details class="wa-ai-dock__find">
+      <summary>
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <%= t("owner_ai_assistant.find_with_ai") %>
+      </summary>
+      <div class="wa-ai-dock__find-body">
+        <%# Only the wired, allowlisted page navigator is presented here.
+            File/date/task/archive provider plugins require independent server policies. %>
+        <%= form_with url: navigate_owner_ai_path, method: :post, class: "wa-ai-dock__navigation" do %>
+          <%= label_tag "wa-dock-command", t("owner_ai_assistant.navigate_label"), class: "visually-hidden" %>
+          <%= text_field_tag :command, nil, id: "wa-dock-command", class: "rc-input",
+                maxlength: 120, required: true, placeholder: t("owner_ai_assistant.navigate_placeholder") %>
+          <%= button_tag type: "submit", class: "rc-action rc-action--quiet rc-action--small" do %>
+            <%= rc_icon_label("signpost-split", t("owner_ai_assistant.navigate_button")) %>
+          <% end %>
+        <% end %>
       </div>
-      <%= button_tag type: "submit", class: "rc-action rc-action--quiet rc-action--small" do %>
-        <%= rc_icon_label("signpost-split", t("owner_ai_assistant.navigate_button")) %>
-      <% end %>
-      <small><%= t("owner_ai_assistant.navigate_hint") %></small>
-    <% end %>
+    </details>
     <nav class="wa-ai-dock__links" aria-label="<%= t("owner_ai_assistant.navigation") %>">
-      <%= link_to t("owner_ai_assistant.open_services"), owner_services_path %>
-      <%= link_to t("owner_ai_assistant.open_cabinet"), owner_cabinet_path %>
+      <% if ClientRequestPilot.enabled?(request: request) %>
+        <%= link_to owner_invitations_path do %>
+          <i class="bi bi-envelope-plus" aria-hidden="true"></i>
+          <%= t("e2.owner_title") %>
+        <% end %>
+      <% end %>
+      <%= link_to owner_ai_conversations_path do %>
+        <i class="bi bi-chat-square-text" aria-hidden="true"></i>
+        <%= t("owner_ai_assistant.my_conversations") %>
+      <% end %>
     </nav>
   </div>
 </details>

@@ -262,3 +262,35 @@ body.app-shell {
 .ws-client-panel h2 {font-size:1.17rem;font-weight:790;margin:15px 0 7px}
 .ws-client-panel p {color:var(--ws-muted);font-size:.88rem;line-height:1.65}
 .ws-client-icon {display:grid;place-items:center;background:var(--ws-teal-wash);color:var(--ws-teal);height:46px;width:46px;border-radius:13px;font-size:1.25rem}
+
+
+// Shared White Atlas semantic section title for owner dashboard, not a new theme.
+.ws-hub-section-head .ws-hub-section-title {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  min-width: 0;
+  font-size: clamp(.95rem, 1.4vw, 1.12rem);
+  font-weight: 800;
+  line-height: 1.35;
+}
+.ws-hub-section-title__icon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--ws-teal-wash);
+  color: var(--ws-teal);
+}
+.ws-hub-section-title__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  padding: .12rem .4rem;
+  border-radius: 7px;
+  background: var(--ws-teal-wash);
+  color: var(--ws-teal-deep);
+  font-size: .74rem;
+  font-variant-numeric: tabular-nums;
+}

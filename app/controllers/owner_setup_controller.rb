@@ -23,7 +23,7 @@ class OwnerSetupController < ApplicationController
     unsure = submitted[:unsure] == "1"
 
     if choices.empty? && notes.empty? && !unsure
-      return redirect_to(owner_setup_path(step: key), alert: t("owner_setup.answer_required"))
+      return render_invalid_answer(key, choices, notes, unsure, "owner_setup.answer_required")
     end
 
     @profile.with_lock do
@@ -43,9 +43,9 @@ class OwnerSetupController < ApplicationController
     next_index = OwnerIntelligence::Catalog::KEYS.index(key) + 1
     destination = OwnerIntelligence::Catalog::KEYS[next_index]
     redirect_to(destination ? owner_setup_path(step: destination) : owner_setup_review_path,
-                notice: t("owner_setup.saved"))
+                notice: t("owner_setup.saved"), flash: { wa_dialog_outcome: "advance" })
   rescue ActiveRecord::RecordInvalid, ActionController::ParameterMissing
-    redirect_to owner_setup_path(step: key), alert: t("owner_setup.invalid_answer")
+    render_invalid_answer(key, choices || [], notes.to_s, unsure == true, "owner_setup.invalid_answer")
   end
 
   def review
@@ -63,7 +63,7 @@ class OwnerSetupController < ApplicationController
     return redirect_to(owner_setup_review_path, alert: t("owner_setup.consent_required")) unless params[:ai_consent] == "1"
 
     OwnerIntelligence::Grok.new(@profile).suggest!
-    redirect_to owner_setup_review_path, notice: t("owner_setup.ai_ready")
+    redirect_to owner_setup_review_path, notice: t("owner_setup.ai_ready"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerIntelligence::Grok::Unavailable
     redirect_to owner_setup_review_path, alert: t("owner_setup.ai_unavailable")
   end
@@ -123,7 +123,7 @@ class OwnerSetupController < ApplicationController
     # Errors do not roll back the already committed owner-approved snapshot.
     begin
       OwnerServices::AutoCatalogue.new(workspace: @workspace).sync!
-      redirect_to owner_practice_path, notice: t("owner_setup.approved")
+      redirect_to owner_practice_path, notice: t("owner_setup.approved"), flash: { wa_dialog_outcome: "replace" }
     rescue OwnerServices::Catalogue::PolicyError, ActiveRecord::RecordInvalid => error
       Rails.logger.warn("Automatic offering draft generation failed: #{error.class}")
       redirect_to owner_practice_path, alert: t("owner_services.auto_sync_blocked")
@@ -145,14 +145,32 @@ class OwnerSetupController < ApplicationController
     @version_count = @profile.professional_context_snapshots.count
     @open_intakes = ProjectIntake.where(status: %w[interviewing draft_spec]).count
     @upcoming_consultations = Consultation.where("start_time >= ?", Time.current).count
+    @outgoing_count = @workspace.client_request_invitations.count
+    @recent_outgoing = @workspace.client_request_invitations.order(created_at: :desc, id: :desc).limit(5)
   end
 
   def ai_activity
     @entries = @profile.ai_spend_entries.order(id: :desc).limit(30)
+    @linked_invitation_by_entry_id = @workspace.client_request_invitations
+      .where(owner_ai_entry_id: @entries.map(&:id))
+      .index_by(&:owner_ai_entry_id)
     @spend = AiSpendLedger.spend_summary
   end
 
   private
+
+  def render_invalid_answer(key, choices, notes, unsure, message)
+    @answers = @profile.owner_interview_answers.reload.index_by(&:section_key)
+    @current_key = key
+    @question = OwnerIntelligence::Catalog.question(key)
+    @answer = OwnerInterviewAnswer.new(
+      section_key: key, selected_options: choices & @question.fetch(:options).keys,
+      notes: notes, unsure: unsure
+    )
+    @answer_invalid = true
+    flash.now[:alert] = t(message)
+    render :show, status: :unprocessable_entity
+  end
 
   def require_owner!
     redirect_to sign_in_path, alert: t("owner_setup.owner_only") unless owner_signed_in?

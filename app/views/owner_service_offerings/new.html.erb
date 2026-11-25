@@ -1,10 +1,8 @@
 <div class="container wa-services my-4 my-sm-5" id="owner-service-new">
-  <header class="rc-page-hero mb-4">
-    <p class="eyebrow"><%= t("owner_services.eyebrow") %></p>
-    <h1 class="page-title"><%= t("owner_services.new_title") %></h1>
-    <p class="rc-hint"><%= t("owner_services.draft_help") %></p>
+  <% banner_actions = capture do %>
     <%= link_to rc_icon_label("arrow-left", t("owner_services.back")), owner_services_path, class: "rc-action rc-action--quiet" %>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "briefcase", path: t("owner_services.eyebrow") + " / " + t("owner_services.new_title"), title: t("owner_services.new_title"), extra_class: "rc-page-hero mb-4", description: t("owner_services.draft_help"), actions: banner_actions %>
   <% if @error %><p class="rc-notice rc-notice--error" role="alert"><%= @error %></p><% end %>
   <% if @snapshot && @eligible_capabilities.any? %>
     <section class="surface-panel wa-services__panel">

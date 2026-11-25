@@ -249,3 +249,55 @@ body.marketing-page { min-width: 320px; margin: 0; background: var(--mk-canvas);
 .rc-locale-option .bi{color:#0a766d;flex:0 0 15px}
 @media(max-width:575.98px){.rc-locale-switcher>summary{padding:.4rem .55rem}.rc-locale-options{right:0}}
 @media(prefers-reduced-motion:reduce){.rc-locale-switcher>summary,.rc-locale-option{transition:none}}
+
+/* F2: variable-size published catalogue; preserve readable cards. */
+.mk-published-catalogue { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.mk-published-catalogue .mk-service-card p { overflow-wrap: anywhere; }
+.mk-process-order { flex-shrink: 0; white-space: nowrap; }
+@media (max-width: 900px) { .mk-published-catalogue { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 560px) { .mk-published-catalogue { grid-template-columns: 1fr; } }
+
+/* F2.1: compact disclosures and native dialog. */
+.mk-process-dialog { width: min(720px, calc(100% - 32px)); max-height: 85vh; overflow: auto; border: 1px solid var(--mk-line); border-radius: 20px; padding: 24px; color: inherit; background: white; box-shadow: var(--mk-shadow-raised); }
+.mk-process-dialog::backdrop { background: rgba(15,39,45,.42); }
+.mk-process-dialog .mk-process { grid-template-columns: 1fr; }
+.mk-footer-disclosure { margin-top: 20px; }
+.mk-footer-disclosure summary { cursor: pointer; font-size: .8rem; color: var(--mk-subtle); }
+@supports selector(details::details-content) { @supports (interpolate-size: allow-keywords) { .mk-footer-disclosure { interpolate-size: allow-keywords; } .mk-footer-disclosure::details-content { block-size: 0; overflow: clip; opacity: 0; transition: block-size .24s ease, opacity .2s ease, content-visibility .24s allow-discrete; } .mk-footer-disclosure[open]::details-content { block-size: auto; opacity: 1; } } }
+@media (prefers-reduced-motion: reduce) { .mk-footer-disclosure::details-content { transition: none; } }
+
+.mk-section-trigger { background: transparent; color: inherit; font: inherit; border: 0; text-align: inherit; cursor: pointer; }
+.mk-sidebar-nav .mk-section-trigger { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; }
+.mk-header-nav .is-current { color: #007e76; font-weight: 800; }
+.mk-process-dialog form { margin-top: 16px; display: flex; justify-content: flex-end; }
+
+.mk-service-card { display: flex; flex-direction: column; }
+.mk-service-card > a { height: auto; flex: 1; }
+.mk-service-tech { margin: 0; padding: 0 17px 14px; }
+.mk-service-tech p { margin: 8px 0 0; }
+.mk-process-dialog > button { margin-top: 16px; }
+
+.mk-tech-list { padding-left: 20px; margin: 8px 0 0; }
+.mk-tech-list li { margin: 4px 0; }
+.mk-contact-links { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; }
+.mk-contact-links .mk-action { width: auto; }
+.mk-contact-card { align-items: center; }
+
+/* F2.4e: shared White Atlas visual vocabulary on the public layout. */
+.mk-compact-banner { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:18px 22px; border:1px solid var(--mk-line); border-radius:20px; background:radial-gradient(circle at 100% 0%,rgba(0,160,140,.08),transparent 45%),linear-gradient(110deg,#fff,#edf8f6); box-shadow:var(--mk-shadow); }
+.mk-compact-banner h1 { margin:0; font-size:.76rem; }
+.mk-compact-banner .mk-intro-actions { margin:0; }
+.mk-compact-banner .mk-action-quiet { border:1px solid var(--mk-line); font-family:inherit; }
+.mk-visually-hidden { position:absolute!important; width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+.mk-process-dialog { border-radius:16px; padding:18px; max-height:85dvh; box-shadow:0 20px 65px rgba(24,60,65,.20); }
+.mk-dialog-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 12px; margin-bottom:12px; background:#edf8f6; border-radius:12px; }
+.mk-dialog-heading h2 { font-size:1rem; margin:0; }
+.mk-dialog-heading button { font:inherit; font-size:1.25rem; border:1px solid var(--mk-line); min-width:40px; }
+.mk-process-dialog .mk-process { margin:0; gap:8px; }
+.mk-workflow-scope { font-size:.75rem;color:var(--mk-subtle);margin:14px 0 0; }
+.mk-process-dialog[open] { animation:mk-dialog-in .22s ease-out; }
+.mk-process-dialog.mk-closing { animation:mk-dialog-out .18s ease-in forwards; }
+@keyframes mk-dialog-in { from {opacity:0;transform:translateY(8px) scale(.99)} to {opacity:1;transform:none} }
+@keyframes mk-dialog-out { to {opacity:0;transform:translateY(6px) scale(.99)} }
+#services,#contact,#evidence { scroll-margin-top:130px; }
+@media(max-width:560px) { .mk-compact-banner { padding:12px; border-radius:16px; } .mk-process-dialog { padding:12px; } }

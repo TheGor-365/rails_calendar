@@ -1,39 +1,27 @@
 <div class="container ws-owner-page wa-ai-page my-4 my-sm-5" id="owner-ai-assistant">
-  <header class="ws-owner-hero wa-ai-page__hero">
-    <span class="wa-ai-page__hero-mark" aria-hidden="true"><i class="bi bi-stars"></i></span>
-    <div class="ws-owner-hero-copy wa-ai-page__hero-copy">
-      <p class="eyebrow"><%= t("owner_ai_assistant.eyebrow") %></p>
-      <h1 class="page-title"><%= t("owner_ai_assistant.title") %></h1>
-      <p class="rc-muted"><%= t("owner_ai_assistant.intro") %></p>
-      <div class="wa-ai-page__hero-notes" aria-label="<%= t("owner_ai_assistant.hero_notes_label") %>">
-        <span><i class="bi bi-lock" aria-hidden="true"></i> <%= t("owner_ai_assistant.hero_private") %></span>
-        <span><i class="bi bi-check2-circle" aria-hidden="true"></i> <%= t("owner_ai_assistant.hero_review") %></span>
-      </div>
-    </div>
-    <div class="wa-ai-page__hero-actions">
+  <% banner_actions = capture do %>
+    <%= link_to rc_icon_label("chat-square-text", t("owner_ai_conversations.title")), owner_ai_conversations_path, class: "rc-action rc-action--quiet" %>
+      <%= link_to rc_icon_label("briefcase", t("owner_services.title")), owner_services_path, data: { wa_page_dialog: true }, class: "rc-action rc-action--quiet" %>
       <%= link_to rc_icon_label("arrow-left", t("owner_ai_assistant.open_cabinet")),
                   owner_cabinet_path, class: "rc-action rc-action--quiet" %>
-    </div>
-  </header>
+  <% end %>
+  <%= render "shared/wa_banner", icon: "stars", path: t("owner_ai_assistant.eyebrow"), title: t("owner_ai_assistant.title"), extra_class: "ws-owner-hero wa-ai-page__hero", actions: banner_actions %>
+  <div class="wa-ai-page__screen-grid" data-controller="wa-section-nav">
   <nav class="wa-ai-page__wayfinder" aria-label="<%= t("owner_ai_assistant.section_navigation") %>">
-    <a href="#wa-ai-compose-heading" class="wa-ai-page__wayfinder-link">
+    <a href="#wa-ai-compose-heading" class="wa-ai-page__wayfinder-link" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate">
       <i class="bi bi-pencil-square" aria-hidden="true"></i><%= t("owner_ai_assistant.section_create") %>
     </a>
-    <a href="#owner-ai-knowledge" class="wa-ai-page__wayfinder-link">
+    <a href="#owner-ai-knowledge" class="wa-ai-page__wayfinder-link" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate">
       <i class="bi bi-diagram-3" aria-hidden="true"></i><%= t("owner_ai_assistant.section_knowledge") %>
     </a>
-    <a href="#owner-ai-draft-library" class="wa-ai-page__wayfinder-link">
+    <a href="#owner-ai-draft-library" class="wa-ai-page__wayfinder-link" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate">
       <i class="bi bi-archive" aria-hidden="true"></i><%= t("owner_ai_assistant.section_library") %>
     </a>
-    <%= link_to owner_services_path, class: "wa-ai-page__wayfinder-link wa-ai-page__wayfinder-link--external" do %>
-      <%= rc_icon_label("arrow-up-right", t("owner_ai_assistant.section_services")) %>
-    <% end %>
-  </nav>
 
-  <p class="wa-ai-page__thread-entry">
-    <%= link_to rc_icon_label("chat-square-text", t("owner_ai_conversations.title")),
-                owner_ai_conversations_path, class: "rc-action rc-action--quiet" %>
-  </p>
+  </nav>
+  <div class="wa-ai-page__screen-body">
+
+
 
   <% if @navigation_result %>
     <section class="surface-panel wa-ai-nav-results" aria-labelledby="wa-ai-nav-heading">
@@ -76,7 +64,7 @@
         <span class="wa-ai-page__icon"><i class="bi bi-pencil-square" aria-hidden="true"></i></span>
         <div>
           <p class="eyebrow"><%= t("owner_ai_assistant.step_one") %></p>
-          <h2 id="wa-ai-compose-heading"><%= t("owner_ai_assistant.compose_heading") %></h2>
+          <h2 class="visually-hidden" id="wa-ai-compose-heading"><%= t("owner_ai_assistant.compose_heading") %></h2>
         </div>
       </div>
       <% if @ai_enabled && @profile&.approved_snapshot && @profile.onboarding_state == "approved" %>
@@ -93,16 +81,15 @@
           </div>
           <div class="rc-field">
             <%= label_tag "wa-ai-brief", t("owner_ai_assistant.brief"), class: "rc-field-label" %>
-            <%= text_area_tag :brief, nil, id: "wa-ai-brief", class: "rc-input rc-input--area",
-                  rows: 5, minlength: 12, maxlength: 1200, required: true,
+            <%= text_area_tag :brief, nil, id: "wa-ai-brief", class: "rc-input rc-input--area wa-compact-input",
+                  rows: 2, data: { controller: "wa-autogrow", wa_autogrow_smooth_value: true, action: "input->wa-autogrow#resize" }, minlength: 12, maxlength: 1200, required: true,
                   placeholder: t("owner_ai_assistant.placeholder") %>
-            <p class="rc-hint"><%= t("owner_ai_assistant.brief_hint") %></p>
+            <p class="rc-hint">12–1200</p>
           </div>
-          <label class="wa-ai-page__consent">
-            <%= check_box_tag :paid_consent, "1", false, required: true %>
-            <span><%= t("owner_ai_assistant.consent") %></span>
-          </label>
-          <%= button_tag type: "submit", class: "rc-action rc-action--primary" do %>
+          <% if @knowledge.service_catalogue_available_to_composer? %>
+            <label class="wa-ai-page__consent"><%= check_box_tag :include_catalogue, "1", false, id: "wa-ai-include-catalogue" %><span><%= t("owner_ai_assistant.include_catalogue") %></span></label>
+          <% end %>
+          <%= button_tag type: "submit", name: "paid_consent", value: "1", class: "rc-action rc-action--primary", data: { turbo_confirm: t("owner_ai_assistant.consent") } do %>
             <%= rc_icon_label("stars", t("owner_ai_assistant.generate")) %>
           <% end %>
         <% end %>
@@ -120,7 +107,7 @@
         <span class="wa-ai-page__icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
         <div>
           <p class="eyebrow"><%= t("owner_ai_assistant.control") %></p>
-          <h2 id="wa-ai-scope"><%= t("owner_ai_assistant.data_heading") %></h2>
+          <h2 class="visually-hidden" id="wa-ai-scope"><%= t("owner_ai_assistant.data_heading") %></h2>
         </div>
       </div>
       <p><%= t("owner_ai_assistant.data_policy") %></p>
@@ -131,7 +118,7 @@
     </aside>
   </div>
 
-  <section class="surface-panel wa-ai-page__result" aria-labelledby="wa-ai-result-heading">
+  <section class="<%= @entry ? "surface-panel wa-ai-page__result" : "wa-ai-result-placeholder" %>" aria-labelledby="wa-ai-result-heading">
     <div class="wa-ai-page__heading">
       <span class="wa-ai-page__icon"><i class="bi bi-file-earmark-text" aria-hidden="true"></i></span>
       <div>
@@ -157,9 +144,7 @@
       <% end %>
       <p class="wa-ai-page__next"><strong><%= t("owner_ai_assistant.next") %></strong> <%= @entry.result["next_step"] %></p>
     <% else %>
-      <div class="rc-empty-state">
-        <p><%= t("owner_ai_assistant.no_draft") %></p>
-      </div>
+
     <% end %>
   </section>
   <% if @entry %>
@@ -274,10 +259,10 @@
           <span class="wa-ai-page__icon"><i class="bi bi-diagram-3" aria-hidden="true"></i></span>
           <div>
             <p class="eyebrow"><%= t("owner_ai_assistant.knowledge_step") %></p>
-            <h2 id="wa-ai-knowledge-title"><%= t("owner_ai_assistant.knowledge_title") %></h2>
+            <h2 class="visually-hidden" id="wa-ai-knowledge-title"><%= t("owner_ai_assistant.knowledge_title") %></h2>
           </div>
         </div>
-        <p class="rc-muted"><%= t("owner_ai_assistant.knowledge_help") %></p>
+        
       </div>
       <span class="wa-ai-knowledge__access-note">
         <i class="bi bi-shield-lock" aria-hidden="true"></i>
@@ -319,7 +304,7 @@
           <p class="wa-ai-knowledge__state"><%= t("owner_ai_assistant.knowledge_services_count",
                     total: @knowledge.private_service_count,
                     approved: @knowledge.approved_service_count) %></p>
-          <p><%= t("owner_ai_assistant.knowledge_services_scope") %></p>
+          <p><%= t("owner_ai_assistant.catalogue_context_scope") %></p>
         </div>
         <%= link_to rc_icon_label("arrow-up-right", t("owner_ai_assistant.knowledge_services_link")),
                     owner_services_path, class: "rc-action rc-action--quiet rc-action--small" %>
@@ -361,7 +346,7 @@
         <h2 id="wa-ai-library-title"><%= t("owner_ai_assistant.library_title") %></h2>
       </div>
     </div>
-    <p class="rc-muted"><%= t("owner_ai_assistant.library_help") %></p>
+
     <% if @draft_history.any? %>
       <div class="wa-ai-draft-library__grid">
         <% @draft_history.each do |record| %>
@@ -377,7 +362,7 @@
             <h3><%= record.result["heading"] %></h3>
             <p><%= truncate(record.result["draft"].to_s, length: 165) %></p>
             <%= link_to rc_icon_label("arrow-up-right", t("owner_ai_assistant.library_open")),
-                  owner_ai_assistant_path(entry_id: record.id, operation: record.result["purpose"]),
+                  owner_ai_assistant_path(entry_id: record.id, operation: record.result["purpose"], anchor: "wa-ai-result-heading"),
                   class: "rc-action rc-action--quiet rc-action--small" %>
           </article>
         <% end %>
@@ -386,5 +371,6 @@
       <p class="rc-hint"><%= t("owner_ai_assistant.library_empty") %></p>
     <% end %>
   </section>
-
+  </div>
+  </div>
 </div>

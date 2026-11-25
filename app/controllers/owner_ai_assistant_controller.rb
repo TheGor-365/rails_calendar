@@ -45,13 +45,14 @@ class OwnerAiAssistantController < ApplicationController
                          alert: t("owner_ai_assistant.invalid_parent") unless parent
     end
     entry = OwnerAi::Composer.new(workspace: @workspace).generate!(
-      operation: operation, brief: params[:brief], parent: parent
+      operation: operation, brief: params[:brief], parent: parent,
+      include_catalogue: params[:include_catalogue] == "1"
     )
     context = @workspace.service_offerings.find_by(id: params[:offering_id])
     destination = { entry_id: entry.id, operation: operation }
     destination[:offering_id] = context.id if context&.draft_version
     redirect_to owner_ai_assistant_path(destination),
-                notice: t("owner_ai_assistant.draft_ready")
+                notice: t("owner_ai_assistant.draft_ready"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerAi::Composer::Unavailable
     redirect_to owner_ai_assistant_path(operation: operation),
                 alert: t("owner_ai_assistant.unavailable")
@@ -65,7 +66,7 @@ class OwnerAiAssistantController < ApplicationController
       base_version: params[:base_version], base_digest: params[:base_digest],
       summary: params[:summary], confirmed: params[:confirmed] == "1"
     )
-    redirect_to owner_service_path(offering), notice: t("owner_ai_assistant.applied_to_draft")
+    redirect_to owner_service_path(offering), notice: t("owner_ai_assistant.applied_to_draft"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerAi::DraftApplier::Conflict
     redirect_to owner_ai_assistant_path(entry_id: params[:entry_id], offering_id: params[:offering_id]),
                 alert: t("owner_ai_assistant.apply_conflict")

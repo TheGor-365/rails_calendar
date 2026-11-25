@@ -1,0 +1,30 @@
+es:
+  e2_ai:
+    title: "Acciones de IA para esta invitación"
+    subtitle: "Generación real de un borrador privado basado en la tarea. No se envía nada al cliente automáticamente."
+    what_changes: "Qué se creará"
+    explain: "Mostrar qué crea {action}"
+    paid_consent: "Autorizo una generación de IA de pago. La tarea revisada puede enviarse a xAI."
+    generate: "Generar borrador de IA"
+    disabled: "La IA está desactivada en esta sesión. No se realizan llamadas de pago."
+    consent_required: "Autorice esta llamada de pago."
+    generating: "Creando un borrador privado…"
+    saved: "Borrador guardado en el historial privado. Revíselo antes de usarlo."
+    unavailable: "IA no disponible. La tarea no se ha modificado."
+    invalid: "Revise el título, resumen y opciones."
+    too_long: "El borrador es demasiado largo para el campo. Abra el resultado guardado."
+    replace_confirm: "¿Reemplazar la descripción de la tarea con el borrador?"
+    applied: "Borrador insertado para revisión. Aún no se ha creado ninguna invitación."
+    open_saved: "Abrir borrador guardado"
+    use_in_form: "Usar en la descripción"
+    result: "Vista previa del borrador"
+    actions:
+      intake_questions:
+        name: "Preguntas al cliente"
+        description: "Crea preguntas concretas y opciones de respuesta. Guardado de forma privada; requiere revisión antes de utilizarlo."
+      client_reply:
+        name: "Explicación al cliente"
+        description: "Redacta un resumen sencillo y detecta datos faltantes. Nada se envía hasta emitir la invitación."
+      plan_outline:
+        name: "Plan preliminar"
+        description: "Propone hitos, dependencias y riesgos. No es un acuerdo ni un calendario comprometido."

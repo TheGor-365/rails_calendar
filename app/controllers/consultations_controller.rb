@@ -35,10 +35,12 @@ class ConsultationsController < ApplicationController
 
     respond_to do |format|
       if @consultation.save
-        format.html { redirect_to consultation_url(@consultation), notice: I18n.t("consultations.created") }
+        format.html { redirect_to consultation_url(@consultation), notice: I18n.t("consultations.created"), flash: { wa_dialog_outcome: "replace" } }
+        format.json { render json: { id: @consultation.id, title: @consultation.title, path: consultation_path(@consultation) }, status: :created }
       else
         prepare_overlap_advisory
         format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: { errors: @consultation.errors.full_messages }, status: :unprocessable_entity }
       end
     end
   end
@@ -60,7 +62,7 @@ class ConsultationsController < ApplicationController
     respond_to do |format|
       case result
       when :updated
-        format.html { redirect_to consultation_url(@consultation), notice: I18n.t("consultations.updated") }
+        format.html { redirect_to consultation_url(@consultation), notice: I18n.t("consultations.updated"), flash: { wa_dialog_outcome: "replace" } }
       when :stale
         prepare_overlap_advisory
         format.html { render :edit, status: :conflict }
@@ -75,7 +77,7 @@ class ConsultationsController < ApplicationController
     @consultation.destroy
 
     respond_to do |format|
-      format.html { redirect_to consultations_url, notice: I18n.t("consultations.destroyed") }
+      format.html { redirect_to consultations_url, notice: I18n.t("consultations.destroyed"), flash: { wa_dialog_outcome: "replace" } }
     end
   end
 

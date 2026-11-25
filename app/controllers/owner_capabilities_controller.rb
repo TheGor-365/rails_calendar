@@ -33,7 +33,7 @@ class OwnerCapabilitiesController < ApplicationController
       end
       @profile.update!(onboarding_state: "draft") if @profile.professional_capability_corrections.exists?
     end
-    redirect_to owner_capabilities_path(anchor: "cap-#{domain}"), notice: t("capability_review.saved")
+    redirect_to owner_capabilities_path(anchor: "cap-#{domain}"), notice: t("capability_review.saved"), flash: { wa_dialog_outcome: "replace" }
   rescue ActiveRecord::RecordInvalid, ActionController::ParameterMissing, KeyError
     redirect_to owner_capabilities_path, alert: t("capability_review.invalid")
   end
@@ -45,13 +45,13 @@ class OwnerCapabilitiesController < ApplicationController
       @profile.update!(onboarding_state: "approved") if
         @profile.professional_capability_corrections.none? && interview_unchanged?
     end
-    redirect_to owner_capabilities_path, notice: t("capability_review.discarded")
+    redirect_to owner_capabilities_path, notice: t("capability_review.discarded"), flash: { wa_dialog_outcome: "replace" }
   end
 
   def suggest
     return redirect_to(owner_capabilities_path, alert: t("capability_review.consent")) unless params[:ai_consent] == "1"
     OwnerIntelligence::Grok.new(@profile).suggest!
-    redirect_to owner_capabilities_path(anchor: "cap-approve"), notice: t("capability_review.ai_ready")
+    redirect_to owner_capabilities_path(anchor: "cap-approve"), notice: t("capability_review.ai_ready"), flash: { wa_dialog_outcome: "replace" }
   rescue OwnerIntelligence::Grok::Unavailable
     redirect_to owner_capabilities_path, alert: t("capability_review.ai_unavailable")
   end
@@ -71,7 +71,7 @@ class OwnerCapabilitiesController < ApplicationController
       headline: headline, private_summary: private_summary,
       public_summary: public_summary
     )
-    redirect_to owner_practice_path, notice: t("capability_review.approved")
+    redirect_to owner_practice_path, notice: t("capability_review.approved"), flash: { wa_dialog_outcome: "replace" }
   rescue ActiveRecord::RecordInvalid, OwnerIntelligence::CapabilityRevision::Invalid,
          OwnerIntelligence::CapabilityRevision::Stale, ActionController::ParameterMissing
     redirect_to owner_capabilities_path, alert: t("capability_review.stale")

@@ -1,0 +1,11 @@
+hy:
+  owner_activity:
+    outgoing: "Ուղարկված հրավերներ"
+    all_outgoing: "Բոլոր հրավերները"
+    open_request: "Բացել հայտը"
+    requirements: "Պահանջներ և տեխնիկական առաջադրանք"
+    none_outgoing: "Ուղարկված հրավերներ դեռ չկան։"
+    view_ai_result: "Դիտել ԱԲ արդյունքը"
+    open_invitation: "Բացել հրավերը"
+    project_activity: "Նախագծերի ակտիվություն"
+    none_in_period: "Այս ժամանակահատվածում ուղարկված հրավերներ չկան։"
