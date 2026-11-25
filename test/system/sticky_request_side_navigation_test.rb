@@ -61,11 +61,12 @@ class StickyRequestSideNavigationTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1440, 900)
   end
 
-  test "owner Requests hub has one primary action, accessible tools and deep-link tabs" do
+  test "owner Requests hub has one canonical outgoing action, accessible tools and deep-link tabs" do
     sign_in_as(@owner)
     visit admin_project_intakes_path
 
-    assert_selector ".wa-requests .rc-page-hero__actions > a.rc-action--primary", count: 1
+    assert_selector ".wa-requests header[data-wa-banner] .wa-banner__actions > a[href='#{owner_invitations_path}'].rc-action--quiet", count: 1
+    assert_selector ".wa-requests header[data-wa-banner] .wa-banner__actions > a", count: 1
     assert_selector ".wa-requests__more > summary", count: 1
     assert_selector ".wa-requests__tab[data-view='incoming'][aria-selected='true']"
     assert_selector "#wa-requests-incoming:not([hidden])"
