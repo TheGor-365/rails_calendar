@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { confirmationPending, requestConfirmation, settleConfirmation } from "../wa_confirmation"
+import { confirmationPending, requestConfirmation, settleConfirmation } from "../lib/wa_confirmation"
 
 // Explicit GET destinations which are safe to use as embedded workspaces.
 // Unknown internal destinations leave the dialog and navigate the main page.
