@@ -42,6 +42,24 @@
         <iframe class="wa-page-dialog__page" src="about:blank" title="<%= t("activity_journal.open") %>" data-wa-embedded-page data-wa-page-dialog-target="page" data-wa-discard-message="<%= { ru: "Есть несохранённые изменения. Выйти без сохранения?", en: "Discard unsaved changes?", hy: "Չպահված փոփոխություններ կան։ Դուրս գա՞լ առանց պահպանելու։", es: "Hay cambios sin guardar. ¿Salir sin guardar?" }.fetch(I18n.locale.to_sym, "Discard unsaved changes?") %>"></iframe>
       </div>
     </dialog>
+    <% discard_copy = {
+      ru: ["Несохранённые изменения", "Изменения не сохранены. Если продолжить, они будут потеряны.", "Продолжить редактирование", "Выйти без сохранения"],
+      en: ["Unsaved changes", "Your changes have not been saved. Continuing will discard them.", "Keep editing", "Discard changes"],
+      hy: ["Չպահված փոփոխություններ", "Փոփոխությունները չեն պահպանվել։ Շարունակելու դեպքում դրանք կկորչեն։", "Շարունակել խմբագրումը", "Դուրս գալ առանց պահպանելու"],
+      es: ["Cambios sin guardar", "Los cambios no se han guardado. Si continúas, se perderán.", "Seguir editando", "Descartar cambios"]
+    }.fetch(I18n.locale.to_sym, ["Unsaved changes", "Your changes have not been saved. Continuing will discard them.", "Keep editing", "Discard changes"]) %>
+    <dialog class="wa-confirm-dialog" role="alertdialog" aria-labelledby="wa-discard-title" aria-describedby="wa-discard-description"
+            data-wa-page-dialog-target="confirmation" data-action="cancel->wa-page-dialog#cancelDiscard click->wa-page-dialog#discardBackdrop">
+      <div class="wa-confirm-dialog__body">
+        <span class="wa-confirm-dialog__icon"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i></span>
+        <h2 id="wa-discard-title"><%= discard_copy[0] %></h2>
+        <p id="wa-discard-description"><%= discard_copy[1] %></p>
+        <div class="wa-confirm-dialog__actions">
+          <button type="button" class="rc-action rc-action--quiet" data-wa-page-dialog-target="keepEditing" data-action="wa-page-dialog#cancelDiscard" autofocus><%= discard_copy[2] %></button>
+          <button type="button" class="rc-action rc-action--danger" data-action="wa-page-dialog#confirmDiscard"><%= discard_copy[3] %></button>
+        </div>
+      </div>
+    </dialog>
     <%= render "layouts/mobile_nav" %>
     <%= render "shared/owner_ai_launcher" if owner_signed_in? %>
   </body>
