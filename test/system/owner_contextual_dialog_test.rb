@@ -90,16 +90,19 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
       fill_in "owner_notes", with: "Synthetic unsaved review note"
     end
     assert_selector "iframe[data-wa-dirty='true']"
-    dismiss_confirm do
-      find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
-    end
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_selector "dialog.wa-confirm-dialog[open][role='alertdialog']"
+    assert_selector "dialog.wa-confirm-dialog [data-wa-page-dialog-target='keepEditing']:focus"
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#cancelDiscard']").click
+    assert_no_selector "dialog.wa-confirm-dialog[open]"
     assert_selector "dialog.wa-page-dialog[open]"
     within_frame(find("iframe[data-wa-embedded-page]")) do
       assert_field "owner_notes", with: "Synthetic unsaved review note"
     end
-    accept_confirm do
-      find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
-    end
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#confirmDiscard']").click
+    assert_no_selector "dialog.wa-confirm-dialog[open]"
     assert_no_selector "dialog.wa-page-dialog[open]"
     assert_current_path owner_cabinet_path
   end
@@ -180,6 +183,32 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
       )
     JS
     assert_operator tops.max - tops.min, :<=, 2
+  end
+
+
+  test "dirty interview menu navigation requires White Atlas confirmation" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("a.ws-account-tool[data-wa-page-dialog][href*='/workspace/setup']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-setup"
+      fill_in "owner_notes", with: "Synthetic unsaved navigation note"
+      find("a.ws-owner-step[href*='step=B']").click
+    end
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#cancelDiscard']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "a.ws-owner-step.is-active[href*='step=A']"
+      assert_field "owner_notes", with: "Synthetic unsaved navigation note"
+      find("a.ws-owner-step[href*='step=B']").click
+    end
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#confirmDiscard']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "a.ws-owner-step.is-active[href*='step=B']"
+    end
+    assert_no_selector "dialog.wa-confirm-dialog[open]"
+    assert_current_path owner_cabinet_path
   end
 
   private
