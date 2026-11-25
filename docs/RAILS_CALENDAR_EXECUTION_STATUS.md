@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.2.1 additional lifecycle regression coverage
+
+- Core SHA 1e899b4 Rails CI #45523915009 and Security #45523915077 queued at inspection. Prior verified local/CI baseline remains f8688dc.
+- Test-only commit `6c09b96bb6924a4fe8e39575e650c61e3dd26349` adds synthetic system coverage for a stale confirmation after replacement iframe document (approval must not close the new document) and Turbo before-cache teardown (cancel, reset modal, reopen fresh request). Existing duplicate/Escape/native-close tests retained. No application code or schema changes in this slice. Tests authored, not executed; exact new candidate CI pending. Synthetic cache event is a focused lifecycle test, not proof of every actual Turbo navigation path.
+- NEXT check exact candidate CI and security, repair if needed, then guarded local core acceptance and F2.5.5f.2.2 JS quiz/overwrite integration. No local checkout changes, DB commands, real mutations, paid AI, merge or production deploy.
+
+
 ## 2026-11-25 — F2.5.5 review smoke PASS / F2.5.5f.2.1 shared confirmation core candidate
 
 - User terminal confirms local f8688dc clean, guarded review PID 962459 cwd, touch review tmp/restart.txt and HTTP 200, :3002 PID 45565 unchanged. Restart trigger and HTTP smoke evidenced; no independent proof of process reload or new browser acceptance. Exact prior CI green: 521 model/controller runs 8083 assertions, 64 browser runs 1065 assertions, zero failures/errors/skips; PG18 and security green.
