@@ -211,6 +211,56 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
     assert_current_path owner_cabinet_path
   end
 
+  test "shared confirmation rejects duplicate departure and cancels on Escape" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("a.ws-account-tool[data-wa-page-dialog][href*='/workspace/setup']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-setup"
+      fill_in "owner_notes", with: "Synthetic duplicate departure note"
+    end
+    assert_selector "iframe[data-wa-dirty='true']"
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_selector "dialog.wa-confirm-dialog[open][data-wa-confirm-kind='discard']"
+    page.execute_script("document.querySelector(\"dialog.wa-page-dialog button[data-action='wa-page-dialog#close']\").click()")
+    assert_selector "dialog.wa-confirm-dialog[open]", count: 1
+    find("dialog.wa-confirm-dialog [data-wa-page-dialog-target='keepEditing']").send_keys(:escape)
+    assert_no_selector "dialog.wa-confirm-dialog[open]"
+    assert_selector "dialog.wa-page-dialog[open]"
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_field "owner_notes", with: "Synthetic duplicate departure note"
+    end
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#confirmDiscard']").click
+    assert_no_selector "dialog.wa-page-dialog[open]"
+    assert_current_path owner_cabinet_path
+  end
+
+  test "shared confirmation fails closed on native dialog close and can reopen" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("a.ws-account-tool[data-wa-page-dialog][href*='/workspace/setup']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-setup"
+      fill_in "owner_notes", with: "Synthetic interrupted confirmation note"
+    end
+    assert_selector "iframe[data-wa-dirty='true']"
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    page.execute_script("document.querySelector('dialog.wa-confirm-dialog').close()")
+    assert_no_selector "dialog.wa-confirm-dialog[data-wa-confirm-kind]"
+    assert_selector "dialog.wa-page-dialog[open]"
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_field "owner_notes", with: "Synthetic interrupted confirmation note"
+    end
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#cancelDiscard']").click
+    assert_no_selector "dialog.wa-confirm-dialog[open]"
+    assert_selector "dialog.wa-page-dialog[open]"
+  end
+
   private
 
   def sign_in_owner
