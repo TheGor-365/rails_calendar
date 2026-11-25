@@ -261,6 +261,60 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
     assert_selector "dialog.wa-page-dialog[open]"
   end
 
+  test "pending confirmation cannot approve departure from a replacement iframe document" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("a.ws-account-tool[data-wa-page-dialog][href*='/workspace/setup']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-setup"
+      fill_in "owner_notes", with: "Synthetic old document note"
+    end
+    assert_selector "iframe[data-wa-dirty='true']"
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    # Simulate an already-started document replacement, not a normal user navigation.
+    page.execute_script("document.querySelector('iframe[data-wa-embedded-page]').src = arguments[0]", owner_setup_path(step: "B"))
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "a.ws-owner-step.is-active[href*='step=B']", visible: :all
+    end
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#confirmDiscard']").click
+    assert_no_selector "dialog.wa-confirm-dialog[open]"
+    assert_selector "dialog.wa-page-dialog[open]"
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "a.ws-owner-step.is-active[href*='step=B']"
+    end
+    assert_current_path owner_cabinet_path
+  end
+
+  test "Turbo cache teardown cancels confirmation and resets contextual dialog" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("a.ws-account-tool[data-wa-page-dialog][href*='/workspace/setup']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-setup"
+      fill_in "owner_notes", with: "Synthetic cache teardown note"
+    end
+    assert_selector "iframe[data-wa-dirty='true']"
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    page.execute_script("document.dispatchEvent(new Event('turbo:before-cache'))")
+    assert_no_selector "dialog.wa-confirm-dialog[open]"
+    assert_no_selector "dialog.wa-confirm-dialog[data-wa-confirm-kind]", visible: :all
+    assert_no_selector "dialog.wa-page-dialog[open]"
+    assert_selector "iframe[data-wa-embedded-page][src='about:blank']", visible: :all
+    find("a.ws-account-tool[data-wa-page-dialog][href*='/workspace/setup']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-setup"
+      fill_in "owner_notes", with: "Synthetic fresh request note"
+    end
+    assert_selector "iframe[data-wa-dirty='true']"
+    find("dialog.wa-page-dialog button[data-action='wa-page-dialog#close']").click
+    assert_selector "dialog.wa-confirm-dialog[open]"
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#cancelDiscard']").click
+    assert_no_selector "dialog.wa-confirm-dialog[open]"
+    assert_selector "dialog.wa-page-dialog[open]"
+  end
+
   private
 
   def sign_in_owner
