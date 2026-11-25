@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.2.2 invitation candidate local preflight PASS
+
+- User terminal confirms isolated review clean at 6c09b96, candidate `8acb84088161a255ba0a4ab56d99b97e233dac92` fetched, ancestry and reachability verified, three changed files +112/-10, infrastructure guard empty. Review :3003 PID 1182083 and independent :3002 PID 45565 both listening. Candidate checkout/build not yet evidenced.
+- Exact candidate Security #45526625195 SUCCESS; Rails CI #45526625297 in progress with PG18 fresh schema and upgrade jobs SUCCESS, test job running. No full CI acceptance yet.
+- NEXT guarded detached switch and Ruby/JS syntax plus assets build, then review-only restart and synthetic overwrite acceptance without generating paid AI or issuing invitations. Quiz migration remains after acceptance. No production, DB commands, merge or provider calls in this slice.
+
+
 ## 2026-11-25 — F2.5.5f.2.1 manual Escape acceptance / F2.5.5f.2.2 invitation overwrite candidate
 
 - Local exact 6c09b96: screenshot and user confirmation show Escape cancels branded warning, parent modal remains open, synthetic WA_CORE_TEST_2511 retained and focus returns to close control. Exact core CI already green (521 server + 68 browser tests); core accepted for next integration. Explicit discard on this local candidate was not separately evidenced; earlier manual and exact automated discard coverage exists. No private profile text copied.
