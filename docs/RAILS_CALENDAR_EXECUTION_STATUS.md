@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.2.1 local core candidate preflight/build PASS
+
+- User terminal confirms isolated review preflight from f8688dc to 6c09b96: clean tree, ancestry/reachability verified, four changed files +208/-12, infrastructure guard empty, Ruby 3.4.13, Node 25.2.1 and npm 11.6.2. Guarded detached switch to `6c09b96bb6924a4fe8e39575e650c61e3dd26349` then Ruby test syntax and both JS syntax checks PASS, esbuild 562.7 KB / map 1014.3 KB and Sass PASS; final tree clean. Review :3003 PID 962459 and independent :3002 PID 45565 listening. No restart or new-core runtime acceptance yet evidenced.
+- Exact candidate Rails CI #45524076439 and Security #45524077137 queued at inspection; no new green CI gate. Previous verified baseline f8688dc remains distinct.
+- NEXT guarded restart trigger and HTTP smoke only review :3003, then manual synthetic dirty close/cancel/Escape/discard review and exact candidate CI; only after core acceptance migrate JS quiz/overwrite scenarios. No DB commands, real writes, paid AI, merge or Railway deploy.
+
+
 ## 2026-11-25 — F2.5.5f.2.1 additional lifecycle regression coverage
 
 - Core SHA 1e899b4 Rails CI #45523915009 and Security #45523915077 queued at inspection. Prior verified local/CI baseline remains f8688dc.
