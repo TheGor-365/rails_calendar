@@ -76,6 +76,9 @@ export default class extends Controller {
       document.documentElement.classList.add("wa-embedded-page")
       this.dirtyForms = new Set()
       this.pendingForms = new Set()
+      this.mutationRedirect = null
+      this.onFetchResponse = event => this.trackMutationResponse(event)
+      document.addEventListener("turbo:before-fetch-response", this.onFetchResponse)
       this.onEdit = event => this.trackEdit(event)
       this.onSubmitStart = event => this.trackSubmitStart(event)
       this.element.addEventListener("input", this.onEdit, true)
@@ -107,6 +110,8 @@ export default class extends Controller {
       this.element.removeEventListener("input", this.onEdit, true)
       this.element.removeEventListener("change", this.onEdit, true)
       document.removeEventListener("turbo:submit-start", this.onSubmitStart)
+      document.removeEventListener("turbo:before-fetch-response", this.onFetchResponse)
+      this.clearMutationRedirect()
       document.removeEventListener("turbo:before-visit", this.beforeVisit)
       document.removeEventListener("turbo:submit-end", this.afterSubmit)
       document.removeEventListener("turbo:load", this.onCommitted)
@@ -150,6 +155,10 @@ export default class extends Controller {
     const intent = intentFor(url, window.location.href, parentHref,
       link.hasAttribute("data-wa-page-dialog"), link.hasAttribute("download"))
     if (["LOCAL_ACTION", "DOWNLOAD"].includes(intent)) return
+    if (this.pendingForms.size || this.mutationRedirect) {
+      event.preventDefault()
+      return
+    }
     if (intent === "LOCAL_WORKFLOW" && link.getAttribute("data-turbo") !== "false" &&
         !link.closest('[data-turbo="false"]')) return
     // Ordinary non-Turbo GET links use the same parent navigation guard.
@@ -171,6 +180,13 @@ export default class extends Controller {
     if (!event.detail?.url) return
     const url = new URL(event.detail.url, location.href)
     if (url.origin !== location.origin) return
+    // Turbo proposes a visit for the exact redirected HTML response of a mutation.
+    // Let Turbo render that response (including flash), never replay the POST or
+    // substitute an independent GET. Other navigation stays guarded.
+    if (this.mutationRedirect?.href === url.href && this.mutationRedirect.form.isConnected) {
+      this.clearMutationRedirect()
+      return
+    }
     const intent = intentFor(url, window.location.href,
       window.frameElement?.dataset.waParentHref)
     if (intent === "LOCAL_ACTION") return
@@ -201,10 +217,30 @@ export default class extends Controller {
 
   trackSubmitStart(event) {
     if (!this.mutationForm(event.target)) return
+    this.clearMutationRedirect()
     this.pendingForms.add(event.target)
     const frame = window.frameElement
     if (frame) frame.dataset.waMutationSource = location.href
     this.publishFormState()
+  }
+
+  trackMutationResponse(event) {
+    const form = event.target
+    const response = event.detail?.fetchResponse
+    if (!this.pendingForms.has(form) || this.pendingForms.size !== 1 ||
+        !response?.succeeded || !response.redirected || !response.isHTML || event.defaultPrevented) return
+    const url = response.location
+    if (url.origin !== location.origin || !areaFor(url.pathname)) return
+    this.clearMutationRedirect()
+    this.mutationRedirect = { form, href: url.href }
+    // submit-end can precede the asynchronous HTML read and before-visit.
+    this.mutationRedirectTimer = window.setTimeout(() => this.clearMutationRedirect(), 5000)
+  }
+
+  clearMutationRedirect() {
+    if (this.mutationRedirectTimer != null) window.clearTimeout(this.mutationRedirectTimer)
+    this.mutationRedirectTimer = null
+    this.mutationRedirect = null
   }
 
   publishFormState() {
@@ -256,6 +292,7 @@ export default class extends Controller {
     if (event.detail?.success && !form.isConnected) this.dirtyForms.delete(form)
     this.publishFormState()
     if (!event.detail?.success) {
+      if (this.mutationRedirect?.form === form) this.clearMutationRedirect()
       const frame = window.frameElement
       if (frame) delete frame.dataset.waMutationSource
     }
