@@ -291,6 +291,13 @@ export default class extends Controller {
 
   pageKey(url) { return url.pathname + url.search }
 
+  // Interview steps are local wizard tabs, not independent modal levels.
+  // Keep the actual URL for stale-message checks and returning to the last step.
+  historyKey(url) {
+    if (/^\/workspace\/setup\/?$/.test(url.pathname)) return "/workspace/setup"
+    return this.pageKey(url)
+  }
+
   acceptCommittedPage(data) {
     if (typeof data.href !== "string") return
     let url
@@ -328,10 +335,10 @@ export default class extends Controller {
 
   recordPage(url, title) {
     this.stack ||= []
-    const key = this.pageKey(url)
+    const key = this.historyKey(url)
     const existing = this.stack.findIndex(entry => entry.key === key)
     const entry = { key, href: url.href, title: title || this.headingTarget.textContent || document.title,
-      scroll: existing >= 0 ? this.stack[existing].scroll : { x: 0, y: 0 } }
+      scroll: existing >= 0 && this.stack[existing].href === url.href ? this.stack[existing].scroll : { x: 0, y: 0 } }
     if (existing >= 0) this.stack.splice(existing, this.stack.length - existing, entry)
     else this.stack.push(entry)
     if (this.stack.length > 40) this.stack.shift()
@@ -346,7 +353,7 @@ export default class extends Controller {
         const frame = this.pageTarget.contentWindow
         frame.requestAnimationFrame(() => {
           try {
-            if (this.dialogTarget.open && this.pageKey(new URL(frame.location.href)) === key) {
+            if (this.dialogTarget.open && this.pageKey(new URL(frame.location.href)) === restore.pageKey) {
               frame.scrollTo(restore.scroll.x, restore.scroll.y)
             }
           } catch (_) {}
@@ -379,7 +386,7 @@ export default class extends Controller {
         !this.stack || index < 0 || index >= this.stack.length - 1) return
     if (!this.allowDeparture()) return
     const entry = this.stack[index]
-    this.pendingRestore = { key: entry.key, scroll: entry.scroll || { x: 0, y: 0 } }
+    this.pendingRestore = { key: entry.key, pageKey: this.pageKey(new URL(entry.href)), scroll: entry.scroll || { x: 0, y: 0 } }
     this.replacePage(new URL(entry.href), entry.title)
   }
 
