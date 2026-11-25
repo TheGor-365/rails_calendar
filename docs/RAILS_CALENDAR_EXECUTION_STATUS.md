@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5 corrected candidate CI GREEN / local build PASS
+
+- Exact functional SHA `f8688dc7bfb5153d99da9fb9b76f21b81aea7f06`: Rails CI #45521955702 SUCCESS (test job including Chrome system tests, PG18 fresh schema and deployed-baseline upgrade all SUCCESS); Security #45521955745 SUCCESS. Browser regression repair gate green; no production acceptance implied.
+- User terminal confirms guarded detached switch to f8688dc, three Ruby test files syntax PASS, JS syntax PASS, esbuild 559.6 KB / map 1009.1 KB and Sass PASS, final clean tree; review :3003 PID 962459 and independent :3002 PID 45565 listening. Runtime restart/smoke of updated candidate not yet evidenced.
+- NEXT guarded review restart/smoke only :3003, then F2.5.5f.2.1 shared confirmation lifecycle per contract; no local DB writes, paid AI, production deployment or merge. CI gate for starting adapter work now satisfied, but full contextual UI acceptance remains pending.
+
+
 ## 2026-11-25 — F2.5.5 candidate local preflight PASS
 
 - User terminal confirms isolated review checkout `~/rails_calendar_c25a_ia_review_20261123` clean at `4c3ccc9`, candidate `f8688dc` fetched and verified descendant/reachable from branch; six changed files, +115/-5, infrastructure guard empty. Initial ASDF shim failure diagnosed as unavailable `~/.local/bin/asdf` on PATH; temporary session PATH correction restores ASDF 0.18.0, Ruby 3.4.13, Node 25.2.1, npm 11.6.2, Bundler 2.6.9. Earlier listener evidence :3003 PID 962459 and independent :3002 PID 45565, review HTTP 200 at previous code. No persistent environment modification.
