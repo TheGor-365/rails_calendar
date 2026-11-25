@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f native dirty guard user PASS / White Atlas confirmation pilot
+
+- User confirms dirty-form guard works on local b842452 and requests branded warnings instead of browser confirmation. Screenshot shows synthetic unsaved marker; native dialog itself not captured. Record user-reported PASS for tested guard, not all mutation/navigation paths. No private form contents copied.
+- 0861b52 introduces parent-owned localized RU/EN/HY/ES alertdialog with safe default keep-editing focus, 63cc120 replaces both native confirms in contextual controller with asynchronous guarded confirmation; dirty same-area Turbo visits are canceled and routed through parent as explicit GET after consent. Close/back/breadcrumb/cross-area routes share guard; reset cancels pending decision, duplicate pending decisions refused, source document checked before accepting discard. c64f4bd styles responsive White Atlas dialog. d1f9bb8 updates close regression and adds dirty interview menu cancellation/confirmation test. Isolated JS parser check passed; no runtime tests executed. At d1f9bb8 no PR workflow result returned; previous 7013249 CI 45517613436 and security 45517613451 queued.
+- Scope only contextual discard confirmation; existing Turbo destructive-action confirmations, other JS alert/confirm/prompt sites, browser-native unload safety and provider consent remain unchanged. Next inventory other confirmation sites with git grep, design shared confirmation adapter without weakening destructive/paid gates, then verify local branded guard including Escape, repeat clicks, focus and mobile. Local remains b842452 pending guarded checkout/rebuild. No merge/deploy/DB commands/paid AI.
+
+
 ## 2026-11-25 — F2.5.5d desktop visual correction recheck
 
 - User terminal confirms exact detached review HEAD b8424522ad1696aaceed5cccb50488d1a566a63f, infrastructure guard passed, system test Ruby syntax and modal JS syntax passed, esbuild (556.7 KB JS) and Sass build passed, guarded review restart and HTTP 200, clean working tree. Screenshots confirm desktop cabinet navigation, profile feature and privacy cards share a top edge; interview step C shows no duplicate breadcrumb strip and disabled global back when opened from cabinet. Parent URL remains /workspace/cabinet. Desktop reported defects corrected in observed states; exhaustive repeated switching, cross-section return and automated system tests not independently confirmed.
