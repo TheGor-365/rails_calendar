@@ -62,7 +62,7 @@ function intentFor(url, currentHref, parentHref, explicitModal = false, download
 // Same-origin full pages retain their own forms, CSRF, Turbo and controllers.
 // Navigation is coordinated only for a document inside the explicitly marked iframe.
 export default class extends Controller {
-  static targets = ["dialog", "heading", "page", "backButton", "trail"]
+  static targets = ["dialog", "heading", "page", "backButton", "trail", "confirmation", "keepEditing"]
 
   connect() {
     this.embedded = window.parent !== window &&
@@ -175,7 +175,12 @@ export default class extends Controller {
       window.frameElement?.dataset.waParentHref)
     if (intent === "LOCAL_ACTION") return
     if (intent === "LOCAL_WORKFLOW") {
-      if (!this.allowEmbeddedDeparture()) event.preventDefault()
+      if (this.pendingForms.size > 0) {
+        event.preventDefault()
+      } else if (this.dirtyForms.size > 0) {
+        event.preventDefault()
+        this.notifyParent("REPLACE_MODAL", url)
+      }
       return
     }
     event.preventDefault()
@@ -209,17 +214,37 @@ export default class extends Controller {
     frame.dataset.waSubmitting = String(this.pendingForms.size > 0)
   }
 
-  allowEmbeddedDeparture() {
-    if (this.pendingForms.size > 0) return false
-    if (!this.dirtyForms.size) return true
-    return window.confirm(window.frameElement?.dataset.waDiscardMessage || "Discard unsaved changes?")
+  async allowDeparture() {
+    const frame = this.pageTarget
+    if (this.discardResolver || frame.dataset.waSubmitting === "true") return false
+    if (frame.dataset.waDirty !== "true") return true
+    if (!this.hasConfirmationTarget) return false
+    const source = frame.contentDocument
+    const approved = await new Promise(resolve => {
+      this.discardResolver = resolve
+      this.confirmationTarget.showModal()
+      this.keepEditingTarget.focus()
+    })
+    return approved && this.dialogTarget.open && source === frame.contentDocument &&
+      frame.dataset.waSubmitting !== "true"
   }
 
-  allowDeparture() {
-    const frame = this.pageTarget
-    if (frame.dataset.waSubmitting === "true") return false
-    if (frame.dataset.waDirty !== "true") return true
-    return window.confirm(frame.dataset.waDiscardMessage || "Discard unsaved changes?")
+  finishDiscard(approved) {
+    const resolve = this.discardResolver
+    this.discardResolver = null
+    if (this.hasConfirmationTarget && this.confirmationTarget.open) this.confirmationTarget.close()
+    if (resolve) resolve(approved)
+  }
+
+  cancelDiscard(event) {
+    event?.preventDefault()
+    this.finishDiscard(false)
+  }
+
+  confirmDiscard() { this.finishDiscard(true) }
+
+  discardBackdrop(event) {
+    if (event.target === this.confirmationTarget) this.finishDiscard(false)
   }
 
   embeddedSubmit(event) {
@@ -257,7 +282,7 @@ export default class extends Controller {
     }, location.origin)
   }
 
-  receiveMessage(event) {
+  async receiveMessage(event) {
     if (!this.hasPageTarget || !this.hasDialogTarget || !this.dialogTarget.open ||
         event.origin !== location.origin || event.source !== this.pageTarget.contentWindow) return
     const data = event.data
@@ -283,7 +308,7 @@ export default class extends Controller {
     if (data.intent === "CLOSE_TO_PARENT") {
       if (sameParentDestination(url, this.pageTarget.dataset.waParentHref)) this.close()
     } else if (data.intent === "REPLACE_MODAL") {
-      if (!this.navigationPending && areaFor(url.pathname) && this.allowDeparture()) this.replacePage(url, data.title || this.headingTarget.textContent)
+      if (!this.navigationPending && areaFor(url.pathname) && await this.allowDeparture() && this.dialogTarget.open && !this.closing && !this.navigationPending) this.replacePage(url, data.title || this.headingTarget.textContent)
     } else {
       this.close(() => window.location.assign(url.href))
     }
@@ -381,11 +406,11 @@ export default class extends Controller {
     })
   }
 
-  jumpTo(index) {
+  async jumpTo(index) {
     if (!this.dialogTarget.open || this.closing || this.navigationPending ||
         !this.stack || index < 0 || index >= this.stack.length - 1) return
-    if (!this.allowDeparture()) return
     const entry = this.stack[index]
+    if (!(await this.allowDeparture()) || !this.dialogTarget.open || this.closing || this.navigationPending || this.stack[index] !== entry) return
     this.pendingRestore = { key: entry.key, pageKey: this.pageKey(new URL(entry.href)), scroll: entry.scroll || { x: 0, y: 0 } }
     this.replacePage(new URL(entry.href), entry.title)
   }
@@ -454,8 +479,8 @@ export default class extends Controller {
   cancel(event) { event.preventDefault(); this.close() }
   backdrop(event) { if (event.target === this.dialogTarget) this.close() }
 
-  close(afterClose) {
-    if (!this.dialogTarget.open || this.closing || !this.allowDeparture()) return
+  async close(afterClose) {
+    if (!this.dialogTarget.open || this.closing || !(await this.allowDeparture()) || !this.dialogTarget.open || this.closing) return
     this.closing = true
     const finish = () => {
       this.reset()
@@ -470,6 +495,7 @@ export default class extends Controller {
   }
 
   reset() {
+    this.finishDiscard(false)
     this.closing = false
     this.clearNavigationTimer()
     if (this.hasDialogTarget && this.dialogTarget.open) this.dialogTarget.close()
