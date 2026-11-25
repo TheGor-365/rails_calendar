@@ -1911,8 +1911,18 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 @media(prefers-reduced-motion:reduce) { .wa-page-dialog[open] {animation:none} }
 
 /* Cabinet columns begin at the profile card rather than the section heading. */
-@media (min-width: 992px) {
-  .ws-account-content--rail > .wa-cabinet-rail, .ws-account-content--rail > .ws-account-aside { margin-top: 60px; }
+// Align the actual card tops on a shared grid row, independent of heading height.
+#owner-cabinet .ws-account-profile-heading { grid-column: 1 / -1; margin-bottom: 0; }
+@media (min-width: 901px) and (max-width: 1199px) {
+  #owner-cabinet .ws-account-profile-heading { grid-column: 1; grid-row: 2; }
+  #owner-cabinet .ws-account-main { grid-column: 1; grid-row: 3; }
+  #owner-cabinet .ws-account-aside { grid-column: 2; grid-row: 3; }
+}
+@media (min-width: 1200px) {
+  #owner-cabinet .ws-account-profile-heading { grid-column: 2; grid-row: 1; }
+  #owner-cabinet .wa-cabinet-rail { grid-column: 1; grid-row: 2; }
+  #owner-cabinet .ws-account-main { grid-column: 2; grid-row: 2; }
+  #owner-cabinet .ws-account-aside { grid-column: 3; grid-row: 2; }
 }
 .wa-page-dialog turbo-frame:not([hidden]) { display:block; }
 .wa-page-dialog turbo-frame[hidden] { display:none; }
