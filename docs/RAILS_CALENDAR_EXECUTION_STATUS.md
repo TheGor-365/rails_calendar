@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.2 adapter design contract / CI gate pending
+
+- Corrective test SHA 87cafc2: Rails CI #45520914113 and Security #45520914108 queued at inspection. Previous ledger SHA 74c475a: CI #45520935907 and Security #45520935880 queued. No green repair gate yet.
+- Design-only commit `8f94dddcc4e3a8a0e3d6408a0dbe0d557b175218` adds `docs/WHITE_ATLAS_CONFIRMATION_ADAPTER_CONTRACT_2026-11-25.md`. Verified six Turbo call sites and three JS confirms, documented per-site invariants, async fail-closed lifecycle, native beforeunload retention, exact submitter/consent/fingerprint requirements and staged synthetic acceptance. API integration must still be verified against installed Turbo source. No runtime implementation or test execution claimed.
+- NEXT: inspect corrected exact-SHA CI; repair any failure before implementing common dialog lifecycle and contextual compatibility, then JS sites, then Turbo sites with paid consent last. Local review remains 4c3ccc9; no local changes, production deploy, DB commands or paid AI calls.
+
+
 ## 2026-11-25 — F2.5.5f.1 CI regression repair before shared adapter
 
 - Exact functional SHA 4c3ccc9: Rails CI #45518605913 FAILURE (521 runs, 8076 assertions, 1 failure, 0 errors/skips); PostgreSQL18 schema and upgrade jobs SUCCESS; Security Audit #45518605952 SUCCESS. System suite did not run. Job #138884416716 identifies stale redirect expectation at OwnerSetupControllerTest line 167: intentional invalid-answer HTTP 422 retention contract returns 422 instead of redirect.
