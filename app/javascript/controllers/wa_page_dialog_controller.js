@@ -187,6 +187,10 @@ export default class extends Controller {
       this.clearMutationRedirect()
       return
     }
+    if (this.mutationRedirect) {
+      event.preventDefault()
+      return
+    }
     const intent = intentFor(url, window.location.href,
       window.frameElement?.dataset.waParentHref)
     if (intent === "LOCAL_ACTION") return
@@ -235,19 +239,22 @@ export default class extends Controller {
     this.mutationRedirect = { form, href: url.href }
     // submit-end can precede the asynchronous HTML read and before-visit.
     this.mutationRedirectTimer = window.setTimeout(() => this.clearMutationRedirect(), 5000)
+    this.publishFormState()
   }
 
   clearMutationRedirect() {
     if (this.mutationRedirectTimer != null) window.clearTimeout(this.mutationRedirectTimer)
     this.mutationRedirectTimer = null
+    const hadRedirect = this.mutationRedirect !== null
     this.mutationRedirect = null
+    if (hadRedirect) this.publishFormState()
   }
 
   publishFormState() {
     const frame = window.frameElement
     if (!frame) return
     frame.dataset.waDirty = String(this.dirtyForms.size > 0)
-    frame.dataset.waSubmitting = String(this.pendingForms.size > 0)
+    frame.dataset.waSubmitting = String(this.pendingForms.size > 0 || Boolean(this.mutationRedirect))
   }
 
   async allowDeparture() {
