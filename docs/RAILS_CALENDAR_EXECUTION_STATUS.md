@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5a/b local candidate preflight and static build PASS
+
+- User terminal evidence: isolated review checkout `~/rails_calendar_c25a_ia_review_20261123`, clean at 83522ce5 before fetch, target 5e847e6c6fb7074c0d4eb88582d8b1712e8d42a6 verified descendant. Diff: 62 files, +772/-452; explicit infrastructure path diff empty (db, config, workflows, dependency manifests/locks and deployment/runtime files checked). Preflight PASS.
+- Detached checkout updated to exact 5e847e6. Ruby 3.4.13, Node 22.23.4, npm 10.9.9; all 17 changed Ruby files syntax OK, modal JS syntax PASS, npm run build PASS (556.3 KB JS, 1003.7 KB source map), npm run build:css PASS, clean final working tree. Listener check: 127.0.0.1:3003 PID 962459 and separate :3002 PID 45565. No explicit restart or database command performed. Listener presence is not HTTP or functional acceptance.
+- Next F2.5.5c: verify :3003 process working directory, touch only its tmp/restart.txt and smoke-test local GET, then manual owner modal navigation/dirty form/scroll/mobile acceptance without real writes or paid AI. CI remains a separate gate; do not deploy/merge or modify review/production DB. Local code stays pinned to 5e847e6; this ledger update is documentation only.
+
+
 ## 2026-11-25 — F2.5.4c.3 stabilization checkpoint / F2.5.5 verification gate
 
 - Exact historical HEAD 53521f85: Rails CI 45511882972 completed failure (520 runs, 8061 assertions, 1 failure, 0 errors/skips); PG18 schema and upgrade jobs passed; Security Audit 45511883407 passed. Failure was stale `.rc-page-hero__actions` selector in AccountCabinetsTest, corrected in dd4677c while retaining unique canonical service link assertion. Browser suite did not run after integration failure.
