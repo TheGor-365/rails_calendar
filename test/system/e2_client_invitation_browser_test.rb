@@ -142,4 +142,47 @@ class E2ClientInvitationBrowserTest < ApplicationSystemTestCase
   ensure
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
+
+  test "invitation overwrite uses explicit shared confirmation without paid generation" do
+    owner = make_test_owner("e2-overwrite-#{SecureRandom.hex(4)}@example.test")
+    approved_profile_for(owner)
+    visit sign_in_path
+    fill_in "Email address", with: owner.email
+    fill_in "Password", with: PASSWORD
+    click_button "Sign in"
+    assert_current_path workspace_path
+    visit owner_invitations_path
+
+    # Synthetic DOM-only draft; no provider or persisted AI entry.
+    page.execute_script(<<~JS)
+      const section = document.querySelector('[data-controller="wa-invitation-ai"]');
+      section.querySelector('[data-wa-invitation-ai-target="heading"]').textContent = "Synthetic heading";
+      section.querySelector('[data-wa-invitation-ai-target="draft"]').textContent = "Synthetic replacement description";
+      section.querySelector('[data-wa-invitation-ai-target="result"]').hidden = false;
+      section.querySelector('[data-wa-invitation-ai-target="apply"]').disabled = false;
+    JS
+    fill_in "proposal_seed_goal", with: "Original synthetic description"
+    find("[data-action='click->wa-invitation-ai#apply']").click
+    assert_selector "dialog.wa-confirm-dialog[open][data-wa-confirm-kind='overwrite']"
+    find("dialog.wa-confirm-dialog [data-wa-page-dialog-target='keepEditing']").click
+    assert_field "proposal_seed_goal", with: "Original synthetic description"
+    find("[data-action='click->wa-invitation-ai#apply']").click
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#confirmDiscard']").click
+    assert_field "proposal_seed_goal", with: "Synthetic replacement description"
+
+    fill_in "proposal_approved_client_preview", with: "Original synthetic preview"
+    find("#proposal_share_preview").check
+    find("[data-action='click->wa-invitation-ai#useClientPreview']").click
+    assert_selector "dialog.wa-confirm-dialog[open][data-wa-confirm-kind='overwrite']"
+    find("dialog.wa-confirm-dialog [data-wa-page-dialog-target='keepEditing']").click
+    assert_field "proposal_approved_client_preview", with: "Original synthetic preview"
+    assert_checked_field "proposal_share_preview"
+    find("[data-action='click->wa-invitation-ai#useClientPreview']").click
+    find("dialog.wa-confirm-dialog [data-action='wa-page-dialog#confirmDiscard']").click
+    assert_field "proposal_approved_client_preview", with: /Synthetic replacement description/
+    assert_unchecked_field "proposal_share_preview"
+    assert_equal 0, AiSpendEntry.count
+    assert_equal 0, ClientRequestInvitation.count
+  end
+
 end
