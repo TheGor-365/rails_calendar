@@ -132,6 +132,56 @@ class OwnerContextualDialogTest < ApplicationSystemTestCase
     assert_current_path owner_cabinet_path
   end
 
+
+  test "interview menu switches do not add contextual breadcrumb levels" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("a.ws-account-tool[data-wa-page-dialog][href*='/workspace/setup']").click
+
+    %w[B C D E F B A].each do |step|
+      within_frame(find("iframe[data-wa-embedded-page]")) do
+        find("a.ws-owner-step[href*='step=#{step}']").click
+        assert_selector "a.ws-owner-step.is-active[href*='step=#{step}']"
+      end
+      assert_no_selector ".wa-page-dialog__trail", visible: true
+      assert_selector ".wa-page-dialog__back[disabled]"
+    end
+    assert_current_path owner_cabinet_path
+  end
+
+  test "interview retains one breadcrumb level when opened from practice" do
+    sign_in_owner
+    visit owner_cabinet_path
+    find("header[data-wa-banner='account'] a[data-wa-page-dialog][href='#{owner_practice_path}']").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-practice"
+      first("header[data-wa-banner] a[href*='/workspace/setup']").click
+      assert_selector "#owner-setup"
+      find("a.ws-owner-step[href*='step=C']").click
+      assert_selector "a.ws-owner-step.is-active[href*='step=C']"
+    end
+    assert_selector ".wa-page-dialog__trail button", count: 1
+    assert_selector ".wa-page-dialog__trail [aria-current='page']", count: 1
+    find(".wa-page-dialog__back").click
+    within_frame(find("iframe[data-wa-embedded-page]")) do
+      assert_selector "#owner-practice"
+    end
+    assert_no_selector ".wa-page-dialog__trail", visible: true
+  end
+
+  test "desktop cabinet cards share a top edge" do
+    sign_in_owner
+    page.current_window.resize_to(1440, 1000)
+    visit owner_cabinet_path
+    assert_selector "#owner-cabinet .ws-account-feature"
+    tops = page.evaluate_script(<<~JS)
+      [".wa-cabinet-rail", ".ws-account-feature", "#cabinet-privacy"].map(
+        selector => document.querySelector(selector).getBoundingClientRect().top
+      )
+    JS
+    assert_operator tops.max - tops.min, :<=, 2
+  end
+
   private
 
   def sign_in_owner
