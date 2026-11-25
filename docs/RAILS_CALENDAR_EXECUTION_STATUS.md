@@ -1,5 +1,11 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.1 branded close confirmation manual acceptance
+
+- Local functional SHA `4c3ccc9b420d25d73b9bdc913843018065ca148c`, review :3003. Screenshot confirms parent-owned White Atlas Russian unsaved-changes dialog, both actions and synthetic unsaved marker. User subsequently reports the requested cancel/retain and explicit discard/reopen scenario works. Record visual evidence plus user-reported behavioral PASS; no private profile text copied. Escape, keyboard focus, mobile, repeated navigation and exact-code CI remain separate verification gates.
+- NEXT F2.5.5f.2: shared confirmation adapter for nine inventoried application sites, preserving distinct overwrite/destructive/bulk/paid-consent semantics, native beforeunload and mock-only tests. Inspect existing Turbo/Stimulus hooks before edits; then scroll and viewport acceptance. No code, DB, production or paid AI changes in this checkpoint.
+
+
 ## 2026-11-25 — F2.5.5f.1 local branded confirmation build PASS / handoff
 
 - User terminal verifies guarded detached update to 4c3ccc9b420d25d73b9bdc913843018065ca148c, clean working tree, Ruby/JS syntax PASS, esbuild 557.8 KB, Sass PASS, guarded :3003 restart and HTTP 200. White Atlas confirmation runtime interaction not yet evidenced. Exact PR Rails CI 45518605913 and Security 45518605952 queued at inspection.
