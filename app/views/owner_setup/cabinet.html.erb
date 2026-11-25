@@ -98,11 +98,11 @@
       <a href="#cabinet-tools" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-grid-1x2" aria-hidden="true"></i><%= t("account_hub.rail_ai", default: "AI settings") %></a>
       <a href="#cabinet-privacy" data-wa-section-nav-target="link" data-action="click->wa-section-nav#activate"><i class="bi bi-shield-lock" aria-hidden="true"></i><%= t("account_hub.rail_data", default: "Data") %></a>
     </nav>
-    <section class="ws-account-main">
-      <div class="ws-account-section-heading" id="cabinet-profile">
-        <div><p class="eyebrow"><%= t("account_hub.profile_eyebrow") %></p><h2 class="visually-hidden"><%= t("account_hub.professional_profile") %></h2></div>
+    <div class="ws-account-section-heading ws-account-profile-heading" id="cabinet-profile">
+        <div><p class="eyebrow"><%= t("account_hub.profile_eyebrow") %></p><h2 id="cabinet-profile-title" class="visually-hidden"><%= t("account_hub.professional_profile") %></h2></div>
         <%= link_to rc_icon_label("arrow-up-right", t("account_hub.open_profile")), owner_practice_path, class: "rc-action rc-action--quiet rc-action--small", data: { wa_page_dialog: "frame" } %>
-      </div>
+    </div>
+    <section class="ws-account-main" aria-labelledby="cabinet-profile-title">
       <div class="ws-account-feature">
         <div class="ws-account-feature-icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></div>
         <div class="ws-account-feature-copy">
