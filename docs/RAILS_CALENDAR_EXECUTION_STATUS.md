@@ -1,5 +1,11 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.1 CI regression repair before shared adapter
+
+- Exact functional SHA 4c3ccc9: Rails CI #45518605913 FAILURE (521 runs, 8076 assertions, 1 failure, 0 errors/skips); PostgreSQL18 schema and upgrade jobs SUCCESS; Security Audit #45518605952 SUCCESS. System suite did not run. Job #138884416716 identifies stale redirect expectation at OwnerSetupControllerTest line 167: intentional invalid-answer HTTP 422 retention contract returns 422 instead of redirect.
+- Test-only correction `87cafc2396d22a66461fcea269c6cadd3ecb397a`: expect 422, same section form, retained synthetic notes, zero answers/revisions/snapshots. No controller/validation weakening. Exact corrected CI not yet verified; manual close acceptance unchanged. Shared adapter F2.5.5f.2 remains pending CI repair gate. Reviewed existing quiz before-visit/beforeunload, invitation overwrite handlers and parent confirmation lifecycle; no application code edits, local checkout changes, DB commands, provider requests or deployment.
+
+
 ## 2026-11-25 — F2.5.5f.1 branded close confirmation manual acceptance
 
 - Local functional SHA `4c3ccc9b420d25d73b9bdc913843018065ca148c`, review :3003. Screenshot confirms parent-owned White Atlas Russian unsaved-changes dialog, both actions and synthetic unsaved marker. User subsequently reports the requested cancel/retain and explicit discard/reopen scenario works. Record visual evidence plus user-reported behavioral PASS; no private profile text copied. Escape, keyboard focus, mobile, repeated navigation and exact-code CI remain separate verification gates.
