@@ -1,5 +1,11 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.2.2 invitation local smoke PASS
+
+- User terminal verifies exact local 8acb840, clean tree, guarded review PID 1182083 cwd, review-only restart trigger and GET HTTP 200. Independent :3002 PID 45565 unchanged; :3003 PID 1182083 still listening. Restart trigger/HTTP smoke evidenced, not independent proof of reload or new browser behavior. Exact candidate CI and Security already green (521 server + 69 browser tests).
+- NEXT direct local owner invitations page, synthetic DOM-only overwrite fixture as in E2ClientInvitationBrowserTest; cancel/approve description and preview, no paid generation or invitation issuance, reload discards fixture. Then quiz migration. No local DB commands, paid calls, real submissions, merge or production deployment.
+
+
 ## 2026-11-25 — F2.5.5f.2.2 invitation exact CI GREEN / local build PASS
 
 - Exact candidate `8acb84088161a255ba0a4ab56d99b97e233dac92`: Rails CI #45526625297 SUCCESS and Security #45526625195 SUCCESS; PG18 fresh schema and deployed-baseline upgrade SUCCESS. Test logs: 2026-11-25T01:35:18.8619986Z 521 runs, 8083 assertions, 0 failures, 0 errors, 0 skips; 2026-11-25T01:37:02.0752478Z 69 runs, 1122 assertions, 0 failures, 0 errors, 0 skips. Invitation overwrite cancel/approve, stale input and sharing-checkbox synthetic regression covered by green CI; no actual provider calls in that test.
