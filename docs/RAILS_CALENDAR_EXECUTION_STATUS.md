@@ -1,5 +1,11 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5c local smoke PASS / desktop visual QA corrections
+
+- User terminal: local review exact 5e847e6 clean; verified PID 962459 cwd, touched review tmp/restart.txt, GET / HTTP 200; :3003 PID 962459 and independent :3002 PID 45565 still listening. Screenshots confirm owner cabinet and interview, assistant and services displayed within single modal, parent cabinet URL unchanged. Interview switching produced up to six identical breadcrumbs; other section trail labels appeared distinct. Owner cabinet rail and privacy panel were below central feature card. No claim of full navigation, dirty form, scroll or mobile acceptance; no screenshot contents/private profile text copied.
+- 1c9dcd2 introduces separate modal history key for /workspace/setup steps, retaining exact page URL for stale checks, scroll and last visited step. Review and other distinct pages retain separate history keys. 58051f5 moves cabinet profile heading to independent grid item; 41afb26 removes hard-coded 60px offset and aligns cards on shared desktop row, keeps responsive order. eafb49e adds system tests for repeated interview menu switches, cross-section breadcrumb return and desktop card top alignment. JS controller parsed in isolated syntax check; new CI result not available at inspection, tests not executed. Local still 5e847e6 until safe update and asset rebuild. Next verify both fixes on :3003, then dirty form cancel/discard, scroll and mobile. No DB commands, paid AI or production deploy.
+
+
 ## 2026-11-25 — F2.5.5a/b local candidate preflight and static build PASS
 
 - User terminal evidence: isolated review checkout `~/rails_calendar_c25a_ia_review_20261123`, clean at 83522ce5 before fetch, target 5e847e6c6fb7074c0d4eb88582d8b1712e8d42a6 verified descendant. Diff: 62 files, +772/-452; explicit infrastructure path diff empty (db, config, workflows, dependency manifests/locks and deployment/runtime files checked). Preflight PASS.
