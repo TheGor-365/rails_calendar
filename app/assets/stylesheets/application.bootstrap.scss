@@ -1971,3 +1971,33 @@ html.wa-embedded-page { scrollbar-width:thin; scrollbar-color:#a7cdc5 #f4f8f8; }
 .wa-page-dialog__trail:not([hidden]) { display: flex; flex: 0 0 auto; align-items: center; gap: .4rem; overflow-x: auto; padding: .45rem .8rem; background: #edf8f6; border-bottom: 1px solid var(--rc-line); }
 .wa-page-dialog__crumb { flex: 0 0 auto; max-width: min(60vw, 22rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .75rem; color: var(--rc-accent); border: 1px solid var(--rc-line); background: var(--rc-paper); border-radius: .35rem; padding: .3rem .6rem; }
 .wa-page-dialog__crumb[aria-current="page"] { font-weight: 700; background: var(--rc-accent-wash); }
+
+
+// White Atlas confirmation: above the contextual work dialog, never another workspace.
+.wa-confirm-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: 0;
+  border: 1px solid var(--rc-line);
+  border-radius: 18px;
+  background: var(--rc-paper);
+  color: var(--rc-ink);
+  box-shadow: 0 24px 64px rgba(21, 43, 53, .24);
+}
+.wa-confirm-dialog::backdrop { background: rgba(23, 47, 49, .36); }
+.wa-confirm-dialog__body { padding: 1.4rem; }
+.wa-confirm-dialog__icon {
+  display: grid; place-items: center; width: 44px; height: 44px;
+  border-radius: 12px; background: #fff1df; color: #8c5319;
+  margin-bottom: 1rem; font-size: 1.2rem;
+}
+.wa-confirm-dialog h2 { font-size: 1.12rem; font-weight: 750; margin: 0 0 .5rem; }
+.wa-confirm-dialog p { color: var(--rc-muted); font-size: .9rem; line-height: 1.6; margin: 0 0 1.25rem; }
+.wa-confirm-dialog__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
+.wa-confirm-dialog__actions .rc-action { white-space: normal; min-height: 44px; }
+@media (max-width: 480px) {
+  .wa-confirm-dialog__body { padding: 1rem; }
+  .wa-confirm-dialog__actions { flex-direction: column; }
+  .wa-confirm-dialog__actions .rc-action { width: 100%; }
+}
