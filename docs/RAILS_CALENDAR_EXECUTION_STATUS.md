@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.2.1 manual Escape acceptance / F2.5.5f.2.2 invitation overwrite candidate
+
+- Local exact 6c09b96: screenshot and user confirmation show Escape cancels branded warning, parent modal remains open, synthetic WA_CORE_TEST_2511 retained and focus returns to close control. Exact core CI already green (521 server + 68 browser tests); core accepted for next integration. Explicit discard on this local candidate was not separately evidenced; earlier manual and exact automated discard coverage exists. No private profile text copied.
+- `22f1724b19b6dc17daf8138fd14f8c30e7bc03f4` replaces two native invitation overwrite confirms with shared async overwrite adapter, RU/EN/HY/ES copy, validates same connected form/field and unchanged input/candidate before write, preserves sharing checkbox on cancel and clears it only on approved preview replacement. No changes to generation/provider/submit paths. `76cf967` adds synthetic DOM-only browser coverage for cancel/approve both fields, sharing checkbox and zero AI spend/invitations; `8acb84088161a255ba0a4ab56d99b97e233dac92` adds stale-field approval rejection. Tests authored, not executed; exact candidate CI pending. Embedded iframe viewport and teardown edge cases remain to verify. Quiz native confirm and six Turbo sites untouched.
+- NEXT check exact invitation candidate CI/security, repair failures and verify local/embedded overwrite before migrating quiz navigation; retain native beforeunload. Local remains 6c09b96, :3003 last PID 1182083. No real writes, AI provider calls, migration, merge or production deploy.
+
+
 ## 2026-11-25 — F2.5.5f.2.1 core exact CI GREEN / local launch PASS
 
 - Exact candidate `6c09b96bb6924a4fe8e39575e650c61e3dd26349`: Rails CI #45524076439 SUCCESS and Security #45524077137 SUCCESS. Test log counts: 2026-11-25T01:25:08.6581081Z 521 runs, 8083 assertions, 0 failures, 0 errors, 0 skips; 2026-11-25T01:26:36.1306177Z 68 runs, 1108 assertions, 0 failures, 0 errors, 0 skips. PG18 jobs passed. All authored core lifecycle system regressions now covered by green CI.
