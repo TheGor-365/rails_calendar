@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5f.1 local branded confirmation build PASS / handoff
+
+- User terminal verifies guarded detached update to 4c3ccc9b420d25d73b9bdc913843018065ca148c, clean working tree, Ruby/JS syntax PASS, esbuild 557.8 KB, Sass PASS, guarded :3003 restart and HTTP 200. White Atlas confirmation runtime interaction not yet evidenced. Exact PR Rails CI 45518605913 and Security 45518605952 queued at inspection.
+- User git grep inventory: quiz_live_controller native confirm plus beforeunload registration/removal; wa_invitation_ai_controller two replacement confirms; six Turbo confirmation sites: consultation destroy, assistant paid consent, conversation remove, catalogue apply-all, service finalize-all, media archive. Nine application confirmation sites total; retain native beforeunload where required. Next verify branded guard, then shared confirmation adapter with distinct destructive/overwrite/paid/bulk semantics and mock-only tests, followed by scroll/mobile/ACL and exact CI acceptance.
+- Handoff follows PRODUCT-FIRST plan, original MVP roadmap and White Atlas contract; F2.6a email composer, F2.6b AI interview/versioned FAQ/pricing, F2.6c downloadable artifacts, F2.6d selected document access; F2.2/F2.3 commercial funnel, F3/C2.4 proposals, F4/E2.4-E2.5 dual approval, F5/M6-M7 delivery, M8 release. R1A PR82 independent gate. Local stays 4c3ccc9. No code changes, production deploy, DB commands or paid calls in this checkpoint.
+
+
 ## 2026-11-25 — F2.5.5f native dirty guard user PASS / White Atlas confirmation pilot
 
 - User confirms dirty-form guard works on local b842452 and requests branded warnings instead of browser confirmation. Screenshot shows synthetic unsaved marker; native dialog itself not captured. Record user-reported PASS for tested guard, not all mutation/navigation paths. No private form contents copied.
