@@ -470,12 +470,15 @@ class ConsultationsTest < ApplicationSystemTestCase
       assert_field "End time", with: /2026-11-06T10:00/
 
       fill_in "Title", with: "Project kickoff"
+      assert_equal "true", page.evaluate_script("window.frameElement.dataset.waDirty")
       click_on "Create Consultation"
       assert_text "Consultation was successfully created"
       assert_text "Project kickoff"
+      assert_no_selector "form.consultation-form"
+      assert_equal "false", page.evaluate_script("window.frameElement.dataset.waDirty")
     end
     assert_current_path calendar_day_path(date: "2026-11-06")
-    assert Consultation.exists?(title: "Project kickoff")
+    assert_equal 1, Consultation.where(title: "Project kickoff").count
   end
 
   private
