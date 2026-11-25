@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { confirmationPending, requestConfirmation } from "../lib/wa_confirmation"
 
 // E2 owner-only, consent-gated AI: generate -> review stored draft -> explicit apply.
 // Never sends requests on connect or on option selection. Text is rendered safely.
@@ -86,7 +87,7 @@ export default class extends Controller {
     node.hidden = node.childElementCount === 0
   }
 
-  apply(event) {
+  async apply(event) {
     event.preventDefault()
     const form = this.element.closest("form")
     const input = form?.querySelector("#proposal_seed_goal")
@@ -96,8 +97,11 @@ export default class extends Controller {
       this.notify(this.element.dataset.tooLong || "AI text exceeds the field limit. Review the saved draft.", true)
       return
     }
-    if (input.value.trim() && !window.confirm(this.element.dataset.replaceConfirm ||
-        "Replace the current description? The existing text will be overwritten in this form.")) return
+    const previous = input.value
+    const current = () => this.element.isConnected && input.isConnected &&
+      this.element.closest("form") === form && form.querySelector("#proposal_seed_goal") === input &&
+      input.value === previous && this.hasDraftTarget && this.draftTarget.textContent.trim() === text
+    if (!(await this.allowReplacement(previous, current)) || !current()) return
     input.value = text
     input.dataset.waGenerated = "false"
     input.dispatchEvent(new Event("input", { bubbles: true }))
@@ -105,29 +109,57 @@ export default class extends Controller {
     input.focus()
   }
 
-  useClientPreview(event) {
+  async useClientPreview(event) {
     event.preventDefault()
     const form = this.element.closest("form")
     const field = form?.querySelector("#proposal_approved_client_preview")
     const check = form?.querySelector("#proposal_share_preview")
     if (!field || !check) return
-    const heading = this.headingTarget.textContent.trim()
-    const draft = this.draftTarget.textContent.trim()
-    const questions = Array.from(this.questionsTarget.children).map(node => node.textContent.trim())
-    const proposal = [heading, draft, ...questions.map((q, i) => `${i + 1}. ${q}`)].filter(Boolean).join("\n\n")
+    const proposal = this.previewText()
     if (proposal.length > 1200) {
       this.notify(this.element.dataset.tooLong || "Reduce the AI result to 1200 characters first.", true)
       field.focus()
       return
     }
-    if (field.value.trim() && !window.confirm(this.element.dataset.replaceConfirm ||
-        "Replace the client preview with this reviewed AI text?")) return
+    const previous = field.value
+    const previousConsent = check.checked
+    const current = () => this.element.isConnected && field.isConnected && check.isConnected &&
+      this.element.closest("form") === form &&
+      form.querySelector("#proposal_approved_client_preview") === field &&
+      form.querySelector("#proposal_share_preview") === check &&
+      field.value === previous && check.checked === previousConsent && this.previewText() === proposal
+    if (!(await this.allowReplacement(previous, current)) || !current()) return
     field.value = proposal
     field.dispatchEvent(new Event("input", { bubbles: true }))
     // A separate explicit checkbox is required before the text is shared.
     check.checked = false
     field.focus()
     this.notify(this.element.dataset.previewReady || "Review this preview and check the sharing confirmation.", false)
+  }
+
+  previewText() {
+    if (!this.hasHeadingTarget || !this.hasDraftTarget || !this.hasQuestionsTarget) return ""
+    const heading = this.headingTarget.textContent.trim()
+    const draft = this.draftTarget.textContent.trim()
+    const questions = Array.from(this.questionsTarget.children).map(node => node.textContent.trim())
+    return [heading, draft, ...questions.map((q, i) => `${i + 1}. ${q}`)].filter(Boolean).join("\n\n")
+  }
+
+  async allowReplacement(previous, current) {
+    const doc = this.element.ownerDocument
+    if (confirmationPending(doc) || !current()) return false
+    if (!previous.trim()) return true
+    const copy = {
+      ru: ["Заменить текст?", "Отмена", "Заменить"],
+      en: ["Replace text?", "Cancel", "Replace"],
+      hy: ["Փոխարինե՞լ տեքստը։", "Չեղարկել", "Փոխարինել"],
+      es: ["¿Reemplazar el texto?", "Cancelar", "Reemplazar"]
+    }[doc.documentElement.lang] || ["Replace text?", "Cancel", "Replace"]
+    return requestConfirmation(doc, {
+      kind: "overwrite", title: copy[0],
+      message: this.element.dataset.replaceConfirm,
+      cancel: copy[1], approve: copy[2], isCurrent: current
+    })
   }
 
   notify(message, error) {
