@@ -164,7 +164,11 @@ class OwnerSetupControllerTest < ActionDispatch::IntegrationTest
     patch owner_setup_section_path(section_key: "B"), params: {
       owner_answer: { selected_options: ["invented_technology"], notes: "No", unsure: "0" }
     }
-    assert_redirected_to owner_setup_path(step: "B")
+    assert_response :unprocessable_entity
+    assert_select "form[action=?]", owner_setup_section_path(section_key: "B")
+    assert_select "textarea[name='owner_answer[notes]']", text: "No"
     assert_equal 0, OwnerInterviewAnswer.count
+    assert_equal 0, OwnerInterviewAnswerRevision.count
+    assert_equal 0, ProfessionalContextSnapshot.count
   end
 end
