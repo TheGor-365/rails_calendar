@@ -1,5 +1,12 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5 candidate local preflight PASS
+
+- User terminal confirms isolated review checkout `~/rails_calendar_c25a_ia_review_20261123` clean at `4c3ccc9`, candidate `f8688dc` fetched and verified descendant/reachable from branch; six changed files, +115/-5, infrastructure guard empty. Initial ASDF shim failure diagnosed as unavailable `~/.local/bin/asdf` on PATH; temporary session PATH correction restores ASDF 0.18.0, Ruby 3.4.13, Node 25.2.1, npm 11.6.2, Bundler 2.6.9. Earlier listener evidence :3003 PID 962459 and independent :3002 PID 45565, review HTTP 200 at previous code. No persistent environment modification.
+- Exact candidate f8688dc Rails CI #45521955702 in progress: PG18 fresh schema and deployed-baseline upgrade SUCCESS, test job running; Security #45521955745 queued at inspection. No final green gate.
+- NEXT user guarded detached switch to f8688dc, Ruby/JS syntax and asset builds, then verify review PID/cwd and restart only :3003, read-only local smoke. Checkout update/build not yet evidenced. No DB commands, real consultation creation, paid AI, production or deployment. Adapter implementation remains gated on corrected CI.
+
+
 ## 2026-11-25 — F2.5.5 browser regression repair candidate / adapter gate remains pending
 
 - Exact test-correction SHA 87cafc2: Security #45520914108 SUCCESS; Rails CI #45520914113 FAILURE in Chrome system suite (64 runs, 1033 assertions, 2 failures, 0 errors/skips). Model/controller 521 runs, 8083 assertions, zero failures/errors/skips; PG18 fresh schema and deployed-baseline upgrade SUCCESS. Failed system cases: sticky Requests hub banner selector (line 68) and admin manual consultation from selected calendar interval (line 474; remains on form instead of committed notice). Other system cases passed; branded discard manual acceptance remains valid.
