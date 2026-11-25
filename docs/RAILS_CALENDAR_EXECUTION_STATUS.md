@@ -1,5 +1,11 @@
 # Rails Calendar — execution status / single entrypoint for next chat
 
+## 2026-11-25 — F2.5.5d desktop visual correction recheck
+
+- User terminal confirms exact detached review HEAD b8424522ad1696aaceed5cccb50488d1a566a63f, infrastructure guard passed, system test Ruby syntax and modal JS syntax passed, esbuild (556.7 KB JS) and Sass build passed, guarded review restart and HTTP 200, clean working tree. Screenshots confirm desktop cabinet navigation, profile feature and privacy cards share a top edge; interview step C shows no duplicate breadcrumb strip and disabled global back when opened from cabinet. Parent URL remains /workspace/cabinet. Desktop reported defects corrected in observed states; exhaustive repeated switching, cross-section return and automated system tests not independently confirmed.
+- Next F2.5.5f: unsaved input guard manual test using synthetic text only, cancel close, verify text remains, then explicitly discard; do not submit changes or invoke AI. Then scroll recovery and mobile 320/390 QA. CI/security remain separate gates; no production deployment, merge or DB operations. Local candidate remains b842452; this checkpoint is docs only.
+
+
 ## 2026-11-25 — F2.5.5c local smoke PASS / desktop visual QA corrections
 
 - User terminal: local review exact 5e847e6 clean; verified PID 962459 cwd, touched review tmp/restart.txt, GET / HTTP 200; :3003 PID 962459 and independent :3002 PID 45565 still listening. Screenshots confirm owner cabinet and interview, assistant and services displayed within single modal, parent cabinet URL unchanged. Interview switching produced up to six identical breadcrumbs; other section trail labels appeared distinct. Owner cabinet rail and privacy panel were below central feature card. No claim of full navigation, dirty form, scroll or mobile acceptance; no screenshot contents/private profile text copied.
